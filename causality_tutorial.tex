@@ -37,7 +37,7 @@
 \section{Why is causality important}
 
 \section{Models of causality}
-To understand causality we first need a more formal definition of what we are talking about. In this post we will look at three slightly different definitions of causality and use them to describe the following very simple example. This section aims to demonstrate the notations and formalisms we will need to tackle more interesting problems later on.
+To understand causality we first need a more formal definition of what we are talking about. In this section we will look at three slightly different definitions of causality and use them to describe the following very simple example. The aim is to demonstrate the notations and formalisms we will need to tackle more interesting problems later on.
 
 We have developed a new drug for some illness and wish to determine how effective it is. We take a large group of patients and randomly assign half of them to a treatment group and the other half to a control group. The people in the treatment group get the drug, everyone else gets a placebo pill. The question we want to answer is does giving people the active drug improve their changes of recovery relative to giving them the placebo. We will use the variable $X$ (1 = drug, 0 = placebo) to represent the treatment each person receives and $Y$ (1 = recover, 0 = not recover) to describe the outcome .
 \subsection{Structural Equation Models}
@@ -46,7 +46,8 @@ Structural equation models (SEMs) describe a deterministic world, where underlyi
 
 Mathematically, each variable is a deterministic function of its direct causes and a noise term that captures unmeasured variables. The noise terms are required to be mutually independent. If there is the possibility that an unmeasured variable influences more than one variable of interest in a study, it must be modelled explicitly as a latent (unobserved) variable. Structural equation models can be represented visually as a network. Each variable is a node and arrows are drawn from causes to their effects. For our example the SEM is:
 
-\[
+\begin{equation}
+\label{eq:SEM}
 \begin {aligned}
 X = & \epsilon_{x} \\
 Y = & f(X,\epsilon_{y})
@@ -67,23 +68,23 @@ Y = & f(X,\epsilon_{y})
 	
 \end{tikzpicture}
 }
-\]
+\end{equation}
 
 This model encodes the assumption that the outcome $y_{i}$ for an individual $i$ is caused solely by the treatment $x_{i}$ they receive and other factors $\epsilon_{y_{i}}$ that are independent of $X$. This is justifiable on the grounds that $X$ is random; the outcome of a coin flip for each patient should not be related to any of their characteristics (hidden or otherwise). 
 
-We want to estimate the causal effect of treatment; what is the probability of recovery if we \textbf{take the action} 'treat' versus the \textbf{action} 'placebo'? 
 
+The probability of observing $Y$ given $X$, $P(Y = y|X = x) = P(f(x,\epsilon_{y})=y)$ where $\epsilon_{y} ~ P(\epsilon_{y})$ as $\epsilon_{y} \ci \epsilon{x}$  
 
+ 
 
-CONSIDER SOLVING THIS JUST FROM THE FUNCTIONAL POINT OF VIEW. MOVE THE DO NOTATION DOWN TO CAUSAL BAYES NETS.
-
+We want to estimate the causal effect of treatment; what is the probability of recovery if we \textbf{take the action} 'treat' versus the \textbf{action} 'placebo'? Taking the action 'treat'  corresponds to replacing the equation $X = \epsilon_{x}$ with $X=1$. The probability distribution over $Y$ given we set $X=1$ is then $P(Y = y|do(X=1)) = P(f(1,\epsilon_{y})=y)$, where we have introduced the $do$ notation to distinguish setting a variable from observing it \cite{Pearl1995}. However, for this model,  The probability of observing $Y$ given $X=1$, $P(Y = y|X = 1)$ is also given by $P(f(1,\epsilon_{y})=y)$ because $\epsilon_{y} \ci \epsilon{x}$. The causal effect is exactly the difference in observed outcomes, as we would intuitively expect for a randomized experiment. 
 
 
 
 For a model with $N$ variables, a structural equation model looks like a set of $N$ simultaneous equations, with each variable playing the role of the dependent (left hand side) variable in one equation. However a SEM is, by definition, more than a set of simultaneous equations. By declaring it to be structural we are saying that it represents assumptions about the relationships between variables. When we visualise the model as a network the absence of an arrow between two variables encodes the assumption that one does not cause the other.
 
 \subsection{Causal Bayesian Networks}
-Causal Bayesian Networks are, unsurprisingly, an extension of Bayesian Networks. Any joint probability distribution can be factorized into a product of conditional probabilities. There are multiple valid factorizations, corresponding to permutations of variable ordering.
+Causal Bayesian Networks are, unsurprisingly, an extension of Bayesian networks. Any joint probability distribution can be factorized into a product of conditional probabilities. There are multiple valid factorizations, corresponding to permutations of variable ordering.
 
 \begin{equation}
 P(X_{1},X_{2},X_{3},...)=P(X_{1})P(X_{2}|X_{1})P(X_{3}|X_{1},X_{2})...
@@ -93,7 +94,7 @@ We can represent this graphically by drawing a network with a node for each vari
 
 \begin{figure}[h]
 \centering
-\caption{General Bayesian Network over 3 variables}
+\caption{General Bayesian network over 3 variables}
 \label{fig:bayesnet}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={punkt}]
@@ -118,15 +119,16 @@ The statement that a given graph $G$ is a Bayesian network for a distribution $P
 P(X_{1}...X_{N}) = \prod_{i = 1...N}P(X_{i}|parents_{X_{i}})
 \end{equation}
 
-A CBN is a Bayesian network in which it a link $X_{i} \rightarrow X_{j}$, by definition, implies $X_{i}$ causes $X_{j}$. This means that if we intervene and change the value of $X_{i}$, we expect $X_{j}$ to change, but if we intervene to change $X_{j}$, $X_{i}$ will not change. More generally, if $G$ is a causal network for a distribution $P$ defined over variables $X_{1}...X_{N}$, then we can calculate the distribution after an intervention where we set $Z \subset X$ to $z$, denoted $do(Z=z)$ by simply dropping the terms for each of the variables in $Z$ from the factorization given by the network \cite{Pearl2000}.
+A causal Bayesian network is a Bayesian network in which it a link $X_{i} \rightarrow X_{j}$, by definition, implies $X_{i}$ causes $X_{j}$. This means that if we intervene and change the value of $X_{i}$, we expect $X_{j}$ to change, but if we intervene to change $X_{j}$, $X_{i}$ will not change. More generally, if $G$ is a causal network for a distribution $P$ defined over variables $X_{1}...X_{N}$, then we can calculate the distribution after an intervention where we set $Z \subset X$ to $z$, denoted $do(Z=z)$ by simply dropping the terms for each of the variables in $Z$ from the factorization given by the network. This is referred to as the truncated product formula \cite{Pearl2000}.
 
-\[
+\begin{equation}
+\label{eq:truncatedproduct}
  P_{do(Z=z)}(X_{1}...X_{N}) =
   \begin{cases}
-  \prod_{i \notin Z}P(X_{i}|parents_{X_{i}}) & \text{$X_{1}...X_{N}$ consistant with $Z=z$}  \\
+  \prod_{i \notin Z}P(X_{i}|parents_{X_{i}}) & \text{if $(X_{1}...X_{N})$ consistant with $Z=z$}  \\
    0       & \text{otherwise } 
   \end{cases}
-\]
+\end{equation}
 
 
 Causal Bayesian networks encode information on all interventional distributions over a set of variables. A causal network represents (much) more information than a Bayesian network with identical structure due to the assumption that links can be interpreted causally. Causal Bayesian networks are Bayesian networks so results that apply to Bayesian networks carry directly across;the local markov property states that variables are independent of their non-effects given their direct causes. Similarly the global markov property and d-separation also hold in causal networks. There is an algorithm \cite{Shpitser2012} based on these properties that, for a given network and interventional (do-type) query, can:
@@ -135,17 +137,7 @@ a) determine if the query can be translated into an expression involving only di
 
 b) if it is identiable, return the required expression
 
-
-
-Returning at last to our simple example, and phrasing our query in terms of interventions; what would the distribution of outcomes look like if everyone was treated $P(Y|do(X=1))$, relative to if no one was treated $P(Y|do(X=0))$? 
-
-assume the network has the same form as 
-
-
-
-We have adopted the do-notation, \cite{Pearl1995}, to distinguish the act of intervening to force X to a given value, from observing it to be that value. In our simple example $P(Y|do(X)) = P(Y|X)$. More generally, for a given SEM and interventional query, there is an algorithm  that can:
-
-
+Returning at last to our simple example, and phrasing our query in terms of interventions; what would the distribution of outcomes look like if everyone was treated $P(Y|do(X=1))$, relative to if no one was treated $P(Y|do(X=0))$? If we assume that $X$ causes $Y$ and there are no common causes then the causal Bayesian network is just $X \rightarrow Y$, the same structure as the network for the SEM specified by equation (\ref{eq:SEM}). This network represents the (causal) factorization  $P(X,Y) = P(X)P(Y|X)$, so from equation (\ref{eq:truncatedproduct}), $P(Y|do(X)) = P(Y|X)$. In this example, the interventional distribution is equivelent to the observational one as we found earlier using the structural equation model. 
 
 \subsection{Counterfactuals and the Neyman-Rubin framework}
 
@@ -175,41 +167,106 @@ P(Y^{0}) &= P(Y^{0}|X=0) = P(Y|X=0)
 \implies P(Y^{1})-P(Y^{0}) = P(Y|X=1) - P(Y|X=0)
 \end{equation}
 
-The assumptions $X \ci Y^{1}$ and $X \ci Y^{0}$  are referred to as ignoreability assumptions \cite{}. They state that the treatment a each person receives is independent of whether they would recover if treated and if they would recover if not treated. Again this is justified in our example due to the randomization of treatment assignment. In general these assumption do not hold. If people were deciding whether or not to buy the treatment, rather than it being randomly assigned, there could be a variable, for example income, that influenced both the decision to get treatment and the likelyhood of recovery given treatment or placebo.
+The assumptions $X \ci Y^{1}$ and $X \ci Y^{0}$  are referred to as ignoreability assumptions \cite{Rosenbaum1983}. They state that the treatment a each person receives is independent of whether they would recover if treated and if they would recover if not treated. Again this is justified in our example due to the randomization of treatment assignment. In general these assumption do not hold. If people were deciding whether or not to buy the treatment, rather than it being randomly assigned, there could be a variable, for example income, that influenced both the decision to get treatment and the likelyhood of recovery given treatment or placebo.
 
 
 
 \subsection{Tying it all together. How do these models relate?}
-acyclic SEMs are valid Causal Bayesian Networks so everything that applies to them also applies to SEMs.
 
-There is a direct relationship between these ignoreability assumptions and the functional or graphical assumptions encoded by SEM and Causal Bayesian Networks.  
+Remarkably for models developed relatively independently in fields with very different approaches and problems, the models we have discussed are definitionally (almost) equivalent. 
 
-Ignoreability holds when do seperation is valid.
+If the network for a structural equation model is acyclic, that is if starting from any node and following edges in the direction of the arrows you cannot return to the starting point, then it implies a recursive factorization of the joint distribution over its variables. In other words, the network is a causal Bayesian network. All of the results that apply to causal Bayesian networks also apply to acyclic structural equation models.  Taking an action that sets a variable to a specific value equates to replacing the equation for that variable with a constant. This corresponds to dropping a term in the factorization and the truncated product formula (equation \ref{eq:truncatedproduct}). Thus, the interventional query $P(Y|do(X))$ is identical in these two frameworks. We can also connect this to counterfactuals via:
 
-Lets link together the notation for SEMs and Counterfactuals here... 
+\begin{equation}
+\begin{aligned}
+&Y^{0} \equiv P(Y|do(X=0)) \\
+&Y^{1} \equiv P(Y|do(X=1))
+\end{aligned}
+\end{equation}
 
-counterfactuals are defined for SEMs and the Rubin-Neyman model but not for causal bayesian networks
+The assumption $\epsilon_{X} \ci \epsilon_{Y}$, stated for our structural equation model, translates to $X \ci (Y^{0},Y^{1})$ in the language of counterfactuals. When discussing the counterfactual model, we actually made the slightly weaker assumption:
 
-We can break the patients down into four groups. The first group will recover whether or not they receive treatment, the second group will recover if treated but not on the placebo, the third group will recover on the placebo and not if treated, and the last group will not recover on treatment or placebo. Unfortunately, the researches don't know which group each person belongs to. Drawing this up as a table:
+\begin{equation}
+\label{eq:weakignore}
+X \ci Y^{0} \text{ and } X \ci Y^{1}
+\end{equation}
+
+It is possible to relax the independence of errors assumption we made for SEMs slightly to correspond exactly the form of equation (\ref{eq:weakignore}) without losing any of the power provided by d-separation and graphical identification rules \cite{Richardson2013}. To determine if and how an interventional query can be non-parametrically identified, it is equivalent to specify assumptions graphically in terms of functional models or bayesian networks or as conditional independence statements involving counterfactual variables (ignorability assumptions). By non-parametrically, I mean that we are not making any assumptions about the form of the relationships between variables. Models that are not non-parametrically identifiable can still be identified given assumptions about the distributions of variables and the functional relationship between them, for example, that the functions are linear or that the noise is additive \cite{Peters2014}. This form of assumption fits extremely naturally into the structural equation framework. 
+
+We can also pose causal queries that are not interventional and cannot be phrased in terms of the do-notation. Our patients can be broken down into four groups. The first group will recover whether or not they receive treatment, the second group will recover if treated but not on the placebo, the third group will recover on the placebo and not if treated, and the last group will not recover on treatment or placebo. Unfortunately, we don't know which group each person belongs to. Drawing this up as a table:
 
 \begin{tabular}{c|c|c|c}
-group & treatment & placebo & probability of group\\
+group & placebo & treatment & probability of group\\
 \hline
-1 & recover & recover & $P(Y^{1}=1,Y^{0}=1)$\\
-2 & recover & die & $P(Y^{1}=1,Y^{0}=0)$\\
-3 & die & recover & $P(Y^{1}=0,Y^{0}=1)$\\
-4 & die & die & $P(Y^{1}=0,Y^{0}=0)$\\
+1 & die & die & $\alpha=P(Y^{0}=0,Y^{1}=0)$\\
+2 & die & recover & $\beta=P(Y^{0}=0,Y^{1}=1)$\\
+3 & recover & die & $\gamma=P(Y^{0}=1,Y^{1}=0)$\\
+4 & recover & recover & $\delta=P(Y^{0}=1,Y^{1}=1)$\\
 \end{tabular}
 
+The queries we have been asking thus far are about $P(Y^{0}=1) = \gamma + \delta$ and $P(Y^{1}=1) = \beta + \delta$, but suppose we asked the question; what is the probability that this patient, who was not treated and died, would have recovered if they had been treated? We know they are in either group 1 or 2 since they died without treatment, so the answer is $\frac{\beta}{\alpha+\beta}$. Can we estimate the $\alpha, \beta, \gamma, \delta$ or in other words, identify the joint distribution over the counterfactuals $P(Y^{0},Y^{1})$ given the interventional distributions, $P(Y^{0})$ and $P(Y^{1})$? The answer is no, putting our constraints and unknowns in matrix form:
 
-This difference does not result in different conclusions for interventional queries but there are subtle difference with regard to counterfactual queries, for example mediation. 
+\begin{equation}
+\left(
+\begin{array}{cccc}
+0&0&1&1\\
+1&1&0&0\\
+0&1&0&1\\
+1&0&1&0\\
+1&1&1&1\\
+\end{array}
+\right)
+\left(
+\begin{array}{c}
+\alpha\\
+\beta\\
+\gamma\\
+\delta\\
+\end{array}
+\right)= 
+\left(
+\begin{array}{c}
+P(Y^{0})\\
+1-P(Y^{0})\\
+P(Y^{1})\\
+1-P(Y^{1})\\
+1\\
+\end{array}
+\right)
+\implies
+\left(
+\begin{array}{c}
+\alpha\\
+\beta\\
+\gamma\\
+\delta\\
+\end{array}
+\right)=
+\left(
+\begin{array}{c}
+1-P(Y^{0})-P(Y^{1})+\delta\\
+P(Y^{1})-\delta\\
+P(Y^{0})-\delta\\
+\delta\\
+\end{array}
+\right)
+\end{equation}
+The value of $\delta$ is not determined so the query is not identifiable. However we do get bounds on the terms. Since probabilities cannot be negative, $P(Y{1})-P(Y^{0})-1 \leq \delta \leq min(P(Y^{1}),P(Y^{0})$. Note, if we made the additional assumption $gamma=0$; that the drug did not cause anyone to die who would otherwise have survived, then we can determine the joint distribution over counterfactuals. Alternatively, if we could assume that after treatment people returned to their initial state after some period of time, (say we were testing a drug for acne) then we could run a crossover study to determine the joint distribution. In a crossover study, the participants are randomly assigned to treatment and placebo, results are measured and then the groups are swapped. The scientific and philosophical validity of counterfactual queries remains under question \cite{Dawid2000,Dawid2014}, however they are nonetheless widely posed in the form of attribution of causal effects to different pathways and mediation \cite{Pearl2014,Imai2010a,VanderWeele2011}. 
+
+There are differences between the models we have considered when it comes to counterfactual queries. Counterfactuals are not defined in causal Bayesian networks, as they only encode information on the interventional distribution over variables.  Counterfactuals can be defined in terms of structural equation models \cite{Pearl2000} but there are subtle differences depending on the form of assumptions made. Structural equation models with independent errors allows the identification of quantities in mediation studies, which are not identifiable with the weak ignorability assumptions and cannot be tested experimentally \cite{Richardson2013}.  
+
+In practice, differences in focus and approach across different fields eclipse these actual differences in the models. The work on causal graphical models \cite{Pearl2000,Sprites} focuses on non-parametric estimation in the population limit and rigorous theoretical foundations. The Neyman-Rubin framework builds on our understanding of randomized experiment and generalizes to quasi-exeperimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimating average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \cite{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data so as to support policy decisions is central to the field. Economists are often interested in broader measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \cite{Heckman2008}. 
+
+The equivalence between models for interventional queries allows researchers to combine the best aspects of all of these models. You can define your assumptions and determine which variables must be controlled for using a graphical model and apply propensity scores to make the adjustment. If non-parametric assumptions are insufficient for identification or lead to overly large uncertainties, you can specify additional assumptions by phrasing your model in terms of structural equations. 
 
 
 \section{The Do Calculus}
+The do calculus provides the algorithm that determines if and how a given set of assumptions is sufficient to make an interventional query non-parametrically identifiable. 
+
 \subsection{Independence in graphical models: D-separation}
 
 \subsection{The three rules}
-The cool thing is they are complete. For a given SEM, a do query is non-parametrically identifiable if and only if it can be transformed to do-less statement via repeated application of these three rules. 
+The cool thing is they are complete. For a given causal network, a do-query is non-parametrically identifiable if and only if it can be transformed to do-less statement via repeated application of these three rules. 
 \subsubsection{Rule 1}
 D-separation still applies
 
@@ -254,7 +311,7 @@ P(Y|do(X=x)) = P(Y)
 \end{equation}
 
 \subsection{Easy graphical tests for identifiability}
-The completeness of these rules does not make them easy to apply. There are some quick graphical tests that are sufficient (but not necessary) for non-parametric identifiability. 
+The completeness of these rules does not make them easy to apply. There are some quick graphical tests that are sufficient (and almost necessary) for non-parametric identifiability. 
 
 \subsubsection{If all variables are observed}
 All interventional queries are identifiable. Just condition on the parents.
@@ -264,6 +321,9 @@ The back door criterion nicely aligns to answer the problem, when can you calcul
 
 \subsubsection{The Front Door Criterion}
 Allows for identification of causal effects via sequentially identifying other causal effects.
+
+\subsubsection{Examples}
+Show how we can represent all kinds specific biases and their solutions graphically and that the solution matches that given by do-calculus. 
 
 \section{It's not (non-parametrically) identifiable! What can I do?}
 \subsection{Bounding causal effects}
