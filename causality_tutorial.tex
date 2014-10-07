@@ -8,6 +8,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
 \usetikzlibrary{arrows,positioning} 
+\usepackage{subcaption}
 \tikzset{
     %Define standard arrow tip
     >=stealth',
@@ -15,12 +16,27 @@
     punkt/.style={
            circle,
            rounded corners,
-           draw=black, very thick,
-           text width=2.5em,
-           minimum height=2em,
+           draw=black, thick,
+           text width=1em,
+           minimum height=1em,
            text centered},
+    punktrect/.style={
+    rectangle, 
+    rounded corners, 
+    % fill=black!10,
+    draw=black, thick,
+    minimum height=1em, 
+    text centered},
     % Define arrow style
-    pil/.style={
+    pil/.style={punktrect/.style={
+    rectangle, 
+    rounded corners, 
+    % fill=black!10,
+    draw=black, very thick,
+    text width=10em, 
+    minimum height=3em, 
+    text centered, 
+    on chain},
            ->,
            thick,
            shorten <=2pt,
@@ -36,7 +52,15 @@
 
 \section{Why is causality important}
 
+TODO
+
+(this section should include explanation of why correlation is not causation)
+
+There are two ways in which correlation is not causation. Firstly correlation may not be statistically significant, - ie not even a genuine association. secondly it can be significant but spurious. 
+
+
 \section{Models of causality}
+\label{sec:causalmodels}
 To understand causality we first need a more formal definition of what we are talking about. In this section we will look at three slightly different definitions of causality and use them to describe the following very simple example. The aim is to demonstrate the notations and formalisms we will need to tackle more interesting problems later on.
 
 We have developed a new drug for some illness and wish to determine how effective it is. We take a large group of patients and randomly assign half of them to a treatment group and the other half to a control group. The people in the treatment group get the drug, everyone else gets a placebo pill. The question we want to answer is does giving people the active drug improve their changes of recovery relative to giving them the placebo. We will use the variable $X$ (1 = drug, 0 = placebo) to represent the treatment each person receives and $Y$ (1 = recover, 0 = not recover) to describe the outcome .
@@ -77,11 +101,10 @@ The probability of observing $Y$ given $X$, $P(Y = y|X = x) = P(f(x,\epsilon_{y}
 
  
 
-We want to estimate the causal effect of treatment; what is the probability of recovery if we \textbf{take the action} 'treat' versus the \textbf{action} 'placebo'? Taking the action 'treat'  corresponds to replacing the equation $X = \epsilon_{x}$ with $X=1$. The probability distribution over $Y$ given we set $X=1$ is then $P(Y = y|do(X=1)) = P(f(1,\epsilon_{y})=y)$, where we have introduced the $do$ notation to distinguish setting a variable from observing it \cite{Pearl1995}. However, for this model,  The probability of observing $Y$ given $X=1$, $P(Y = y|X = 1)$ is also given by $P(f(1,\epsilon_{y})=y)$ because $\epsilon_{y} \ci \epsilon{x}$. The causal effect is exactly the difference in observed outcomes, as we would intuitively expect for a randomized experiment. 
-
-
+We want to estimate the causal effect of treatment; what is the probability of recovery if we \textbf{take the action} 'treat' versus the \textbf{action} 'placebo'? Taking the action 'treat'  corresponds to replacing the equation $X = \epsilon_{x}$ with $X=1$. The probability distribution over $Y$ given we set $X=1$ is then $P(Y = y|do(X=1)) = P(f(1,\epsilon_{y})=y)$, where we have introduced the $do$ notation to distinguish setting a variable from observing it \cite{Pearl1995}. However, for this model,  The probability of observing $Y$ given $X=1$, $P(Y = y|X = 1)$ is also given by $P(f(1,\epsilon_{y})=y)$ because $\epsilon_{y} \ci \epsilon{x}$. The causal effect is exactly the difference in observed outcomes, as we would intuitively expect for a randomized experiment. In this case, due to the assumption that $X \rightarrow Y$ and that there is no hidden common cause, correlation is causation.  
 
 For a model with $N$ variables, a structural equation model looks like a set of $N$ simultaneous equations, with each variable playing the role of the dependent (left hand side) variable in one equation. However a SEM is, by definition, more than a set of simultaneous equations. By declaring it to be structural we are saying that it represents assumptions about the relationships between variables. When we visualise the model as a network the absence of an arrow between two variables encodes the assumption that one does not cause the other.
+
 
 \subsection{Causal Bayesian Networks}
 Causal Bayesian Networks are, unsurprisingly, an extension of Bayesian networks. Any joint probability distribution can be factorized into a product of conditional probabilities. There are multiple valid factorizations, corresponding to permutations of variable ordering.
@@ -167,7 +190,7 @@ P(Y^{0}) &= P(Y^{0}|X=0) = P(Y|X=0)
 \implies P(Y^{1})-P(Y^{0}) = P(Y|X=1) - P(Y|X=0)
 \end{equation}
 
-The assumptions $X \ci Y^{1}$ and $X \ci Y^{0}$  are referred to as ignoreability assumptions \cite{Rosenbaum1983}. They state that the treatment a each person receives is independent of whether they would recover if treated and if they would recover if not treated. Again this is justified in our example due to the randomization of treatment assignment. In general these assumption do not hold. If people were deciding whether or not to buy the treatment, rather than it being randomly assigned, there could be a variable, for example income, that influenced both the decision to get treatment and the likelyhood of recovery given treatment or placebo.
+The assumptions $X \ci Y^{1}$ and $X \ci Y^{0}$  are referred to as ignoreability assumptions \cite{Rosenbaum1983}. They state that the treatment a each person receives is independent of whether they would recover if treated and if they would recover if not treated. Again this is justified in our example due to the randomization of treatment assignment. In general these assumption do not hold. If people were deciding whether or not to buy the treatment, rather than it being randomly assigned, there could be a variable, for example income,D-separation still applies in the augmented model. that influenced both the decision to get treatment and the likelyhood of recovery given treatment or placebo.
 
 
 
@@ -204,7 +227,7 @@ group & placebo & treatment & probability of group\\
 4 & recover & recover & $\delta=P(Y^{0}=1,Y^{1}=1)$\\
 \end{tabular}
 
-The queries we have been asking thus far are about $P(Y^{0}=1) = \gamma + \delta$ and $P(Y^{1}=1) = \beta + \delta$, but suppose we asked the question; what is the probability that this patient, who was not treated and died, would have recovered if they had been treated? We know they are in either group 1 or 2 since they died without treatment, so the answer is $\frac{\beta}{\alpha+\beta}$. Can we estimate the $\alpha, \beta, \gamma, \delta$ or in other words, identify the joint distribution over the counterfactuals $P(Y^{0},Y^{1})$ given the interventional distributions, $P(Y^{0})$ and $P(Y^{1})$? The answer is no, putting our constraints and unknowns in matrix form:
+The queries we have been asking thus far are about $P(Y^{0}=1) = \gamma + \delta$ and $P(Y^{1}=1) = \beta + \delta$, but suppose we asked the question; what is the probability that this patient, who was not treated and died, would have recovered if they had been treated? We know they are in either group 1 or 2 since they died without treatment, so the answer is $\frac{\beta}{\alpha+\beta}$. Can we estimate the $\alpha, \beta, \gamma, \delta$ or in other words, identify the joint distribution over the counterfactuals $P(Y^{0},Y^{1})$ given the interventional distributions, $P(Y^{0})$ and $P(Y^{1})$? The answer is no, putting our constraints and unknowns in matrix form:D-separation still applies in the augmented model.
 
 \begin{equation}
 \left(
@@ -251,82 +274,356 @@ P(Y^{0})-\delta\\
 \end{array}
 \right)
 \end{equation}
-The value of $\delta$ is not determined so the query is not identifiable. However we do get bounds on the terms. Since probabilities cannot be negative, $P(Y{1})-P(Y^{0})-1 \leq \delta \leq min(P(Y^{1}),P(Y^{0})$. Note, if we made the additional assumption $gamma=0$; that the drug did not cause anyone to die who would otherwise have survived, then we can determine the joint distribution over counterfactuals. Alternatively, if we could assume that after treatment people returned to their initial state after some period of time, (say we were testing a drug for acne) then we could run a crossover study to determine the joint distribution. In a crossover study, the participants are randomly assigned to treatment and placebo, results are measured and then the groups are swapped. The scientific and philosophical validity of counterfactual queries remains under question \cite{Dawid2000,Dawid2014}, however they are nonetheless widely posed in the form of attribution of causal effects to different pathways and mediation \cite{Pearl2014,Imai2010a,VanderWeele2011}. 
+The value of $\delta$ is not determined so the query is not identifiable. However we do get bounds on the terms. Since probabilities cannot be negative, $P(Y{1})-P(Y^{0})-1 \leq \delta \leq min(P(Y^{1}),P(Y^{0})$. Note, if we made the additional assumption $\gamma=0$; that the drug did not cause anyone to die who would otherwise have survived, then we can determine the joint distribution over counterfactuals. Alternatively, if we could assume that after treatment people returned to their initial state after some period of time, (say we were testing a drug for acne) then we could run a crossover study to determine the joint distribution. In a crossover study, the participants are randomly assigned to treatment and placebo, results are measured and then the groups are swapped. The scientific and philosophical validity of counterfactual queries remains under question \cite{Dawid2000,Dawid2014}, however they are nonetheless widely posed in the form of attribution of causal effects to different pathways and mediation \cite{Pearl2014,Imai2010a,VanderWeele2011}. 
 
 There are differences between the models we have considered when it comes to counterfactual queries. Counterfactuals are not defined in causal Bayesian networks, as they only encode information on the interventional distribution over variables.  Counterfactuals can be defined in terms of structural equation models \cite{Pearl2000} but there are subtle differences depending on the form of assumptions made. Structural equation models with independent errors allows the identification of quantities in mediation studies, which are not identifiable with the weak ignorability assumptions and cannot be tested experimentally \cite{Richardson2013}.  
 
-In practice, differences in focus and approach across different fields eclipse these actual differences in the models. The work on causal graphical models \cite{Pearl2000,Sprites} focuses on non-parametric estimation in the population limit and rigorous theoretical foundations. The Neyman-Rubin framework builds on our understanding of randomized experiment and generalizes to quasi-exeperimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimating average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \cite{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data so as to support policy decisions is central to the field. Economists are often interested in broader measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \cite{Heckman2008}. 
+In practice, differences in focus and approach across different fields eclipse these actual differences in the models. The work on causal graphical models \cite{Pearl2000,Sprites} focuses on non-parametric estimation in the population limit and rigorous theoretical foundations. The Neyman-Rubin framework builds on our understanding of randomized experiment and generalizes to quasi-exeperimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimating average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \cite{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data so as to support policy decisions is central to the field. Economists are often interested in broader measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \cite{Heckman2008}. SAY SOMETHING ABOUT NON-RECURSIVE (IE CYCLIC MODELS) HERE.
 
-The equivalence between models for interventional queries allows researchers to combine the best aspects of all of these models. You can define your assumptions and determine which variables must be controlled for using a graphical model and apply propensity scores to make the adjustment. If non-parametric assumptions are insufficient for identification or lead to overly large uncertainties, you can specify additional assumptions by phrasing your model in terms of structural equations. 
+The equivalence between models for interventional queries allows researchers to combine the best aspects of all of these models. You can define your assumptions and determine which variables must be controlled for using a graphical model and apply propensity scores to make the adjustment. \cite{Morgan2007} provides an excellent and pragmatic introduction to this combined approach. If non-parametric assumptions are insufficient for identification or lead to overly large uncertainties, you can specify additional assumptions by phrasing your model in terms of structural equations. 
+
+
 
 
 \section{The Do Calculus}
-The do calculus provides the algorithm that determines if and how a given set of assumptions is sufficient to make an interventional query non-parametrically identifiable. 
+If you state your assumptions in the form of an acyclic structural equation model or a causal bayesian network, the do calculus provides the methodology to determine if a given causal effect can be estimated from observational data and, if it can, provides to formula to do so. The calculus relies heavily on the understanding how conditional independence properties are encoded in graphical models. Therefore, in the next section we give a short review of independence in graphical models.
 
 \subsection{Independence in graphical models: D-separation}
+TODO
+Local Markov property implies global markov property (in other words d-separation). 
 
 \subsection{The three rules}
-The cool thing is they are complete. For a given causal network, a do-query is non-parametrically identifiable if and only if it can be transformed to do-less statement via repeated application of these three rules. 
+The do calculus consists of three rules. They derive from the causal information encoded in a causal network and the properties of d-separation and do not imply any addition assumptions other than that of specifying the causal network. The key property of these three rules is that they are complete. If an interventional, do-query, can be transformed to a do-less statement via repeated application of these rules we can get an unbiased estimate of the causal effect from observational data. Conversely, if the query is not identified via these rules we cannot get an unbiased estimate of the causal effect without additional assumptions, even with an infinite amount of observational data. 
+
 \subsubsection{Rule 1}
-D-separation still applies
-
-Let $Z$ be the set of variables on which we are intervening and $G$ our graphical model. $G^{\dag}_{Z}$ represents the model where all links going into variables $Z elementof Z$ are deleted and replaced by a new parent node $Z$
+This rule describes which variables, on which we have not intervened, effect the distribution of the outcome given some intervention. The intervention $do(\boldsymbol{Z}=\boldsymbol{z})$ changes a causal network, $G$, in a simple way. Variables in $\boldsymbol{Z}$ are no longer determined by their parents but instead take on fixed values specified by $\boldsymbol{z}$. This corresponds to deleting the edges with arrows into variables in $\boldsymbol{Z}$  see example Figure \ref{fig:mutilatednet}. The resulting 'mutilated' network $G_{\overline{\boldsymbol{Z}}}$ remains a causal network and d-separation still applies. 
 
 
-if $(W \ci Y | Z,X)$ in $G_{Z}$:
+\begin{figure}[]
+\centering
+\caption{Visualizing intervention in a causal bayesian network. Left: original network, $G$. Right: network after the intervention $do(Z=z)$, $G_{\overline{Z}}$}
+\label{fig:mutilatednet}
+\begin{tabular}{cc}
+
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={punkt}]
+
+ %nodes
+\node[main node](1){$U$};
+\node[main node, below left=of 1](2){$Z$};
+\node[main node, below right=of 1](3){$Y$};
+\node[main node, above left=of 2](4){$W$};
+
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (2) edge node {} (3)
+    (4) edge node {} (2);
+	
+\end{tikzpicture} &
+
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={punkt}]
+
+ %nodes
+\node[main node](1){$U$};
+\node[main node, below left=of 1](2){$z$};
+\node[main node, below right=of 1](3){$Y$};
+\node[main node, above left=of 2](4){$W$};
+
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (3)
+    (2) edge node {} (3);
+    
+	
+\end{tikzpicture}
+\end{tabular}
+
+\end{figure}
+
+
+If $(\boldsymbol{Y} \ci \boldsymbol{W} | \boldsymbol{Z},\boldsymbol{X})$ in $G_{\overline{\boldsymbol{Z}}}$:
 \begin{equation}
 \label{eq:Do1}
- P(Y|do(Z=z),X=x,W=w) = P(Y|do(Z=z),X=x) 
+ P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),\boldsymbol{X}=\boldsymbol{x},\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),\boldsymbol{X}=\boldsymbol{x}) 
 \end{equation}
+
+$\implies$ if $(\boldsymbol{Y} \ci \boldsymbol{W} | \boldsymbol{Z})$ in $G_{\overline{\boldsymbol{Z}}}$:
 \begin{equation}
 \label{eq:Do12}
- P(Y|do(Z=z),W=w) = P(Y|do(Z=z)) 
+ P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z})) 
 \end{equation}
+
+This stems directly from the fact that the relationship between d-separation in a network and independence in the corresponding probability distribution still holds in the mutilated network. 
+
 
 \subsubsection{Rule 2}
-If the outcome does not depend on how the decision to assign the interventional variables was made, then the interventional distribution equals the observational one. 
+Rule 2 states when conditioning on $\boldsymbol{X} = \boldsymbol{x}$ and intervening  $do(\boldsymbol{X}=\boldsymbol{x})$ have the same effect on the distribution of the outcome $\boldsymbol{Y}$. You can think of this as when correlation is causation. It is easiest to understand by explicitly including the intervention process in the graphical model. We can depict the possibility of intervention by adding a new decision node $\hat{X}$ as a parent of each $X$ in the set of nodes we are intervening on. Let $\epsilon$ be some arbitrary value not in the set of possible values for $X$. If $X = \epsilon$ the distribution of $X$ is what it was without intervention. Otherwise, if $X=x$, $X$ deterministically takes the value $x$ and is independent of its previous parents, representing the intervention $do(X=x)$. We use the notation $G^{\dagger}$ to represent $G$ augmented with these decision nodes. 
 
-if $(W \ci Y | Z,X)$ in $G_{Z}$:
+if $(\boldsymbol{Y} \ci \boldsymbol{\hat{X}}|\boldsymbol{X},\boldsymbol{Z},\boldsymbol{W})$ in $G^{\dagger}_{\boldsymbol{\overline{Z}}}$:
+
 \begin{equation}
 \label{eq:Do2}
-P(Y|do(Z=z),do(X=x),W=w) = P(Y|do(Z=z),X=x,W=w)
+P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),\boldsymbol{X}=\boldsymbol{x},\boldsymbol{W}=\boldsymbol{w})
 \end{equation}
 
-This also implies that if $Y d-sep X|X$:
+$\implies$ if  $(\boldsymbol{Y} \ci \boldsymbol{\hat{X}}|\boldsymbol{X})$ in $G^{\dagger}$:
 \begin{equation}
 \label{eq:Do22}
-P(Y|do(X=x)) = P(Y|X=x)
+P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x})) = P(\boldsymbol{Y}|\boldsymbol{X}=\boldsymbol{x})
 \end{equation}
 
+If the outcome does not depend on how the decision to assign the interventional variables was made, then the interventional distribution equals the observational one. 
 
 \subsubsection{Rule 3}
-if $(W \ci Y | Z,X)$ in $G_{Z}$:
+This rule describes cases where the intervention $do(\boldsymbol{X}=\boldsymbol{x})$ has no effect on the distribution of the outcome $\boldsymbol{Y}$. 
+
+if $(\boldsymbol{Y} \ci \boldsymbol{\hat{X}} |\boldsymbol{Z},\boldsymbol{W})$ in $G^{\dagger}_{\boldsymbol{\overline{Z}}}$:
 \begin{equation}
 \label{eq:Do3}
-P(Y|do(Z=z),do(X=x),W=w) = P(Y|do(Z=z),W=w)
+P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),\boldsymbol{W}=\boldsymbol{w})
 \end{equation}
+$\implies$ if  $(\boldsymbol{Y} \ci \boldsymbol{\hat{X}})$ in $G^{\dagger}$:
 \begin{equation}
 \label{eq:Do32}
-P(Y|do(X=x)) = P(Y)
+P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x})) = P(\boldsymbol{Y})
 \end{equation}
+The statement that $\boldsymbol{Y} \ci \boldsymbol{\hat{X}}$ without conditioning on $\boldsymbol{X}$ implies that there is no unblocked path from $\boldsymbol{X}$ to $\boldsymbol{Y}$ which starts on an arrow leaving $\boldsymbol{X}$. This means there is no causal effect of $\boldsymbol{X}$ on $\boldsymbol{Y}$ and the intervention $do(\boldsymbol{X}=\boldsymbol{x})$ does not alter the distribution of $P(\boldsymbol{Y})$.
 
 \subsection{Easy graphical tests for identifiability}
-The completeness of these rules does not make them easy to apply. There are some quick graphical tests that are sufficient (and almost necessary) for non-parametric identifiability. 
+Determining if a network is identifiable via the two calculus still requires some algebra and it may not always be obvious what sequence of rules are required for a given network. From the do-calculus we can derive some quick graphical tests that are sufficient (but not necessary) for non-parametric identifiability, and align with intuitive ideas about estimating causal effect by adjusting for confounding variables. 
 
 \subsubsection{If all variables are observed}
-All interventional queries are identifiable. Just condition on the parents.
+If all the variables in a causal network can be measured any interventional query on that network are identifiable. You just have to condition on the parents of the variables on which you intervene. For discrete variables, the causal effect is given by:
+
+\begin{equation}
+P(\boldsymbol{Y}|do(\boldsymbol{X})) = \sum_{\boldsymbol{Pa_{X}}}{P(\boldsymbol{Y}|\boldsymbol{X},\boldsymbol{Pa_{X}})P(\boldsymbol{Pa_{X}})}
+\end{equation}
+
+where $\boldsymbol{Pa_{X}}$ are the parents of $\boldsymbol{X}$.
+
+
+Conditioning on the parents blocks all information that does not flow causally (along the arrows) from the variables on which we intervened which eliminates spurious correlations and gives the causal effect. 
 
 \subsubsection{The Back Door criterion}
-The back door criterion nicely aligns to answer the problem, when can you calculate a causal effect by conditioning on or adjusting for confounding variables and answers which variables should be included. 
+The back door criterion generalizes from the case where all variables can be measured by observing we don't need to condition on all the parents of the intervened on variables: it is sufficient to condition on a set of variables that block all spurious paths from $\boldsymbol{X}$ to $\boldsymbol{Y}$. A spurious, or back door, path is one that leaves $\boldsymbol{X}$ against the direction of the causal arrows. If we have a set of variables $\boldsymbol{Z}$ that block all back door paths from $\boldsymbol{X}$ to $\boldsymbol{Y}$, where no variable in $\boldsymbol{Z}$ is a descendent of $\boldsymbol{X}$ then:
 
+\begin{equation}
+P(\boldsymbol{Y}|do(\boldsymbol{X})) = \sum_{Z}{P(\boldsymbol{Y}|\boldsymbol{X},\boldsymbol{Z})P(\boldsymbol{Z})}
+\end{equation}
+
+The requirement that $\boldsymbol{Z}$ should not include descendants of $\boldsymbol{X}$ stems from the fact that we don't want to open any new spurious paths. If $Z$ descends from $X$ then it may lie on a path of the form $X \rightarrow...\rightarrow Z \leftarrow... Y$, which conditioning on $Z$ would open. The back door criterion corresponds exactly to the strong ignoreability assumption \cite{Rosenbaum1983}, used to justify the validity of a causal estimate in the counterfactual approach . If $\boldsymbol{Z}$ satisfies the backdoor criterion then, for a single binary treatment variable $X$ and outcome variable $Y$, $\{Y^{0},Y^{1}\} \ci X | \boldsymbol{Z}$. 
+ 
 \subsubsection{The Front Door Criterion}
-Allows for identification of causal effects via sequentially identifying other causal effects.
+It we have an unobservable variable creating a spurious path from $\boldsymbol{X}$ to $\boldsymbol{Y}$ then we cannot apply the back door criterion to directly estimate $P(\boldsymbol{Y}|do(\boldsymbol{X}))$. However, if there is a set of mediating variables $\boldsymbol{M}$ that intercepts all all the direct (non-spurious) paths from $\boldsymbol{X}$ to $\boldsymbol{Y}$ and we can estimate the causal effect of $\boldsymbol{X}$ on $\boldsymbol{M}$ and the causal effect of $\boldsymbol{M}$ on $\boldsymbol{Y}$ then we can combine these terms to get the causal effect of $\boldsymbol{X}$ on $\boldsymbol{Y}$. 
+
+\begin{equation}
+\begin {aligned}
+P(\boldsymbol{Y}|do(\boldsymbol{X})) & = \sum_{\boldsymbol{M}}{P(\boldsymbol{M}|do(\boldsymbol{X}))P(\boldsymbol{Y}|do(\boldsymbol{M}))} \\
+&= \sum_{\boldsymbol{M}}{P(\boldsymbol{M}|\boldsymbol{X})} \sum_{\boldsymbol{X}}P(\boldsymbol{Y}|\boldsymbol{X},\boldsymbol{M})P(\boldsymbol{X}) 
+\end {aligned}
+\end{equation}
 
 \subsubsection{Examples}
-Show how we can represent all kinds specific biases and their solutions graphically and that the solution matches that given by do-calculus. 
+
+We are now in a position to consider some more interesting examples than the one in section \ref{sec:causalmodels}. Consider the question; does eating chocolate increase or decrease the risk of obesity? Assume we have data from a cross-sectional study where a large group of people were weighed and asked how much chocolate they ate. It is easy to come up with a whole lot of variables that may causally effect chocolate consumption and obesity, ie. age, income and gender, so we cannot conclude that the causal effect is equivalent to the correlation. If we assume there may be unknown variables (denoted by $U$ in all the following examples) that effect both obesity and chocolate consumption, (figure \ref{fig:chockNI}), the causal effect cannot be identified as there is no way to block the spurious path through the unobserved variables. If we assume the only confounding variables are income, age and gender, (figure \ref{fig:chockI}), we can calculate the causal effect by conditioning on these variables.  
+
+
+\begin{figure}[h]
+\centering
+\caption{Chocolate and Obesity}
+\label{fig:chocolate}
+\begin{subfigure}[t]{0.4\textwidth}
+\caption{Not identifiable}
+\label{fig:chockNI}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.5cm,  thick,main node/.style={punktrect}]
+
+ %nodes
+\node[main node](1){$\boldsymbol{U}$};
+\node[main node, below left=of 1](2){Chocolate};
+\node[main node, below right=of 1](3){Obesity};
+
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (2) edge node {} (3);
+\end{tikzpicture}
+\end{subfigure}
+\begin{subfigure}[t]{0.4\textwidth}
+\caption{Identifiable}
+\label{fig:chockI}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,  thick,main node/.style={punktrect}]
+
+ %nodes
+\node[main node](1){Age};
+\node[main node, left= of 1](4){Income};
+\node[main node, right=of 1](5){Gender};
+\node[main node, below left=of 1](2){Chocolate};
+\node[main node, below right=of 1](3){Obesity};
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (2) edge node {} (3)
+    (4) edge node {} (2)
+        edge node {} (3)
+    (5) edge node {} (2)
+    	edge node {} (3);
+\end{tikzpicture}
+\end{subfigure}
+\end{figure}
+
+In reality of course there are many other variables involved  \cite{Golomb2012} and it may not be obvious from prior knowledge or theory what role the variables play in the network. This is important as conditioning on the wrong variables can increase the bias in a causal estimate: Conditioning on a collider variable, $\rightarrow Z \leftarrow$, may open a previously blocked, spurious path \cite{Sjolander2009a} (figure \ref{fig:colliderCondition}) . Conditioning on a variable that mediates between the cause and effect biases the causal estimate by blocking a true casual path (figure \ref{fig:mediationBias}). Conditioning on a variable that is a true confounder, that is a common cause of both $X$ and $Y$, may increase the bias in our causal estimate if it moves the causal estimate in the opposite direction than would correcting for a hidden (and stronger) confounder $U$. Finally, (although it is not obvious graphically) conditioning on a variable that is a cause of $X$ but not (or only weakly) a cause of $Y$ can amplify or introduce bias \cite{Pearl2012b,Wooldridge2009}.
+
+
+\begin{figure}[h]
+		\caption{Conditioning on a collider variable can introduce bias}\label{fig:colliderCondition}
+       \centering
+        \begin{subfigure}[t]{0.4\textwidth}
+        \centering
+                \caption{post-treatment bias: conditioning on $Z$ opens the spurious path $X,Z,Y$}
+                \label{fig:postTreatmentBias}
+                \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,  thick,main node/.style={punkt}]
+ %nodes
+\node[](1){}; 
+\node[main node, left = of 1](2){X};
+\node[main node, right= of 1](3){Y};
+\node[main node, below =of 1](4){Z};
+ \path[every node/.style={font=\sffamily\small}]
+    (2) edge node {} (3)
+    	edge node {} (4)
+    (3) edge node {} (4);
+\end{tikzpicture}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[t]{0.4\textwidth}
+        \centering
+                \caption{M-bias: conditioning on $Z$ opens the path $X,U_{1},Z,U_{2},Y$}
+                \label{fig:Mbias}
+                \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,  thick,main node/.style={punkt}]
+ %nodes
+\node[main node](1){Z}; 
+\node[main node, below left = of 1](2){$X$};
+\node[main node, below right= of 1](3){$Y$};
+\node[main node, above left = of 1](5){$U_{1}$};
+\node[main node, above right = of 1](6){$U_{2}$};
+ \path[every node/.style={font=\sffamily\small}]
+    (2) edge node {} (3)
+    (5) edge node {} (1)
+    	edge node {} (2)
+    (6) edge node {} (1)
+    	edge node {} (3)
+    (1) edge node {} (2)
+    	edge node {} (3);
+\end{tikzpicture}
+        \end{subfigure}    
+\end{figure}
+
+
+\begin{figure}[h]
+\centering
+\caption{Conditioning on a mediating variable ($Z$) can introduce bias}
+\label{fig:mediationBias}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,  thick,main node/.style={punkt}]
+ %nodes
+\node[main node](1){$X$}; 
+\node[main node, above right = of 1](2){$Z$};
+\node[main node, below right= of 1](3){$U$};
+\node[main node, above right = of 3](4){$Y$};
+\path[every node/.style={font=\sffamily\small}]
+	(1) edge node {} (2)
+		edge node {} (3)
+	(2) edge node {} (4)
+	(3) edge node {} (4);
+  
+\end{tikzpicture}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\caption{Conditioning on a confounder ($Z$) can increase bias}
+\label{fig:biasAmplification}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,  thick,main node/.style={punkt}]
+ %nodes
+\node[main node](1){Z}; 
+\node[main node, below left = of 1](2){X};
+\node[main node, right = of 1](4){U};
+\node[main node, below right= of 4](3){Y};
+
+ \path[every node/.style={font=\sffamily\small}]
+    (2) edge node {} (3)
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (4) edge node {} (2)
+    	edge node {} (3);
+    
+\end{tikzpicture}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\caption{Bias amplification}
+\label{fig:biasAmplification}
+\begin{subfigure}[t]{0.4\textwidth}
+\centering
+\caption{Conditioning on an instrumental variable $Z$ can increase bias in estimate of effect of $X$ on $Y$}
+\label{fig:instrumentalBias}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,  thick,main node/.style={punkt}]
+ %nodes
+\node[main node](1){U}; 
+\node[main node, below left = of 1](2){X};
+\node[main node, below right = of 1](3){Y};
+\node[main node, above left= of 2](4){Z};
+
+ \path[every node/.style={font=\sffamily\small}]
+    (2) edge node {} (3)
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (4) edge node {} (2);
+    
+\end{tikzpicture}
+\end{subfigure}
+ \begin{subfigure}[t]{0.4\textwidth}
+\centering
+\caption{Conditioning on a confounding variable that is strongly linked to $X$ and weakly linked to $Y$ can increase bias.}
+\label{fig:semiinstrumentalbias}
+
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,  thick,main node/.style={punkt}]
+ %nodes
+\node[main node](1){U}; 
+\node[main node, below left = of 1](2){X};
+\node[main node, below right = of 1](3){Y};
+\node[main node, above left= of 2](4){Z};
+
+ \path[every node/.style={font=\sffamily\small}]
+    (2) edge node {} (3)
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (4) edge node {} (2)
+    	edge [dashed] node {} (3);
+    	
+
+\end{tikzpicture}
+\end{subfigure}
+\end{figure}
+
+
+For some problems, the temporal ordering of events imposes restrictions on the causal structure. Consider the example of a non-randomized trial. A new treatment is developed and made available to a large group of patients some of whom decide to take. Researchers have variables on the health, income, gender, age, etc of the patients before the treatment was offered (pre-treatment variables) and collect further data on the health of all patients after treatment has begun (post-treatment variables). It has been understood for a long time that conditioning on post-treatment variables can increase bias \cite{Rosenbaum1984a}. The realization that that conditioning on pre-treatement can also introduce bias is more recent. Not conditioning on post-treatment variables avoids the biases in figure \ref{fig:postTreatmentBias} and figure \ref{fig:mediationBias}. However, M-bias (figure \ref{fig:Mbias}) and bias amplification (figure \ref{fig:biasAmplification}) are consequences of conditioning on pre-treatment variables. 
+
+
+It is clear we need to be wary of the condition on everything approach and the condition on all pre-treatment variables approach. But what is the alternative if the structure of the causal network is not clear from prior knowledge? One approach would be to construct a number of different plausible structures and evaluate the desired causal effect for each of them. This would give more accurate uncertainty bounds for the causal effect. Alternatively, one could apply a causal discovery algorithm (see section \ref{sec:causaldiscovery}). 
+
+It may be that there are some general conditions under which certain types of biases are less likely or weaker than other. For example, in the situation in figure \ref{fig:Mbias}, where $Z$ is both a confounding variable and part of an M-structure. Conditioning on $Z$ blocks the spurious path $X \leftarrow Z \rightarrow Y$ and opens the spurious path $X \leftarrow U_{1} \rightarrow Z \leftarrow U_{2} \rightarrow Y$. Should we condition on $Z$ or not? Under what general assumptions is one of these paths weaker than the other. There has been relatively little work in this area. \cite{Vansteelandt2012} gives a description of the problem and links it to selecting covariates when the goal is causal estimation. \cite{Myers2011} use simulation studies to consider if one should adjust for a variable that could be either an instrumental variable or a confounder for the effect of $X$ on $Y$. 
+
 
 \section{It's not (non-parametrically) identifiable! What can I do?}
 \subsection{Bounding causal effects}
+Causal effects that cannot be identified can often still be bounded. In other words, bounds require weaker assumptions than point identification.
+ 
 \subsection{Additional assumptions}
 additive noise
 causal anti-causal \cite{Janzing2012}
@@ -334,11 +631,15 @@ causal anti-causal \cite{Janzing2012}
 \subsection{Instrumental variables}
 
 
-\section{Structure learning}
+
+\section{Causal structure learning (causal discovery)}
+\label{sec:causaldiscovery}
 peters approach \cite{Peters2014}
 Pearl/Verma/Sprites approach \cite{Pearl2000} 
 
-
+\section{Causality and prediction}
+Refresh the difference between a causal query and predictive query.
+Point out the importance of accurate prediction for causal inference. For example, if we can predict the control response, we can run experimental studies without controls (\cite{Brodersen2013})
 
 
 \bibliographystyle{plain}% Select the citation style e.g. ieeetr
