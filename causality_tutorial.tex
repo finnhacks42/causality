@@ -49,6 +49,8 @@
 
 \begin{document}
 \def\ci{\perp\!\!\!\perp} % from Wikipedia
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
 
 \section{Why is causality important}
 
@@ -107,6 +109,7 @@ For a model with $N$ variables, a structural equation model looks like a set of 
 
 
 \subsection{Causal Bayesian Networks}
+\label{sec:causalbayesnets}
 Causal Bayesian Networks are, unsurprisingly, an extension of Bayesian networks. Any joint probability distribution can be factorized into a product of conditional probabilities. There are multiple valid factorizations, corresponding to permutations of variable ordering.
 
 \begin{equation}
@@ -278,39 +281,147 @@ The value of $\delta$ is not determined so the query is not identifiable. Howeve
 
 There are differences between the models we have considered when it comes to counterfactual queries. Counterfactuals are not defined in causal Bayesian networks, as they only encode information on the interventional distribution over variables.  Counterfactuals can be defined in terms of structural equation models \cite{Pearl2000} but there are subtle differences depending on the form of assumptions made. Structural equation models with independent errors allows the identification of quantities in mediation studies, which are not identifiable with the weak ignorability assumptions and cannot be tested experimentally \cite{Richardson2013}.  
 
-In practice, differences in focus and approach across different fields eclipse these actual differences in the models. The work on causal graphical models \cite{Pearl2000,Sprites} focuses on non-parametric estimation in the population limit and rigorous theoretical foundations. The Neyman-Rubin framework builds on our understanding of randomized experiment and generalizes to quasi-exeperimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimating average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \cite{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data so as to support policy decisions is central to the field. Economists are often interested in broader measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \cite{Heckman2008}. SAY SOMETHING ABOUT NON-RECURSIVE (IE CYCLIC MODELS) HERE.
+In practice, differences in focus and approach across different fields eclipse these actual differences in the models. The work on causal graphical models \cite{Pearl2000,Sprites} focuses on non-parametric estimation in the population limit and rigorous theoretical foundations. The Neyman-Rubin framework builds on our understanding of randomized experiment and generalizes to quasi-exeperimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimating average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \cite{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data so as to support policy decisions is central to the field. Economists are often interested in broader measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \cite{Heckman2008}. In addition, the parametric structural equation models favoured in economics can be extended to analyse cyclic (otherwise referred to as non-recursive) models. 
 
 The equivalence between models for interventional queries allows researchers to combine the best aspects of all of these models. You can define your assumptions and determine which variables must be controlled for using a graphical model and apply propensity scores to make the adjustment. \cite{Morgan2007} provides an excellent and pragmatic introduction to this combined approach. If non-parametric assumptions are insufficient for identification or lead to overly large uncertainties, you can specify additional assumptions by phrasing your model in terms of structural equations. 
 
 
-
-
 \section{The Do Calculus}
-If you state your assumptions in the form of an acyclic structural equation model or a causal bayesian network, the do calculus provides the methodology to determine if a given causal effect can be estimated from observational data and, if it can, provides to formula to do so. The calculus relies heavily on the understanding how conditional independence properties are encoded in graphical models. Therefore, in the next section we give a short review of independence in graphical models.
+If you state your assumptions in the form of an acyclic structural equation model or a causal bayesian network, the do calculus provides the methodology to determine if a given causal effect can be estimated from observational data and, if it can, provides to formula to do so. The calculus relies heavily on the understanding how conditional independence properties are encoded in bayesian networks. Therefore, in the next section we give a short review of independence in bayesian networks.
 
-\subsection{Independence in graphical models: D-separation}
-TODO
-Local Markov property implies global markov property (in other words d-separation). 
+\subsection{Independence in bayesian networks: D-separation}
+
+Recall from section \ref{sec:causalbayesnets} the local markov condition: 
+
+\begin{theorem}
+\textbf{(Local markov condition)} Given a bayesian network $G$ with nodes $X_{1}...X_{N}$, each variable $X_{i}$ is independent of its non-decendents given its parents in $G$ for all distributions $P(X_{1}...X_{N})$ that are compatible with $G$.
+\end{theorem}
+
+The set of conditional independence relations given by the local markov condition can enforce additional independences that also hold in all distributions that are compatible with $G$. D-separation extends the local markov property to find these additional independences and allows us to read from a network if a given conditional independence statement is true in all distributions compatible with that network.
+
+\begin{theorem}
+\textbf{(D-separation)} If a set of variables $\boldsymbol{Z}$ d-separates $\boldsymbol{X}$ and $\boldsymbol{Y}$ in $G$ then ${(\boldsymbol{X} \ci \boldsymbol{Y}|\boldsymbol{Z})}$ in all distributions $P$ compatible with $G$. Conversely, if $\boldsymbol{X}$ and $\boldsymbol{Y}$ are d-connected given $\boldsymbol{Z}$ then there will be at least one distribution $P'$ that is compatible with $G$ where they are dependent. 
+\end{theorem}
+
+$X$ conditionally independent of $Y$ given $Z$ means, if we know $Z$, learning the value of $Y$ gives us no additional information about $X$. You can also think of this as $Z$ blocks the flow of information from $X$ to $Y$ in the network. Let's examine the four possible bayesian networks over the variables ${X,Y,Z}$ that do not have a direct link  ${X \rightarrow Y}$ (figure \ref{fig:dseptriples}). 
+
+In figure (\ref{fig:dseptripple1}) conditioning on $Z$ renders $X$ and $Y$ conditionally independent. For example, $X$ could be number of years a person smoked, $Z$ the amount of tar in their lungs and $Y$ lung cancer. If you don't know $Z$, knowing how much they smoked changes your estimate of the likelyhood of their having lung cancer, but, if smoking causes cancer purely through the build up of tar in the lungs as we have assumed in this model, then once you measure the amount of tar in the lungs knowing how many years a person smoked for gives you no additional information on the probability that they will develop lung cancer. Figure (\ref{fig:dseptripple2}) is the same as (\ref{fig:dseptripple1}) with $X$ and $Y$ exchanged, which does not change anything since conditional independence is symmetric $(X \ci Y|Z) \Leftrightarrow (Y \ci X|Z)$.
+
+In figure (\ref{fig:dseptripple3}), $Z$ could represent having an illness and $X$ and $Y$ could be two independent tests that can detect (with some error) that illness. Without conditioning on $Z$ you would expect results from the two different tests to be highly correlated, but if you already know someone has the illness then learning they tested positive to the test $X$ doesn't change the likelyhood they test positive in test $Y$. Again, conditioning on $Z$ blocks the path from $X$ to $Y$.
+
+The arrangement of variables in figure (\ref{fig:dseptripple4}), often referred to as a collider or v-structure, is the odd one out. In this case $X$ is independent of $Y$ without conditioning on $Z$ but if you do condition on $Z$ then $X$ and $Y$ actually become dependent. Suppose $X$ is socio-economic status, $Y$ is gender and $Z$ is receipt of a scholarship available to female or disadvantaged students. Roughly equal numbers of women and men grow up in poorer families so $X$ is independent of $Y$, but if you know that a given student received a scholarship, then learning that they are male tells you they must have a low socio-economic background. Conditioning on $Z$ unblocks the path from $X$ to $Y$. 
+
+
+\begin{figure}[h]
+\centering
+\caption{All possible two edge paths from $X$ to $Y$ via $Z$}
+\label{fig:dseptriples}
+\begin{subfigure}[t]{0.2\textwidth}
+\centering
+\caption{$X \ci Y| Z$}
+\label{fig:dseptripple1}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.5cm,
+  thick,main node/.style={punkt}]
+\node[main node](1){$X$};
+\node[main node, below =of 1](2){$Z$};
+\node[main node, below =of 2](3){$Y$};
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+    (2) edge node {} (3);	
+\end{tikzpicture}
+\end{subfigure}
+\begin{subfigure}[t]{0.2\textwidth}
+\centering
+\caption{$X \ci Y|Z$}
+\label{fig:dseptripple2}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.5cm,
+  thick,main node/.style={punkt}]
+\node[main node](1){$Y$};
+\node[main node, below =of 1](2){$Z$};
+\node[main node, below =of 2](3){$X$};
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+    (2) edge node {} (3);	
+\end{tikzpicture}
+\end{subfigure}
+\begin{subfigure}[t]{0.2\textwidth}
+\centering
+\caption{$X \ci Y|Z$}
+\label{fig:dseptripple3}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.5cm,
+  thick,main node/.style={punkt}]
+\node[main node](1){$Z$};
+\node[main node, below left =of 1](2){$X$};
+\node[main node, below right=of 1](3){$Y$};
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+        edge node {} (3);	
+\end{tikzpicture}
+\end{subfigure}
+\begin{subfigure}[t]{0.2\textwidth}
+\centering
+\caption{$X \ci Y|\{\}$}
+\label{fig:dseptripple4}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.5cm,
+  thick,main node/.style={punkt}]
+\node[main node](1){$Z$};
+\node[main node, above left =of 1](2){$X$};
+\node[main node, above right =of 1](3){$Y$};
+ \path[every node/.style={font=\sffamily\small}]
+    (2) edge node {} (1)
+    (3) edge node {} (1);	
+\end{tikzpicture}
+\end{subfigure}
+\end{figure}
+
+For a general bayesian network a path between two variables may involve more than three variables. 
+
+\begin{definition}
+\textbf{(unblocked path)} A path from $X$ to $Y$ is a sequence of edges linking adjacent nodes starting at $X$ and finishing at $Y$,  $(X,V_{1},V_{2}...V_{k},Y)$. It is unblocked if every triple, $X-V_{1}-V_{2},V_{1}-V_{2}-V{3},...,V_{k-1}-V_{k}-Y$ in the path is unblocked (each triple will belong to one of the cases in figure \ref{fig:dseptriples})
+\end{definition}
+
+If all paths between two nodes are blocked by conditioning on $\boldsymbol{Z}$ then no information can flow between them and they are d-separated given $\boldsymbol{Z}$. 
+
+\begin{definition}
+The variables $\boldsymbol{X}$ are d-separated from $\boldsymbol{Y}$ given $\boldsymbol{Z}$ in the network $G$ if, after conditioning on $\boldsymbol{Z}$ there are no unblocked paths from $\boldsymbol{X}$ to $\boldsymbol{Y}$.  
+\end{definition}
+
+For a more complete introduction to d-separation (with proofs) see \cite{Koller2009}.
 
 \subsection{The three rules}
-The do calculus consists of three rules. They derive from the causal information encoded in a causal network and the properties of d-separation and do not imply any addition assumptions other than that of specifying the causal network. The key property of these three rules is that they are complete. If an interventional, do-query, can be transformed to a do-less statement via repeated application of these rules we can get an unbiased estimate of the causal effect from observational data. Conversely, if the query is not identified via these rules we cannot get an unbiased estimate of the causal effect without additional assumptions, even with an infinite amount of observational data. 
+The do calculus consists of three rules. They derive from the causal information encoded in a causal network and the properties of d-separation and do not imply any addition assumptions other than that of specifying the causal network. The key property of these three rules is that they are complete. If an interventional (do-type) query can be transformed to a do-less statement via repeated application of these rules we can get an unbiased point estimate of the causal effect from observational data. Conversely, if the query is not identified via these rules we cannot get an unbiased estimate of the causal effect without additional assumptions, even with an infinite amount of observational data. 
 
 \subsubsection{Rule 1}
-This rule describes which variables, on which we have not intervened, effect the distribution of the outcome given some intervention. The intervention $do(\boldsymbol{Z}=\boldsymbol{z})$ changes a causal network, $G$, in a simple way. Variables in $\boldsymbol{Z}$ are no longer determined by their parents but instead take on fixed values specified by $\boldsymbol{z}$. This corresponds to deleting the edges with arrows into variables in $\boldsymbol{Z}$  see example Figure \ref{fig:mutilatednet}. The resulting 'mutilated' network $G_{\overline{\boldsymbol{Z}}}$ remains a causal network and d-separation still applies. 
+This rule describes which variables, on which we have not intervened, effect the distribution of the outcome given some intervention. The intervention $do(\boldsymbol{X}=\boldsymbol{x})$ changes a causal network, $G$, in a simple way. Variables in $\boldsymbol{X}$ are no longer determined by their parents but instead take on fixed values specified by $\boldsymbol{x}$. This corresponds to deleting the edges with arrows into variables in $\boldsymbol{X}$  (see figure \ref{fig:mutilatednet}). The resulting 'mutilated' network $G_{\overline{\boldsymbol{X}}}$ remains a causal network and d-separation still applies. 
 
+If $(\boldsymbol{Y} \ci \boldsymbol{W} | \boldsymbol{Z},\boldsymbol{X})$ in $G_{\overline{\boldsymbol{X}}}$:
+\begin{equation}
+\label{eq:Do1}
+ P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{Z}=\boldsymbol{z},\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{Z}=\boldsymbol{z}) 
+\end{equation}
 
-\begin{figure}[]
+$\implies$ if $(\boldsymbol{Y} \ci \boldsymbol{W} | \boldsymbol{X})$ in $G_{\overline{\boldsymbol{X}}}$:
+\begin{equation}
+\label{eq:Do12}
+ P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x})) 
+\end{equation}
+
+This stems directly from the fact that the relationship between d-separation in a network and independence in the corresponding probability distribution still holds in the mutilated network. 
+
+\begin{figure}[h]
 \centering
-\caption{Visualizing intervention in a causal bayesian network. Left: original network, $G$. Right: network after the intervention $do(Z=z)$, $G_{\overline{Z}}$}
+\caption{Intervention in a causal bayesian network}
 \label{fig:mutilatednet}
-\begin{tabular}{cc}
-
+\begin{subfigure}[t]{0.3\textwidth}
+\centering
+\caption{original network, $G$}
+\label{fig:mutilatedOriginal}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={punkt}]
 
  %nodes
 \node[main node](1){$U$};
-\node[main node, below left=of 1](2){$Z$};
+\node[main node, below left=of 1](2){$X$};
 \node[main node, below right=of 1](3){$Y$};
 \node[main node, above left=of 2](4){$W$};
 
@@ -321,14 +432,18 @@ This rule describes which variables, on which we have not intervened, effect the
     (2) edge node {} (3)
     (4) edge node {} (2);
 	
-\end{tikzpicture} &
-
+\end{tikzpicture} 
+\end{subfigure}
+\begin{subfigure}[t]{0.5\textwidth}
+\centering
+\caption{network after the intervention $do(X=x)$, $G_{\overline{X}}$}
+\label{fig:mutilatedAfter}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={punkt}]
 
  %nodes
 \node[main node](1){$U$};
-\node[main node, below left=of 1](2){$z$};
+\node[main node, below left=of 1](2){$x$};
 \node[main node, below right=of 1](3){$Y$};
 \node[main node, above left=of 2](4){$W$};
 
@@ -337,30 +452,12 @@ This rule describes which variables, on which we have not intervened, effect the
     (1) edge node {} (3)
     (2) edge node {} (3);
     
-	
 \end{tikzpicture}
-\end{tabular}
-
+\end{subfigure}
 \end{figure}
 
-
-If $(\boldsymbol{Y} \ci \boldsymbol{W} | \boldsymbol{Z},\boldsymbol{X})$ in $G_{\overline{\boldsymbol{Z}}}$:
-\begin{equation}
-\label{eq:Do1}
- P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),\boldsymbol{X}=\boldsymbol{x},\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),\boldsymbol{X}=\boldsymbol{x}) 
-\end{equation}
-
-$\implies$ if $(\boldsymbol{Y} \ci \boldsymbol{W} | \boldsymbol{Z})$ in $G_{\overline{\boldsymbol{Z}}}$:
-\begin{equation}
-\label{eq:Do12}
- P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z})) 
-\end{equation}
-
-This stems directly from the fact that the relationship between d-separation in a network and independence in the corresponding probability distribution still holds in the mutilated network. 
-
-
 \subsubsection{Rule 2}
-Rule 2 states when conditioning on $\boldsymbol{X} = \boldsymbol{x}$ and intervening  $do(\boldsymbol{X}=\boldsymbol{x})$ have the same effect on the distribution of the outcome $\boldsymbol{Y}$. You can think of this as when correlation is causation. It is easiest to understand by explicitly including the intervention process in the graphical model. We can depict the possibility of intervention by adding a new decision node $\hat{X}$ as a parent of each $X$ in the set of nodes we are intervening on. Let $\epsilon$ be some arbitrary value not in the set of possible values for $X$. If $X = \epsilon$ the distribution of $X$ is what it was without intervention. Otherwise, if $X=x$, $X$ deterministically takes the value $x$ and is independent of its previous parents, representing the intervention $do(X=x)$. We use the notation $G^{\dagger}$ to represent $G$ augmented with these decision nodes. 
+Rule 2 states when conditioning on $\boldsymbol{X} = \boldsymbol{x}$ and intervening  $do(\boldsymbol{X}=\boldsymbol{x})$ have the same effect on the distribution of the outcome $\boldsymbol{Y}$. You can think of this as when correlation is causation. It is easiest to understand by explicitly including the intervention process in the graphical model. We can depict the possibility of intervention by adding a new decision node $\hat{X}$ as a parent of each $X$ in the set of nodes we are intervening on (figure \ref{fig:augmentedNetwork}). Let $\epsilon$ be some arbitrary value not in the set of possible values for $X$. If $X = \epsilon$ the distribution of $X$ is what it was without intervention. Otherwise, if $X=x$, $X$ deterministically takes the value $x$ and is independent of its previous parents, representing the intervention $do(X=x)$. We use the notation $G^{\dagger}$ to represent $G$ augmented with these decision nodes. 
 
 if $(\boldsymbol{Y} \ci \boldsymbol{\hat{X}}|\boldsymbol{X},\boldsymbol{Z},\boldsymbol{W})$ in $G^{\dagger}_{\boldsymbol{\overline{Z}}}$:
 
@@ -376,6 +473,68 @@ P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x})) = P(\boldsymbol{Y}|\boldsymb
 \end{equation}
 
 If the outcome does not depend on how the decision to assign the interventional variables was made, then the interventional distribution equals the observational one. 
+
+\begin{figure}[h]
+\centering
+\caption{Augmentated causal network with intervention}
+\label{fig:augmentedNetwork}
+\begin{subfigure}[t]{0.4\textwidth}
+\centering
+\caption{original network, $G$}
+\label{fig:augmentedOriginal}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={punkt}]
+ %nodes
+\node[main node](1){$Z$};
+\node[main node, below left=of 1](2){$X$};
+\node[main node, below right=of 1](3){$Y$};
+\node[main node, above left = of 1](4){$U_{1}$};
+\node[main node, above right = of 1](5){$U_{2}$};
+
+
+ \path[every node/.style={font=\sffamily\small}]
+ 	(2) edge node {} (3)
+ 	(4) edge node {} (2)
+ 		edge node {} (1)
+ 	(5) edge node {} (3)
+ 		edge node {} (1)
+ 	(1) edge node {} (2)
+ 		edge node {} (3);
+    
+	
+\end{tikzpicture} 
+\end{subfigure}
+\begin{subfigure}[t]{0.4\textwidth}
+\centering
+\caption{augmented network after the intervention $do(Z=z)$, $G^{\dagger}_{\overline{Z}}$}
+\label{fig:augmentedAfter}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.3cm,
+  thick,main node/.style={punkt}]
+
+\node[main node](1){$z$};
+\node[below left=of 1](2){};
+\node[below right=of 1](3){};
+\node[main node, below left=of 2](4){$X$};
+\node[main node, below right=of 3](5){$Y$};
+\node[above right=of 1](6){};
+\node[above left=of 1](7){};
+\node[main node, above left=of 7](8){$U_{1}$};
+\node[main node, above right=of 6](9){$U_{2}$};
+\node[main node, above left=of 4](10){$\hat{X}$};
+
+
+ \path[every node/.style={font=\sffamily\small}]
+ 	(4) edge node {} (5)
+ 	(10) edge node {} (4)
+ 	(8) edge node {} (4)
+ 	(9) edge node {} (5)
+ 	(1) edge node {} (4)
+ 		edge node {} (5);
+ 	
+    
+\end{tikzpicture}
+\end{subfigure}
+\end{figure}
 
 \subsubsection{Rule 3}
 This rule describes cases where the intervention $do(\boldsymbol{X}=\boldsymbol{x})$ has no effect on the distribution of the outcome $\boldsymbol{Y}$. 
@@ -479,7 +638,7 @@ We are now in a position to consider some more interesting examples than the one
 In reality of course there are many other variables involved  \cite{Golomb2012} and it may not be obvious from prior knowledge or theory what role the variables play in the network. This is important as conditioning on the wrong variables can increase the bias in a causal estimate: Conditioning on a collider variable, $\rightarrow Z \leftarrow$, may open a previously blocked, spurious path \cite{Sjolander2009a} (figure \ref{fig:colliderCondition}) . Conditioning on a variable that mediates between the cause and effect biases the causal estimate by blocking a true casual path (figure \ref{fig:mediationBias}). Conditioning on a variable that is a true confounder, that is a common cause of both $X$ and $Y$, may increase the bias in our causal estimate if it moves the causal estimate in the opposite direction than would correcting for a hidden (and stronger) confounder $U$. Finally, (although it is not obvious graphically) conditioning on a variable that is a cause of $X$ but not (or only weakly) a cause of $Y$ can amplify or introduce bias \cite{Pearl2012b,Wooldridge2009}.
 
 
-\begin{figure}[h]
+\begin{figure}[]
 		\caption{Conditioning on a collider variable can introduce bias}\label{fig:colliderCondition}
        \centering
         \begin{subfigure}[t]{0.4\textwidth}
@@ -524,7 +683,7 @@ In reality of course there are many other variables involved  \cite{Golomb2012} 
 \end{figure}
 
 
-\begin{figure}[h]
+\begin{figure}[]
 \centering
 \caption{Conditioning on a mediating variable ($Z$) can introduce bias}
 \label{fig:mediationBias}
@@ -543,7 +702,7 @@ In reality of course there are many other variables involved  \cite{Golomb2012} 
 \end{tikzpicture}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[]
 \centering
 \caption{Conditioning on a confounder ($Z$) can increase bias}
 \label{fig:biasAmplification}
@@ -564,7 +723,7 @@ In reality of course there are many other variables involved  \cite{Golomb2012} 
 \end{tikzpicture}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[]
 \centering
 \caption{Bias amplification}
 \label{fig:biasAmplification}
@@ -617,7 +776,7 @@ For some problems, the temporal ordering of events imposes restrictions on the c
 
 It is clear we need to be wary of the condition on everything approach and the condition on all pre-treatment variables approach. But what is the alternative if the structure of the causal network is not clear from prior knowledge? One approach would be to construct a number of different plausible structures and evaluate the desired causal effect for each of them. This would give more accurate uncertainty bounds for the causal effect. Alternatively, one could apply a causal discovery algorithm (see section \ref{sec:causaldiscovery}). 
 
-It may be that there are some general conditions under which certain types of biases are less likely or weaker than other. For example, in the situation in figure \ref{fig:Mbias}, where $Z$ is both a confounding variable and part of an M-structure. Conditioning on $Z$ blocks the spurious path $X \leftarrow Z \rightarrow Y$ and opens the spurious path $X \leftarrow U_{1} \rightarrow Z \leftarrow U_{2} \rightarrow Y$. Should we condition on $Z$ or not? Under what general assumptions is one of these paths weaker than the other. There has been relatively little work in this area. \cite{Vansteelandt2012} gives a description of the problem and links it to selecting covariates when the goal is causal estimation. \cite{Myers2011} use simulation studies to consider if one should adjust for a variable that could be either an instrumental variable or a confounder for the effect of $X$ on $Y$. 
+It may be that there are some general conditions under which certain types of biases are less likely or weaker than other. For example, in the situation in figure \ref{fig:Mbias}, where $Z$ is both a confounding variable and part of an M-structure. Conditioning on $Z$ blocks the spurious path $X \leftarrow Z \rightarrow Y$ and opens the spurious path $X \leftarrow U_{1} \rightarrow Z \leftarrow U_{2} \rightarrow Y$. Should we condition on $Z$ or not? Under what general assumptions is one of these paths weaker than the other. There has been relatively little work in this area. \cite{Vansteelandt2012} gives a description of the problem and links it to selecting covariates when the goal is causal estimation. \cite{Myers2011, Pearl2012b} consider if one should adjust for a variable that could be either an instrumental variable or a confounder for the effect of $X$ on $Y$. 
 
 
 \section{It's not (non-parametrically) identifiable! What can I do?}
@@ -627,6 +786,7 @@ Causal effects that cannot be identified can often still be bounded. In other wo
 \subsection{Additional assumptions}
 additive noise
 causal anti-causal \cite{Janzing2012}
+learning what indicates causality. 
 
 \subsection{Instrumental variables}
 
@@ -634,8 +794,11 @@ causal anti-causal \cite{Janzing2012}
 
 \section{Causal structure learning (causal discovery)}
 \label{sec:causaldiscovery}
+If you have a method for doing things pairwise, then you can extend it to a full network. 
+
 peters approach \cite{Peters2014}
 Pearl/Verma/Sprites approach \cite{Pearl2000} 
+
 
 \section{Causality and prediction}
 Refresh the difference between a causal query and predictive query.
