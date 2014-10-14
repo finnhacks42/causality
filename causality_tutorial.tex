@@ -1,14 +1,25 @@
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
+\usepackage{listings}
 \usepackage{amsfonts}
 \usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithm
+\usepackage[noend]{algpseudocode}% http://ctan.org/pkg/algorithmicx
 \usepackage{parskip}
 \usepackage{tikz}
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
 \usetikzlibrary{arrows,positioning} 
 \usepackage{subcaption}
+
+
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+
 \tikzset{
     %Define standard arrow tip
     >=stealth',
@@ -28,16 +39,8 @@
     minimum height=1em, 
     text centered},
     % Define arrow style
-    pil/.style={punktrect/.style={
-    rectangle, 
-    rounded corners, 
-    % fill=black!10,
-    draw=black, very thick,
-    text width=10em, 
-    minimum height=3em, 
-    text centered, 
-    on chain},
-           ->,
+    pil/.style={
+           o->,
            thick,
            shorten <=2pt,
            shorten >=2pt,}
@@ -52,9 +55,11 @@
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{definition}{Definition}[section]
 
+
 \section{Why is causality important}
 
 TODO
+1BVAEU
 
 (this section should include explanation of why correlation is not causation)
 
@@ -67,7 +72,7 @@ To understand causality we first need a more formal definition of what we are ta
 
 We have developed a new drug for some illness and wish to determine how effective it is. We take a large group of patients and randomly assign half of them to a treatment group and the other half to a control group. The people in the treatment group get the drug, everyone else gets a placebo pill. The question we want to answer is does giving people the active drug improve their changes of recovery relative to giving them the placebo. We will use the variable $X$ (1 = drug, 0 = placebo) to represent the treatment each person receives and $Y$ (1 = recover, 0 = not recover) to describe the outcome .
 \subsection{Structural Equation Models}
-
+\label{sec:SEM}
 Structural equation models (SEMs) describe a deterministic world, where underlying mechanisms determine the output of any process for a given input. The mechanism (but not the output) is assumed to be independent of what is fed into it. Linear structural equation models have a long history for causal estimation \cite {Wright1921,Haavelmo1943}. More recently, they have been formalized, generalized to the non-parametric setting and connected to developments in graphical models to provide a powerful causal framework \cite{Pearl2000}.
 
 Mathematically, each variable is a deterministic function of its direct causes and a noise term that captures unmeasured variables. The noise terms are required to be mutually independent. If there is the possibility that an unmeasured variable influences more than one variable of interest in a study, it must be modelled explicitly as a latent (unobserved) variable. Structural equation models can be represented visually as a network. Each variable is a node and arrows are drawn from causes to their effects. For our example the SEM is:
@@ -96,13 +101,8 @@ Y = & f(X,\epsilon_{y})
 }
 \end{equation}
 
-This model encodes the assumption that the outcome $y_{i}$ for an individual $i$ is caused solely by the treatment $x_{i}$ they receive and other factors $\epsilon_{y_{i}}$ that are independent of $X$. This is justifiable on the grounds that $X$ is random; the outcome of a coin flip for each patient should not be related to any of their characteristics (hidden or otherwise). 
-
-
-The probability of observing $Y$ given $X$, $P(Y = y|X = x) = P(f(x,\epsilon_{y})=y)$ where $\epsilon_{y} ~ P(\epsilon_{y})$ as $\epsilon_{y} \ci \epsilon{x}$  
-
+This model encodes the assumption that the outcome $y_{i}$ for an individual $i$ is caused solely by the treatment $x_{i}$ they receive and other factors $\epsilon_{y_{i}}$ that are independent of $X$. This is justifiable on the grounds that $X$ is random. The outcome of a coin flip for each patient should not be related to any of their characteristics (hidden or otherwise). 
  
-
 We want to estimate the causal effect of treatment; what is the probability of recovery if we \textbf{take the action} 'treat' versus the \textbf{action} 'placebo'? Taking the action 'treat'  corresponds to replacing the equation $X = \epsilon_{x}$ with $X=1$. The probability distribution over $Y$ given we set $X=1$ is then $P(Y = y|do(X=1)) = P(f(1,\epsilon_{y})=y)$, where we have introduced the $do$ notation to distinguish setting a variable from observing it \cite{Pearl1995}. However, for this model,  The probability of observing $Y$ given $X=1$, $P(Y = y|X = 1)$ is also given by $P(f(1,\epsilon_{y})=y)$ because $\epsilon_{y} \ci \epsilon{x}$. The causal effect is exactly the difference in observed outcomes, as we would intuitively expect for a randomized experiment. In this case, due to the assumption that $X \rightarrow Y$ and that there is no hidden common cause, correlation is causation.  
 
 For a model with $N$ variables, a structural equation model looks like a set of $N$ simultaneous equations, with each variable playing the role of the dependent (left hand side) variable in one equation. However a SEM is, by definition, more than a set of simultaneous equations. By declaring it to be structural we are saying that it represents assumptions about the relationships between variables. When we visualise the model as a network the absence of an arrow between two variables encodes the assumption that one does not cause the other.
@@ -290,6 +290,7 @@ The equivalence between models for interventional queries allows researchers to 
 If you state your assumptions in the form of an acyclic structural equation model or a causal bayesian network, the do calculus provides the methodology to determine if a given causal effect can be estimated from observational data and, if it can, provides to formula to do so. The calculus relies heavily on the understanding how conditional independence properties are encoded in bayesian networks. Therefore, in the next section we give a short review of independence in bayesian networks.
 
 \subsection{Independence in bayesian networks: D-separation}
+\label{sec:dsep}
 
 Recall from section \ref{sec:causalbayesnets} the local markov condition: 
 
@@ -385,6 +386,29 @@ If all paths between two nodes are blocked by conditioning on $\boldsymbol{Z}$ t
 \begin{definition}
 The variables $\boldsymbol{X}$ are d-separated from $\boldsymbol{Y}$ given $\boldsymbol{Z}$ in the network $G$ if, after conditioning on $\boldsymbol{Z}$ there are no unblocked paths from $\boldsymbol{X}$ to $\boldsymbol{Y}$.  
 \end{definition}
+
+Let us conclude with an example. Assuming the model in figure \ref{fig:chocindepstress}: Is obesity independent of stress given chocolate consumption?
+\begin{figure}[h]
+\centering
+\caption{D-separation example}
+\label{fig:chocindepstress}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.5cm,  thick,main node/.style={punktrect}]
+ %nodes
+\node[main node](1){Cholocate};
+\node[main node, above left=of 1](2){Stress};
+\node[main node, above right=of 1](3){Genotype};
+\node[main node, below = of 1](4){Obesity};
+
+ \path[every node/.style={font=\sffamily\small}]
+ 	(2) edge node {} (1)
+ 	(3) edge node {} (1)
+ 		edge node {} (4)
+ 	(1) edge node {} (4);
+
+\end{tikzpicture}
+\end{figure}
+
+There are two paths from stress to obesity in figure \ref{fig:chocindepstress}, $Stress \rightarrow Chocolate \rightarrow Obesity$ and $Stress \rightarrow Chocolate \leftarrow Genotype \rightarrow Obesity$. In the first, the variable chocolate is an intermediary as in figure \ref{fig:dseptripple1} so this path is blocked when we condition on chocolate. However, in the second path chocolate is a collider as in figure \ref{fig:dseptripple4} so this path is unblocked when we condition on chocolate. Since there is an unblocked path from stress to obesity after conditioning on chocolate, obesity is not independent of stress given chocolate consumption. This example shows the role of a variable (if it is a collider or not) is relative to the path you are considering. Conditioning on a variable can block some paths and unblock others.
 
 For a more complete introduction to d-separation (with proofs) see \cite{Koller2009}.
 
@@ -558,6 +582,7 @@ Determining if a network is identifiable via the two calculus still requires som
 If all the variables in a causal network can be measured any interventional query on that network are identifiable. You just have to condition on the parents of the variables on which you intervene. For discrete variables, the causal effect is given by:
 
 \begin{equation}
+\label{eq:allvarsobserved}
 P(\boldsymbol{Y}|do(\boldsymbol{X})) = \sum_{\boldsymbol{Pa_{X}}}{P(\boldsymbol{Y}|\boldsymbol{X},\boldsymbol{Pa_{X}})P(\boldsymbol{Pa_{X}})}
 \end{equation}
 
@@ -567,7 +592,7 @@ where $\boldsymbol{Pa_{X}}$ are the parents of $\boldsymbol{X}$.
 Conditioning on the parents blocks all information that does not flow causally (along the arrows) from the variables on which we intervened which eliminates spurious correlations and gives the causal effect. 
 
 \subsubsection{The Back Door criterion}
-The back door criterion generalizes from the case where all variables can be measured by observing we don't need to condition on all the parents of the intervened on variables: it is sufficient to condition on a set of variables that block all spurious paths from $\boldsymbol{X}$ to $\boldsymbol{Y}$. A spurious, or back door, path is one that leaves $\boldsymbol{X}$ against the direction of the causal arrows. If we have a set of variables $\boldsymbol{Z}$ that block all back door paths from $\boldsymbol{X}$ to $\boldsymbol{Y}$, where no variable in $\boldsymbol{Z}$ is a descendent of $\boldsymbol{X}$ then:
+The back door criterion is simplified version of rule 2. It generalizes from the case where all variables can be measured by observing we don't need to condition on all the parents of the intervened on variables: it is sufficient to condition on a set of variables that block all spurious paths from $\boldsymbol{X}$ to $\boldsymbol{Y}$. A spurious, or back door, path is one that leaves $\boldsymbol{X}$ against the direction of the causal arrows. If we have a set of variables $\boldsymbol{Z}$ that block all back door paths from $\boldsymbol{X}$ to $\boldsymbol{Y}$, where no variable in $\boldsymbol{Z}$ is a descendent of $\boldsymbol{X}$ then:
 
 \begin{equation}
 P(\boldsymbol{Y}|do(\boldsymbol{X})) = \sum_{Z}{P(\boldsymbol{Y}|\boldsymbol{X},\boldsymbol{Z})P(\boldsymbol{Z})}
@@ -794,16 +819,267 @@ learning what indicates causality.
 
 \section{Causal structure learning (causal discovery)}
 \label{sec:causaldiscovery}
-If you have a method for doing things pairwise, then you can extend it to a full network. 
 
-peters approach \cite{Peters2014}
-Pearl/Verma/Sprites approach \cite{Pearl2000} 
+In previous sections we discussed when assumptions about the structure of the variables in a specific problem is sufficient to identify a causal effect. This approach relies on having enough prior knowledge or theory about the problem to allow you to, at least partially, specify the causal network. In this section, we consider the much harder problem of causal inference where you need to learn the network. Causal inference might seem impossible without specific assumptions about the structure of the variables involved but, amazingly, some aspects of causal structure can be determined from much more general assumptions.  
+
+In this section we consider variants of the following problem: Assume there is some acyclic causal network $G$ that generated the distribution $P(\boldsymbol{V})$ from which our data has been sampled. Our goal is to recover the network from this data. 
+
+What can we look for in the distribution that could give us clues as to the structure of the network? 
+
+\subsection{Causal discovery with conditional independence tests}
+One general approach is to look for clues about the structure of the network in the conditional independence relations in the distribution. We know, (section \ref{sec:dsep}), if $Z$ d-separates $X$ and $Y$ in $G$ then $(X \ci Y|Z)$ in $P$ . However, we want to work in the other direction, from conditional independence in the distribution to the structure of the network. This requires that we assume the reverse condition:$(X \ci Y|Z)$ in $P$ must imply $Z$ d-separates $X$ and $Y$ in $G$. This assumption, commonly referred to as  \textbf{\textit{faithfulness}}, says there are no additional independence relations that are satisfied in $P$ but not in all distributions $\boldsymbol{P'}$ that are compatible with $G$. Stating that $P$ is faithful to $G$ is equivalent to $G$ is a \textbf{\textit{perfect map}} for $P$.
+
+Faithfulness is an assumption. It does not always hold and we cannot verify it from the observational data we wish to use for causal inference. However, most distributions generated by a causal bayesian network will be faithful to that network. For faithfulness to be violated, different causal effects must exactly balance one-another out. For example, consider a simple binary variable model of chocolate consumption, income and obesity (figure). If the coefficients in the conditional probability tables are just right then the direct effect of chocolate on obesity will exactly balance the indirect effect through income and obesity will appear independent of chocolate consumption. However, this independence is not stable. It would disappear under a small perturbation to any of the parameters.  
+
+Given the faithfulness assumption, our causal discovery problem reduces to finding the set of bayesian networks that have exactly the dependency structure as we observe in $P$. This set can also be referred to as the markov equivalence class compatible with $P$.
+
+\subsubsection{Without hidden common causes}
+The strong assumption that there are no hidden variables that cause two or more variables in $\boldsymbol{V}$ significantly reduces the 'search space' of bayesian networks we must consider. 
+
+We will begin with a brute force algorithm (described as the SGS algorithm in \cite{Sprites} and IC algorithm in \cite{Pearl2000}). While it is impractical for all but the smallest of networks, it demonstrates key concepts that also underlie the more useful and complex algorithms we will discuss later. 
+
+\begin{table}[H]
+ \begin{tabularx}{\textwidth}{X}
+ \hline
+\rule{0pt}{2.5ex} 
+ \textbf{The SGS (or IC) Algorithm}\\
+ \hline
+ \rule{0pt}{2.5ex}
+\textbf{Input:} A distribution $P$, over variables $\boldsymbol{V}$, that was generated by and is faithful to an (unknown) bayesian network $G$\\
+\textbf{Output:} A partially directed network that represents the markov equivelence class of $G$\\
+ \begin{enumerate}[itemsep=8pt]
+  \item Join all pairs of vertices $(a,b) \in \boldsymbol{V}$ with an undirected link to form a complete graph.
+  \item For each link $a-b$ search for a set $\boldsymbol{S}_{a,b} \subseteq V \setminus \{a,b\}$ that renders $a$ and $b$ conditionally independent. If such a set (including the empty set) exists then $a$ and $b$ cannot be directly connected in $G$ so delete the link.
+  \label{alg:SGSexponential}
+  
+  \item For all pairs of non-linked variables $(\alpha,\beta)$ with a common neighbour, $c$, if $c \notin \boldsymbol{S}_{\alpha,\beta}$, then $c$ must be a collider in the path $\alpha,c,\beta$ so  add arrows to direct the links $\alpha-c$ and $\beta-c$ towards $c$.
+  \label{alg:SGScolliders}  
+  \item Recursively try to orient any edges that remain undirected to avoid creating cycles (because they are not there by assumption) and additional colliders (because any colliders were found in step \ref{alg:SGScolliders}).
+  \label{alg:SGSfinal}
+\end{enumerate}\\
+ \hline
+\end{tabularx}
+\end{table}
+
+The SGS algorithm utilizes the fact that a collider structure (f
+igure \ref{fig:dseptripple4}) induces a distinct conditional independence relation. Assuming you have a consistent conditional independence test, it converges to return a partially directed network that represents the Markov equivalence class for the generating causal model. Unfortunately the number of conditional independence tests required for step \ref{alg:SGSexponential} grows exponentially (in the worst case) with the number of variables. Not only that, but for each edge that is in the true network, the algorithm will always tests all other possible subsets of variables. If the assumption that there are no hidden common causes or that the distribution is faithful are violated, step \ref{alg:SGScolliders} of the SGS algorithm can produce double headed arrows.
+
+The PC algorithm \cite{Sprites} modifies step \ref{alg:SGSexponential} of the SGS algorithm to utilize the fact that if two variables $(a,b)$ are conditionally independent given some set, they will also be conditionally independent given a set that contains only variables adjacent to $a$ or $b$. It also checks for low order conditional independence relations before higher order ones. This allows it to exploit any sparsity in the true network, leading to much better average case performance  \cite{Sprites} (although the worst case, where the true network is complete, is still exponential). With finite data, the order in which the links are considered can change the output (unlike for SGS). The effect of wrongly removing a link early on flows through to later conditional independence tests by changing which nodes are considered adjacent.
+
+
+\begin{table}[H]
+ \begin{tabularx}{\textwidth}{X}
+ \hline
+\rule{0pt}{2.5ex} 
+ \textbf{The PC Algorithm}\\
+ \hline
+ \rule{0pt}{2.5ex}
+\textbf{Input:} A distribution $P$, over variables $\boldsymbol{V} = \{V_{1}...V_{k}\}$, that was generated by and is faithful to an (unknown) bayesian network $G$\\
+\textbf{Output:} A partially directed network that represents the markov equivelence class of $G$\\
+ \begin{enumerate}[itemsep=8pt]
+  \item As for SGS
+  \item \textbf{for} each link $a-b$:
+  \begin{itemize}[label={}]
+   \item $n = 0$
+   \item $\boldsymbol{A}_{a,b} = \{A_{1}...A_{j}\}$ be the set of nodes adjacent to $a$ and/or $b$
+   \item \textbf{while} $a$ and $b$ are connected and $n < j$:
+   \item 
+    	\begin{itemize}[label={}]
+    	\item \textbf{if} any subset of size $n$ of $\boldsymbol{A}$ makes $a$ and $b$ conditionally independent:
+    	\item \begin{itemize}[label={}]
+    			delete the link
+    		  \end{itemize}
+    	
+    	\item $n = n+1$
+    	\end{itemize}
+  \end{itemize}   
+  \item as for SGS
+  \item as for SGS
+\end{enumerate}\\
+ \hline
+\end{tabularx}
+\end{table}
+
+The PC algorithm also returns a set of Markov equivalent networks consistent with the distribution. Since we have assumed there are no hidden variables, for any single graph in this set we can calculate causal effects with equation \ref{eq:allvarsobserved}. We can then bound the true causal effect by combining the results for the all the networks. This procedure is the IDA algorithm \cite{Maathuis2009} and has been found to outperform standard regularization techniques at finding causal effects in a high-dimensional yeast gene expression data set \cite{Maathuis2010}. An implementation is available in the R package \cite{Kalisch2012} 
+
+
+\subsubsection{With hidden variables}
+There are an number of difficulties in extending the approach of the last section to deal with the case where there are latent variables. With an unknown number of hidden variables there are an infinity many possible structures to search over. In addition, the space of causal networks is not closed under marginalization. If we have a distribution that $P'(\boldsymbol{O},\boldsymbol{U})$ generated by and is faithful to a network $G$ the distribution $P(\boldsymbol{O})$, that results from marginalizing over $\boldsymbol{U}$, may not be faithful to any bayesian network (see figure \ref{fig:DAGSnotclosed}).
+
+\begin{figure}
+\centering
+\caption{A distribution faithful to this DAG is not faithful to any DAG over the variables $\{A,B,C,D\}$ after marginalizing over $U$. }
+\label{fig:DAGSnotclosed}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,  thick,main node/.style={punkt}]
+ %nodes
+\node[main node](1){U}; 
+\node[main node, below left = of 1](2){B};
+\node[main node, below right = of 1](3){C};
+\node[main node, above left= of 2](4){A};
+\node[main node, above right = of 3](5){D};
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (4) edge node {} (2)
+    (5) edge node {} (3);
+    	
+    	
+
+\end{tikzpicture}
+
+\end{figure}
+ 
+
+The key to constraining the space of possible models is that many latent structures are equivalent (under transforms of the hidden variables). See example figure XXX.
+
+\begin{theorem}
+\cite{Verma1993} For every latent structure there is a dependency equivalent structure such that every latent (unobserved) variable is a root node with exactly two children .
+\end{theorem}
+
+Since we only care about the causal relationships between observed variables, it is sufficient to search over networks where any hidden variables have no parents and directly cause two of the observed variables. Instead of representing hidden variables explicitly we can capture the necessary independence relations with a more general graphical model that supports bi-directed edges that play the role of a hidden confounding variable. These models, referred to as maximal ancestral graphs (MAGs) are closed under marginalization and conditioning. 
+
+For any DAG with latent (and selection) variables there is a unique MAG \cite{Richardson2002}. This makes it possible to extend the PC algorithm to latent structures, resulting in the FCI algorithm \cite{Sprites}. The logic is very similar. Certain structures are ruled out by being inconstant with the observed conditional independence relations. The output is an equivalence class of MAGs, which can be represented graphically as a partial ancestral graph PAG. Assuming there are no selection variables (see \cite xxx), the PAG can contain four types of link:
+
+\begin{enumerate}
+\item $X \rightarrow Y$, meaning $X$ causes $Y$
+\item $X \leftrightarrow Y$, meaning there is a latent variable that causes $X$ and $Y$.
+\item $X\ {\circ} {\rightarrow}\ Y$, either $X$ causes $Y$ or a latent variable causes both.
+\item $X\ {\circ} {-}  {\circ}\ Y$, either $X$ causes $Y$ or $Y$ causes $X$ or a latent variable causes both.
+\end{enumerate}
+
+The circles indicate where it is ambiguous if there should be an arrowhead (ie where there is one in some MAGs and not in others in the equivalence class). Counter-intuitively it is sometimes possible to  rule out or confirm the existence of a confounding variable and fully determine the causal type of a link (see examples in figure \ref{fig:FCIExamples}). 
+
+\begin{figure}
+\centering
+\caption{A distribution faithful to this DAG is not faithful to any DAG over the variables $\{A,B,C,D\}$ after marginalizing over $U$. }
+\label{fig:FCIExamples}
+ \begin{subfigure}[t]{0.8\textwidth}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.7cm,  thick,main node/.style={punkt}]
+ %nodes
+\node[main node](1){U}; 
+\node[main node, below left = of 1](2){B};
+\node[main node, below right = of 1](3){C};
+\node[main node, above left= of 2](4){A};
+\node[main node, above right = of 3](5){D};
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (4) edge node {} (2)
+    (5) edge node {} (3);
+    	
+\end{tikzpicture}
+ \end{subfigure}
+ \begin{subfigure}[t]{0.8\textwidth}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.7cm,  thick,main node/.style={punkt}]
+ %nodes
+
+\node[main node](1){A};
+\node[main node, below right=of 1](2){B};
+\node[main node, right=of 2](3){C};
+\node[main node, above right=of 3](4){D};
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge[pil] node {} (2)
+    (2) edge node {} (3)
+    (3) edge node {} (2)
+    (4) edge [pil] node {} (3);    	
+\end{tikzpicture}
+\end{subfigure}
+ \begin{subfigure}[t]{0.4\textwidth}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.7cm,  thick,main node/.style={punkt}]
+ %nodes
+
+\node[main node](1){C};
+\node[main node, above left=of 1](2){A};
+\node[main node, above right=of 1](3){B};
+\node[main node, below=of 1](4){D};
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (4)
+    (2) edge node {} (1)
+    (3) edge node {} (1);    	
+\end{tikzpicture}
+\end{subfigure}
+ \begin{subfigure}[t]{0.4\textwidth}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.7cm,  thick,main node/.style={punkt}]
+ %nodes
+
+\node[main node](1){C};
+\node[main node, above left=of 1](2){A};
+\node[main node, above right=of 1](3){B};
+\node[main node, below=of 1](4){D};
+
+ \path[every node/.style={font=\sffamily\small}]
+ 	(1) edge node {} (4)
+    (2) edge [pil] node {} (1)
+    (3) edge [pil] node {} (1);    	
+\end{tikzpicture}
+\end{subfigure}
+  
+
+\end{figure} 
+
+The FCI algorithm can be made complete such that it discovers all aspects of the true causal structure that are identifiable from the conditional independence relations of a distribution over observed variables and the faithfulness assumption \cite{Zhang2008}. More recently \cite{Colombo2012} have proposed the RFCI algorithm, which in some cases returns more ambiguous links than FCI but is substantially faster. \cite{Claassen2013} point out that the problem of learning sparse causal networks from data is not NP-hard and propose the FCI+ algorithm, that requires $O(N^{2(k+2)})$ conditional independence tests, where $k$ is the maximum node degree over the observed variables. 
+
+With latent variables we are not using all the information - so we could go further (to nested markov models and inequalities.) \cite{Richardson2012} \cite{Shipster2014}
+
+
+These are all constraint based methods ... efficient because they stop early, but also may not be robust to errors early on. 
+
+
+
+\subsubsection{Doing conditional independence tests}
+The off-diagonal elements of the standardized inverse of the correlation
+matrix are the negatives of the partial correlation coefficients between the corresponding
+variables given the remaining variables (see e.g. Whittaker, 1990). Hence in the linear case, the
+independence graph can be efficiently constructed by placing an edge between A and B if and
+only if the entry in the standardized inverse correlation matrix is non-zero. In the discrete case,
+Fung and Crawford (1990) have recently proposed a fast algorithm for constructing an
+independence graph from discrete data. We have not tested their procedure as a preprocessor for
+the PC algorithm. (COPIED FROM SPRITES)
+
+\cite{Zhang2012} Kernel independence tests
+
+HSIC \cite{Gretton2008}
+
+\subsection{Discovery with functional models}
+All of the algorithms we have considered so far return a Markov equivalence class. They cannot distinguish between two models that result in the same set of conditional independence relations. Consider the very simple case where we have only two variables and the only possible causal structures are $X \rightarrow Y$ or $Y \rightarrow X$. These models have the same dependency structure but in one case $P(Y|do(X)) = P(Y|X)$ and in the other $P(Y|do(X)) = P(Y)$. No algorithm relying purely on conditional independence relations can separate these two cases. 
+
+Let us focus only on the two variable case $X \rightarrow Y$ or $Y \rightarrow X$. What possible clues could there be in the distribution $P(X,Y)$ that could indicate which causal model it was generated from. Recall the functional definition of causality (section \ref{sec:SEM}). There are a number of assumptions about the form of the functions that can allow us to identify the causal direction: non-invertible functions, additive noise \ref{}, post-non-linear additive noise 
+
+
+Linear models with non-gaussian noise \cite{Hoyer2012}
+
+Allow us to make assumptions about the form of the relationships between variables.
+With just two variables:
+
+Additive noise, \cite{Hoyer2009}
+
+post-non-linear additive noise \cite{Zhang2008a}, 
+
+causal anti-causal, 
+
+deterministic functions,
+
+IGCI \cite{Janzing2012a}
+
+learning what causality looks like.
+
+If we have a method to solve this case we can solve the more general case (with no hidden variables) Putting things together to learn the full network. 
+
+
+\subsection{Scoring}
 
 
 \section{Causality and prediction}
 Refresh the difference between a causal query and predictive query.
 Point out the importance of accurate prediction for causal inference. For example, if we can predict the control response, we can run experimental studies without controls (\cite{Brodersen2013})
 
+\section{Concluding remarks}
+
+Section 3 tells empirical researchers how to formalize what they already do when forced to work with observational data. The results should not be taken to mean that experimentation should be abandoned. Similarly the fact that causal discovery from general assumptions is possible (section 5) does not mean we should throw away careful analysis of a specific problem in favour of simply throwing all the variables into a causal discovery algorithm. A human may likely still be the state of the art for constructing a qualitative network (or better set of plausible networks) in fields like economics, ecology and social science where the variables are subject to human intuition and there exists some some theory to constrain models. However, we should not assume this will always be the case. As causal discovery methods are improved and the ability of AI to automatically incorporate large bodies of theory or prior knowledge into models develops computers should become better at science than us. Even if you don't believe in such dreams, there are already problems with large number of variables where we don't have a lot of theoretical understanding of the relationships between them. For these problems, even very naive causal discovery algorithms can improve on the alternative of standard feature selection.
 
 \bibliographystyle{plain}% Select the citation style e.g. ieeetr
 \bibliography{library}% write the directory to the .bib file
@@ -812,7 +1088,28 @@ Point out the importance of accurate prediction for causal inference. For exampl
 
 
 
-
+\begin{algorithm}
+  \caption{The SGS (or IC) Algorithm}\label{alg:IC}
+  \label{alg:PC}
+  \begin{algorithmic}[1]
+    \For{all pairs of variables $(a,b)$}
+    	\State  {all other sets of variables excluding a,b}
+    		
+    \EndFor
+    \If{$n < 0$}
+      \State $X \leftarrow 1 / x$
+    \EndIf
+    \If{$n > 0$}
+      \State $X \leftarrow 1$
+    \EndIf
+    \For{$N \neq 0$}
+      \State $X \leftarrow X \times X$
+    \EndFor
+    \While{$N \neq 0$}
+      \State $X \leftarrow X \times X$
+    \EndWhile
+  \end{algorithmic}
+\end{algorithm}
 
 
 
