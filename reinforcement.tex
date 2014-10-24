@@ -1,0 +1,63 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithm
+\usepackage[noend]{algpseudocode}% http://ctan.org/pkg/algorithmicx
+\usepackage{parskip}
+\usepackage{tikz}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usetikzlibrary{arrows,positioning} 
+\usepackage{subcaption}
+
+
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    punkt/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           text width=1em,
+           minimum height=1em,
+           text centered},
+    punktrect/.style={
+    rectangle, 
+    rounded corners, 
+    % fill=black!10,
+    draw=black, thick,
+    minimum height=1em, 
+    text centered},
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,}
+}
+
+
+\author{Finnian Lattimore}
+\title{Notes on Re-inforcment learning}
+
+\begin{document}
+\def\ci{\perp\!\!\!\perp} % from Wikipedia
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+
+In both classical experimental design and in reinforcement learning the number of possible configurations explodes as we add variables. Key strategy of bandits is 'Randomized probability matching'; play the arm according to the probability its optimal
+
+
+\bibliographystyle{plain}% Select the citation style e.g. ieeetr
+\bibliography{library}% write the directory to the .bib file
+\end{document}

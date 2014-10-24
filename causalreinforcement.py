@@ -84,7 +84,7 @@ for i in range(simulations):
 # 
 
 #hmmm this doesn't get to do final optimization as ultimately can't narrow down enough - It should be setting each arm ... eventually. Ie it should learn ...
-interventions = [{"X1":'0'},{"X1":'1'},{"X2":'0'},{"X2":'1'},{"X3":'0'},{"X3":'1'}] # number of arms the same in this case as 2*2 = 2^2
+interventions = [{"X1":'0'},{"X1":'1'},{"X2":'0'},{"X2":'1'},{"X3":'0'},{"X3":'1'}] 
 X1arms = {0:0,1:1}
 X2arms = {0:2,1:3}
 X3arms = {0:4,1:5}
