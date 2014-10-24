@@ -6,7 +6,9 @@ from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
 from libpgm.tablecpdfactorization import TableCPDFactorization
 import itertools
 import matplotlib.pyplot as plt
+import matplotlib
 import time
+import json
         
 
 class BinaryNetworkBandit(object):
@@ -120,14 +122,18 @@ class BinaryNetworkBandit(object):
         # put labels under each plot
         f,sp = plt.subplots(1,len(self.variables),sharey=False,figsize=(15,5))
         for i in range(len(self.variables)):
-            dist = beta(self.observed_true[i], self.observed_trials[i]-self.observed_true[i])
+            dist = beta(self.prior[0]+self.observed_true[i], self.prior[1]+self.observed_trials[i]-self.observed_true[i])
             sp[i].plot(self.theta_range,dist.pdf(self.theta_range))
         plt.show()
 
     def plot_assignments(self):
+        print self.atrials
+        print self.asuccesses
         f,sp = plt.subplots(1,len(self.assingment_map),sharey=False,figsize=(15,5))
-        for i in range(len(self.assingment_map)):
-            dist = beta(self.asuccesses[i], self.atrials[i]-self.asuccesses[i])
+        titles = [json.dumps(x) for x in self.assignements]
+        for i in range(len(self.assingment_map)): # need to get rid of the unicode tags so things fit - dirty way is s.encode('ascii')
+            dist = beta(self.prior[0]+self.asuccesses[i]+1, self.prior[1]+self.atrials[i]-self.asuccesses[i])
+            sp[i].set_title(titles[i])
             sp[i].plot(self.theta_range,dist.pdf(self.theta_range))
         plt.show()
         
@@ -165,10 +171,10 @@ class BinaryNetworkBandit(object):
         optimal = bestprob
         return 1 - reward/bestprob
 
-
+matplotlib.rcParams.update({'font.size': 8})
 bandit = BinaryNetworkBandit("bayesnet.json")
 bandit.sample(500,plot=500)
 print bandit.trials
 print bandit.successes
 bandit.plot_observed()
-bandit.plot_assignments()
+bandit.plot_assignments() 
