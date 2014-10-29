@@ -60,6 +60,7 @@ class CausalBinaryBandit(object):
         self.pxEstimate = [BetaPosterior() for x in range(numCauses)] # hold and estimate of P(X1),P(X2)...
         self.interventions = 0
         self.rewards = 0
+        self.sumExpectedReward = 0
         
         
     def setProbXandProbYGivenX(self,pxlist,probYisOne):
@@ -132,17 +133,16 @@ class CausalBinaryBandit(object):
                 self.pxEstimate[var].update(val) # update observed estimates for non-intervened variables
                 oArm = self.getArm((var,val))
                 self.arms[oArm].wieghtdUpdate(y,w) # update other arms based on observed values, weighted according to likelyhood this combination would have occured in observational data 
-            
-        
-        
-        
+               
     def selectArm(self):
         """ Returns the index of the next arm to select """
         sampled_theta = []
         for indx,arm in enumerate(self.arms):
             sampled_theta.append(arm.sample())
         self.interventions+=1
-        return sampled_theta.index( max(sampled_theta))
+        selectedArmIndx = sampled_theta.index( max(sampled_theta))
+        self.sumExpectedReward += self.py[selectedArmIndx]
+        return selectedArmIndx
 
     def randomSample(self,n):
         """ sample at random"""
@@ -166,36 +166,43 @@ class CausalBinaryBandit(object):
             
 
     def regret(self):
-        """ total reward vs expected reward had optimal arm been played from the start """
+        """ optimal expected reward minus sum of expected reward of played arms """
         optimal_reward = max(self.py)*self.interventions
-        return (optimal_reward - self.rewards)/(float(self.interventions))
+        return (optimal_reward - self.sumExpectedReward)/(float(self.interventions))
+
+
+
+def compareBandits(trials,interventions,o,px,pyGivenX):
+    cr = 0
+    tr = 0
+    for experiment in range(trials):
+        numArms = len(px)
+        bandit = CausalBinaryBandit(numArms)
+        bandit.setProbXandProbYGivenX(px,pyGivenX)
+        bandit.causalThompsonSample(interventions)
+        regret = bandit.regret()
+        cr += regret
+        o.write(str(regret)+",CT,"+str(interventions)+","+str(numArms)+"\n")
+    
+        bandit = CausalBinaryBandit(len(px))
+        bandit.setProbXandProbYGivenX(px,pyGivenX)
+        bandit.thompsonSample(interventions)
+        regret = bandit.regret()
+        tr += regret
+        o.write(str(regret)+",T,"+str(interventions)+","+str(numArms)+"\n")
+    return (cr/float(trials),tr/float(trials))
 
 o = open("causal_thompson.txt","w")
-cr = 0
-tr = 0
-trials = 100
-interventions = 15
-for experiment in range(trials):
-    print experiment
-    bandit = CausalBinaryBandit(4)
-    bandit.setProbXandProbYGivenX([0.2,0.1,0.5,.3],[0.2,0.4,0.6,0.8,0.2,0.4,0.6,0.8,.3,.01,.2,.9,.7,.2,.5,.005])
-    bandit.causalThompsonSample(interventions)
-    regret = bandit.regret()
-    cr += regret
-    o.write(str(regret)+",CT\n")
-    
-    bandit = CausalBinaryBandit(4)
-    bandit.setProbXandProbYGivenX([0.2,0.1,0.5,.3],[0.2,0.4,0.6,0.8,0.2,0.4,0.6,0.8,.3,.01,.2,.9,.7,.2,.5,.005])
-    bandit.thompsonSample(interventions)
-    regret = bandit.regret()
-    tr += regret
-    o.write(str(regret)+",T\n")
+for numArms in [pow(2,x) for x in range(1,5)]:
+    trials = 100
+    px = [0.5]*numArms
+    pyGivenX = [0.5]*pow(2,numArms)
+    pyGivenX[0] = 0.6
+    interventions = 100
+    print compareBandits(trials,interventions,o,px,pyGivenX)
 o.close()
-print "CAUSAL",cr/float(trials)
-print "STANDARD",tr/float(trials)
+
             
-    
-    
 
 
     
