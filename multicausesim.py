@@ -171,18 +171,28 @@ class CausalBinaryBandit(object):
         return (optimal_reward - self.rewards)/(float(self.interventions))
 
 o = open("causal_thompson.txt","w")
-for experiment in range(10):
+cr = 0
+tr = 0
+trials = 100
+interventions = 15
+for experiment in range(trials):
     print experiment
-    bandit = CausalBinaryBandit(3)
-    bandit.setProbXandProbYGivenX([0.2,0.1,0.5],[0.2,0.4,0.6,0.8,0.2,0.4,0.6,0.8])
-    bandit.causalThompsonSample(10)
-    o.write(str(bandit.regret)+"CT\n")
+    bandit = CausalBinaryBandit(4)
+    bandit.setProbXandProbYGivenX([0.2,0.1,0.5,.3],[0.2,0.4,0.6,0.8,0.2,0.4,0.6,0.8,.3,.01,.2,.9,.7,.2,.5,.005])
+    bandit.causalThompsonSample(interventions)
+    regret = bandit.regret()
+    cr += regret
+    o.write(str(regret)+",CT\n")
     
-    bandit = CausalBinaryBandit(3)
-    bandit.setProbXandProbYGivenX([0.2,0.1,0.5],[0.2,0.4,0.6,0.8,0.2,0.4,0.6,0.8])
-    bandit.causalThompsonSample(10)
-    o.write(str(bandit.regret)+"T\n")
+    bandit = CausalBinaryBandit(4)
+    bandit.setProbXandProbYGivenX([0.2,0.1,0.5,.3],[0.2,0.4,0.6,0.8,0.2,0.4,0.6,0.8,.3,.01,.2,.9,.7,.2,.5,.005])
+    bandit.thompsonSample(interventions)
+    regret = bandit.regret()
+    tr += regret
+    o.write(str(regret)+",T\n")
 o.close()
+print "CAUSAL",cr/float(trials)
+print "STANDARD",tr/float(trials)
             
     
     
