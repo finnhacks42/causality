@@ -54,15 +54,17 @@ class BetaPosterior(object):
 class CausalBinaryBandit(object):
     def __init__(self,numCauses):
         self.numCauses = numCauses
-        self.setProbXandProbYGivenX(beta.rvs(1,1,size=numCauses),beta.rvs(1,1,size=pow(2,numCauses)))
-        self.arms = [BetaPosterior() for x in range(2*numCauses)] # arms are ordered as X1=0,X1=1,X2=0,X2=1,...
         self.numArms = numCauses*2
-        self.pxEstimate = [BetaPosterior() for x in range(numCauses)] # hold and estimate of P(X1),P(X2)...
+        self.reset()
+        
+    def reset(self):
+        self.arms = [BetaPosterior() for x in range(2*self.numCauses)] # arms are ordered as X1=0,X1=1,X2=0,X2=1,...
+        self.pxEstimate = [BetaPosterior() for x in range(self.numCauses)] # hold and estimate of P(X1),P(X2)...
         self.interventions = 0
         self.rewards = 0
         self.sumExpectedReward = 0
         
-        
+    
     def setProbXandProbYGivenX(self,pxlist,probYisOne):
         """ probYisOne should be single array of length 2^numCauses.
             The order is assumed to be cycling through the last variable fastest
@@ -77,7 +79,8 @@ class CausalBinaryBandit(object):
         for index,row in enumerate(combinations):
             p = [self.pxlist[i] if val == 1 else 1-self.pxlist[i] for i,val in enumerate(row)] # the probabilities for each val in X(independent)
             for i,value in enumerate(row):
-                dp = np.prod(list(iskip(p,i)))*probYisOne[index]  #product of p excluding index i * probYisOne[index]
+                excludeI = list(iskip(p,i))
+                dp = np.prod(excludeI)*probYisOne[index]  #product of p excluding index i * probYisOne[index]
                 field = self.getArm((i,value))
                 self.py[field]+=dp # update correct field
                 
@@ -175,17 +178,20 @@ class CausalBinaryBandit(object):
 def compareBandits(trials,interventions,o,px,pyGivenX):
     cr = 0
     tr = 0
+    numArms = len(px)
+    bandit = CausalBinaryBandit(numArms)
+    bandit.setProbXandProbYGivenX(px,pyGivenX)
     for experiment in range(trials):
-        numArms = len(px)
-        bandit = CausalBinaryBandit(numArms)
-        bandit.setProbXandProbYGivenX(px,pyGivenX)
+        print experiment
+        bandit.reset()
+        
         bandit.causalThompsonSample(interventions)
         regret = bandit.regret()
         cr += regret
         o.write(str(regret)+",CT,"+str(interventions)+","+str(numArms)+"\n")
-    
-        bandit = CausalBinaryBandit(len(px))
-        bandit.setProbXandProbYGivenX(px,pyGivenX)
+
+        bandit.reset()
+        
         bandit.thompsonSample(interventions)
         regret = bandit.regret()
         tr += regret
@@ -194,14 +200,19 @@ def compareBandits(trials,interventions,o,px,pyGivenX):
 
 o = open("causal_thompson.txt","w")
 for numArms in [pow(2,x) for x in range(1,5)]:
-    trials = 100
+    print numArms
+    trials = 5
     px = [0.5]*numArms
     pyGivenX = [0.5]*pow(2,numArms)
-    pyGivenX[0] = 0.6
-    interventions = 100
+    pyGivenX[0:pow(2,numArms-1)] = [0.6]*pow(2,numArms-1) # think further about this step ...
+    interventions = 10
     print compareBandits(trials,interventions,o,px,pyGivenX)
+    
 o.close()
 
+# gets a lot slower as the number of arms increases - not entirely obvious why - would be good to know which method spent most time running - is it selectArm?
+# actually appears to be in intitialization - the marginalization step gets expensive as graph size increases - one option would be to allow specification of marginal probabilities
+# and select joint probabilities such that marginals known analytically. 
             
 
 
