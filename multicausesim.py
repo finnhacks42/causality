@@ -3,6 +3,7 @@ from scipy.stats import bernoulli
 from scipy.stats import beta
 from itertools import izip
 from random import randint
+import math
 
 def generateCombinations(nVars):    
     rows = pow(2,nVars)
@@ -19,21 +20,26 @@ def iskip(iterable, skip):
     for i, element in enumerate(iterable):
         if i != skip:
             yield element
-       
+
+def epsilon(N,alpha):
+    return math.sqrt((1.0/float(2.0*N))*math.log(2.0/alpha))
 
 
 class BetaPosterior(object):
     def __init__(self,prior = (1,1)):
         self.trueCount = prior[0]
         self.falseCount = prior[1]
+        self.N = sum(prior)
 
     def update(self,result):
+        self.N +=1
         if result:
             self.trueCount +=1
         else:
             self.falseCount +=1
             
     def wieghtdUpdate(self,result,weight):
+        self.N += weight
         if result:
             self.trueCount+=weight
         else:
@@ -48,6 +54,13 @@ class BetaPosterior(object):
     
     def pOfReward(self):
         return self.trueCount/float(self.trueCount+self.falseCount)
+
+    def upperCI(self,alpha):
+        """ get the upper confidence interval on theta"""
+        e = epsilon(self.N,alpha)
+        return self.pOfReward()+e # I know this is not an actual CI bound as it can exceed 1 (I could take min 1 and this) but maybe I get extra info this way ...
+ 
+        
         
         
 
@@ -136,12 +149,19 @@ class CausalBinaryBandit(object):
                 self.pxEstimate[var].update(val) # update observed estimates for non-intervened variables
                 oArm = self.getArm((var,val))
                 self.arms[oArm].wieghtdUpdate(y,w) # update other arms based on observed values, weighted according to likelyhood this combination would have occured in observational data 
+
+    
+    def UCBSelectArm(self,alpha):
+        """ pick the arm with the highest upper bound on its payoff"""
+        upperBounds = [arm.upperCI(alpha) for arm in self.arms]
+        self.interventions +=1
+        selectedArmIndx = upperBounds.index(max(upperBounds))
+        self.sumExpectedReward += self.py[selectedArmIndx]
+        return selectedArmIndx
                
     def selectArm(self):
         """ Returns the index of the next arm to select """
-        sampled_theta = []
-        for indx,arm in enumerate(self.arms):
-            sampled_theta.append(arm.sample())
+        sampled_theta = [arm.sample() for arm in self.arms]
         self.interventions+=1
         selectedArmIndx = sampled_theta.index( max(sampled_theta))
         self.sumExpectedReward += self.py[selectedArmIndx]
@@ -161,6 +181,12 @@ class CausalBinaryBandit(object):
             outcome = self.do(arm)
             self.thompsonUpdate(arm,outcome)
 
+    def UCBSample(self,n,alpha):
+        for i in xrange(n):
+            arm = self.UCBSelectArm(alpha)
+            outcome = self.do(arm)
+            self.thompsonUpdate(arm,outcome)
+    
     def causalThompsonSample(self,n):
         for i in xrange(n):
             arm = self.selectArm()
@@ -178,42 +204,58 @@ class CausalBinaryBandit(object):
 def compareBandits(trials,interventions,o,px,pyGivenX):
     cr = 0
     tr = 0
+    cbr = 0
     numArms = len(px)
     bandit = CausalBinaryBandit(numArms)
     bandit.setProbXandProbYGivenX(px,pyGivenX)
     for experiment in range(trials):
-        print experiment
         bandit.reset()
         
+        bandit.UCBSample(interventions,0.05)
+        regret = bandit.regret()
+        cbr += regret
+        o.write(str(regret)+",UCB,"+str(interventions)+","+str(numArms)+"\n")
+
+        bandit.reset()
+
         bandit.causalThompsonSample(interventions)
         regret = bandit.regret()
         cr += regret
         o.write(str(regret)+",CT,"+str(interventions)+","+str(numArms)+"\n")
-
+        
         bandit.reset()
         
         bandit.thompsonSample(interventions)
         regret = bandit.regret()
         tr += regret
         o.write(str(regret)+",T,"+str(interventions)+","+str(numArms)+"\n")
-    return (cr/float(trials),tr/float(trials))
+    return (cr/float(trials),tr/float(trials),cbr/float(trials))
 
-o = open("causal_thompson.txt","w")
-for numArms in [pow(2,x) for x in range(1,5)]:
-    print numArms
-    trials = 5
-    px = [0.5]*numArms
-    pyGivenX = [0.5]*pow(2,numArms)
-    pyGivenX[0:pow(2,numArms-1)] = [0.6]*pow(2,numArms-1) # think further about this step ...
-    interventions = 10
-    print compareBandits(trials,interventions,o,px,pyGivenX)
-    
+o = open("thompsonvsUCBvsCT2.txt","w")
+px = [0.5,0.5,0.5]
+pyGivenX = [0.1,0.3,0.2,0.5,.05,.03,.2,.3]
+for ni in [pow(2,x) for x in range(2,12)]:
+    print compareBandits(1000,ni,o,px,pyGivenX)
 o.close()
+
+
+
+
+##o = open("causal_thompson.txt","w")
+##for numArms in [pow(2,x) for x in range(1,4)]:
+##    print numArms
+##    trials = 5
+##    px = [0.5]*numArms
+##    pyGivenX = [0.5]*pow(2,numArms)
+##    pyGivenX[0:pow(2,numArms-1)] = [0.6]*pow(2,numArms-1) # think further about this step ...
+##    interventions = 10
+##    print compareBandits(trials,interventions,o,px,pyGivenX)
+##    
+##o.close()
 
 # gets a lot slower as the number of arms increases - not entirely obvious why - would be good to know which method spent most time running - is it selectArm?
 # actually appears to be in intitialization - the marginalization step gets expensive as graph size increases - one option would be to allow specification of marginal probabilities
 # and select joint probabilities such that marginals known analytically. 
             
-
 
     
