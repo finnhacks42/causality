@@ -1,0 +1,166 @@
+\documentclass{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{accents}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage[ruled]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{dsfont}
+\usepackage[bf]{caption}
+\usepackage{hyperref}
+\hypersetup{
+    bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in AcrobatÕs bookmarks
+    pdftoolbar=true,        % show AcrobatÕs toolbar?
+    pdfmenubar=true,        % show AcrobatÕs menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={My title},    % title
+    pdfauthor={Author},     % author
+    pdfsubject={Subject},   % subject of the document
+    pdfcreator={Creator},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfkeywords={keyword1} {key2} {key3}, % list of keywords
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=red,          % color of internal links (change box color with linkbordercolor)
+    citecolor=blue,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+\usepackage{amsthm}
+\usepackage{natbib}
+\usepackage[capitalize]{cleveref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MACROS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\defined}{\vcentcolon =}
+\newcommand{\rdefined}{=\vcentcolon}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\calF}{\mathcal F}
+\newcommand{\sr}[1]{\stackrel{#1}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\ind}[1]{\mathds{1}\!\!\set{#1}}
+\newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
+\newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
+\newcommand{\floor}[1]{\left \lfloor {#1} \right\rfloor}
+\newcommand{\ceil}[1]{\left \lceil {#1} \right\rceil}
+\newcommand{\eqn}[1]{\begin{align}#1\end{align}}
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+\newcommand{\Ber}{\operatorname{Bernoulli}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+\title{Causal Inference and Bandits}
+\author{Blah blah}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+An abstract.
+\end{abstract}
+
+\section{Introduction}
+
+Useful references are: \cite{BC12}.
+
+\section{Notation}
+
+We are considering a variant of the multi-armed bandit problem.
+Let $p \in [0,1]^K$ be a fixed and known vector.
+In each time-step $t$ 
+\begin{enumerate}
+\item The learner chooses an $I_t \in \set{1,\ldots, K}$ and $J_t \in \set{0,1}$.
+\item Then $X_t \in \set{0,1}^K$ is sampled from a product of Bernoulli distributions, $X_{t,i} \sim \Ber(p_i)$ 
+\item The learner observes $\tilde X_t \in \set{0,1}^K$, which is defined by 
+\eq{
+\tilde X_{t,i} = \begin{cases}
+X_{t,i} &\text{if } i \neq I_t \\
+J_t & \text{otherwise}\,.
+\end{cases}
+}
+\item The learner receives reward $Y_t \sim \Ber(q(\tilde X))$ where $q:\set{0,1}^K \to [0,1]$ is unknown and arbitrary.
+\end{enumerate}
+The expected reward of taking action $i,j$ is $\mu_{i,j} = \E[q(X)|X_i = j]$. The optimal reward and action are $\mu^*$ and $(i^*,j^*)$ respectively,
+where $(i^*,j^*) = \argmax_{i,j} \mu_{i,j}$ and $\mu^* = \mu(i^*,j^*)$. The $n$-step cumulative expected regret is
+\eq{
+R_n = \E \sum_{t=1}^n \left(\mu^* - \mu_{I_t,J_t}\right).
+}
+
+\section{Estimating $\mu_{i,j}$}
+The most natural way to estimate $\mu_{i,j}$ is to compute an empirical estimate based on samples when that action was taken. This approach would
+lead directly to the UCB algorithm with $2K$ actions and a regret bound that depended linearly on $K$. In this instance we can significantly
+outperform this approach by exploiting the extra structure in the problem.
+
+Fix some time-step $t$ and $i \in \set{1,\ldots,K}$ and $j \in \set{0,1}$.
+We define estimator $\hat \mu_t$ of $\mu_{i,j}$ by
+\eq{
+n_{a,b}    &= \sum_{s=1}^t \ind{I_t = i, J_t = j, X_a = b, Y_t = 1} \\
+m_{a,b}    &= \sum_{s=1}^t \ind{I_t = i, J_t = j, X_a = b} \\
+\hat \mu_t &= \eta_i \frac{m_{i,j}}{n_{i,j}}  + \sum_{a \neq i} \eta_a \left[p_a \frac{m_{a,1}}{n_{a,1}} + (1 - p_a) \frac{m_{a,0}}{n_{a,0}}\right] \\
+\eta_a     &= \frac{n_a}{\sum_{a=1}^K n_a} \\
+n_a        &= \begin{cases} 
+  n_{i,j}                                           & \text{if } a = i \\
+  \min\set{\frac{n_{a,1}}{p_a}, \frac{n_{a,0}}{1-p_a}}  & \text{otherwise}
+\end{cases}
+}
+\begin{theorem} With probability at least $1 - \delta$ we have that:
+$\displaystyle \left|\hat \mu_t - \mu\right| \leq \sqrt{\frac{\beta}{\sum_{a} n_a} \log{1 \over \delta}}$,
+where $\beta > 0$ is some constant.
+\end{theorem}
+
+\section{Algorithm}
+
+\begin{algorithm}
+\caption{UCB}
+\begin{algorithmic}[1]
+\State {\bf Input:} Number of variables $K$, vector $p \in [0,1]^K$, horizon $n$
+\For{$t \in 1,\ldots,n$}
+\For{$i \in 1,\ldots,K$}
+\For{$j \in \set{0,1}$}
+\State Compute $\tilde \mu_{i,j} = \hat \mu_{i,j} + \sqrt{\frac{\alpha}{\sum_{a} n_a} \log n}$ 
+\EndFor
+\EndFor
+\State Choose $I_t, J_t = \argmax_{i,j} \tilde \mu_{i,j}$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\section{Theorems}
+\section{Experiments}
+\section{Conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{c-bandit}
+
+\end{document}
+
+
+
+
