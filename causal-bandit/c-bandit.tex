@@ -59,6 +59,7 @@
 \newcommand{\eqn}[1]{\begin{align}#1\end{align}}
 \newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
 \newcommand{\Ber}{\operatorname{Bernoulli}}
+\renewcommand{\P}[1]{\operatorname{P}\left\{#1\right\}}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,7 +76,7 @@
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{example}[theorem]{Example}
 
-\title{Causal Inference and Bandits}
+\title{Intervention Bandits}
 \author{Blah blah}
 
 \begin{document}
@@ -121,19 +122,48 @@ outperform this approach by exploiting the extra structure in the problem.
 Fix some time-step $t$ and $i \in \set{1,\ldots,K}$ and $j \in \set{0,1}$.
 We define estimator $\hat \mu_t$ of $\mu_{i,j}$ by
 \eq{
-n_{a,b}    &= \sum_{s=1}^t \ind{I_t = i, J_t = j, X_a = b, Y_t = 1} \\
-m_{a,b}    &= \sum_{s=1}^t \ind{I_t = i, J_t = j, X_a = b} \\
+m_{a,b}    &= \sum_{s=1}^t \ind{I_t = i, J_t = j, X_a = b, Y_t = 1} \\
+n_{a,b}    &= \sum_{s=1}^t \ind{I_t = i, J_t = j, X_a = b} \\
 \hat \mu_t &= \eta_i \frac{m_{i,j}}{n_{i,j}}  + \sum_{a \neq i} \eta_a \left[p_a \frac{m_{a,1}}{n_{a,1}} + (1 - p_a) \frac{m_{a,0}}{n_{a,0}}\right] \\
 \eta_a     &= \frac{n_a}{\sum_{a=1}^K n_a} \\
 n_a        &= \begin{cases} 
   n_{i,j}                                           & \text{if } a = i \\
-  \min\set{\frac{n_{a,1}}{p_a}, \frac{n_{a,0}}{1-p_a}}  & \text{otherwise}
+  \frac{1}{2}\min\set{\frac{n_{a,1}}{p_a}, \frac{n_{a,0}}{1-p_a}}  & \text{otherwise}
 \end{cases}
 }
 \begin{theorem} With probability at least $1 - \delta$ we have that:
 $\displaystyle \left|\hat \mu_t - \mu\right| \leq \sqrt{\frac{\beta}{\sum_{a} n_a} \log{1 \over \delta}}$,
 where $\beta > 0$ is some constant.
 \end{theorem}
+
+\begin{proof}
+First note that $n_{a,b}$ is a random variable that is bounded by $t$ for all $a,b$.
+We use the short-hand $\mu^{a,b}_{i,j} = \E[q(X) | X_i = j, X_a = b]$. Then
+\eq{
+\mu_{i,j} = p_a \mu_{i,j}^{a,1} + (1 - p_a) \mu_{i,j}^{a,0}\,.
+}
+Now we can apply Hoeffding's bound and the union bound to show that
+\eq{
+\P{\left|\frac{m_{a,b}}{n_{a,b}} - \mu_{i,j}^{a,b}\right| \geq \sqrt{\frac{1}{2n_{a,b}} \log \frac{2t}{\delta}}} \leq \delta\,.
+}
+Therefore by the union bound
+\eq{
+\P{\left|p_a \frac{m_{a,1}}{n_{a,1}} + (1 - p_a) \frac{m_{a,0}}{n_{a,0}} - \mu_{i,j}\right| \geq p_a \sqrt{\frac{1}{2n_{a,1}} \log\frac{4t}{\delta}}
++ (1 - p_a) \sqrt{\frac{1}{2n_{a,0}}\frac{4t}{\delta}}} \leq \delta\,
+}
+Now by Jensen's inequality 
+\eq{
+p_a \sqrt{\frac{1}{2n_{a,1}}\log\frac{4t}{\delta}} + (1 - p_a) \sqrt{\frac{1}{2n_{a,0}}\log\frac{4t}{\delta}}
+&\leq \sqrt{\left(\frac{p_a}{2n_{a,1}} + \frac{1-p_a}{2n_{a,0}}\right)\log \frac{4t}{\delta}} \\
+&\leq \sqrt{\max\set{\frac{p_a}{n_{a,1}}, \frac{1-p_a}{n_{a,0}}} \log\frac{4t}{\delta}} \\
+&= \sqrt{{1 \over 2n_a} \log\frac{4t}{\delta}}\,.
+}
+Similarly,
+\eq{
+\P{\left|\frac{m_{i,j}}{n_{i,j}} - \mu_{i,j}\right| \geq \sqrt{\frac{1}{2n_a} \log\frac{4t}{\delta}}} \leq
+\P{\left|\frac{m_{i,j}}{n_{i,j}} - \mu_{i,j}\right| \geq \sqrt{\frac{1}{2n_a} \log\frac{2t}{\delta}}} \leq \delta\,.
+}
+\end{proof}
 
 \section{Algorithm}
 
