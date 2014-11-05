@@ -4,6 +4,8 @@ from scipy.stats import beta
 from itertools import izip
 from random import randint
 import math
+from matplotlib import *
+
 
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
@@ -26,6 +28,144 @@ def iskip(iterable, skip):
 
 def epsilon(N,alpha):
     return math.sqrt((1.0/float(2.0*N))*math.log(2.0/alpha))
+
+def getArm(action):
+    # arms are ordered as X1=0,X1=1,X2=0,X2=1,...
+    variable,value = action
+    return int(variable)*2+int(value)
+
+def getAction(arm):
+    # arms are ordered as X1=0,X1=1,X2=0,X2=1,...
+    value = arm % 2
+    variable = arm/2
+    return (variable,value)
+
+def flip(binary):
+    """ turns 0 -> 1 and 1 -> 0 """
+    return binary*-1+1
+
+
+
+
+class Arm(object):
+    def __init__(self,numArms,armIndx,alpha = 0.05):
+        self.counts = [[1,1] for x in xrange(numArms)] # first entry is trials, second is success
+        self.id = armIndx
+        self.action = getAction(armIndx) # tuple (variable,value) that is the action corresponding to this arm
+        self.alpha = alpha
+        # One of the other arms also corresponds to the same variable and should not be updated
+        self.sisterID = getArm((self.action[0],flip(self.action[1]))) 
+        
+    def update_intervention(self,result):
+        """ updates the arm based on the result of pulling that arm"""
+        self.counts[self.id][0]+=1
+        self.counts[self.id][1]+= result
+
+    def update_observation(self,otherArmID,result):
+        """ updates this arm based on the result of pulling otherArm"""
+        self.counts[otherArmID][0]+=1
+        self.counts[otherArmID][1]+=result
+
+    def prY(self, pxlist): # pxlist holds the probability each variable is 1
+        """ returns an estimation of the probability of getting a reward by pulling this arm and an uncertainty"""
+        # each other arm corresponds to a key value pair ie (x1,0), (x1,1),(x3,0),(x3,1)
+        # clearly ignore sisterID here ...
+        pr = 0
+        totalW = 0
+        varID = 0
+        for i in range(0,len(self.counts),2):
+            if i != self.id and i != self.sisterID:
+                # combine i and i+1 - these correspond to parts A and B
+                cA = self.counts[i]
+                cB = self.counts[i+1]
+                A = cA[1]/float(cA[0])
+                B = cB[1]/float(cB[0])
+                eA = epsilon(cA[0],self.alpha)
+                eB = epsilon(cB[0],self.alpha)
+                pXIs1 = pxlist[varID]
+                theta = A*(1-pXIs1)+B*pXIs1
+                etheta =  eA*(1-pXIs1)+eB*pXIs1 # a dodgy standard deviation in the estiate of theta
+            else:
+                # add in the ones from actual interventions on this variable.
+                cS = self.counts[self.id]
+                theta = cS[1]/float(cS[0])
+                etheta = epsilon(cS[0],self.alpha)
+            w = 1/pow(etheta,2)
+            pr+=theta*w
+            totalW +=w
+            varID +=1
+
+        
+        pr = pr/totalW
+        er = pow(1.0/totalW,2)
+
+        # combine this whole lot with the actual intervention based on ...
+        return (pr,er)
+                
+    def upperCI(self,armProbs):
+        """ returns the upper confidence bound on prY """
+        pr,er = self.prY(armProbs)
+        return pr+er
+
+    
+
+
+class CausalBandit2(object):
+    def __init__(self,model):
+        self.model = model
+        self.numCauses = len(model.pxlist)
+        self.numArms = self.numCauses*2
+        self.reset()
+        
+    def reset(self):
+        self.arms = [Arm(self.numArms,i) for i in range(self.numArms)] # arms are ordered as X1=0,X1=1,X2=0,X2=1,...
+        self.interventions = 0
+        self.rewards = 0
+        self.sumExpectedReward = 0
+        
+    
+    def update(self,armID,outcome):
+        """ called when armID was pulled with given outcome """
+        y,other = outcome
+        self.rewards += y
+        arm = self.arms[armID]
+        arm.update_intervention(y)
+    
+        for var,val in enumerate(other):
+            if var != arm.action[0]:
+                oArm = self.arms[getArm((var,val))]
+                oArm.update_observation(armID,y)
+                
+    def pull(self,arm):
+        action = getAction(arm)
+        return self.model.do(action)
+    
+    def selectArm(self,alpha):
+        """ pick the arm with the highest upper bound on its payoff"""
+        upperBounds = [arm.upperCI(self.model.pxlist) for arm in self.arms]
+        self.interventions +=1
+        selectedArmIndx = upperBounds.index(max(upperBounds))
+        self.sumExpectedReward += self.model.py[selectedArmIndx]
+        return selectedArmIndx
+               
+    
+    def sample(self,n,alpha,verbose=False):
+        for i in xrange(n):
+            arm = self.selectArm(alpha)
+            outcome = self.pull(arm)
+            self.update(arm,outcome)
+            if verbose:
+                print "arm:"+str(arm)+"="+str(getAction(arm))+"->"+str(outcome)
+                print [arm.prY(self.model.pxlist)[0] for arm in self.arms]
+        return self.regret()
+
+    def regret(self):
+        """ optimal expected reward minus sum of expected reward of played arms """
+        optimal_reward = max(self.model.py)*self.interventions
+        return (optimal_reward - self.sumExpectedReward)/(float(self.interventions))
+
+
+
 
 
 class BetaPosterior(object):
@@ -63,6 +203,14 @@ class BetaPosterior(object):
         e = epsilon(self.N,alpha)
         return self.pOfReward()+e # I know this is not an actual CI bound as it can exceed 1 (I could take min 1 and this) but maybe I get extra info this way ...
 
+    def plot(self,axis):
+        if axis == None:
+            f,axis = subplots()
+        dist = beta(self.trueCount,self.falseCount)
+        x = np.linspace(0,1,100)
+        axis.plot(x,dist.pdf(x))
+        return axis
+        
 
 class ProbabilityModel(object):
     
@@ -73,21 +221,7 @@ class ProbabilityModel(object):
         pY = self.pYGivenX(sample) # get P(Y|X)
         y = bernoulli.rvs(pY)  # sample Y from P(Y|X)
         return (y,sample)   
-    # want some way of quantifying the variability of pYGivenX
-
-    def getArm(self,action):
-        # arms are ordered as X1=0,X1=1,X2=0,X2=1,...
-        variable,value = action
-        return int(variable)*2+int(value)
-
-    def getAction(self,arm):
-        # arms are ordered as X1=0,X1=1,X2=0,X2=1,...
-        value = arm % 2
-        variable = arm/2
-        return (variable,value)
-        
-    
-    
+   
     
 class FullProbabilityModel(ProbabilityModel):
     def __init__(self,pxlist,probYisOne):
@@ -106,15 +240,16 @@ class FullProbabilityModel(ProbabilityModel):
             for i,value in enumerate(row):
                 excludeI = list(iskip(p,i))
                 dp = np.prod(excludeI)*probYisOne[index]  #product of p excluding index i * probYisOne[index]
-                field = self.getArm((i,value))
+                field = getArm((i,value))
                 self.py[field]+=dp # update correct field
                 
 
-    def pYGivenX(self,xsample):
+    def pYGivenX(self,sample):
         """ calculate P(y|x1...xN) """
         return self.yGivenX.get(tuple(sample))# get P(Y|X)
 
-    
+
+
 
 class LogisticProbabilityModel(ProbabilityModel):
     """ models the case where P(x1...xn) = g(w0+w1*x1+w2*x2+...wn*xn) """
@@ -197,8 +332,9 @@ class CausalBinaryBandit(object):
                 oArm = self.model.getArm((var,val))
                 self.arms[oArm].wieghtdUpdate(y,w) # update other arms based on observed values, weighted according to likelyhood this combination would have occured in observational data 
 
+
     def pull(self,arm):
-        action = self.model.getAction(arm)
+        action = getAction(arm)
         return self.model.do(action)
     
     def UCBSelectArm(self,alpha):
@@ -253,39 +389,30 @@ class CausalBinaryBandit(object):
         return (optimal_reward - self.sumExpectedReward)/(float(self.interventions))
 
 
+n = 100
+experiments = 1000
+data = np.zeros((experiments,2))
+for i in xrange(experiments):
+    pxlist = np.random.uniform(0,1,size=2)
+    pygivenx = np.random.uniform(0,1,size=4)
+    model = FullProbabilityModel(pxlist,[0.1,0.3,0.5,0.2])
+    bandit = CausalBandit2(model)
+    bandit.sample(n,0.05)
+
+    bandit2 = CausalBinaryBandit(model)
+    bandit2.UCBSample(n,0.05)
+    data[i,0] = bandit.regret()
+    data[i,1] = bandit2.regret()
+
+#print data
+print np.mean(data,axis=0)
+
+#print "actual",model.py
+#print "causal bandit",[arm.prY(pxlist)[0] for arm in bandit.arms]
+#print "normal bandit",[arm.pOfReward() for arm in bandit2.arms]
 
 
 
-
-def compareBandits(trials,interventions,o,px,pyGivenX):
-    cr = 0
-    tr = 0
-    cbr = 0
-    numArms = len(px)
-    bandit = CausalBinaryBandit(numArms)
-    bandit.setProbXandProbYGivenX(px,pyGivenX)
-    for experiment in range(trials):
-        bandit.reset()
-        
-        bandit.UCBSample(interventions,0.05)
-        regret = bandit.regret()
-        cbr += regret
-        o.write(str(regret)+",UCB,"+str(interventions)+","+str(numArms)+"\n")
-
-        bandit.reset()
-
-        bandit.causalThompsonSample(interventions)
-        regret = bandit.regret()
-        cr += regret
-        o.write(str(regret)+",CT,"+str(interventions)+","+str(numArms)+"\n")
-        
-        bandit.reset()
-        
-        bandit.thompsonSample(interventions)
-        regret = bandit.regret()
-        tr += regret
-        o.write(str(regret)+",T,"+str(interventions)+","+str(numArms)+"\n")
-    return (cr/float(trials),tr/float(trials),cbr/float(trials))
 
 
 # requires structural but not parametric assumptions
