@@ -40,6 +40,7 @@
 \usepackage{amsthm}
 \usepackage{natbib}
 \usepackage[capitalize]{cleveref}
+\usepackage{graphicx}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MACROS
@@ -93,9 +94,11 @@ Useful references are: \cite{BC12}.
 
 \section{Notation}
 
-We are considering a variant of the multi-armed bandit problem.
-Let $p \in [0,1]^K$ be a fixed and known vector.
-In each time-step $t$ 
+Assume we have a known causal model with binary variables $\boldsymbol{X} = \{X_{1}..X_{K}\}$ that independently cause a target variable of interest $Y$. We can run sequential experiments on the system, where at each timestep $t$ we can select a variable on which to intervene and then we observe the complete result, $(\boldsymbol{X}_{t},Y_{t})$ This problem can be viewed as a variant of the multi-armed bandit problem.
+
+
+Let $p \in [0,1]^K$ be a fixed and known vector. In each time-step $t$:
+ 
 \begin{enumerate}
 \item The learner chooses an $I_t \in \set{1,\ldots, K}$ and $J_t \in \set{0,1}$.
 \item Then $X_t \in \set{0,1}^K$ is sampled from a product of Bernoulli distributions, $X_{t,i} \sim \Ber(p_i)$ 
@@ -184,6 +187,32 @@ Similarly,
 
 \section{Theorems}
 \section{Experiments}
+
+
+
+\begin{figure}[h]
+\caption{Testing values of beta - 100 experiments for each value of beta, with a 4 armed bandit.}
+\includegraphics[width=0.7\textwidth]{regretvsbeta.pdf}
+\end{figure}
+
+
+
+Simululations to compare the performance of standard UCB with our modified algorithm. For each number of arms, $100$ bandits of each type were created and run upto to a horizon of $1000$ timesteps. The mean regret and its standard error from these simulations is plotted in figure \ref{fig:regretvsarms} The true data was generated from a model where:
+
+\eq{
+&p = [0.5]^{K}\\
+&q(\boldsymbol{X}) = \begin{cases}0.5 & \text{if $X_{1}=0$}\\ 0.6 & \text{otherwise} \end{cases}
+}
+
+For small number of arms there is not much difference. As the number of arms increases, cusb shows significantly lower regret. As the number of arms increases above 100 the regret of the two algorithms begins to converge again. I suspect this is due to the fixed time horizon of $1000$ steps. With a time horizon of $100$ steps the two algorithms begin to converge again at a smaller number of arms. 
+
+\begin{figure}[h]
+\caption{Shows relationship between the regret and the number of bandit arms $2K$ for the standard UCB algorithm and our modified algorithm.  }
+\label{fig:regretvsarms}
+\includegraphics[width=0.9\textwidth]{regretvsarms.pdf}
+\end{figure}
+
+
 \section{Conclusion}
 
 \bibliographystyle{plainnat}
