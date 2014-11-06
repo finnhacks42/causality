@@ -144,12 +144,12 @@ We use the short-hand $\mu^{a,b}_{i,j} = \E[q(X) | X_i = j, X_a = b]$. Then
 }
 Now we can apply Hoeffding's bound and the union bound to show that
 \eq{
-\P{\left|\frac{m_{a,b}}{n_{a,b}} - \mu_{i,j}^{a,b}\right| \geq \sqrt{\frac{1}{2n_{a,b}} \log \frac{2t}{\delta}}} \leq \delta\,.
+\P{\left|\frac{m_{a,b}}{n_{a,b}} - \mu_{i,j}^{a,b}\right| \geq \sqrt{\frac{1}{2n_{a,b}} \log \frac{4t}{\delta}}} \leq \frac{\delta}{2}\,.
 }
 Therefore by the union bound
 \eq{
 \P{\left|p_a \frac{m_{a,1}}{n_{a,1}} + (1 - p_a) \frac{m_{a,0}}{n_{a,0}} - \mu_{i,j}\right| \geq p_a \sqrt{\frac{1}{2n_{a,1}} \log\frac{4t}{\delta}}
-+ (1 - p_a) \sqrt{\frac{1}{2n_{a,0}}\frac{4t}{\delta}}} \leq \delta\,
++ (1 - p_a) \sqrt{\frac{1}{2n_{a,0}}\log\frac{4t}{\delta}}} \leq \delta\,
 }
 Now by Jensen's inequality 
 \eq{
