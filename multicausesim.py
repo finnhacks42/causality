@@ -5,6 +5,7 @@ from itertools import izip
 from random import randint
 import math
 from matplotlib import *
+import matplotlib.pyplot as plt
 
 
 def sigmoid(x):
@@ -66,15 +67,16 @@ class Arm(object):
         self.counts[otherArmID][0]+=1
         self.counts[otherArmID][1]+=result
 
-    def prY(self, pxlist): # pxlist holds the probability each variable is 1
+    def prYdisabled(self, pxlist): # pxlist holds the probability each variable is 1
         """ returns an estimation of the probability of getting a reward by pulling this arm and an uncertainty"""
         # each other arm corresponds to a key value pair ie (x1,0), (x1,1),(x3,0),(x3,1)
-        # clearly ignore sisterID here ...
+        
         pr = 0
         totalW = 0
         varID = 0
         for i in range(0,len(self.counts),2):
-            if i != self.id and i != self.sisterID:
+            if varID != self.action[0]: #
+                
                 # combine i and i+1 - these correspond to parts A and B
                 cA = self.counts[i]
                 cB = self.counts[i+1]
@@ -98,23 +100,55 @@ class Arm(object):
         
         pr = pr/totalW
         er = pow(1.0/totalW,2)
+        return (pr,er)
 
-        # combine this whole lot with the actual intervention based on ...
+    def prY(self,pxlist,beta):
+        pr = 0
+        totalW = 0
+        varID = 0
+        for i in range(0,len(self.counts),2): # stepping throught the variables
+            if varID != self.action[0]:
+                assert(i!=self.id and i!=self.sisterID)
+
+                na0 = float(self.counts[i][0])
+                ma0 = self.counts[i][1]
+                na1 = float(self.counts[i+1][0])
+                ma1 = self.counts[i+1][1]
+                p = pxlist[varID]
+
+                n = .5*min(na1/p,na0/(1-p))
+                pr += n*(p*ma1/na1+(1-p)*ma0/na0)
+                totalW += n
+                    
+            else:
+                # add in the ones from actual interventions on this variable.
+                mij = self.counts[self.id][1]
+                nij = float(self.counts[self.id][0])
+                    
+                n = nij
+                pr += n*mij/nij
+                totalW += n
+     
+            varID +=1
+
+        pr = pr/totalW
+        er = math.sqrt((beta/totalW)*math.log(1/self.alpha))    
         return (pr,er)
                 
-    def upperCI(self,armProbs):
+    def upperCI(self,armProbs,beta):
         """ returns the upper confidence bound on prY """
-        pr,er = self.prY(armProbs)
+        pr,er = self.prY(armProbs,beta)
         return pr+er
 
     
 
 
 class CausalBandit2(object):
-    def __init__(self,model):
+    def __init__(self,model,beta):
         self.model = model
         self.numCauses = len(model.pxlist)
         self.numArms = self.numCauses*2
+        self.beta = beta
         self.reset()
         
     def reset(self):
@@ -142,7 +176,7 @@ class CausalBandit2(object):
     
     def selectArm(self,alpha):
         """ pick the arm with the highest upper bound on its payoff"""
-        upperBounds = [arm.upperCI(self.model.pxlist) for arm in self.arms]
+        upperBounds = [arm.upperCI(self.model.pxlist,self.beta) for arm in self.arms]
         self.interventions +=1
         selectedArmIndx = upperBounds.index(max(upperBounds))
         self.sumExpectedReward += self.model.py[selectedArmIndx]
@@ -156,7 +190,7 @@ class CausalBandit2(object):
             self.update(arm,outcome)
             if verbose:
                 print "arm:"+str(arm)+"="+str(getAction(arm))+"->"+str(outcome)
-                print [arm.prY(self.model.pxlist)[0] for arm in self.arms]
+                print [arm.prY(self.model.pxlist,self.beta)[0] for arm in self.arms]
         return self.regret()
 
     def regret(self):
@@ -250,6 +284,21 @@ class FullProbabilityModel(ProbabilityModel):
 
 
 
+class TrivialProbabilityModel(ProbabilityModel):
+    """ p(x1)...p(xn) = 0.5 and y independent of all x except x1. P(y|x1=1) = 0.6, P(y|x1=0) = 0.5 """
+    def __init__(self,numArms,epsilon):
+        assert(numArms % 2 == 0)
+        self.epsilon = epsilon
+        self.py = [.5*(1+self.epsilon)]*numArms
+        self.py[0] = 0.5
+        self.py[1] = 0.5+self.epsilon
+        self.pxlist = np.array([0.5]*(numArms/2))
+
+    def pYGivenX(self,xvals):
+        return 0.5+self.epsilon*xvals[0]
+
+    
+        
 
 class LogisticProbabilityModel(ProbabilityModel):
     """ models the case where P(x1...xn) = g(w0+w1*x1+w2*x2+...wn*xn) """
@@ -275,11 +324,6 @@ class LogisticProbabilityModel(ProbabilityModel):
                 pyk += self.pYGivenX(sample)
             pyk = pyk/float(m)
             self.py[k] = pyk
-
-    def bestArm(self):
-        """ figure out which is the best arm and what is probability is """
-        # if w[i] is -ive then x[i] = 0, if w[i] is +ive x[i] = 1
-        return
         
 
     def pYGivenX(self,xvals):
@@ -388,24 +432,117 @@ class CausalBinaryBandit(object):
         optimal_reward = max(self.model.py)*self.interventions
         return (optimal_reward - self.sumExpectedReward)/(float(self.interventions))
 
+def plot(self,axis):
+        if axis == None:
+            f,axis = subplots()
+        dist = beta(self.trueCount,self.falseCount)
+        x = np.linspace(0,1,100)
+        axis.plot(x,dist.pdf(x))
+        return axis
 
-n = 100
-experiments = 1000
-data = np.zeros((experiments,2))
-for i in xrange(experiments):
-    pxlist = np.random.uniform(0,1,size=2)
-    pygivenx = np.random.uniform(0,1,size=4)
-    model = FullProbabilityModel(pxlist,[0.1,0.3,0.5,0.2])
-    bandit = CausalBandit2(model)
-    bandit.sample(n,0.05)
+def tryBeta(betalst):
+    experiments = 100
+    n = 100
+    model = FullProbabilityModel([0.5,0.1],[0.1,0.3,0.5,0.2])
+    means = []
+    stds = []
+    for beta in betalst:
+        data = np.zeros((experiments,1))
 
-    bandit2 = CausalBinaryBandit(model)
-    bandit2.UCBSample(n,0.05)
-    data[i,0] = bandit.regret()
-    data[i,1] = bandit2.regret()
+        for i in xrange(experiments):
+            bandit2 = CausalBandit2(model,beta)
+            bandit2.sample(n,0.05,verbose=False)
+            data[i,0] = bandit2.regret()
+        means.append(np.mean(data))
+        stds.append(np.std(data))
+    f,axis = plt.subplots()
+    ste = np.array(stds)/math.sqrt(experiments)
+    axis.errorbar(betalst,means,yerr=ste,fmt="o",label="ucb")
+    axis.set_xlabel("beta")
+    axis.set_ylabel("regret")
+    axis.set_title("regret vs beta")
+    #plt.show()
+    plt.savefig("regretvsbeta.png")
+    plt.savefig("regretvsbeta.pdf")
 
-#print data
-print np.mean(data,axis=0)
+
+beta = 0.6
+n = 1000
+experiments = 100
+cmeans = []
+cstds = []
+means = []
+stds = []
+o = open("manyarmedbandit.txt","w")
+armslst = [pow(2,x) for x in range(2,11)]
+for numArms in armslst:
+    print numArms,"arms",
+    model = TrivialProbabilityModel(numArms,0.3)
+
+    data = np.zeros((experiments,2))
+    for i in xrange(experiments):
+        bandit = CausalBinaryBandit(model)
+        bandit.UCBSample(n,0.05)
+        bandit2 = CausalBandit2(model,beta)
+        bandit2.sample(n,0.05)
+        data[i,0] = bandit2.regret()
+        data[i,1] = bandit.regret()
+        if i % 5 == 0:
+            print i,
+    print ""
+        
+    
+    m = np.mean(data,axis=0)
+    sd = np.std(data,axis=0)/math.sqrt(experiments)
+    l = list(m)
+    s = list(sd)
+    l.extend(s)
+    l.append(numArms)
+    l = [str(x) for x in l]
+    o.write(",".join(l)+"\n")
+    o.flush()
+    cmeans.append(m[0])
+    cstds.append(sd[0])
+    means.append(m[1])
+    stds.append(sd[1])
+
+o.close()
+
+f,axis = plt.subplots()
+axis.errorbar(armslst,means,yerr=stds,fmt="o",label="ucb")
+axis.errorbar(armslst,cmeans,yerr=cstds,fmt="D",label="cucb")
+axis.set_xlabel("number of arms")
+axis.set_ylabel("regret")
+axis.set_title("regret vs number of arms")
+axis.legend(loc="lower right",numpoints=1)
+plt.savefig("regretvsarms.png")
+plt.savefig("regretvsarms.pdf")
+
+
+plt.show()
+
+    
+
+
+print "DONE"
+
+##experiments = 100
+##for i in xrange(experiments):
+##    pxlist = np.random.uniform(0,1,size=2)
+##    pygivenx = np.random.uniform(0,1,size=4)
+##    model = FullProbabilityModel(pxlist,[0.1,0.3,0.5,0.2])
+##    bandit = CausalBandit2(model)
+##    bandit2 = CausalBinaryBandit(model)
+##    for n in [10,50,100,200,500,1000]:
+##        
+##        bandit.sample(n,0.05)
+##        bandit2.UCBSample(n,0.05)
+##        data[i,0] = bandit.regret()
+##        data[i,1] = bandit2.regret() #update and see what happens to regret with n for each type of bandit.Repeat for increasing number of arms.
+##
+###print data
+##print np.mean(data,axis=0)
+##print np.std(data,axis=0)/math.sqrt(experiments)
 
 #print "actual",model.py
 #print "causal bandit",[arm.prY(pxlist)[0] for arm in bandit.arms]
