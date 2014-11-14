@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.8.12)  7 NOV 2014 10:04
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.8.12)  14 NOV 2014 11:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -898,51 +898,70 @@ Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
 (hyperref)                removing `math shift' on input line 120.
 
-LaTeX Font Info:    Try loading font information for U+dsrom on input line 136.
+[1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+LaTeX Font Info:    Try loading font information for U+dsrom on input line 145.
+
 
 (/usr/share/texlive/texmf-dist/tex/latex/doublestroke/Udsrom.fd
 File: Udsrom.fd 1995/08/01 v0.1 Double stroke roman font definitions
-) [1
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+)
 
 Package amsmath Warning: Foreign command \over;
 (amsmath)                \frac or \genfrac should be used instead
-(amsmath)                 on input line 138.
+(amsmath)                 on input line 167.
 
+[2]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 174.
-<regretvsbeta.pdf, id=57, 578.16pt x 433.62pt>
-File: regretvsbeta.pdf Graphic file (type pdf)
- <use regretvsbeta.pdf>
-Package pdftex.def Info: regretvsbeta.pdf used on input line 195.
-(pdftex.def)             Requested size: 328.82707pt x 246.61679pt.
- [2]
-[3 <./regretvsbeta.pdf>] <regretvsarms.pdf, id=158, 665.48625pt x 331.2375pt>
-File: regretvsarms.pdf Graphic file (type pdf)
+put line 203.
+ <regret_vs_K_series_beta.pdf, id=65, 990.70125pt x 592.2125pt>
+File: regret_vs_K_series_beta.pdf Graphic file (type pdf)
 
-<use regretvsarms.pdf>
-Package pdftex.def Info: regretvsarms.pdf used on input line 212.
-(pdftex.def)             Requested size: 422.77664pt x 210.43456pt.
+<use regret_vs_K_series_beta.pdf>
+Package pdftex.def Info: regret_vs_K_series_beta.pdf used on input line 224.
+(pdftex.def)             Requested size: 469.75502pt x 280.80685pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<regret_vs_beta_boxplot.pdf, id=66, 763.85374pt x 619.31375pt>
+File: regret_vs_beta_boxplot.pdf Graphic file (type pdf)
+
+<use regret_vs_beta_boxplot.pdf>
+Package pdftex.def Info: regret_vs_beta_boxplot.pdf used on input line 229.
+(pdftex.def)             Requested size: 328.82707pt x 266.60211pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `fig:regretvsarms' on page 3 undefined on input line 2
+34.
 
 No file c-bandit.bbl.
 
 Package natbib Warning: There were undefined citations.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 221.
-[4 <./regretvsarms.pdf>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 221.
- (./c-bandit.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 221.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 221.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 251.
+[3] [4 <./regret_vs_K_series_beta.pdf>] [5 <./regret_vs_beta_boxplot.pdf>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 251.
+
+(./c-bandit.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 251.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 251.
 Package rerunfilecheck Info: File `c-bandit.out' has not changed.
 (rerunfilecheck)             Checksum: 09FEDD8524045FC918976411FA1E7083;317.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 221.
+
+
+LaTeX Warning: There were undefined references.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 251.
  ) 
 Here is how much of TeX's memory you used:
- 25744 strings out of 493304
- 561376 string characters out of 6139871
- 714952 words of memory out of 5000000
+ 25745 strings out of 493304
+ 561466 string characters out of 6139871
+ 711952 words of memory out of 5000000
  28678 multiletter control sequences out of 15000+600000
  31430 words of font info for 87 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
@@ -964,10 +983,10 @@ e/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texlive
 /texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fon
 ts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/ti
 mes/utmri8a.pfb>
-Output written on c-bandit.pdf (4 pages, 185840 bytes).
+Output written on c-bandit.pdf (5 pages, 225124 bytes).
 PDF statistics:
- 232 PDF objects out of 1000 (max. 8388607)
- 136 compressed objects within 2 object streams
- 29 named destinations out of 1000 (max. 500000)
+ 165 PDF objects out of 1000 (max. 8388607)
+ 135 compressed objects within 2 object streams
+ 30 named destinations out of 1000 (max. 500000)
  79 words of extra memory for PDF output out of 10000 (max. 10000000)
 
