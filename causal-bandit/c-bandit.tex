@@ -131,10 +131,10 @@ P(Y|do(X_i=j)) &= P(Y|X_i = j)\\
 
 Fix some time-step $t$ and $i \in \set{1,\ldots,K}$ and $j \in \set{0,1}$. 
 
-Let $\hat{\mu_a}$ be an empirical estimator for $P(Y|do(X_i=j))$ obtained via marginalization over $a$.
+Let $\hat{\mu}_a$ be an empirical estimator for $P(Y|do(X_i=j))$ obtained via marginalization over $X_a$.
 
 \eq {
-\hat{\mu_a} &=
+\hat{\mu}_a &=
 \begin{cases}
 \frac{m_{a,1}}{n_{a,1}}p_a+\frac{m_{a,0}}{n_{a,0}}(1-p_a) & \text{if } a \neq{i} \\
 \frac{m_{i,j}}{n_{i,j}} & \text{if } a=i \\
@@ -157,10 +157,10 @@ n_{i,j} & \text{if } a = i \\
 \end{cases}
 }
 
-If $p$ is not known, these expression are unchanged except that $p_a$ is replaced with $\hat{p_a}$
+If $p$ is not known, these expression are unchanged except that $p_a$ is replaced with $\hat{p}_a$
 
 \eq{
-\hat{p_a} = \frac{\sum_{s=1}^{t} \ind{X_a=1,I \neq a}_s}{\sum_{s=1}^{t} \ind{I \neq a}_s}
+\hat{p}_a = \frac{\sum_{s=1}^{t} \ind{X_a=1,I \neq a}_s}{\sum_{s=1}^{t} \ind{I \neq a}_s}
 }
 
 \begin{theorem} With probability at least $1 - \delta$ we have that:
