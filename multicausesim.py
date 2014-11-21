@@ -130,7 +130,7 @@ class Arm(object):
                 totalW += n
      
             varID +=1
-
+        print "arm",self.id,"u:",pr,"nSum:",totalW
         pr = pr/totalW
         er = math.sqrt((beta/totalW)*math.log(1/self.alpha))    
         return (pr,er)
@@ -179,6 +179,7 @@ class CausalBandit2(object):
         upperBounds = [arm.upperCI(self.model.pxlist,self.beta) for arm in self.arms]
         self.interventions +=1
         selectedArmIndx = upperBounds.index(max(upperBounds))
+        print "Arm:",selectedArmIndx
         self.sumExpectedReward += self.model.py[selectedArmIndx]
         return selectedArmIndx
                
@@ -467,59 +468,64 @@ def tryBeta(betalst):
 
 
 beta = 0.6
-n = 1000
-experiments = 100
-cmeans = []
-cstds = []
-means = []
-stds = []
-o = open("manyarmedbandit.txt","w")
-armslst = [pow(2,x) for x in range(2,11)]
-for numArms in armslst:
-    print numArms,"arms",
-    model = TrivialProbabilityModel(numArms,0.3)
-
-    data = np.zeros((experiments,2))
-    for i in xrange(experiments):
-        bandit = CausalBinaryBandit(model)
-        bandit.UCBSample(n,0.05)
-        bandit2 = CausalBandit2(model,beta)
-        bandit2.sample(n,0.05)
-        data[i,0] = bandit2.regret()
-        data[i,1] = bandit.regret()
-        if i % 5 == 0:
-            print i,
-    print ""
-        
-    
-    m = np.mean(data,axis=0)
-    sd = np.std(data,axis=0)/math.sqrt(experiments)
-    l = list(m)
-    s = list(sd)
-    l.extend(s)
-    l.append(numArms)
-    l = [str(x) for x in l]
-    o.write(",".join(l)+"\n")
-    o.flush()
-    cmeans.append(m[0])
-    cstds.append(sd[0])
-    means.append(m[1])
-    stds.append(sd[1])
-
-o.close()
-
-f,axis = plt.subplots()
-axis.errorbar(armslst,means,yerr=stds,fmt="o",label="ucb")
-axis.errorbar(armslst,cmeans,yerr=cstds,fmt="D",label="cucb")
-axis.set_xlabel("number of arms")
-axis.set_ylabel("regret")
-axis.set_title("regret vs number of arms")
-axis.legend(loc="lower right",numpoints=1)
-plt.savefig("regretvsarms.png")
-plt.savefig("regretvsarms.pdf")
-
-
-plt.show()
+numArms=4
+model = TrivialProbabilityModel(numArms,0.1)
+bandit = CausalBandit2(model,beta)
+bandit.sample(10,0.05)
+##n = 100
+##experiments = 100
+##cmeans = []
+##cstds = []
+##means = []
+##stds = []
+##o = open("manyarmedbandit.txt","w")
+##armslst = [pow(2,x) for x in range(2,9)]
+##for numArms in armslst:
+##    print numArms,"arms",
+##    model = TrivialProbabilityModel(numArms,0.3)
+##
+##    data = np.zeros((experiments,2))
+##    for i in xrange(experiments):
+##        bandit = CausalBinaryBandit(model)
+##        bandit.UCBSample(n,0.05)
+##        bandit2 = CausalBandit2(model,beta)
+##        bandit2.sample(n,0.05)
+##        data[i,0] = bandit2.regret()
+##        data[i,1] = bandit.regret()
+##        if i % 5 == 0:
+##            print i,
+##    print ""
+##        
+##    
+##    m = np.mean(data,axis=0)
+##    sd = np.std(data,axis=0)/math.sqrt(experiments)
+##    l = list(m)
+##    s = list(sd)
+##    l.extend(s)
+##    l.append(numArms)
+##    l = [str(x) for x in l]
+##    o.write(",".join(l)+"\n")
+##    o.flush()
+##    cmeans.append(m[0])
+##    cstds.append(sd[0])
+##    means.append(m[1])
+##    stds.append(sd[1])
+##
+##o.close()
+##
+##f,axis = plt.subplots()
+##axis.errorbar(armslst,means,yerr=stds,fmt="o",label="ucb")
+##axis.errorbar(armslst,cmeans,yerr=cstds,fmt="D",label="cucb")
+##axis.set_xlabel("number of arms")
+##axis.set_ylabel("regret")
+##axis.set_title("regret vs number of arms")
+##axis.legend(loc="lower right",numpoints=1)
+##name = "regregvsamrs"+str(n)
+##plt.savefig(name+".png")
+##plt.savefig(name+".pdf")
+##
+##
+##plt.show()
 
     
 

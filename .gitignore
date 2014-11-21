@@ -5,9 +5,17 @@
 *.swp
 *.out
 *.data
+*.zip
+*.tar
 
 # java
 *.class
+*.jar
 
 #python
 *.pyc
+
+#latex 
+*.aux
+*.gz
+*.log

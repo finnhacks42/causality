@@ -41,14 +41,22 @@ class BinaryNetworkBandit(object):
         self.prior = prior
         self.interventions = [] # a list of possible assignments
         self.variables = [] # store the variables - defines an ordering
+        self.intervention_to_arm = {}
+        self.variable_name_to_index = {}
         values = []
+        index = 0
+        variable_index = 0
         for variable, data in self.bn.Vdata.iteritems():
             if variable != self.y:
                 self.variables.append(variable)
+                self.variable_name_to_index[variable] = variable_index
+                variable_index +=1
                 vals = data.get("vals")
                 values.append(vals)
                 for value in vals:
                     self.interventions.append({variable:value})
+                    self.intervention_to_arm[(variable,value)]=index
+                    index +=1
 
         # lets calculate and print the actual value of theta for each arm (since we know it)
         
@@ -80,6 +88,10 @@ class BinaryNetworkBandit(object):
         # record distributions for P(X1), P(X2) ... - they update only when we observe Xn not when we do it
         self.observed_trials = zeros(shape=(self.num_arms,), dtype=int)
         self.observed_true = zeros(shape=(self.num_arms,), dtype=int)
+
+        # records how many times each variable was set by intervention
+        self.intervened_trials = zeros(shape=(self.num_arms,), dtype=int)
+        self.intervened_true = zeros(shape=(self.num_arms,), dtype=int)
                 
     
     def sample(self,n,plot=-1):
@@ -91,7 +103,7 @@ class BinaryNetworkBandit(object):
                 do_plot = False
             arm = self.get_recommendation(do_plot)
             intervention = self.interventions[arm]
-            # note evidence is equivelent to do in libpgm
+            # note: evidence is equivelent to do in libpgm
             result = self.bn.randomsample(1,evidence=intervention)[0] # returns a dictionary containing values for each variable
             reward = int(result.get(self.y))
            
@@ -100,6 +112,15 @@ class BinaryNetworkBandit(object):
             if (reward == 1):
                 self.successes[arm] = self.successes[arm] + 1
 
+            # for variable we intervened on record that the we intervened
+            assert(len(interventions.keys())==1)
+            do_variable = intervention.keys()[0] # ASSUMING SINGLE INTERVENTIONS AT THIS POINT
+            do_value = intervention.values()[0]
+            do_variable_indx = self.variable_name_to_index[do_variable]
+            self.intervened_trials[do_variable_indx] +=1
+            self.intervened_true[do_variable_indx] +=1
+            
+            
             
             # for all variables we did not intervene on, update observed
             values = []
@@ -110,6 +131,30 @@ class BinaryNetworkBandit(object):
                     self.observed_trials[indx] += 1
                     if int(value) == 1:
                         self.observed_true[indx]+=1
+
+            # update based on intervened and non-intervened ...
+
+            # for the pulled arm
+            self.trials_c[arm] = self.trials_c[arm] + 1
+            if (reward == 1):
+                self.successes_c[arm] = self.successes_c[arm] + 1
+                
+            # each other value in result corresponds to an arm
+            for k,val in result:
+                # calculate how much this should be weighted down
+                otrials = self.observed_trials[do_variable_indx]
+                oratio = (otrials+self.observed_true[do_variable_indx])/otrials
+                itrials = self.intervened_trials[do_variable_indx]
+                isuccess = itrials/
+                total_success = osuccess+/
+                w = 
+                if k not in intervention:
+                    o_arm = # get arm corresponding to setting variable k to var
+                    self.trials_c[o_arm] = self.trials_c[o_arm]+w
+                    if reward == 1:
+                        self.successes_c[arm] = self.successes_c[arm] + w
+                # the value of [arm] occured because of intervention so we need to weight down based on that - going to lead to fractional trials...
+            
             
             # update relevent exact assignment
             key = str((values))
@@ -154,8 +199,9 @@ class BinaryNetworkBandit(object):
             #Draw sample from beta distribution
             sampled_theta.append(dist.rvs())
 
-            # Alternately calculate P(Y|X1) as sum(P(Y|X1,X2)P(X2)
+            # Alternately calculate P(Y|X1) as sum(P(Y|X1,X2)P(X2))
             # Do this here ....
+            
             
         if do_plot:
             plt.show()
@@ -163,8 +209,7 @@ class BinaryNetworkBandit(object):
         # Return the index of the sample with the largest value
         return sampled_theta.index( max(sampled_theta) )
     
-    
-             
+               
     def regret(self, bestprob):
         """ regret as ratio between reward and expectation of reward had we always selected best """
         reward = sum(self.successes)/float(sum(self.trials))
