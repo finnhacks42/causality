@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: conference_poster_5.aux
+The style file: plain.bst
+Database file #1: library.bib
+Warning--there's a number but no volume in Richardson2013
+Warning--empty institution in Verma1993
+You've used 13 entries,
+            2118 wiz_defined-function locations,
+            580 strings with 5763 characters,
+and the built_in function-call counts, 3787 in all, are:
+= -- 350
+> -- 191
+< -- 1
++ -- 75
+- -- 62
+* -- 249
+:= -- 664
+add.period$ -- 39
+call.type$ -- 13
+change.case$ -- 69
+chr.to.int$ -- 0
+cite$ -- 15
+duplicate$ -- 151
+empty$ -- 310
+format.name$ -- 62
+if$ -- 772
+int.to.chr$ -- 0
+int.to.str$ -- 13
+missing$ -- 14
+newline$ -- 68
+num.names$ -- 26
+pop$ -- 83
+preamble$ -- 1
+purify$ -- 57
+quote$ -- 0
+skip$ -- 90
+stack$ -- 0
+substring$ -- 158
+swap$ -- 17
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 48
+warning$ -- 2
+while$ -- 32
+width$ -- 15
+write$ -- 139
+(There were 2 warnings)

@@ -1,0 +1,125 @@
+\documentclass{article}
+\usepackage{tikz} 
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithm
+\usepackage[noend]{algpseudocode}% http://ctan.org/pkg/algorithmicx
+
+\usepackage{tikz}
+
+\usepackage{graphicx}
+\usetikzlibrary{arrows,positioning} 
+\usepackage{subcaption}
+\thispagestyle{empty}
+\usepackage{multicol,caption}
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           fill=blue!20!white},
+     latent/.style={
+           circle,
+           rounded corners,
+           draw=black, thick, dashed,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           fill=black!10!white
+           },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 }
+    
+}
+   
+\begin{document}
+\def\ci{\perp\!\!\!\perp} % from Wikipedia
+
+
+\begin{figure}
+\centering
+\begin{subfigure}[t]{0.44\textwidth}
+\centering
+\caption{}
+\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=0.45cm,  thick,main node/.style={observed}, shaded/.style={latent}]
+\node[main node](1){C};
+\node[main node, above left=of 1](2){A};
+\node[main node, above right=of 1](3){B};
+\node[main node, below=of 1](4){D};
+
+ \path[]
+ 	(1) edge node {} (4)
+    (2) edge [->]  (1)
+    (3) edge [->]  (1); 
+    
+\node[main node,right of=3,xshift=1.2em](5){A};
+\node[main node, below right=of 5](6){C};
+\node[main node, above right=of 6](7){B};
+\node[main node, below=of 6](8){D};
+\path[every node/.style={font=\sffamily\footnotesize}]
+	(1) edge [-, >=stealth', blue!30!white, line width=.9em,shorten <=1em,shorten >= 1.7em,
+	preaction={line width = .3em, blue!30!white,-triangle 90,draw,shorten >=.6em,shorten <=1em}
+	] node[black]{FCI} (6)
+	(5) edge [o->] (6)
+	(7) edge [o->] (6)
+	(6) edge [->] (8);
+
+\end{tikzpicture}
+\end{subfigure}
+\begin{subfigure}[t]{0.55\textwidth}
+\centering
+\caption{}
+\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=0.45cm,  thick,main node/.style={observed}, shaded/.style={latent}]
+
+\node[main node](1){A};
+\node[main node, below right=of 1](2){B};
+\node[shaded, above right=of 2](3){U};
+\node[main node, below right=of 3](4){C};
+\node[main node, above right=of 4](5){D};
+\node[ below=of 3,yshift=.2cm](11){};
+\path[] (1) edge (2)
+		(3) edge (2) edge (4)
+		(5) edge (4);
+		
+\node[main node,right=of 5,xshift=-.5em](6){A};
+\node[main node, below right=of 6](7){B};
+\node[above right=of 7](8){};
+\node[main node, below right=of 8](9){C};
+\node[main node, above right=of 9](10){D};
+\node[below = of 8,yshift=0.2cm](12){};	
+\path[every node/.style={font=\sffamily\footnotesize}]
+(11) edge [-, >=stealth', blue!30!white, line width=.9em,shorten <=3.3em,shorten >= 4.5em,
+	preaction={line width = .3em, blue!30!white,-triangle 90,draw,shorten >=3.7em,shorten <=4em}
+	] node[black,xshift=-.5em]{FCI} (12)
+(6) edge [o->] (7)
+(7) edge [<->] (9)
+(10) edge [o->](9);
+ 
+\end{tikzpicture}
+\end{subfigure}
+\end{figure}
+
+\end{document}

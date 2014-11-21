@@ -1,0 +1,70 @@
+\begin{thebibliography}{10}
+
+\bibitem{Claassen2013}
+Tom Claassen, J~Mooij, and Tom Heskes.
+\newblock {Learning sparse causal models is not NP-hard}.
+\newblock In {\em UAI}, 2013.
+
+\bibitem{Daniusis2010}
+P~Daniusis, Dominik Janzing, and Joris Mooij.
+\newblock {Inferring deterministic causal relations}.
+\newblock In {\em UAI}, 2010.
+
+\bibitem{Hoyer2009}
+PO~Hoyer, Dominik Janzing, and JM~Mooij.
+\newblock {Nonlinear causal discovery with additive noise models}.
+\newblock In {\em NIPS}, 2009.
+
+\bibitem{Kalisch2012}
+Markus Kalisch and M~M\"{a}chler.
+\newblock {Causal inference using graphical models with the R package pcalg}.
+\newblock {\em JSS}, VV(Ii), 2012.
+
+\bibitem{LopezPaz2014}
+David Lopez-Paz, Krikamol Muandet, and Benjamin Recht.
+\newblock {The Randomized Causation Coefficient}.
+\newblock {\em arXiv Prepr. arXiv1409.4366}, September 2014.
+
+\bibitem{Pearl2000}
+Judea Pearl.
+\newblock {\em {Causality: models, reasoning and inference}}.
+\newblock MIT Press, Cambridge, 2000.
+
+\bibitem{Peters2014}
+Jonas Peters, J~Mooij, Dominik Janzing, and B~Sch\"{o}lkopf.
+\newblock {Causal discovery with continuous additive noise models}.
+\newblock {\em JMLR}, 15:2009--2053, 2014.
+
+\bibitem{Richardson2013}
+TS~Richardson and JM~Robins.
+\newblock {Single world intervention graphs (SWIGs): a unification of the
+  counterfactual and graphical approaches to causality}.
+\newblock {\em Cent. Stat. \ldots}, (128), 2013.
+
+\bibitem{Scholkopf2012}
+B~Sch\"{o}lkopf, Dominik Janzing, and Jonas Peters.
+\newblock {On causal and anticausal learning}.
+\newblock In {\em ICML}, 2012.
+
+\bibitem{Shpitser2008}
+Ilya Shpitser and Judea Pearl.
+\newblock {Complete identification methods for the causal hierarchy}.
+\newblock {\em JMLR}, 9:1941--1979, 2008.
+
+\bibitem{Sprites}
+Peter Spirtes, Clark~N Glymour, and Richard Scheines.
+\newblock {\em {Causation, prediction, and search}}, volume~81.
+\newblock MIT press, 2000.
+
+\bibitem{Verma1993}
+TS~Verma.
+\newblock {Graphical aspects of causal models}.
+\newblock Technical report, 1993.
+
+\bibitem{Zhang2008}
+Jiji Zhang.
+\newblock {On the completeness of orientation rules for causal discovery in the
+  presence of latent confounders and selection bias}.
+\newblock {\em Artificial Intelligence}, 172(16-17):1873--1896, November 2008.
+
+\end{thebibliography}
