@@ -20,12 +20,19 @@
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Notation}{1}{section.2}}
 \@writefile{toc}{\contentsline {section}{\numberline {3}Estimating $\mu _{i,j}$}{1}{section.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Estimators}{2}{subsection.3.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Random sampling variant}{3}{subsection.3.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}UCB variant}{3}{subsection.3.3}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Algorithm}{4}{section.4}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces UCB\relax }}{4}{algorithm.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Comparison of the performance of standard UCB versus causal UCB with $\beta =3$ and $\beta = 5$. 100 simulations were run for each algorithm up to a horizon of $10^5$ per value of $K$. Error bars span the 1st to 3rd quantile of the regret, round points mark the median and triangular points show the mean. For standard UCB the regret increases linearly with the number of arms $K$. For causal UCB the increase is sub-linear. Increasing $\beta $ leads to slower convergence but lower variance.\relax }}{5}{figure.caption.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Theorems}{6}{section.5}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Experiments}{6}{section.6}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The distribution of regret varies with the $\beta $ parameter in the bound in the estimator. As beta increases, the mean regret increases but the variance decreases. The plot shows the results of running $100$ independent bandits, with $K=256$ and $\epsilon =0.1$, up to a horizon $h=10^5$ for each value of $\beta $. \relax }}{6}{figure.caption.2}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{6}{section.7}}
 \bibstyle{plainnat}
 \bibdata{c-bandit}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Algorithm}{3}{section.4}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces UCB\relax }}{3}{algorithm.1}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Theorems}{3}{section.5}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Experiments}{3}{section.6}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Comparison of the performance of standard UCB versus causal UCB with $\beta =3$ and $\beta = 5$. 100 simulations were run for each algorithm up to a horizon of $10^5$ per value of $K$. Error bars span the 1st to 3rd quantile of the regret, round points mark the median and triangular points show the mean. For standard UCB the regret increases linearly with the number of arms $K$. For causal UCB the increase is sub-linear. Increasing $\beta $ leads to slower convergence but lower variance.\relax }}{4}{figure.caption.1}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{4}{section.7}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The distribution of regret varies with the $\beta $ parameter in the bound in the estimator. As beta increases, the mean regret increases but the variance decreases. The plot shows the results of running $100$ independent bandits, with $K=256$ and $\epsilon =0.1$, up to a horizon $h=10^5$ for each value of $\beta $. \relax }}{5}{figure.caption.2}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Notes}{7}{section.8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Why Hoeffdings bound doesn't hold if $n$ is a random variable}{7}{subsection.8.1}}
+\newlabel{eq:HoeffdingsRandom}{{3}{7}{Why Hoeffdings bound doesn't hold if $n$ is a random variable}{equation.8.3}{}}
+\newlabel{eq:HoeffdingsRandom@cref}{{[equation][3][]3}{7}}

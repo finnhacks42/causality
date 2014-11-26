@@ -41,7 +41,7 @@
 \usepackage{natbib}
 \usepackage[capitalize]{cleveref}
 \usepackage{graphicx}
-
+\usepackage{parskip}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MACROS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -129,6 +129,8 @@ P(Y|do(X_i=j)) &= P(Y|X_i = j)\\
  &= \sum_{b}P(Y|X_i = j,do(X_a = b))P(X_a = b) 
 }
 
+
+\subsection{Estimators}
 Fix some time-step $t$ and $i \in \set{1,\ldots,K}$ and $j \in \set{0,1}$. 
 
 Let $\hat{\mu}_a$ be an empirical estimator for $P(Y|do(X_i=j))$ obtained via marginalization over $X_a$.
@@ -162,8 +164,31 @@ If $p$ is not known, these expression are unchanged except that $p_a$ is replace
 \eq{
 \hat{p}_a = \frac{\sum_{s=1}^{t} \ind{X_a=1,I \neq a}_s}{\sum_{s=1}^{t} \ind{I \neq a}_s}
 }
+\subsection{Random sampling variant}
 
-\begin{theorem} With probability at least $1 - \delta$ we have that:
+Basic idea - explore randomly until the uncertainty on all actions is smaller than $\epsilon$, then exploit (or switch to standard UCB). Bounds on regret: when exploring regret is at most 1, when exploiting regret it at most $\epsilon$. If the horizon is $n$, the cost of exploiting $< \epsilon n$ and the cost of exploring is $O(1/\epsilon^2)$ (this comes from how quickly we converge to within $\epsilon$ for all arms). 
+
+\eqn{
+R_n = O(n\epsilon+\frac{1}{\epsilon^2})
+}
+
+Differentiating and selecting $\epsilon = (\frac{2}{n})^{1/3}$ to minimize the regret yields:
+
+\eqn{
+R_n = O(n^{2/3})
+}
+
+
+At each time step we randomly select a variable $X_i$ on which to intervene and set it to $1$ with probability $p_i$. 
+
+The estimators from section XX are unbiased. So we can get an estimate of the error in the estimate by 
+
+we are pooling estimators - so what is the error in a pooled estimate - is it the same as what Tor wrote before (because he was assuming unbiased estimators? Or is it tighter because we don't need to worry about the the non-fixed nature of ...) I could try a couple of different bounds and see what happens. 
+
+\subsection{UCB variant}
+In this case the estimators from section XX are biased - so its a lot harder to prove a regret bound. 
+
+\begin{theorem} (Probably False) With probability at least $1 - \delta$ we have that:
 $\displaystyle \left|\hat{\mu}_t - \mu\right| \leq \sqrt{\frac{\beta}{\sum_{a} n_a} \log{1 \over \delta}}$,
 where $\beta > 0$ is some constant.
 \end{theorem}
@@ -224,7 +249,7 @@ Similarly,
 \includegraphics[width=1\textwidth]{regret_vs_K_series_beta.pdf}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \caption{The distribution of regret varies with the $\beta$ parameter in the bound in the estimator. As beta increases, the mean regret increases but the variance decreases. The plot shows the results of running $100$ independent bandits, with $K=256$ and $\epsilon=0.1$, up to a horizon $h=10^5$ for each value of $\beta$. }
 \includegraphics[width=0.7\textwidth]{regret_vs_beta_boxplot.pdf}
 \end{figure}
@@ -244,6 +269,44 @@ Simululations to compare the performance of standard UCB with our modified algor
 
 
 \section{Conclusion}
+
+\newpage
+\section{Notes}
+
+\subsection{Why Hoeffdings bound doesn't hold if $n$ is a random variable}
+
+Let $\{Z_1,Z_2...Z_n\} \sim Bernoulli(\frac{1}{2}) $ and $X_i = 2Z_i-1 \implies X_i \in \{-1,1\} \text{ and } E[X_i] = 0$.
+
+For a fixed $n$, Hoeffdings inequality says: 
+\begin{equation}
+\label{eq:HoeffdingsRandom}
+\begin{aligned}
+& P\left(|\frac{1}{n}\sum_{i=1}^{n}X_i| > \epsilon\right) \leq 2e^{-n\epsilon^2} \\
+\implies & P \left(|\frac{1}{n}\sum_{i=1}^{n}X_i| > \sqrt{\frac{\log{4}}{n}}\right) \leq \frac{1}{2} \\
+\implies & P\left( |\sum_{i=1}^{n}X_i| > \sqrt{n \log{4}}\right) \leq \frac{1}{2}\\
+\end{aligned}
+\end{equation}
+
+If $n$ is allowed to be dependent on the sequence of values sampled, this inequality no longer holds. 
+
+\begin{proof}
+Choose $n$ based on the sequence of samples seen so far such that:
+\eq {
+n = min \{ n: n > 4 \text{ and } \sum_{i=1}^{n}X_i > \sqrt{n \log \log n}\}
+}
+By the law of iterated logarithms this quantity is finite with probability $\sim 1$.
+
+\eq {
+& \implies  P\left( |\sum_{i=1}^{n}X_i| > \sqrt{n \log{\log{n}}}\right) \sim 1 \\
+& \implies  P\left( |\sum_{i=1}^{n}X_i| > \sqrt{n \log{4}}\right) \sim 1 \text{, Since } \log{\log{n}} > \log{4} \;\; \forall n > 4 \\
+}
+ 
+Thus Hoeffdings inequality (equation \ref{eq:HoeffdingsRandom}) does not hold in general if $n$ is not independent of the samples $\{X_i\}$ (The bound does not work if you decide to stop sampling as soon as you reach a point where random walk fluctuations take you outside it)
+
+
+
+\end{proof}
+
 
 \bibliographystyle{plainnat}
 \bibliography{c-bandit}

@@ -85,7 +85,7 @@
 \maketitle
 
 
-Assume $\exists$ a convex function, $\psi$, such that:
+Assume for each arm $i \in \{1...K\} $ there is an unknown distribution of rewards $P(X)$ and a convex function, $\psi$, such that:
 
 \begin{equation}
 \begin{aligned}
@@ -93,11 +93,21 @@ log(E[e^{\lambda(X-E[X]}]) & \leq \psi(\lambda)\\
 log(E[e^{\lambda(E[X]-X}]) & \leq \psi(\lambda)
 \end{aligned}
 \end{equation}
-This ensures that the moments of the distribution of X are defined. Assume that at time $t$ we select arm $I_t$ with the highest upper confidence bound:
+This ensures that the moments of the distribution of $X$ are defined. If we select arm $i$ a fixed number of times $s$:
+\eqn {
+\label{eq:hoeff1}
+& P(|\hat \mu_{is} - \mu_{i}| > \epsilon) \leq 2e^{-s\psi^*(\epsilon)} \\
+\label{eq:hoeff2}
+ \implies & P(|\hat \mu_{is} - \mu_{i}| > (\psi^{*})^{-1}\frac{\log(\frac{2}{\delta})}{s}) \leq \delta
+}
+
+
+
+Assume that at time $t$ we select arm $I_t$ with the highest upper confidence bound:
 
 \begin{equation}
 \label{eq:armSelection}
-I_{t} = argmax_{i=1...K}\left[\hat{\mu}_{it} + (\psi^{*})^{-1}\frac{\alpha log(t)}{T_{it}}\right]
+I_{t} = argmax_{i=1...K}\left[\hat{\mu}_{it} + (\psi^{*})^{-1}\frac{\alpha \log(t)}{T_{it}}\right]
 \end{equation}
 
 Then if $\alpha > 2$,
@@ -112,9 +122,9 @@ R_n \leq \sum_{i:\Delta i > 0}\left(\frac{\alpha \Delta i}{\psi^{*}(\Delta i/2)}
 
 \begin{theorem} If $I_t = i \neq i^*$ at least one of the following statements is true:
 \begin{enumerate}
-\item The estimated UCB on the best arm, $i^*$, is less than or equal to the actual reward for that arm: $\hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t} \leq \hat \mu$
+\item The estimated UCB on the best arm, $i^*$, is less than or equal to the actual reward for that arm: $\hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t} \leq \mu^*$
 \item The estimated reward for arm $i$ is greater than or equal to the estimated CI higher than the true reward for that arm: $\hat \mu_{it} \geq \mu_i + \hat \epsilon_{it}$
-\item The number of times we have selected arm $i$ in previous timesteps, $T_{it}$, is less than some bound (that grows logarithmically with $n$). $T_{it} < \frac{\alpha log(n)}{\psi^*(\Delta i/2)}$
+\item The number of times we have selected arm $i$ in previous timesteps, $T_{it}$, is less than some bound (that grows logarithmically with $n$). $T_{it} < \frac{\alpha log(n)}{\psi^*(\Delta i/2)} \;\;\; \color{red} \longleftarrow \text{feels odd that this grows with $n$, not $t$}$
 \end{enumerate}
 \end{theorem}
 \begin{proof}
@@ -122,17 +132,52 @@ Assume statements 1-3 are all false.
 \eq {
 3. & \implies T_{it} > \frac{\alpha log(n)}{\psi^*(\Delta i/2)} \\
   & \implies \Delta i > 2 (\psi^*)^{-1} \frac{\alpha log(n)}{T_{it}} \geq 2 (\psi^*)^{-1} \frac{\alpha log(t)}{T_{it}} = 2 \hat \epsilon_{it}\\
-  & \implies \Delta i > 2 \hat \epsilon_{it} \\
-1. & \implies \hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t}  > \hat \mu  = \mu_i+\Delta i > \mu_i +  2 \hat \epsilon_{it}\\
-& \implies \hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t}  > \mu_i +  2 \hat \epsilon_{it}\\
+  & \implies \Delta i > 2 \hat \epsilon_{it} \\[10pt]
+1. & \implies \hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t}  >  \mu^*  = \mu_i+\Delta i > \mu_i +  2 \hat \epsilon_{it}\\
+& \implies \hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t}  > \mu_i +  2 \hat \epsilon_{it}\\[10pt]
 2. & \implies \hat \mu_{it} < \mu_i + \hat \epsilon_{it} \\
    & \implies \hat \mu_{it} + \hat \epsilon_{it} < \mu_i +2 \hat \epsilon_{it} \\
-   & \implies \hat \mu_{it} + \hat \epsilon_{it} <  \hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t} \longleftarrow \text { UCB for arm $i < $ UCB for arm $i^*$, which contradicts equation (\ref{eq:armSelection}})
+   & \implies \hat \mu_{it} + \hat \epsilon_{it} <  \hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t} \longleftarrow \text { UCB for arm $i < $ UCB for arm $i^*$, which contradicts $i \neq i^*$}
 }
 
 \end{proof}
 
-If statements 1. and 2. are both false, then statement 3. places a bound on the number of times we can previously have selected the incorrect arm $i$ in order to select it in this timestep. 
+If statements (1) and (2) are both false, then statement (3) places a bound on the number of times we can previously have selected the incorrect arm $i$ in order to select it in this timestep. We can write the regret in terms of the number of times we select each arm and its sub-optimality:
+
+\eq {
+\bar{R}_n = & n\mu^* - \sum_{t=1}^{n}E[\mu_{I_t}] \\
+= & \sum_{i=1}^{K}\Delta_i E[T_{in}]\\
+= & \sum_{i=1}^{K}\Delta_i E\left[\sum_{t=1}^{n} \mathds{1} \{I_t = i\}\right] \;\; \leftarrow \text{Expected number of times selected arm $I_t$ is $i$ }\\
+}
+
+
+Let $\gamma = \ceil{\frac{\alpha \log(n)}{\psi^*(\Delta i/2)}}$ and suppose we had selected arm $i$ in all timesteps until $\gamma$. In the remaining timesteps, we can only select $i$ if statement 3) is false 
+
+\eq{
+\implies E\left[T_{in}\right] & \leq \gamma + E\left[\sum_{t=1}^{n} \mathds{1} \{I_t = i \text{ and (3) is false} \}\right] \\[3pt]
+& \leq \gamma + E\left[\sum_{t=\gamma+1}^{n} \mathds{1} \{\text{(1) or (2) is true} \}\right] \leftarrow \text{since if (3) is false, (1) or (2) must be true}\\[3pt]
+& \leq \gamma + \sum_{t=\gamma+1}^{n} \left[ \mathds{P}(\text{(1) is true}) + \mathds{P}(\text{(2) is true})  \}\right] \color{red} \leftarrow \text{Bubeck has $=$ here but are (1) and (2) disjoint?} 
+}
+
+\eq {
+P(\text{(1) is true})  = & P(\hat{\mu}_{i^*t}+ (\psi^*)^{-1}\left( \frac{\alpha \log{t}}{t} \right) \leq \mu^*)\\
+\leq & P(\exists s \in \{1...t\} : \hat{\mu}_{i^*s}+ (\psi^*)^{-1}\left( \frac{\alpha \log{t}}{s} \right) \leq \mu^*) \color{red} \leftarrow \text {to get around the problem that t is random}\\
+\leq & \sum_{s=1}^t P\left( \hat{\mu}_{i^*s}+ (\psi^*)^{-1}\left( \frac{\alpha \log{t}}{s} \right) \leq \mu^* \right) \color{red} \leftarrow \text{union bound}\\
+\text{ From equation (\ref{eq:hoeff2}) we have:}\\
+& P\left( \hat{\mu}_{i^*s}+ (\psi^*)^{-1}\left( \frac{ \log{\frac{1}{\delta}}}{s} \right) \leq \mu^* \right) < \delta\\
+\text{Let } \delta = t^{-\alpha} \implies & P\left( \hat{\mu}_{i^*s}+ (\psi^*)^{-1}\left( \frac{\alpha \log{t}}{s} \right)\leq \mu^* \right) < t^{-\alpha}\\
+\implies & P(\text{(1) is true}) \leq \sum_{s=1}^t t^{-\alpha} = t*t^{-\alpha} =  t^{1-\alpha}
+}
+
+Similarly, $P(\text{(2) is true}) \leq t^{1-\alpha} \implies E[T_{in}] \leq \gamma + \sum_{t=\gamma+1}^n 2t^{1-\alpha}$
+
+
+
+
+
+
+
+
 
 
 
