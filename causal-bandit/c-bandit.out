@@ -2,11 +2,13 @@
 \BOOKMARK [1][-]{section.2}{Notation}{}% 2
 \BOOKMARK [1][-]{section.3}{Estimating i,j}{}% 3
 \BOOKMARK [2][-]{subsection.3.1}{Estimators}{section.3}% 4
-\BOOKMARK [2][-]{subsection.3.2}{Random sampling variant}{section.3}% 5
-\BOOKMARK [2][-]{subsection.3.3}{UCB variant}{section.3}% 6
-\BOOKMARK [1][-]{section.4}{Algorithm}{}% 7
-\BOOKMARK [1][-]{section.5}{Theorems}{}% 8
-\BOOKMARK [1][-]{section.6}{Experiments}{}% 9
-\BOOKMARK [1][-]{section.7}{Conclusion}{}% 10
-\BOOKMARK [1][-]{section.8}{Notes}{}% 11
-\BOOKMARK [2][-]{subsection.8.1}{Why Hoeffdings bound doesn't hold if n is a random variable}{section.8}% 12
+\BOOKMARK [2][-]{subsection.3.2}{Observe then exploit}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.3}{Bounding a weighted sum of unbiased estimators with McDiarmid's Ineqaulity}{section.3}% 6
+\BOOKMARK [2][-]{subsection.3.4}{Targeted Sampling}{section.3}% 7
+\BOOKMARK [2][-]{subsection.3.5}{UCB variant}{section.3}% 8
+\BOOKMARK [1][-]{section.4}{Algorithm}{}% 9
+\BOOKMARK [1][-]{section.5}{Theorems}{}% 10
+\BOOKMARK [1][-]{section.6}{Experiments}{}% 11
+\BOOKMARK [1][-]{section.7}{Conclusion}{}% 12
+\BOOKMARK [1][-]{section.8}{Notes}{}% 13
+\BOOKMARK [2][-]{subsection.8.1}{Why Hoeffdings bound doesn't hold if n is a random variable}{section.8}% 14

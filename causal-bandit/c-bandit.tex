@@ -119,8 +119,10 @@ R_n = \E \sum_{t=1}^n \left(\mu^* - \mu_{I_t,J_t}\right).
 
 \section{Estimating $\mu_{i,j}$}
 The most natural way to estimate $\mu_{i,j}$ is to compute an empirical estimate based on samples when that action was taken. This approach would
-lead directly to the UCB algorithm with $2K$ actions and a regret bound that depended linearly on $K$. In this instance we can significantly
-outperform this approach by exploiting the known causal structure of the problem.
+lead directly to the UCB algorithm with $2K$ actions and a regret bound that depended linearly on $K$. 
+
+In this instance we can significantly
+outperform the standard approach by exploiting the known causal structure of the problem.
 
 \eq {
 P(Y|do(X_i=j)) &= P(Y|X_i = j)\\
@@ -131,6 +133,7 @@ P(Y|do(X_i=j)) &= P(Y|X_i = j)\\
 
 
 \subsection{Estimators}
+\label{sec:estimators}
 Fix some time-step $t$ and $i \in \set{1,\ldots,K}$ and $j \in \set{0,1}$. 
 
 Let $\hat{\mu}_a$ be an empirical estimator for $P(Y|do(X_i=j))$ obtained via marginalization over $X_a$.
@@ -151,22 +154,19 @@ n_{a,b}    &= \sum_{s=1}^t \ind{X_i = j, I = a,J = b}_s \\
 This gives $K$ estimators $\{\hat{\mu_1}...\hat{\mu_K}\}$ to be pooled into a single estimator $\hat{\mu}$.
 
 \eq {
-\hat{\mu} &= \sum^{K}_{a=1}\eta_a\hat{\mu}_a=\eta_i \frac{m_{i,j}}{n_{i,j}}+ \sum_{a \neq i} \eta_a \left[p_a \frac{m_{a,1}}{n_{a,1}} + (1 - p_a) \frac{m_{a,0}}{n_{a,0}}\right]\\
-\text{where:}\\
-\eta_a     &= \frac{n_a}{\sum_{a=1}^K n_a} \text{ and } n_{i,j}=\begin{cases} 
-n_{i,j} & \text{if } a = i \\
-\frac{1}{2}\min\set{\frac{n_{a,1}}{p_a}, \frac{n_{a,0}}{1-p_a}}  & \text{otherwise}
-\end{cases}
+\hat{\mu} &= \sum^{K}_{a=1}w_a\hat{\mu}_a=w_i \frac{m_{i,j}}{n_{i,j}}+ \sum_{a \neq i} w_a \left[p_a \frac{m_{a,1}}{n_{a,1}} + (1 - p_a) \frac{m_{a,0}}{n_{a,0}}\right]\\
 }
+
+
 
 If $p$ is not known, these expression are unchanged except that $p_a$ is replaced with $\hat{p}_a$
 
 \eq{
 \hat{p}_a = \frac{\sum_{s=1}^{t} \ind{X_a=1,I \neq a}_s}{\sum_{s=1}^{t} \ind{I \neq a}_s}
 }
-\subsection{Random sampling variant}
+\subsection{Observe then exploit}
 
-Basic idea - explore randomly until the uncertainty on all actions is smaller than $\epsilon$, then exploit (or switch to standard UCB). Bounds on regret: when exploring regret is at most 1, when exploiting regret it at most $\epsilon$. If the horizon is $n$, the cost of exploiting $< \epsilon n$ and the cost of exploring is $O(1/\epsilon^2)$ (this comes from how quickly we converge to within $\epsilon$ for all arms). 
+Basic idea - observe until the uncertainty on all actions is smaller than $\epsilon$, then exploit (or switch to standard UCB). Bounds on regret: when observing the regret for each timestep is at most 1 (since the reward is $\in [0,1]$). When exploiting regret it at most $\epsilon$. If the horizon is $n$, the cost of exploiting $< \epsilon n$ and the cost of observing is $O(1/\epsilon^2)$ (this comes from how quickly we converge to within $\epsilon$ for all arms). 
 
 \eqn{
 R_n = O(n\epsilon+\frac{1}{\epsilon^2})
@@ -178,15 +178,138 @@ Differentiating and selecting $\epsilon = (\frac{2}{n})^{1/3}$ to minimize the r
 R_n = O(n^{2/3})
 }
 
+For each arm $X_i = j$, we have:
 
-At each time step we randomly select a variable $X_i$ on which to intervene and set it to $1$ with probability $p_i$. 
+\eqn{
+\hat{\mu}_{ij} = \frac{m_{ij}}{n_{ij}}
+}
 
-The estimators from section XX are unbiased. So we can get an estimate of the error in the estimate by 
+where
 
-we are pooling estimators - so what is the error in a pooled estimate - is it the same as what Tor wrote before (because he was assuming unbiased estimators? Or is it tighter because we don't need to worry about the the non-fixed nature of ...) I could try a couple of different bounds and see what happens. 
+\eqn{
+m_{i,j}    &= \sum_{s=1}^t \ind{X_i = j, Y = 1} \\
+n_{i,j}    &= \sum_{s=1}^t \ind{X_i = j} \\
+}
+
+and 
+
+
+
+
+\subsection{Bounding a weighted sum of unbiased estimators with McDiarmid's Ineqaulity}
+
+McDiarmid's Inequality states:
+If $X_i \ci X_j$ and 
+\eqn{
+|\phi(X_1...X_i...X_N) - \phi(X_1...X_i^{'}...X_N)| < c_i \;\; \forall i
+}
+\eqn{
+& P\left(|\phi(\boldsymbol{X}) - E[\phi(\boldsymbol{X})]| \geq \epsilon \right) \leq 2 \exp \left(-\frac{2 \epsilon^2}{\sum_{i}c_i^2} \right)\\
+\label{eqn:McDiarmid}
+& P\left(|\phi(\boldsymbol{X}) - E[\phi(\boldsymbol{X})]| \geq 
+\sqrt{\frac{\sum_{i}c_i^2}{2}\log{\frac{2}{\delta}}} 
+\right) \leq \delta
+}
+
+
+In our problem we have:
+
+\eqn{
+\hat{\mu}_a = \begin{cases}
+\frac{p_a}{n_{a1}}\sum_{j=1}^{n_{a1}}X_{a1,j} + \frac{1-p_a}{n_{a0}}\sum_{j=1}^{n_{a0}}X_{a0,j} & \text{ if $a \neq i$}\\
+\sum_{j=1}^{n_i}X_j & \text{if $a = i$}
+\end{cases}
+}
+
+\eqn {
+\mu = \sum_a w_a \mu_a \text{ where } \sum_a w_a = 1
+}
+
+Let 
+
+\eqn {
+\hat{\mu} = \phi(\boldsymbol{X}) = \sum_{a \neq i} w_a \left[ 
+\frac{p_a}{n_{a1}}\sum_{j=1}^{n_{a1}}X_{a1,j} + \frac{1-p_a}{n_{a0}}\sum_{j=1}^{n_{a0}}X_{a0,j}
+\right] + \frac{w_i}{n_i} \sum_{j=1}^{n_i}X_{i,j}
+}
+
+Note: this treats the number of samples $n_i$,$n_{a1}$, and $n_{a0}$ as fixed. If the choice of action is random they are in fact random variables (but do not depend on previous action choices). Will this bounds still hold?  
+
+\eqn {
+&\phi(...X_{\alpha 1,j}...) - \phi(...X_{\alpha 1,j}^{'}...) \leq w_\alpha \frac{p_\alpha}{n_{\alpha 1}} \\
+&\phi(...X_{\alpha 0,j}...) - \phi(...X_{\alpha 0,j}^{'}...) \leq w_\alpha \frac{1-p_\alpha}{n_{\alpha 0}}\\
+& \phi(...X_i...) - \phi(...X_i^{'}...) \leq \frac{w_i}{n_i}
+}
+
+
+\eqn{
+\sum_i c_i^2 = & n_i \left(\frac{w_i}{n_i}\right)^2+ \sum_a \left[ n_{a1}\left(w_a \frac{p_a}{n_{a1}}\right)^2 + n_{a0}\left(w_a \frac{1-p_a}{n_{a0}}\right)^2\right]\\
+= & \frac{w_i^2}{n_i}+ \sum_a w_a^2 \left(\frac{p_a^2}{n_{a1}}+  \frac{(1-p_a)^2}{n_{a0}} \right) \\
+\label{eq:tominimize}
+= & \sum_a w_a^2 f(a) \text{, where }\\ 
+f(a) =& \begin{cases}
+\frac{p_a^2}{n_{a1}}+  \frac{(1-p_a)^2}{n_{a0}}  & a \neq i\\
+\frac{1}{n_i} & a = i
+\end{cases}
+}
+
+We want to choose weights $\boldsymbol{w}$ so as to minimize \ref{eq:tominimize} subject to the constraint $\sum_a w_a = 1$.
+
+
+The minimum (assuming it exists) should occur at a critical point of:
+
+\eqn {
+L(w_1...w_k,\lambda) = \sum_a w_a^2 f(a) + \lambda((\sum_a w_a)-1)
+}
+
+\eqn{
+& \frac{\partial L}{\partial w_a}  = 2 w_a f(a) + \lambda = 0 \\
+& \implies w_a =  \frac{-\lambda}{2 f(a)}\\
+& \frac{\partial L}{\partial \lambda}  = (\sum_a w_a)-1= 0 \\
+& \implies -\frac{\lambda}{2}\sum_a \frac{1}{f(a)} = 1
+ \implies \lambda = -\frac{2}{\sum_a \frac{1}{f(a)}}\\
+& \implies w_a = \frac{1}{f(a)\sum_a \frac{1}{f(a)}} \\
+\label{eqn:sumofsquares}
+& \implies \sum_i c_i^2 = \frac{1}{\sum_a \frac{1}{f(a)}} \\
+}
+
+Substituting \ref{eqn:sumofsquares} into the McDiarmid inequality \ref{eqn:McDiarmid}:
+
+\eqn{
+P\left(|\hat{\mu} - \mu| > \sqrt{\frac{1}{2\sum_a \eta_a} \log{\frac{2}{\delta}}}\right) \leq \delta
+}
+
+where:
+
+\eqn {
+\eta_a = \begin{cases}
+\frac{n_{a1}n_{a0}}{n_{a1}(1-p_a)^2+n_{a0}p_a^2} & a \neq i\\
+n_i & a = i
+\end{cases}
+}
+
+
+\begin{figure}[H]
+\centering
+\caption{The effective number of samples $\eta_a$ versus $n_{a1}$, where $p_a = .8$ and the total number of samples,  $ n_{a1}+n_{a0}=100$. The effective number of samples is maximized (and equals the total) if we sample each side according to its probability.}
+\includegraphics[width=.5\textwidth]{samplehalves}
+\end{figure}
+
+
+\subsection{Targeted Sampling}
+Sample a equal number of points from each half of each arm - until the error on all arms is smaller than some threshold. Then exploit. This should do better than observe-exploit, particularly where the probability of some events occurring without intervention is low.
 
 \subsection{UCB variant}
-In this case the estimators from section XX are biased - so its a lot harder to prove a regret bound. 
+Combine estimators according to:
+
+\eq {
+w_a     &= \frac{n_a}{\sum_{a=1}^K n_a} \text{ and } n_{i,j}=\begin{cases} 
+n_{i,j} & \text{if } a = i \\
+\frac{1}{2}\min\set{\frac{n_{a,1}}{p_a}, \frac{n_{a,0}}{1-p_a}}  & \text{otherwise}
+\end{cases}
+}
+
+In this case the estimators from section \ref{sec:estimators} are biased - so its a lot harder to prove a regret bound. 
 
 \begin{theorem} (Probably False) With probability at least $1 - \delta$ we have that:
 $\displaystyle \left|\hat{\mu}_t - \mu\right| \leq \sqrt{\frac{\beta}{\sum_{a} n_a} \log{1 \over \delta}}$,
@@ -315,20 +438,26 @@ Thus Hoeffdings inequality (equation \ref{eq:HoeffdingsRandom}) does not hold in
 
 
 
-\begin{figure}[h]
-\caption{Testing values of beta - 100 experiments for each value of beta, with a 4 armed bandit.}
-\includegraphics[width=0.7\textwidth]{regretvsbeta.pdf}
-\end{figure}
+ 
 
-\begin{figure}[h]
-\caption{Shows relationship between the regret and the number of bandit arms $2K$ for the standard UCB algorithm and our modified algorithm.  }
-\label{fig:regretvsarms}
-\includegraphics[width=0.9\textwidth]{regretvsarms.pdf}
-\end{figure}
+\eqn {
+P(|\hat{\mu}_{a0} -\mu_{a0}| > \epsilon_{a0}) \leq \delta/2 \;\; \text{ where } 
+\epsilon_{a0}=\sqrt{\frac{1}{2n_{a0}}\log{\frac{4}{\delta}}}\\ 
+P(|\hat{\mu}_{a1} -\mu_{a1}| > \epsilon_{a1}) \leq \delta/2 \;\; \text{ where } 
+\epsilon_{a1}=\sqrt{\frac{1}{2n_{a1}}\log{\frac{4}{\delta}}}\\ 
+}
 
-\begin{figure}[h]
-\caption{Regret vs number of arms with horizon $100$}
-\label{fig:regretvsarmsshorthorizon}
-\includegraphics[width=0.8\textwidth]{regregvsamrs100.pdf}
-\end{figure}
+We should not need $t$ in here since, although $n_{aj}$ is still random, its not dependent on previous results. 
+
+Combining these two halves and applying the union bound gives:
+
+\eqn{
+P\left(|\hat{\mu}_a - \mu | > \sqrt{\frac{1}{2} \log{\frac{4}{\delta}}}
+\left(p_a \sqrt{\frac{1}{2n_{a1}}}+(1-p_a) \sqrt{\frac{1}{2n_{a0}}} \right)\right) \leq \delta
+}
+
+
+I now need to pool these estimators for each $a \in \{1...K\}/I$ but I can't just use a union bound - I need the bound to shrink by combining the multiple estimates. 
+
+For some distributions, 
 
