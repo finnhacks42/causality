@@ -24,26 +24,35 @@
 \newlabel{sec:estimators}{{3.1}{2}{Estimators}{subsection.3.1}{}}
 \newlabel{sec:estimators@cref}{{[subsection][1][3]3.1}{2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Observe then exploit}{2}{subsection.3.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Bounding a weighted sum of unbiased estimators with McDiarmid's Ineqaulity}{3}{subsection.3.3}}
-\newlabel{eqn:McDiarmid}{{9}{3}{Bounding a weighted sum of unbiased estimators with McDiarmid's Ineqaulity}{equation.3.9}{}}
-\newlabel{eqn:McDiarmid@cref}{{[equation][9][]9}{3}}
-\newlabel{eq:tominimize}{{18}{4}{Bounding a weighted sum of unbiased estimators with McDiarmid's Ineqaulity}{equation.3.18}{}}
-\newlabel{eq:tominimize@cref}{{[equation][18][]18}{4}}
-\newlabel{eqn:sumofsquares}{{26}{5}{Bounding a weighted sum of unbiased estimators with McDiarmid's Ineqaulity}{equation.3.26}{}}
-\newlabel{eqn:sumofsquares@cref}{{[equation][26][]26}{5}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The effective number of samples $\eta _a$ versus $n_{a1}$, where $p_a = .8$ and the total number of samples, $ n_{a1}+n_{a0}=100$. The effective number of samples is maximized (and equals the total) if we sample each side according to its probability.\relax }}{5}{figure.caption.1}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Targeted Sampling}{6}{subsection.3.4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}UCB variant}{6}{subsection.3.5}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces UCB\relax }}{7}{algorithm.1}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Algorithm}{7}{section.4}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Theorems}{7}{section.5}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Experiments}{7}{section.6}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The distribution of regret varies with the $\beta $ parameter in the bound in the estimator. As beta increases, the mean regret increases but the variance decreases. The plot shows the results of running $100$ independent bandits, with $K=256$ and $\epsilon =0.1$, up to a horizon $h=10^5$ for each value of $\beta $. \relax }}{7}{figure.caption.3}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Comparison of the performance of standard UCB versus causal UCB with $\beta =3$ and $\beta = 5$. 100 simulations were run for each algorithm up to a horizon of $10^5$ per value of $K$. Error bars span the 1st to 3rd quantile of the regret, round points mark the median and triangular points show the mean. For standard UCB the regret increases linearly with the number of arms $K$. For causal UCB the increase is sub-linear. Increasing $\beta $ leads to slower convergence but lower variance.\relax }}{8}{figure.caption.2}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{8}{section.7}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Observe until number of plausibly optional arms $< \alpha $}{3}{section.4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Regret during observe phase}{4}{subsection.4.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.1}A very simple model}{4}{subsubsection.4.1.1}}
+\newlabel{eq:overlap1}{{16}{4}{A very simple model}{equation.4.16}{}}
+\newlabel{eq:overlap1@cref}{{[equation][16][]16}{4}}
+\newlabel{eq:overlap2}{{17}{4}{A very simple model}{equation.4.17}{}}
+\newlabel{eq:overlap2@cref}{{[equation][17][]17}{4}}
+\newlabel{eq:overlap3}{{18}{4}{A very simple model}{equation.4.18}{}}
+\newlabel{eq:overlap3@cref}{{[equation][18][]18}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Bounding a weighted sum of unbiased estimators with McDiarmid's Ineqaulity}{5}{subsection.4.2}}
+\newlabel{eqn:McDiarmid}{{25}{5}{Bounding a weighted sum of unbiased estimators with McDiarmid's Ineqaulity}{equation.4.25}{}}
+\newlabel{eqn:McDiarmid@cref}{{[equation][25][]25}{5}}
+\newlabel{eq:tominimize}{{34}{6}{Bounding a weighted sum of unbiased estimators with McDiarmid's Ineqaulity}{equation.4.34}{}}
+\newlabel{eq:tominimize@cref}{{[equation][34][]34}{6}}
+\newlabel{eqn:sumofsquares}{{42}{6}{Bounding a weighted sum of unbiased estimators with McDiarmid's Ineqaulity}{equation.4.42}{}}
+\newlabel{eqn:sumofsquares@cref}{{[equation][42][]42}{6}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The effective number of samples $\eta _a$ versus $n_{a1}$, where $p_a = .8$ and the total number of samples, $ n_{a1}+n_{a0}=100$. The effective number of samples is maximized (and equals the total) if we sample each side according to its probability.\relax }}{8}{figure.caption.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Targeted Sampling}{8}{subsection.4.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}UCB variant}{8}{subsection.4.4}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Algorithm}{9}{section.5}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces UCB\relax }}{9}{algorithm.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Comparison of the performance of standard UCB versus causal UCB with $\beta =3$ and $\beta = 5$. 100 simulations were run for each algorithm up to a horizon of $10^5$ per value of $K$. Error bars span the 1st to 3rd quantile of the regret, round points mark the median and triangular points show the mean. For standard UCB the regret increases linearly with the number of arms $K$. For causal UCB the increase is sub-linear. Increasing $\beta $ leads to slower convergence but lower variance.\relax }}{10}{figure.caption.2}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Theorems}{11}{section.6}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Experiments}{11}{section.7}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The distribution of regret varies with the $\beta $ parameter in the bound in the estimator. As beta increases, the mean regret increases but the variance decreases. The plot shows the results of running $100$ independent bandits, with $K=256$ and $\epsilon =0.1$, up to a horizon $h=10^5$ for each value of $\beta $. \relax }}{11}{figure.caption.3}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{11}{section.8}}
 \bibstyle{plainnat}
 \bibdata{c-bandit}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Notes}{9}{section.8}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Why Hoeffdings bound doesn't hold if $n$ is a random variable}{9}{subsection.8.1}}
-\newlabel{eq:HoeffdingsRandom}{{30}{9}{Why Hoeffdings bound doesn't hold if $n$ is a random variable}{equation.8.30}{}}
-\newlabel{eq:HoeffdingsRandom@cref}{{[equation][30][]30}{9}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Notes}{12}{section.9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Why Hoeffdings bound doesn't hold if $n$ is a random variable}{12}{subsection.9.1}}
+\newlabel{eq:HoeffdingsRandom}{{54}{12}{Why Hoeffdings bound doesn't hold if $n$ is a random variable}{equation.9.54}{}}
+\newlabel{eq:HoeffdingsRandom@cref}{{[equation][54][]54}{12}}

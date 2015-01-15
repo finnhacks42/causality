@@ -41,6 +41,7 @@
 \usepackage{natbib}
 \usepackage[capitalize]{cleveref}
 \usepackage{graphicx}
+\usepackage{parskip}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MACROS
@@ -77,15 +78,49 @@
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{example}[theorem]{Example}
 
-\title{Regret Bounds for UCB}
+\title{Regret Bounds for $(\alpha,\gamma)$-UCB}
 \author{Finnian Lattimore}
 
 \begin{document}
 \def\ci{\perp\!\!\!\perp}
 \maketitle
 
+The basic setting is the stochastic bandit problem: 
 
-Assume for each arm $i \in \{1...K\} $ there is an unknown distribution of rewards $P(X)$ and a convex function, $\psi$, such that:
+\begin{itemize}
+\item We have a set of arms $i \in \{1...K\}$
+\item For each arm $i$, there is an unknown distribution of rewards $P_{i}(X)$
+\item Each time we select a given arm, $i$, the reward is sampled i.i.d from $P_{i}(X)$. This is a big assumption - it states that the reward at a given timestep depends only on the action selected at that timestep, not on the sequence of previous actions. 
+\item \color{red}Can the reward distributions be (fixed) functions of the timestep? (No I think - otherwise the idea of an optimal arm independent of t doesn't make sense)
+\end{itemize}
+
+Some notation:
+
+\begin{itemize}
+\item $K$ the number of arms
+\item $i$ identifies an arm, $i \in \{1...K\}$
+\item $i^*$ the arm with the highest true expected reward
+\item $I_t$ the arm selected by the algorithm at timestep $t$
+\item $\hat{\mu}_i$ an estimator for the expected reward of arm $i$ based on the sample mean
+\item $\mu_i$ the true expected reward for an arm $i$
+\item $\mu^*$ the true expected reward of  $i^*$ (the best arm)
+\item $\Delta_i = \mu^* - \mu_i$ how much worse arm $i$ is than the best arm
+\item $T_i(s) = \sum_{t=1}^s \ind{I_t = i}$ the number of times arm $i$ was selected upto timestep $s$
+\item $\hat \epsilon_{it} =  (\psi^*)^{-1} \left(\frac{\alpha log(t)}{T_{i}(t-1)}\right)$ an estimate of the uncertainty in the empirical estimator for the expected reward
+
+
+\end{itemize}
+
+The goal is to get a bound on the pseudo-regret, defined as:
+
+\eqn{
+R_n  = & n\mu^* - E\left[\sum_{t = 1}^n \mu_{It}\right] \\
+\label{eq:regretK}
+= & \sum_{i=1}^K \Delta_i E[T_i(n)] 
+}
+
+
+For the UCB algorithm we make the additional assumption that for each $P(X)$ there exists a convex function $\psi$ such that:
 
 \begin{equation}
 \begin{aligned}
@@ -93,29 +128,55 @@ log(E[e^{\lambda(X-E[X]}]) & \leq \psi(\lambda)\\
 log(E[e^{\lambda(E[X]-X}]) & \leq \psi(\lambda)
 \end{aligned}
 \end{equation}
-This ensures that the moments of the distribution of $X$ are defined. If we select arm $i$ a fixed number of times $s$:
+This ensures that the moments of the distribution of $X$ are defined and gives us a high probability bound on the how much our sample based estimate of the expected reward can be below the true expected reward. Let  $\hat \mu_{is} = \frac{1}{s}\sum_{t=1}^s X_t$ be the sample average and $\mu_{i} = E[P_i(X)]$ if we select arm $i$ a fixed number of times $s$:
+
 \eqn {
 \label{eq:hoeff1}
-& P(|\hat \mu_{is} - \mu_{i}| > \epsilon) \leq 2e^{-s\psi^*(\epsilon)} \\
+& P( \mu_{i} - \hat \mu_{is}  > \epsilon) \leq e^{-s\psi^*(\epsilon)} \\
 \label{eq:hoeff2}
- \implies & P(|\hat \mu_{is} - \mu_{i}| > (\psi^{*})^{-1}\frac{\log(\frac{2}{\delta})}{s}) \leq \delta
+ \implies & P\left(\mu_{i} - \hat \mu_{is} > (\psi^{*})^{-1}\left( \frac{1}{s}\log\frac{1}{\delta}\right)\right) \leq \delta
 }
 
+\fbox{\begin{minipage}{\textwidth}%
+\textbf{The UCB Algorithm}
 
+Define the upper confidence bound for each arm $i$ at timestep $t$ as:
 
-Assume that at time $t$ we select arm $I_t$ with the highest upper confidence bound:
+\eqn {
+ucb_{it} & = \hat \mu_{it} + (\psi^{*})^{-1}\left( \frac{\alpha}{T_{i}(t-1)}\log t\right) \text{ , where $\alpha$ is an input parameter} \\
+& =  \hat \mu_{it} + \hat \epsilon_{it}
+}
+
+At time $t$ select arm $I_t$ with the highest upper confidence bound:
 
 \begin{equation}
 \label{eq:armSelection}
-I_{t} = argmax_{i=1...K}\left[\hat{\mu}_{it} + (\psi^{*})^{-1}\frac{\alpha \log(t)}{T_{it}}\right]
+I_{t} = argmax_{i=1...K}\left(ucb_{it} \right)
 \end{equation}
 
 Then if $\alpha > 2$,
 
 \begin{equation}
-R_n \leq \sum_{i:\Delta i > 0}\left(\frac{\alpha \Delta i}{\psi^{*}(\Delta i/2)}log(n)+\frac{\alpha}{\alpha-2}\right)
+\label{eq:regretBound}
+R_n \leq \sum_{i:\Delta i > 0}\left(\frac{\alpha \Delta i \log(n)}{\psi^{*}(\Delta i/2)}+\frac{\alpha}{\alpha-2}\right)
 \end{equation}
 
+For $[0,1]$ random variables, with $\psi(\lambda) = \frac{\lambda^2}{8}$ gives $\psi^{*}(\epsilon)=2\epsilon^2$,  $(\psi^{*})^{-1}(x)=\sqrt{\frac{x}{2}}$ and:
+
+\eqn{
+ucb_{it} & = \hat \mu_{it} +  \sqrt{\frac{\alpha}{2 T_{i}(t-1)}\log t}
+} 
+
+\begin{equation}
+\label{eq:Bernoulli}
+R_n \leq \sum_{i:\Delta i > 0}\left(\frac{2 \alpha \log(n)}{\Delta_i}+\frac{\alpha}{\alpha-2}\right)
+\end{equation}
+
+\end{minipage}}
+
+The confidence bound we use in the UCB algorithm is clearly related but not identical to the bound in equation \ref{eq:hoeff2}. The difference is due to the fact that when we use the UCB algorithm, the number of times each arm is selected is not fixed in advance but depends on the results of previous actions. 
+
+We now want to prove the bound in equation \ref{eq:regretBound} holds.
 
 
 
@@ -124,14 +185,14 @@ R_n \leq \sum_{i:\Delta i > 0}\left(\frac{\alpha \Delta i}{\psi^{*}(\Delta i/2)}
 \begin{enumerate}
 \item The estimated UCB on the best arm, $i^*$, is less than or equal to the actual reward for that arm: $\hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t} \leq \mu^*$
 \item The estimated reward for arm $i$ is greater than or equal to the estimated CI higher than the true reward for that arm: $\hat \mu_{it} \geq \mu_i + \hat \epsilon_{it}$
-\item The number of times we have selected arm $i$ in previous timesteps, $T_{it}$, is less than some bound (that grows logarithmically with $n$). $T_{it} < \frac{\alpha log(n)}{\psi^*(\Delta i/2)} \;\;\; \color{red} \longleftarrow \text{feels odd that this grows with $n$, not $t$}$
+\item The number of times we have selected arm $i$ in previous timesteps, $T_{i}(t-1)$, is less than some bound (that grows logarithmically with $n$). $T_{i}(t-1) < \frac{\alpha log(n)}{\psi^*(\Delta i/2)} \;\;\; \color{red} \longleftarrow \text{feels odd that this grows with $n$, not $t$. Consequence of union bound?}$
 \end{enumerate}
 \end{theorem}
 \begin{proof}
 Assume statements 1-3 are all false.
 \eq {
-3. & \implies T_{it} > \frac{\alpha log(n)}{\psi^*(\Delta i/2)} \\
-  & \implies \Delta i > 2 (\psi^*)^{-1} \frac{\alpha log(n)}{T_{it}} \geq 2 (\psi^*)^{-1} \frac{\alpha log(t)}{T_{it}} = 2 \hat \epsilon_{it}\\
+3. & \implies T_{i}(t-1) > \frac{\alpha log(n)}{\psi^*(\Delta i/2)} \\
+  & \implies \Delta i > 2 (\psi^*)^{-1} \frac{\alpha log(n)}{T_{i}(t-1)} \geq 2 (\psi^*)^{-1} \frac{\alpha log(t)}{T_{i}(t-1)} = 2 \hat \epsilon_{it}\\
   & \implies \Delta i > 2 \hat \epsilon_{it} \\[10pt]
 1. & \implies \hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t}  >  \mu^*  = \mu_i+\Delta i > \mu_i +  2 \hat \epsilon_{it}\\
 & \implies \hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t}  > \mu_i +  2 \hat \epsilon_{it}\\[10pt]
@@ -142,19 +203,12 @@ Assume statements 1-3 are all false.
 
 \end{proof}
 
-If statements (1) and (2) are both false, then statement (3) places a bound on the number of times we can previously have selected the incorrect arm $i$ in order to select it in this timestep. We can write the regret in terms of the number of times we select each arm and its sub-optimality:
-
-\eq {
-\bar{R}_n = & n\mu^* - \sum_{t=1}^{n}E[\mu_{I_t}] \\
-= & \sum_{i=1}^{K}\Delta_i E[T_{in}]\\
-= & \sum_{i=1}^{K}\Delta_i E\left[\sum_{t=1}^{n} \mathds{1} \{I_t = i\}\right] \;\; \leftarrow \text{Expected number of times selected arm $I_t$ is $i$ }\\
-}
-
+If statements (1) and (2) are both false, then statement (3) places a bound on the number of times we can previously have selected the incorrect arm $i$ in order to select it in this timestep. 
 
 Let $\gamma = \ceil{\frac{\alpha \log(n)}{\psi^*(\Delta i/2)}}$ and suppose we had selected arm $i$ in all timesteps until $\gamma$. In the remaining timesteps, we can only select $i$ if statement 3) is false 
 
 \eq{
-\implies E\left[T_{in}\right] & \leq \gamma + E\left[\sum_{t=1}^{n} \mathds{1} \{I_t = i \text{ and (3) is false} \}\right] \\[3pt]
+\implies E\left[T_{i}(n)\right] & \leq \gamma + E\left[\sum_{t=1}^{n} \mathds{1} \{I_t = i \text{ and (3) is false} \}\right] \\[3pt]
 & \leq \gamma + E\left[\sum_{t=\gamma+1}^{n} \mathds{1} \{\text{(1) or (2) is true} \}\right] \leftarrow \text{since if (3) is false, (1) or (2) must be true}\\[3pt]
 & \leq \gamma + \sum_{t=\gamma+1}^{n} \left[ \mathds{P}(\text{(1) is true}) + \mathds{P}(\text{(2) is true})  \}\right] \color{red} \leftarrow \text{Bubeck has $=$ here but are (1) and (2) disjoint?} 
 }
@@ -169,12 +223,18 @@ P(\text{(1) is true})  = & P(\hat{\mu}_{i^*t}+ (\psi^*)^{-1}\left( \frac{\alpha 
 \implies & P(\text{(1) is true}) \leq \sum_{s=1}^t t^{-\alpha} = t*t^{-\alpha} =  t^{1-\alpha}
 }
 
-Similarly, $P(\text{(2) is true}) \leq t^{1-\alpha} \implies E[T_{in}] \leq \gamma + \sum_{t=\gamma+1}^n 2t^{1-\alpha}$
+Similarly, $P(\text{(2) is true}) \leq t^{1-\alpha}$ so we have proved: 
+
+\eqn {
+ E\left[T_{i}(n)\right] & \leq \gamma + \sum_{t=\gamma+1}^n 2t^{1-\alpha}
+}
+
+Plugging this into the definition of pseudo-regret in equation \ref{eq:regretK} gives:
 
 
-
-
-
+\eqn {
+R_n \leq \sum_{i=1}^K \Delta_i  \left( \ceil{\frac{\alpha \log(n)}{\psi^*(\Delta i/2)}} + \sum_{t=\gamma+1}^n 2t^{1-\alpha}\right) 
+}
 
 
 

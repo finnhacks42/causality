@@ -166,7 +166,9 @@ If $p$ is not known, these expression are unchanged except that $p_a$ is replace
 }
 \subsection{Observe then exploit}
 
-Basic idea - observe until the uncertainty on all actions is smaller than $\epsilon$, then exploit (or switch to standard UCB). Bounds on regret: when observing the regret for each timestep is at most 1 (since the reward is $\in [0,1]$). When exploiting regret it at most $\epsilon$. If the horizon is $n$, the cost of exploiting $< \epsilon n$ and the cost of observing is $O(1/\epsilon^2)$ (this comes from how quickly we converge to within $\epsilon$ for all arms). 
+Basic idea - observe until the uncertainty on all actions is smaller than $\epsilon$, then exploit (or switch to standard UCB). This is only really going to work if $p_a \sim 0.5$. 
+
+Bounds on regret: when observing the regret for each timestep is at most 1 (since the reward is $\in [0,1]$). When exploiting regret it at most $\epsilon$. If the horizon is $n$, the cost of exploiting $< \epsilon n$ and the cost of observing is $O(1/\epsilon^2)$ (this comes from how quickly we converge to within $\epsilon$ for all arms). 
 
 \eqn{
 R_n = O(n\epsilon+\frac{1}{\epsilon^2})
@@ -191,7 +193,84 @@ m_{i,j}    &= \sum_{s=1}^t \ind{X_i = j, Y = 1} \\
 n_{i,j}    &= \sum_{s=1}^t \ind{X_i = j} \\
 }
 
-and 
+and Hoeffding's Inequality gives:
+
+\eqn {
+P\left(|\hat{\mu}_{ij} - \mu_{ij}| > \sqrt{\frac{1}{2n_{ij}}\log{\frac{2}{\delta}}}\right) \leq \delta
+}
+
+\section{Observe until number of plausibly optional arms $< \alpha$}
+
+Define the set of plausibly optimal arms to be those with an upper confidence bound that is higher than the largest lower confidence bound.
+
+\eqn {
+A_t = \{k : UB(k) \geq max_{k'}(LB(k'))  \}
+}
+
+We then observe until the size of this set is less than some value $\alpha$ before switching to UCB. This takes into account that we don't need narrow confidence bounds on the arms with very low expected reward. Once we start doing UCB, we keep track of the ucb bound separately and for each arm use whichever bounds are narrower. 
+
+\subsection{Regret during observe phase}
+
+
+\eqn {
+R_n = & \max_{i=1...K} E\left[\sum_{t=1}^n Y_{it} - \sum_{t=1}^n Y_{I_t,t} \right] \\
+= & E[n]\left(P(Y|X_{i^*}={j^*})  - P(Y)\right) \text{ where } X_{i^*}={j^*} \text{ is the best arm}
+}
+
+ 
+\subsubsection{A very simple model}
+
+Lets try to analyse a very simple model in which the reward depends only on the value of $X_1$.
+
+\eqn{
+&P(Y|X_1=0,X_2,...X_N) = \frac{1}{2}-a\\
+&P(Y|X_1=1,X_2,...X_N) = \frac{1}{2}+a\\
+&P(X_i = j) = \frac{1}{2} \;\;\; \forall (i,j)\\
+&\implies P(Y) = \frac{1}{2} \\
+&\implies R_n = aE[n]
+}
+
+The goal is now to find $E[n]$ (which will be a function of $a$)
+
+Lets start by considering how long on average we need to observe until the lower bound on the optimal arm is higher than the upper bound on a single other arm, $i$, (with expected reward $\frac{1}{2}$)
+
+If the following three statements hold, then there is no overlap $LB^* = \hat{\mu}^* - \epsilon > UB_i = \hat{\mu}_i + \epsilon$.
+
+\eqn {
+\label{eq:overlap1}
+&\mu^* - \hat{\mu}^* \leq \epsilon \\
+\label{eq:overlap2}
+&\hat{\mu}_i - \mu_i \leq \epsilon \\
+\label{eq:overlap3}
+&\epsilon \leq a/4
+}
+
+If \ref{eq:overlap3} is true, we can bound the probability of overlap at some timestep $t$ with the union bound of the probability that either \ref{eq:overlap1} or \ref{eq:overlap2} are false.
+
+\eqn {
+P(overlap) = P(n \geq t) \leq 
+P(\mu^* - \hat{\mu}^* \geq \epsilon) + P(\hat{\mu}_i - \mu_i \geq \epsilon)  \;\;\;\text{ if } \epsilon \leq a/4
+}
+
+Let $\epsilon = a/4$
+
+\eqn {
+P(n > t) \leq & e^{-nD(p_{ij}+p (a/4) || p_{ij})} +e^{-nD(p_{ij}-p (a/4) || p_{ij})} \\
+\leq & \;\;\;?
+}
+
+Where $p_ij = P(Y = 1, X_i = j) \leq P(X_i=j) = p \;\;\; \forall(i,j)$
+
+Now 
+
+\eqn {
+E[n] = \sum_{t=1}^\infty P(n \geq t)
+}
+
+
+But this is just the expected number of steps until one arm does not overlap. With more arms its more complicated - as we need the probability that $\alpha$ of them overlap (another union bound?).
+
+
 
 
 
@@ -212,32 +291,36 @@ If $X_i \ci X_j$ and
 }
 
 
-In our problem we have:
+In our problem, for each variable $V_i$ and value $j$ we have:
 
 \eqn{
-\hat{\mu}_a = \begin{cases}
-\frac{p_a}{n_{a1}}\sum_{j=1}^{n_{a1}}X_{a1,j} + \frac{1-p_a}{n_{a0}}\sum_{j=1}^{n_{a0}}X_{a0,j} & \text{ if $a \neq i$}\\
-\sum_{j=1}^{n_i}X_j & \text{if $a = i$}
+\hat{\mu}_a = \tilde{P}(Y|V_i = j)= \begin{cases}
+\frac{p_a}{n_{a1}}\sum_{s=1}^{n_{a1}}X_{a1,s} + \frac{1-p_a}{n_{a0}}\sum_{s=1}^{n_{a0}}X_{a0,s} & \text{ if $a \neq i$}\\
+\sum_{s=1}^{n_i}X_s & \text{if $a = i$}
 \end{cases}
 }
 
+where $X_{a1,s}  \sim P(Y|V_i = j, do(V_a = 1))$ and $X_{a0,s}  \sim P(Y|V_i = j, do(V_a = 0))$, both $\in [0,1]$. We then pool $\{\hat{\mu}_1 ... \hat{\mu}_K \}$ to get a single estimate.
+
 \eqn {
-\mu = \sum_a w_a \mu_a \text{ where } \sum_a w_a = 1
+\hat{\mu} = \tilde{P}(Y|V_i = j)= \sum_a w_a \hat{\mu}_a \text{, where } \sum_a w_a = 1
 }
 
 Let 
 
 \eqn {
 \hat{\mu} = \phi(\boldsymbol{X}) = \sum_{a \neq i} w_a \left[ 
-\frac{p_a}{n_{a1}}\sum_{j=1}^{n_{a1}}X_{a1,j} + \frac{1-p_a}{n_{a0}}\sum_{j=1}^{n_{a0}}X_{a0,j}
-\right] + \frac{w_i}{n_i} \sum_{j=1}^{n_i}X_{i,j}
+\frac{p_a}{n_{a1}}\sum_{s=1}^{n_{a1}}X_{a1,s} + \frac{1-p_a}{n_{a0}}\sum_{s=1}^{n_{a0}}X_{a0,s}
+\right] + \frac{w_i}{n_i} \sum_{s=1}^{n_i}X_{i,s}
 }
 
-Note: this treats the number of samples $n_i$,$n_{a1}$, and $n_{a0}$ as fixed. If the choice of action is random they are in fact random variables (but do not depend on previous action choices). Will this bounds still hold?  
+Note: this treats the number of samples $n_i$,$n_{a1}$, and $n_{a0}$ as fixed. Even for fixed actions, the latter two are still random variables that depend on $\boldsymbol{p}$  Will this bound still hold?  
+
+
 
 \eqn {
-&\phi(...X_{\alpha 1,j}...) - \phi(...X_{\alpha 1,j}^{'}...) \leq w_\alpha \frac{p_\alpha}{n_{\alpha 1}} \\
-&\phi(...X_{\alpha 0,j}...) - \phi(...X_{\alpha 0,j}^{'}...) \leq w_\alpha \frac{1-p_\alpha}{n_{\alpha 0}}\\
+&\phi(...X_{\alpha 1,s}...) - \phi(...X_{\alpha 1,s}^{'}...) \leq w_\alpha \frac{p_\alpha}{n_{\alpha 1}} \\
+&\phi(...X_{\alpha 0,s}...) - \phi(...X_{\alpha 0,s}^{'}...) \leq w_\alpha \frac{1-p_\alpha}{n_{\alpha 0}}\\
 & \phi(...X_i...) - \phi(...X_i^{'}...) \leq \frac{w_i}{n_i}
 }
 
@@ -270,22 +353,55 @@ L(w_1...w_k,\lambda) = \sum_a w_a^2 f(a) + \lambda((\sum_a w_a)-1)
  \implies \lambda = -\frac{2}{\sum_a \frac{1}{f(a)}}\\
 & \implies w_a = \frac{1}{f(a)\sum_a \frac{1}{f(a)}} \\
 \label{eqn:sumofsquares}
-& \implies \sum_i c_i^2 = \frac{1}{\sum_a \frac{1}{f(a)}} \\
+& \implies \sum_i c_i^2 = \frac{1}{\sum_a \frac{1}{f(a)}} 
 }
 
 Substituting \ref{eqn:sumofsquares} into the McDiarmid inequality \ref{eqn:McDiarmid}:
 
 \eqn{
-P\left(|\hat{\mu} - \mu| > \sqrt{\frac{1}{2\sum_a \eta_a} \log{\frac{2}{\delta}}}\right) \leq \delta
+P\left(|\hat{\mu}^{ij} - \mu^{ij}| > \sqrt{\frac{1}{2\sum_a \eta_a^{ij}} \log{\frac{2}{\delta}}}\right) \leq \delta
 }
 
 where:
 
 \eqn {
-\eta_a = \begin{cases}
-\frac{n_{a1}n_{a0}}{n_{a1}(1-p_a)^2+n_{a0}p_a^2} & a \neq i\\
-n_i & a = i
-\end{cases}
+& \mu^{ij} = P(Y | V_i = j) \\
+& \eta_a^{ij} = \begin{cases}
+\frac{n_{a1}^{ij} n_{a0}^{ij}}{n_{a1}^{ij}(1-p_a)^2+n_{a0}^{ij}p_a^2} & a \neq i\\
+n_{ij} & a = i
+\end{cases} \\
+&n_{al}^{ij} = \sum_{s=1}^t \ind{do(V_a = l), V_i = j} \\
+& n_{ij} = \sum_{s=1}^t \ind{(do(V_i = j)}
+}
+
+
+
+
+
+
+All of the above is to get estimates for $P(Y|V_i = j)$ for some fixed $i,j$. Suppose we explore for some fixed total number of rounds $h$, the goal is to minimize the worst confidence bound - that doesn't quite make sense as a goal - we just need to be sure that all actions are worse than our estimate of the best with probability $\delta$. ... anyway
+
+We have control of are the number of times we do each action, $n_{al}$, which obviously also influences the random variables $n_{al}^{ij}$, subject to the constraint $\sum n_{al} = h$.
+
+Objective: minimize the expectation of the largest confidence bound after a fixed number of rounds $n$. 
+
+Let $\boldsymbol{n} = [n_{11},n_{10},n_{21},n_{20}...n_{k1},n_{k0}]$
+
+\eqn{
+\tilde{\boldsymbol{n}} = \argmin_{\{\boldsymbol{n}:\|\boldsymbol{n}\|=h\}} \max_{i,j} \left( E \left[ \sqrt{\frac{1}{2\sum_a \eta_a^{ij}} \log{\frac{2}{\delta}}} \right] \right)
+}
+
+We can bound the first part of $\eta_a^{ij}$
+
+\eqn {
+\eta_a^{ij} = \frac{n_{a1}^{ij}n_{a0}^{ij}}{n_{a1}^{ij}(1-p_a)^2+n_{a0}^{ij}p_a^2} & \leq \frac{n_{a1}^{ij}n_{a0}^{ij}}{\max(n_{a1}^{ij}(1-p_a)^2+n_{a0}^{ij}p_a^2)} \\
+& = \min \left( \frac{n_{a0}^{ij}}{(1-p_a)^2}, \frac{n_{a1}^{ij}}{p_a^2} \right)
+}
+
+\eqn {
+E \left[ \min \left( \frac{n_{a0}^{ij}}{(1-p_a)^2}, \frac{n_{a1}^{ij}}{p_a^2} \right)  \right] & \leq 
+\min \left( E\left[\frac{n_{a0}^{ij}}{(1-p_a)^2} \right], E\left[\frac{n_{a1}^{ij}}{p_a^2} \right] \right) \\
+& = P(V_i = j) *\min \left( \frac{n_{a0}}{(1-p_a)^2} , \frac{n_{a1}}{p_a^2}  \right) \\
 }
 
 
@@ -295,9 +411,14 @@ n_i & a = i
 \includegraphics[width=.5\textwidth]{samplehalves}
 \end{figure}
 
-
 \subsection{Targeted Sampling}
-Sample a equal number of points from each half of each arm - until the error on all arms is smaller than some threshold. Then exploit. This should do better than observe-exploit, particularly where the probability of some events occurring without intervention is low.
+Sample a equal number of points from each arm - until the error on all arms is smaller than some threshold. Then exploit. This should do better than observe-exploit, particularly where the probability of some events occurring without intervention is low.
+
+A more sophisticated version:
+
+
+
+
 
 \subsection{UCB variant}
 Combine estimators according to:
@@ -401,14 +522,13 @@ Simululations to compare the performance of standard UCB with our modified algor
 Let $\{Z_1,Z_2...Z_n\} \sim Bernoulli(\frac{1}{2}) $ and $X_i = 2Z_i-1 \implies X_i \in \{-1,1\} \text{ and } E[X_i] = 0$.
 
 For a fixed $n$, Hoeffdings inequality says: 
-\begin{equation}
+\eqn{
 \label{eq:HoeffdingsRandom}
-\begin{aligned}
 & P\left(|\frac{1}{n}\sum_{i=1}^{n}X_i| > \epsilon\right) \leq 2e^{-n\epsilon^2} \\
 \implies & P \left(|\frac{1}{n}\sum_{i=1}^{n}X_i| > \sqrt{\frac{\log{4}}{n}}\right) \leq \frac{1}{2} \\
-\implies & P\left( |\sum_{i=1}^{n}X_i| > \sqrt{n \log{4}}\right) \leq \frac{1}{2}\\
-\end{aligned}
-\end{equation}
+\implies & P\left( |\sum_{i=1}^{n}X_i| > \sqrt{n \log{4}}\right) \leq \frac{1}{2}
+}
+
 
 If $n$ is allowed to be dependent on the sequence of values sampled, this inequality no longer holds. 
 

@@ -1,12 +1,12 @@
 This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
-The top-level auxiliary file: conference_poster_5.aux
+The top-level auxiliary file: a4version.aux
 The style file: plain.bst
 Database file #1: library.bib
 Warning--empty institution in Verma1993
 You've used 13 entries,
             2118 wiz_defined-function locations,
-            583 strings with 6203 characters,
+            583 strings with 6183 characters,
 and the built_in function-call counts, 4056 in all, are:
 = -- 368
 > -- 241

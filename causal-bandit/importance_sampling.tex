@@ -1,0 +1,164 @@
+\documentclass{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{accents}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage[ruled]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{dsfont}
+\usepackage[bf]{caption}
+\usepackage{hyperref}
+\hypersetup{
+    bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in AcrobatÕs bookmarks
+    pdftoolbar=true,        % show AcrobatÕs toolbar?
+    pdfmenubar=true,        % show AcrobatÕs menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={My title},    % title
+    pdfauthor={Author},     % author
+    pdfsubject={Subject},   % subject of the document
+    pdfcreator={Creator},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfkeywords={keyword1} {key2} {key3}, % list of keywords
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=red,          % color of internal links (change box color with linkbordercolor)
+    citecolor=blue,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+\usepackage{amsthm}
+\usepackage{natbib}
+\usepackage[capitalize]{cleveref}
+\usepackage{graphicx}
+\usepackage{parskip}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MACROS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\defined}{\vcentcolon =}
+\newcommand{\rdefined}{=\vcentcolon}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\calF}{\mathcal F}
+\newcommand{\sr}[1]{\stackrel{#1}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\ind}[1]{\mathds{1}\!\!\set{#1}}
+\newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
+\newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
+\newcommand{\floor}[1]{\left \lfloor {#1} \right\rfloor}
+\newcommand{\ceil}[1]{\left \lceil {#1} \right\rceil}
+\newcommand{\eqn}[1]{\begin{align}#1\end{align}}
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+\newcommand{\Ber}{\operatorname{Bernoulli}}
+\renewcommand{\P}[1]{\operatorname{P}\left\{#1\right\}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+\title{Estimators}
+
+
+\begin{document}
+\def\ci{\perp\!\!\!\perp}
+\maketitle
+
+
+Suppose we have samples $(X_t,Y_t)$ for $t = 1... n$ drawn from the joint distribution $P(X,Y)$ and we want to estimate $\mu = P(Y=1|X=1)$ 
+
+\section{The standard estimator}
+
+\eqn{
+\hat{\mu} = \frac{\sum_{t=1}^n Y_t \ind{X_t=1}}{\sum_{t=1}^n\ind{X_t=1}}
+}
+
+We can't actually say that this estimator is unbiased - as it can be undefined if $n = 0$
+
+\color{red}{Is there an unbiased estimator for this simple problem if the $P(X = 1)$ is not known?}\color{black}
+
+Let's consider variance and bounds.
+
+
+
+\section{The importance sampling estimator}
+If we know the probability that $X=1$ we can instead use importance sampling.
+
+\eqn{
+\hat{\mu} = \frac{1}{n}\sum_{t=1}^n\frac{Y_t \ind{X_t=1}}{P(X_t=1)}
+}
+
+The estimator is unbiased:
+
+\eqn{
+E[\hat{\mu}] = &\frac{1}{n}\sum_{t=1}^n E\left[\frac{Y_t \ind{X_t=1}}{P(X_t=1)}\right] = \frac{1}{np}\sum_{t=1}^n E\left[Y_t \ind{X_t=1}\right] \\
+= & \frac{1}{n} \sum_{t=1}^n \frac{\left( 0*P(Y_t=0 \text{ or } X_t=0) + 1*P(Y_t = 1 \text{ and } X_t=1) \right)}{P(X_t=1)} \\
+= & \frac{1}{n}\sum_{i=1}^n\frac{P(Y=1,X=1)}{P(X=1)} = \frac{1}{n}\sum_{i=1}^{n}P(Y=1|X=1) = \frac{1}{n} \sum_{i=1}^n \mu = \mu
+}
+
+We can use Hoeffding's inequality to get a bound on how far the estimator is likely to be from the true value. Let:
+
+\eqn{
+Z_t = \frac{Y_t \ind{X_t=1}}{p} \in \{0,\frac{1}{p}\}
+}
+
+\textbf{Hoeffding's inequality:} If $X_1...X_n$ are independent observations such that $a_i < X_i < b_i$ and $\bar{X} = \frac{1}{n}\sum_{i=1}^n X_i$ then:
+
+\eqn {
+P(\bar{X} - E[\bar{X}] \geq \epsilon) \leq \exp{\frac{-2n^2\epsilon^2}{\sum_{i=1}^n(b_i - a_i)^2}}
+}
+
+In our case this gives:
+\eqn{
+P(\frac{1}{n}\sum_{i=1}^n Z_t - \mu \geq \epsilon) \leq \exp{(-2n\epsilon^2p^2)} 
+\implies P(\frac{1}{n}\sum_{i=1}^n Z_t - \mu \geq \frac{1}{p}\sqrt{\frac{1}{2n}\log{\frac{1}{\delta}}}) \leq \delta
+}
+
+This is not so good because $\frac{1}{p}$ can be very large if $p$ is small and its outside the log - so the bounds will grow quickly as $p$ gets small. 
+
+We can get a tighter bound by using an Chernoff's inequality that takes account of the variance of $X$. Let $W_t = \ind{Y_t = 1,X_t=1} = pZ_t$, then:
+
+\eqn{
+P(\frac{1}{n}\sum_{i=1}^n Z_t - \mu \geq \epsilon) = P(\frac{1}{n}\sum_{i=1}^n pZ_t - p\mu \geq p\epsilon) = P(\frac{1}{n}\sum_{i=1}^n W_t - p\mu \geq p\epsilon)
+}
+
+Now $W_t$ is a bernoulli random variable so:
+\eqn{
+V[W_t] = P(W_t=1)P(W_t=0) \leq P(W_t=1) = P(Y_t=1,X_t=1) \leq P(X_t=1) = p
+}
+
+
+
+\color{red} Now do the same for the standard estimator \color{black}
+
+
+
+
+
+
+\bibliographystyle{plainnat}
+\bibliography{c-bandit}
+
+\end{document}
+
+

@@ -18,14 +18,14 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
-\documentclass[b0,landscape,25pt]{sciposter}
+%\documentclass[a4,portrait,25pt]{sciposter}
+%\documentclass{article}
+\documentclass[20pt]{extreport}
 
-
-
-\usepackage{multicol,caption} % This is so we can have multiple columns of text side-by-side
-\columnsep=100pt % This is the amount of white space between the columns in the poster
-\columnseprule=3pt % This is the thickness of the black line between the columns in the poster
-
+%\usepackage{multicol,caption} % This is so we can have multiple columns of text side-by-side
+%\columnsep=100pt % This is the amount of white space between the columns in the poster
+%\columnseprule=3pt % This is the thickness of the black line between the columns in the poster
+\usepackage[margin=0.3in]{geometry}
 \usepackage[svgnames]{xcolor} % Specify colors by their 'svgnames', for a full list of all colors available see here: http://www.latextemplates.com/svgnames-colors
 
 %\usepackage{times} % Use the times font
@@ -54,10 +54,13 @@
 %\usepackage[boxruled]{algorithm2e}
 %\usepackage{algorithm}% http://ctan.org/pkg/algorithm
 \usepackage[noend]{algpseudocode}% http://ctan.org/pkg/algorithmicx
+\usepackage{algorithm}% http://ctan.org/pkg/algorithms
+
 \newtheorem{Def}{Definition}
 \newtheorem{Theorem}{Theorem}
 
 \usetikzlibrary{arrows,positioning} 
+
 
 
 \usetikzlibrary{arrows,positioning} 
@@ -92,9 +95,12 @@
            shorten >=2pt,}
 }
 
+\title{Causal Inference in Machine Learning: A Review}
+\author{Finnian Lattimore\\ Australian National University\\finnlattimore@gmail.com\\\textbf{Apologies,}\\ \textbf{the poster is in Air Canada's lost baggage area} }
 
 \begin{document}
 \def\ci{\perp\!\!\!\perp}
+\maketitle
 %----------------------------------------------------------------------------------------
 %	POSTER HEADER 
 %----------------------------------------------------------------------------------------
@@ -104,29 +110,29 @@
 % The second is 25% wide and houses contact information
 % The third is 19% wide and houses a logo for your university/organization or a photo of you
 % The widths of these boxes can be easily edited to accommodate your content as you see fit
-\begin{minipage}[t]{0.15\linewidth}%
-\centering
-\includegraphics[height=12cm]{nicta_logo2.jpg} % Logo or a photo of you, adjust its dimensions here
-\end{minipage}
-\begin{minipage}[b]{0.65\linewidth}
-\centering
-\resizebox{\linewidth}{!}{\veryHuge \color{NavyBlue} \textbf{Causal Inference in Machine Learning: A review}}
- \color{Black}\\ 
+%\begin{minipage}[t]{0.15\linewidth}%
+%\centering
+%\includegraphics[height=12cm]{nicta_logo2.jpg} % Logo or a photo of you, adjust its dimensions here
+%\end{minipage}
+%\begin{minipage}[b]{0.65\linewidth}
+%\centering
+%\resizebox{\linewidth}{!}{\veryHuge \color{NavyBlue} \textbf{Causal Inference in Machine Learning: %A review}}
+% \color{Black}\\ 
 
-\huge \textbf{Finnian Lattimore}\\ % Author(s)
-\huge Australian National University\\ % University/organization
-finnlattimore@gmail.com
+%\huge \textbf{Finnian Lattimore}\\ % Author(s)
+%\huge Australian National University\\ % University/organization
+%finnlattimore@gmail.com
 
-\end{minipage}
-\begin{minipage}[t]{0.15\linewidth}
-\centering
-\includegraphics[height=12cm]{anu-logo-notext}
-\end{minipage}
+%\end{minipage}
+%\begin{minipage}[t]{0.15\linewidth}
+%\centering
+%\includegraphics[height=12cm]{anu-logo-notext}
+%\end{minipage}
 
 
 %----------------------------------------------------------------------------------------
 
-\begin{multicols}{5} % This is how many columns your poster will be broken into, a poster with many figures may benefit from less columns whereas a text-heavy poster benefits from more
+%\begin{multicols}{2} % This is how many columns your poster will be broken into, a poster with many figures may benefit from less columns whereas a text-heavy poster benefits from more
 
 
 %----------------------------------------------------------------------------------------
@@ -217,15 +223,15 @@ The do-calculus consists of three rules, which result from d-separation in a cau
 {\resizebox{\columnwidth}{!}{\includegraphics{dsepfigure-crop}}}
 \end{figure}
 
- 
-\fbox{\begin{minipage}{0.99\columnwidth}%
+\begin{center} 
+\fbox{\begin{minipage}{0.9\textwidth}%
 \textbf{The Three Rules}
 \begin{enumerate}
 \item A causal DAG remains a causal DAG after an intervention so d-separation still applies.
 \begin{equation*}
 \label{eq:Do1}
 \begin{aligned}
-\text{if }  (\boldsymbol{Y} \ci & \boldsymbol{W}|\boldsymbol{X})  \text{ in } G_{\overline{\boldsymbol{X}}}  \\
+& \text{if }  (\boldsymbol{Y} \ci  \boldsymbol{W}|\boldsymbol{X})  \text{ in } G_{\overline{\boldsymbol{X}}}  \\
 & P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x})) 
 \end{aligned}
 \end{equation*}
@@ -233,7 +239,7 @@ The do-calculus consists of three rules, which result from d-separation in a cau
 \begin{equation*}
 \label{eq:Do2}
 \begin{aligned}
-\text{if } (\boldsymbol{Y} \ci  \boldsymbol{\hat{X}}|\boldsymbol{X},\boldsymbol{Z}) & \text{ in } G^{\dagger}\\
+& \text{if } (\boldsymbol{Y} \ci  \boldsymbol{\hat{X}}|\boldsymbol{X},\boldsymbol{Z})  \text{ in } G^{\dagger}\\
 & P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{Z}) = P(\boldsymbol{Y}|\boldsymbol{X}=\boldsymbol{x},\boldsymbol{Z})
 \end{aligned}
 \end{equation*}
@@ -241,7 +247,7 @@ The do-calculus consists of three rules, which result from d-separation in a cau
 \begin{equation*}
 \label{eq:Do2}
 \begin{aligned}
-\text{if }  (\boldsymbol{Y} \ci  \boldsymbol{\hat{X}}|\boldsymbol{Z}) & \text{ in } G^{\dagger}\\
+&\text{if }  (\boldsymbol{Y} \ci  \boldsymbol{\hat{X}}|\boldsymbol{Z})  \text{ in } G^{\dagger}\\
 & P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{Z}) = P(\boldsymbol{Y}|\boldsymbol{Z})
 \end{aligned}
 \end{equation*}
@@ -249,8 +255,9 @@ The do-calculus consists of three rules, which result from d-separation in a cau
 \footnotesize (For readability, this is a simplified version of the do-calculus that covers interventions on a single variable or cases where it is sufficient for identifiability to consider intervention on all variables together. The fully general version is only slightly more complex see \cite{Pearl2000})
 \normalsize
 \end{minipage}}
+\end{center}
 
-\columnbreak
+%\columnbreak
 \section*{Causal Discovery}
 
 Causal discovery attempts to infer causal structure from data based on more general assumptions. 
@@ -279,7 +286,7 @@ Causal discovery attempts to infer causal structure from data based on more gene
 \caption{The SGS Algorithm}
 \label{fig:SGS}
 \centering
-{\resizebox{0.45\columnwidth}{!}{\includegraphics{SGS_figure-crop}}}
+{\resizebox{0.55\columnwidth}{!}{\includegraphics{SGS_figure-crop}}}
 \end{figure}
 
 \begin{itemize}
@@ -383,7 +390,7 @@ where $l_{i}$ is a binary label that indicates if $X \rightarrow Y$ or $Y \right
 \bibliography{library} % Use the example bibliography file sample.bib
 
 
-\end{multicols}
+%\end{multicols}
 \end{document}
 
 
