@@ -245,12 +245,13 @@ If the following three statements hold, then there is no overlap $LB^* = \hat{\m
 &\epsilon \leq a/4
 }
 
-If \ref{eq:overlap3} is true, we can bound the probability of overlap at some timestep $t$ with the union bound of the probability that either \ref{eq:overlap1} or \ref{eq:overlap2} are false.
+If \ref{eq:overlap3} is true, we can bound the probability of overlap  been the confidence intervals of the best arm and one of the other arms, $k$, at some timestep $t$ with the union bound of the probability that either \ref{eq:overlap1} or \ref{eq:overlap2} are false.
 
 \eqn {
-P(overlap) = P(n \geq t) \leq 
-P(\mu^* - \hat{\mu}^* \geq \epsilon) + P(\hat{\mu}_i - \mu_i \geq \epsilon)  \;\;\;\text{ if } \epsilon \leq a/4
+\rho(t) \equiv P(overlap_k) \leq 
+P(\mu^* - \hat{\mu}^* \geq \epsilon) + P(\hat{\mu}_k - \mu_k \geq \epsilon)  \;\;\;\text{ if } \epsilon \leq a/4
 }
+
 
 
 Now for random variables $W_{sij} = P(Y|X_i=j)$ drawn from a Bernoulli distribution with mean $p_{ij}$ the Chernoff inequality gives:
@@ -267,7 +268,12 @@ Similarly
 P(\mu^* - \hat{\mu}^* \geq \epsilon) \leq exp(-tp^2\epsilon^2) = exp(-\frac{t\epsilon^2}{4})
 }
 
-Now 
+Now the estimators and their bounds are independent, as they are composed from sums of independent variables $X_i$ so the probability that $\alpha$ of them have overlapping bounds is given by a binomial distribution. 
+
+\eqn {
+P(O > \alpha)  = & P(n \geq t) = 1 - \sum_{i=1}^\alpha \binom{K-1}{i}\rho(t)^{i}(1-\rho(t))^{K-1-i} \\
+\leq & \exp(-(K-1)D(\frac{\alpha}{K-1} || \rho(t))
+} 
 
 \eqn {
 E[n] = \sum_{t=1}^\infty P(n \geq t) \leq & \sum_{t=1}^\infty \left( \exp(-\frac{t\epsilon^2}{4+4\epsilon/3}) +exp(-\frac{t\epsilon^2}{4}) \right) \\
