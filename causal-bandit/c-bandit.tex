@@ -252,20 +252,38 @@ P(overlap) = P(n \geq t) \leq
 P(\mu^* - \hat{\mu}^* \geq \epsilon) + P(\hat{\mu}_i - \mu_i \geq \epsilon)  \;\;\;\text{ if } \epsilon \leq a/4
 }
 
-Let $\epsilon = a/4$
+
+Now for random variables $W_{sij} = P(Y|X_i=j)$ drawn from a Bernoulli distribution with mean $p_{ij}$ the Chernoff inequality gives:
 
 \eqn {
-P(n > t) \leq & e^{-nD(p_{ij}+p (a/4) || p_{ij})} +e^{-nD(p_{ij}-p (a/4) || p_{ij})} \\
-\leq & \;\;\;?
+& P(\frac{1}{t}\sum_s W_{sij} - p_{ij} \geq \gamma) \leq \exp(-\frac{t\gamma^2}{2p_{ij}(1-p_{ij})+2\gamma/3}) \\
+\implies & P(\frac{1}{t}\sum_s \frac{W_{sij}}{p} - \frac{p_{ij}}{p} \geq \epsilon) = P(\hat{\mu}_i - \mu_i \geq \epsilon) \leq \exp(-\frac{tp\epsilon^2}{2+2\epsilon/3}) = \exp(-\frac{t\epsilon^2}{4+4\epsilon/3})
 }
+Where $p_{ij} = P(Y = 1, X_i = j) \leq P(X_i=j) = p = 1/2 \;\;\; \forall(i,j)$
 
-Where $p_ij = P(Y = 1, X_i = j) \leq P(X_i=j) = p \;\;\; \forall(i,j)$
+Similarly 
+
+\eqn {
+P(\mu^* - \hat{\mu}^* \geq \epsilon) \leq exp(-tp^2\epsilon^2) = exp(-\frac{t\epsilon^2}{4})
+}
 
 Now 
 
 \eqn {
-E[n] = \sum_{t=1}^\infty P(n \geq t)
+E[n] = \sum_{t=1}^\infty P(n \geq t) \leq & \sum_{t=1}^\infty \left( \exp(-\frac{t\epsilon^2}{4+4\epsilon/3}) +exp(-\frac{t\epsilon^2}{4}) \right) \\
+= & \frac{1}{\exp(\epsilon^2/(4+4\epsilon/3)) - 1} + \frac{1}{\exp(\epsilon^2/4) - 1} \\
+\leq & \frac{2}{\exp(\epsilon^2/(4+4\epsilon/3)) - 1} \\
+= & \frac{2}{\exp(a^2/(64+4a/3)) - 1}
 }
+
+So the regret for the observe stage is bounded by:
+
+\eqn {
+R \leq \frac{2a}{\exp(a^2/(64+4a/3)) - 1}
+}
+
+
+
 
 
 But this is just the expected number of steps until one arm does not overlap. With more arms its more complicated - as we need the probability that $\alpha$ of them overlap (another union bound?).
