@@ -211,76 +211,76 @@ We then observe until the size of this set is less than some value $\alpha$ befo
 
 \subsection{Regret during observe phase}
 
+Let $n$ be the number of timesteps until the size of the set $A_t$ falls below $\alpha$ or we reach the overall horizon $T$
+
+\eqn {
+n = \min(\{t:size(A_t)< \alpha, T\})
+}
+
+Let $Q(k)$ be the expected reward for arm $k$ and $\mu^*$ be the expected reward for the best arm.
 
 \eqn {
 R_n = & \max_{i=1...K} E\left[\sum_{t=1}^n Y_{it} - \sum_{t=1}^n Y_{I_t,t} \right] \\
-= & E[n]\left(P(Y|X_{i^*}={j^*})  - P(Y)\right) \text{ where } X_{i^*}={j^*} \text{ is the best arm}
+= & E[n]\left(\mu^*  - E[Q]\right) 
 }
 
- 
-\subsubsection{A very simple model}
-
-Lets try to analyse a very simple model in which the reward depends only on the value of $X_1$.
+Without loss of generality, assume the arms are ordered from best to worst.
 
 \eqn{
-&P(Y|X_1=0,X_2,...X_N) = \frac{1}{2}-a\\
-&P(Y|X_1=1,X_2,...X_N) = \frac{1}{2}+a\\
-&P(X_i = j) = \frac{1}{2} \;\;\; \forall (i,j)\\
-&\implies P(Y) = \frac{1}{2} \\
-&\implies R_n = aE[n]
+& Q(k = 1...K) = [\mu^*, \mu^*-d_2 ... \mu^*-d_k] \\
+&\implies E[Q] = \mu^* - \frac{1}{K}\sum_{k=2}^K d_k \\
+&\implies  R_n = E[n]\left(\frac{1}{K}\sum_{k=2}^K d_k \right)
 }
 
-The goal is now to find $E[n]$ (which will be a function of $a$)
-
-Lets start by considering how long on average we need to observe until the lower bound on the optimal arm is higher than the upper bound on a single other arm, $i$, (with expected reward $\frac{1}{2}$)
-
-If the following three statements hold, then there is no overlap $LB^* = \hat{\mu}^* - \epsilon > UB_i = \hat{\mu}_i + \epsilon$.
+Whenever the following two statements hold only arms with indexes less than $\alpha$ can be in the set $A_t$:
 
 \eqn {
-\label{eq:overlap1}
-&\mu^* - \hat{\mu}^* \leq \epsilon \\
-\label{eq:overlap2}
-&\hat{\mu}_i - \mu_i \leq \epsilon \\
-\label{eq:overlap3}
-&\epsilon \leq a/4
+& \mu^* - \hat{\mu}^* \leq \frac{d_\alpha}{2} \\
+& \hat{\mu_k} - \mu_k \leq \frac{d_k}{2} \; \forall k \geq \alpha 
 }
 
-If \ref{eq:overlap3} is true, we can bound the probability of overlap  been the confidence intervals of the best arm and one of the other arms, $k$, at some timestep $t$ with the union bound of the probability that either \ref{eq:overlap1} or \ref{eq:overlap2} are false.
+\eqn{
+\label{eq:proboverlap}
+\implies \rho(t) \equiv P(\exists k \in A_t: k \geq \alpha)  \leq P(\mu^* - \hat{\mu}^* > \frac{d_\alpha}{2}) + \sum_{k=\alpha}^K P( \hat{\mu_k} - \mu_k > \frac{d_k}{2})
+}
+
 
 \eqn {
-\rho(t) \equiv P(overlap_k) \leq 
-P(\mu^* - \hat{\mu}^* \geq \epsilon) + P(\hat{\mu}_k - \mu_k \geq \epsilon)  \;\;\;\text{ if } \epsilon \leq a/4
+P(n > t) = \begin{cases} 0 & \text{if } t \geq T \\
+P(\exists k \in A_t: k \geq \alpha) & \text{otherwise}
+\end{cases}
 }
 
 
-
-Now for random variables $W_{sij} = P(Y|X_i=j)$ drawn from a Bernoulli distribution with mean $p_{ij}$ the Chernoff inequality gives:
+We now concentrate bounding \ref{eq:proboverlap}. For random variables $W_{sij} = P(Y|X_i=j)$ drawn from a Bernoulli distribution with mean $p_{ij}$ the Chernoff inequality gives:
 
 \eqn {
 & P(\frac{1}{t}\sum_s W_{sij} - p_{ij} \geq \gamma) \leq \exp(-\frac{t\gamma^2}{2p_{ij}(1-p_{ij})+2\gamma/3}) \\
-\implies & P(\frac{1}{t}\sum_s \frac{W_{sij}}{p} - \frac{p_{ij}}{p} \geq \epsilon) = P(\hat{\mu}_i - \mu_i \geq \epsilon) \leq \exp(-\frac{tp\epsilon^2}{2+2\epsilon/3}) = \exp(-\frac{t\epsilon^2}{4+4\epsilon/3})
+\implies & P(\frac{1}{t}\sum_s \frac{W_{sij}}{p} - \frac{p_{ij}}{p} \geq \epsilon) = P(\hat{\mu}_k - \mu_k \geq \epsilon) \leq \exp(-\frac{tp\epsilon^2}{2+2\epsilon/3}) = \exp(-\frac{t\epsilon^2}{4+4\epsilon/3})
 }
 Where $p_{ij} = P(Y = 1, X_i = j) \leq P(X_i=j) = p = 1/2 \;\;\; \forall(i,j)$
 
-Similarly 
-
+Similarly, 
 \eqn {
 P(\mu^* - \hat{\mu}^* \geq \epsilon) \leq exp(-tp^2\epsilon^2) = exp(-\frac{t\epsilon^2}{4})
 }
 
-Now the estimators and their bounds are independent, as they are composed from sums of independent variables $X_i$ so the probability that $\alpha$ of them have overlapping bounds is given by a binomial distribution. 
-
 \eqn {
-P(O > \alpha)  = & P(n \geq t) = 1 - \sum_{i=1}^\alpha \binom{K-1}{i}\rho(t)^{i}(1-\rho(t))^{K-1-i} \\
-\leq & \exp(-(K-1)D(\frac{\alpha}{K-1} || \rho(t))
-} 
-
-\eqn {
-E[n] = \sum_{t=1}^\infty P(n \geq t) \leq & \sum_{t=1}^\infty \left( \exp(-\frac{t\epsilon^2}{4+4\epsilon/3}) +exp(-\frac{t\epsilon^2}{4}) \right) \\
-= & \frac{1}{\exp(\epsilon^2/(4+4\epsilon/3)) - 1} + \frac{1}{\exp(\epsilon^2/4) - 1} \\
-\leq & \frac{2}{\exp(\epsilon^2/(4+4\epsilon/3)) - 1} \\
-= & \frac{2}{\exp(a^2/(64+4a/3)) - 1}
+\implies \rho(t) \leq \exp(-\frac{ d_\alpha^2 t}{16}) + \sum_{k=\alpha}^K exp(-\frac{d_k^2 t}{16(1+d_k/6)})
 }
+
+
+\eqn{ 
+E[n] = & \sum_{t=1}^T P(n \geq t) \leq \sum_{t=1}^T \rho(t) \\
+= & \min \left(T, \frac{1 - e^{-d_\alpha^2 T/16}}{e^{d_\alpha^2 /16} -1 } +  \sum_{k=\alpha}^K \frac{1 - e^{-d_k^2 T/16(1+d_k/6)}}{e^{d_k^2 /16(1+d_k/6)} -1 } \right)
+}
+
+Since the regret is $R_n = E[n]\left(\frac{1}{K}\sum_{k=2}^K d_k \right)$ the worst case is that just enough of the differences $d_k$ are $0$ to make $E[n] = T$ and the remainder are $1$. This occurs if $d_\alpha = 0$, In this case the regret is:
+
+\eqn {
+R_n = T \left(\frac{K-(\alpha+1)}{K}\right)
+}
+
 
 So the regret for the observe stage is bounded by:
 
@@ -580,7 +580,55 @@ Thus Hoeffdings inequality (equation \ref{eq:HoeffdingsRandom}) does not hold in
 
 \end{document}
 
+\eqn {
+E[n] = \sum_{t=1}^T P(n \geq t) \leq & \sum_{t=1}^\infty \left( \exp(-\frac{t\epsilon^2}{4+4\epsilon/3}) +exp(-\frac{t\epsilon^2}{4}) \right) \\
+= & \frac{1}{\exp(\epsilon^2/(4+4\epsilon/3)) - 1} + \frac{1}{\exp(\epsilon^2/4) - 1} \\
+\leq & \frac{2}{\exp(\epsilon^2/(4+4\epsilon/3)) - 1} \\
+= & \frac{2}{\exp(a^2/(64+4a/3)) - 1}
+}
 
+
+\subsubsection{A very simple model}
+
+Lets try to analyse a very simple model in which the reward depends only on the value of $X_1$.
+
+\eqn{
+&P(Y|X_1=0,X_2,...X_N) = \frac{1}{2}-a\\
+&P(Y|X_1=1,X_2,...X_N) = \frac{1}{2}+a\\
+&P(X_i = j) = \frac{1}{2} \;\;\; \forall (i,j)\\
+&\implies P(Y) = \frac{1}{2} \\
+&\implies R_n = aE[n]
+}
+
+The goal is now to find $E[n]$ (which will be a function of $a$)
+
+Lets start by considering how long on average we need to observe until the lower bound on the optimal arm is higher than the upper bound on a single other arm, $i$, (with expected reward $\frac{1}{2}$)
+
+If the following three statements hold, then there is no overlap $LB^* = \hat{\mu}^* - \epsilon > UB_i = \hat{\mu}_i + \epsilon$.
+
+\eqn {
+\label{eq:overlap1}
+&\mu^* - \hat{\mu}^* \leq \epsilon \\
+\label{eq:overlap2}
+&\hat{\mu}_i - \mu_i \leq \epsilon \\
+\label{eq:overlap3}
+&\epsilon \leq a/4
+}
+
+If \ref{eq:overlap3} is true, we can bound the probability of overlap  been the confidence intervals of the best arm and one of the other arms, $k$, at some timestep $t$ with the union bound of the probability that either \ref{eq:overlap1} or \ref{eq:overlap2} are false FOR ALL ARMS.
+
+\eqn {
+\rho(t) \equiv P(overlap_k) \leq 
+P(\mu^* - \hat{\mu}^* \geq \epsilon) + P(\hat{\mu}_k - \mu_k \geq \epsilon)  \;\;\;\text{ if } \epsilon \leq a/4
+}
+
+
+Now the estimators and their bounds are independent, as they are composed from sums of independent variables $X_i$ so the probability that $\alpha$ of them have overlapping bounds is given by a binomial distribution. 
+
+\eqn {
+P(O > \alpha)  = & P(n \geq t) = 1 - \sum_{i=1}^\alpha \binom{K-1}{i}\rho(t)^{i}(1-\rho(t))^{K-1-i} \\
+\leq & \exp(-(K-1)D(\frac{\alpha}{K-1} || \rho(t))
+} 
 
  
 
