@@ -282,17 +282,6 @@ R_n = T \left(\frac{K-(\alpha+1)}{K}\right)
 }
 
 
-So the regret for the observe stage is bounded by:
-
-\eqn {
-R \leq \frac{2a}{\exp(a^2/(64+4a/3)) - 1}
-}
-
-
-
-
-
-But this is just the expected number of steps until one arm does not overlap. With more arms its more complicated - as we need the probability that $\alpha$ of them overlap (another union bound?).
 
 
 
@@ -580,6 +569,19 @@ Thus Hoeffdings inequality (equation \ref{eq:HoeffdingsRandom}) does not hold in
 
 \end{document}
 
+
+So the regret for the observe stage is bounded by:
+
+\eqn {
+R \leq \frac{2a}{\exp(a^2/(64+4a/3)) - 1}
+}
+
+
+
+
+
+But this is just the expected number of steps until one arm does not overlap. With more arms its more complicated - as we need the probability that $\alpha$ of them overlap (another union bound?).
+
 \eqn {
 E[n] = \sum_{t=1}^T P(n \geq t) \leq & \sum_{t=1}^\infty \left( \exp(-\frac{t\epsilon^2}{4+4\epsilon/3}) +exp(-\frac{t\epsilon^2}{4}) \right) \\
 = & \frac{1}{\exp(\epsilon^2/(4+4\epsilon/3)) - 1} + \frac{1}{\exp(\epsilon^2/4) - 1} \\
@@ -590,6 +592,17 @@ E[n] = \sum_{t=1}^T P(n \geq t) \leq & \sum_{t=1}^\infty \left( \exp(-\frac{t\ep
 
 \subsubsection{A very simple model}
 
+So the regret for the observe stage is bounded by:
+
+\eqn {
+R \leq \frac{2a}{\exp(a^2/(64+4a/3)) - 1}
+}
+
+
+
+
+
+But this is just the expected number of steps until one arm does not overlap. With more arms its more complicated - as we need the probability that $\alpha$ of them overlap (another union bound?).
 Lets try to analyse a very simple model in which the reward depends only on the value of $X_1$.
 
 \eqn{
