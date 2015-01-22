@@ -5,12 +5,14 @@
 \BOOKMARK [2][-]{subsection.3.2}{Observe then exploit}{section.3}% 5
 \BOOKMARK [1][-]{section.4}{Observe until number of plausibly optional arms < }{}% 6
 \BOOKMARK [2][-]{subsection.4.1}{Regret during observe phase}{section.4}% 7
-\BOOKMARK [2][-]{subsection.4.2}{Bounding a weighted sum of unbiased estimators with McDiarmid's Ineqaulity}{section.4}% 8
-\BOOKMARK [2][-]{subsection.4.3}{Targeted Sampling}{section.4}% 9
-\BOOKMARK [2][-]{subsection.4.4}{UCB variant}{section.4}% 10
-\BOOKMARK [1][-]{section.5}{Algorithm}{}% 11
-\BOOKMARK [1][-]{section.6}{Theorems}{}% 12
-\BOOKMARK [1][-]{section.7}{Experiments}{}% 13
-\BOOKMARK [1][-]{section.8}{Conclusion}{}% 14
-\BOOKMARK [1][-]{section.9}{Notes}{}% 15
-\BOOKMARK [2][-]{subsection.9.1}{Why Hoeffdings bound doesn't hold if n is a random variable}{section.9}% 16
+\BOOKMARK [2][-]{subsection.4.2}{Regret during UCB stage}{section.4}% 8
+\BOOKMARK [2][-]{subsection.4.3}{General rough thoughts}{section.4}% 9
+\BOOKMARK [2][-]{subsection.4.4}{Bounding a weighted sum of unbiased estimators with McDiarmid's Ineqaulity}{section.4}% 10
+\BOOKMARK [2][-]{subsection.4.5}{Targeted Sampling}{section.4}% 11
+\BOOKMARK [2][-]{subsection.4.6}{UCB variant}{section.4}% 12
+\BOOKMARK [1][-]{section.5}{Algorithm}{}% 13
+\BOOKMARK [1][-]{section.6}{Theorems}{}% 14
+\BOOKMARK [1][-]{section.7}{Experiments}{}% 15
+\BOOKMARK [1][-]{section.8}{Conclusion}{}% 16
+\BOOKMARK [1][-]{section.9}{Notes}{}% 17
+\BOOKMARK [2][-]{subsection.9.1}{Why Hoeffdings bound doesn't hold if n is a random variable}{section.9}% 18

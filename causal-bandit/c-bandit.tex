@@ -282,7 +282,16 @@ R_n = T \left(\frac{K-(\alpha+1)}{K}\right)
 }
 
 
+\subsection{Regret during UCB stage}
 
+On completion of the observe stage we have tight bounds on all the arms except the first $\alpha$
+
+Essentially, we want to know how large the regret is if we initialize with a certain number of counts already in place...
+
+
+\subsection{General rough thoughts}
+
+When observing the confidence interval on all the arms drops approximately with $\sqrt{\frac{1}{n}}$ (provided that the probability of each occurring is the same) - otherwise for each arm it will be weighted by this drop will be weighted by a function of the probability that it occurs. When acting, the interval on a single arm we intervene on drops. What is the informational value of reducing the bounds on various arms (it is higher for arms that are more likely to be good). 
 
 
 
