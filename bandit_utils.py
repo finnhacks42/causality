@@ -10,7 +10,7 @@ class BernoulliEstimator(object):
         
     def upper(self,t):
         """ returns Bubeck's UCB upper bound"""
-        return self.mean()+sqrt(self.alpha*log(t)/(2.0*self.n))
+        return self.mean()+sqrt(self.alpha*log(t+1)/(2.0*self.n))
         
     def mean(self):
         return self.success/self.n
@@ -39,14 +39,14 @@ class TrivialProbabilityModel(object):
 
     def sampleX(self):
         """ sample a vector X from P(X)"""
-        return self.px.rvs(size=numVars)
+        return self.px.rvs(size=self.numVars)
         
     def sampleYGivenX(self,X):
         """ sample from P(Y|X), where X is the full vector of variables values"""
         x1 = X[0]
         return self.pyx1[x1].rvs()
 
-    def expectedYGiven(self,actionID):
+    def expectedYGivenAction(self,actionID):
         """ returns the expected reward of the action specified by the given index """
         if actionID == 0:
             return 0.5-self.epsilon
