@@ -1,5 +1,6 @@
 from math import sqrt,log
 from scipy.stats import bernoulli
+import numpy as np
 class BernoulliEstimator(object):
     """ records number of success,failures and calculates bounds and expectation"""
     def __init__(self,success,fail,alpha):
@@ -20,6 +21,21 @@ class BernoulliEstimator(object):
         self.success+=reward
         self.fail+= (1-reward)
         self.n +=1
+
+   
+def ucbBound(model,alpha,horizon):
+    t = np.arange(horizon)
+    rewards = [model.expectedYGivenAction(a) for a in range(model.numArms)]
+    inverseDeltas = []
+    for r in rewards:
+        deltaI = model.best - r
+        if deltaI > 0:
+            inverseDeltas.append(1.0/deltaI)
+    s = sum(inverseDeltas)
+    bound = 2*alpha*np.log(t)*s+len(inverseDeltas)*alpha/(alpha-2)
+    return bound
+    
+            
 
 class TrivialProbabilityModel(object):
     """ Holds only for the special case where each X variable is an independent cause of Y. 
@@ -78,4 +94,5 @@ class TrivialProbabilityModel(object):
     def sampleY(self,actionID):
         action = self.toVar(actionID)
         return self.sampleYGivenXi(*action)
+    
     
