@@ -345,11 +345,9 @@ R_n = T \left(\frac{K-(\alpha+1)}{K}\right)
 }
 
 Clearly, this is not quite the right criteria to decide when to switch ...
-\subsubsection{Regret during UCB stage}
+\subsubsection{Regret on observing for h rounds before switching to UCB}
 
-On completion of the observe stage we have tight bounds on all the arms except the first $\alpha$
-
-Essentially, we want to know how large the regret is if we initialize with a certain number of counts already in place...
+How large the regret is if we initialize with a certain number of counts already in place...
 
 Suppose we have $O_i$ observations for arm $i$. We will now begin doing standard UCB - storing a separate set of bounds, only each time we choose an action we will pick the narrower of the observational/interventional confidence bounds. 
 
@@ -369,7 +367,13 @@ When running UCB, in order to select a non-optimal arm $i$ at timestep $t$, at l
 
 Given our expression for the confidence bound in equation \ref{eqn:combinedBoundsEpsilon} we can write statement (3) as:
 \eqn{
-\max(T_{it},O_i) < \frac{2\alpha \log(t)}{\Delta_i^2} := \beta
+\max(T_{it},O_i) < \frac{2\alpha \log(t)}{\Delta_i^2}
+}
+
+Let:
+
+\eqn{
+\beta = \frac{2\alpha \log(n)}{\Delta_i^2} 
 }
 
 If $O_i \geq \beta$, statement (3) is guaranteed to be false for all $t$ and we can bound the expected number of times we select $i$ with how many times we expect the bounds given by (1) and (2) to be true. 
@@ -383,7 +387,7 @@ For arms $i$ such that $O_i \geq \beta$
 & \implies R_n(i) \leq \frac{\Delta_i \alpha}{\alpha -2}
 }
 
-For all other arms with $\Delta_i > 0$
+For all other arms with $\Delta_i > 0$, the bound is the same as standard UCB
 \eqn{
 R_n(i) \leq  \frac{2\alpha \log(n)}{\Delta_i} + \frac{\Delta_i \alpha}{\alpha -2} 
 }
