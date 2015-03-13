@@ -42,6 +42,10 @@
 \usepackage[capitalize]{cleveref}
 \usepackage{graphicx}
 \usepackage{parskip}
+\usepackage{tikz} 
+\usetikzlibrary{arrows,positioning} 
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+%\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MACROS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -61,6 +65,39 @@
 \newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
 \newcommand{\Ber}{\operatorname{Bernoulli}}
 \renewcommand{\P}[1]{\operatorname{P}\left\{#1\right\}}
+
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=1em,
+           minimum height=1em,
+           font=\footnotesize,
+           text centered,
+           fill=blue!20!white},
+     latent/.style={
+           circle,
+           rounded corners,
+           draw=black, thick, dashed,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           fill=black!10!white
+           },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 }  
+}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -94,7 +131,7 @@ Useful references are: \cite{BC12}.
 
 \section{Notation}
 
-Assume we have a known causal model with binary variables $\boldsymbol{X} = \{X_{1}..X_{K}\}$ that independently cause a target variable of interest $Y$. We can run sequential experiments on the system, where at each timestep $t$ we can select a variable on which to intervene and then we observe the complete result, $(\boldsymbol{X}_{t},Y_{t})$ This problem can be viewed as a variant of the multi-armed bandit problem.
+Assume we have a known causal model with binary variables $\boldsymbol{X} = \{X_{1}..X_{K}\}$ that independently cause a target variable of interest $Y$, figure . We can run sequential experiments on the system, where at each timestep $t$ we can select a variable on which to intervene and subsequently observe the complete result, $(\boldsymbol{X}_{t},Y_{t})$ This problem can be viewed as a variant of the multi-armed bandit problem.
 
 
 Let $p \in [0,1]^K$ be a fixed and known vector. In each time-step $t$:
@@ -124,10 +161,11 @@ lead directly to the UCB algorithm with $2K$ actions and a regret bound that dep
 In this instance we can significantly
 outperform the standard approach by exploiting the known causal structure of the problem.
 
-\eq {
+\eqn {
 P(Y|do(X_i=j)) &= P(Y|X_i = j)\\
  &= \sum_{b}P(Y|X_i = j,X_a = b)P(X_a = b|X_i = j) \\
  &= \sum_{b}P(Y|X_i = j,X_a = b)P(X_a = b), \; \forall \, a \in \{1...K\}/i \text{ as } X_a \ci X_i\\
+ \label{eqn:marginalizedEstimator}
  &= \sum_{b}P(Y|X_i = j,do(X_a = b))P(X_a = b) 
 }
 
@@ -136,35 +174,57 @@ P(Y|do(X_i=j)) &= P(Y|X_i = j)\\
 \label{sec:estimators}
 Fix some time-step $t$ and $i \in \set{1,\ldots,K}$ and $j \in \set{0,1}$. 
 
-Let $\hat{\mu}_a$ be an empirical estimator for $P(Y|do(X_i=j))$ obtained via marginalization over $X_a$.
+Considering equation \ref{eqn:marginalizedEstimator}, a natural way to construct an empirical estimator,  $\hat{\mu}_a$, for $P(Y|do(X_i=j))$ utilizing the information obtained by intervening on variable $a$ is:
 
-\eq {
+\eqn {
 \hat{\mu}_a &=
 \begin{cases}
+\label{eqn:marginalizedEstimator2}
 \frac{m_{a,1}}{n_{a,1}}p_a+\frac{m_{a,0}}{n_{a,0}}(1-p_a) & \text{if } a \neq{i} \\
 \frac{m_{i,j}}{n_{i,j}} & \text{if } a=i \\
 \end{cases}\\
-\text{where:}\\
-m_{a,b}    &= \sum_{s=1}^t \ind{X_i = j, I = a,J = b, Y = 1}_s \\
-n_{a,b}    &= \sum_{s=1}^t \ind{X_i = j, I = a,J = b}_s \\
 }
-
+where $\frac{m_{a,b}}{n_{a,b}}$ is an empirical estimator for $P(Y|X_i = j,do(X_a = b))$,
+\eqn{
+m_{a,b}   &= \sum_{s=1}^t \ind{X_i = j, I = a,J = b, Y = 1}_s \\
+n_{a,b}    &= \sum_{s=1}^t \ind{X_i = j, I = a,J = b}_s 
+}
 
 
 This gives $K$ estimators $\{\hat{\mu_1}...\hat{\mu_K}\}$ to be pooled into a single estimator $\hat{\mu}$.
 
-\eq {
+\eqn {
+\label{eqn:pooledEstimators}
 \hat{\mu} &= \sum^{K}_{a=1}w_a\hat{\mu}_a=w_i \frac{m_{i,j}}{n_{i,j}}+ \sum_{a \neq i} w_a \left[p_a \frac{m_{a,1}}{n_{a,1}} + (1 - p_a) \frac{m_{a,0}}{n_{a,0}}\right]\\
 }
 
 
 
-If $p$ is not known, these expression are unchanged except that $p_a$ is replaced with $\hat{p}_a$
+If $p$ is not known $p_a$ could be replaced with its empirical estimate $\hat{p}_a$
 
-\eq{
+\eqn{
 \hat{p}_a = \frac{\sum_{s=1}^{t} \ind{X_a=1,I \neq a}_s}{\sum_{s=1}^{t} \ind{I \neq a}_s}
 }
-\subsection{Observe then exploit}
+
+Now I want to select weights $w$ to minimize the variance in $\hat{\mu}$ and then get some kind of high probability bound for it. However, if I'm not very careful about how I pool things in equation \ref{eqn:pooledEstimators}, the estimator could get very biased, ie estimators $\hat{\mu_a}$ where I have data only for one state of the variable $a$ are not very informative, so should tend to get low weight, but if we choose to sample the second state based on previous payoffs - then we could end up assigning high weights to those estimators that had fluctuated above the true value...
+
+This complicates getting correct uncertainty bounds for a UCB type algorithm/proof.
+
+Consider, what exactly you mean by not unbiased ... 
+
+
+
+
+\section{Importance Sampling Approach}
+
+Consider down weighting estimators proportional to the number of times we played them
+
+
+
+\section{Observe then exploit}
+
+
+\subsection{Basic idea}
 
 Basic idea - observe until the uncertainty on all actions is smaller than $\epsilon$, then exploit (or switch to standard UCB). This is only really going to work if $p_a \sim 0.5$. 
 
@@ -199,7 +259,10 @@ and Hoeffding's Inequality gives:
 P\left(|\hat{\mu}_{ij} - \mu_{ij}| > \sqrt{\frac{1}{2n_{ij}}\log{\frac{2}{\delta}}}\right) \leq \delta
 }
 
-\section{Observe until number of plausibly optional arms $< \alpha$}
+\subsection{Alternate Observe and Exploit With Some Decay}
+Keep track of two separate bounds and always choose the narrower of the two. 
+
+\subsection{Observe until number of plausibly optional arms $< \alpha$}
 
 Define the set of plausibly optimal arms to be those with an upper confidence bound that is higher than the largest lower confidence bound.
 
@@ -209,7 +272,7 @@ A_t = \{k : UB(k) \geq max_{k'}(LB(k'))  \}
 
 We then observe until the size of this set is less than some value $\alpha$ before switching to UCB. This takes into account that we don't need narrow confidence bounds on the arms with very low expected reward. Once we start doing UCB, we keep track of the ucb bound separately and for each arm use whichever bounds are narrower. 
 
-\subsection{Regret during observe phase}
+\subsubsection{Regret during observe phase}
 
 Let $n$ be the number of timesteps until the size of the set $A_t$ falls below $\alpha$ or we reach the overall horizon $T$
 
@@ -281,15 +344,72 @@ Since the regret is $R_n = E[n]\left(\frac{1}{K}\sum_{k=2}^K d_k \right)$ the wo
 R_n = T \left(\frac{K-(\alpha+1)}{K}\right)
 }
 
-
-\subsection{Regret during UCB stage}
+Clearly, this is not quite the right criteria to decide when to switch ...
+\subsubsection{Regret during UCB stage}
 
 On completion of the observe stage we have tight bounds on all the arms except the first $\alpha$
 
 Essentially, we want to know how large the regret is if we initialize with a certain number of counts already in place...
 
+Suppose we have $O_i$ observations for arm $i$. We will now begin doing standard UCB - storing a separate set of bounds, only each time we choose an action we will pick the narrower of the observational/interventional confidence bounds. 
 
-\subsection{General rough thoughts}
+\eqn{
+\hat{\epsilon}_{it} &= \min \left( \sqrt{\frac{\alpha \log(t)}{2 T_{it}}},\sqrt{\frac{log(1/\delta)}{2 O_i}} \right)\\
+\label{eqn:combinedBoundsEpsilon}
+& = \sqrt{\frac{\alpha \log(t)}{2 \max(T_{it},O_i)}} \;\; \text{if we let $\delta = t^{-\alpha}$}
+}
+
+When running UCB, in order to select a non-optimal arm $i$ at timestep $t$, at least one of the following statements must be true: 
+
+\begin{enumerate}
+\item $\hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t} \leq \mu_i + \Delta_i$
+\item $\hat{\mu}_{it} + \hat{\epsilon}_{it} \geq \mu_i + 2\hat{\epsilon}_{it}$
+\item $\Delta_i < 2 \hat{\epsilon}_{it}$
+\end{enumerate}
+
+Given our expression for the confidence bound in equation \ref{eqn:combinedBoundsEpsilon} we can write statement (3) as:
+\eqn{
+\max(T_{it},O_i) < \frac{2\alpha \log(t)}{\Delta_i^2} := \beta
+}
+
+If $O_i \geq \beta$, statement (3) is guaranteed to be false for all $t$ and we can bound the expected number of times we select $i$ with how many times we expect the bounds given by (1) and (2) to be true. 
+
+For arms $i$ such that $O_i \geq \beta$
+
+\eqn{
+&P(\text{1 is true}) < t^{1-\alpha}\\
+&P(\text{2 is true}) < t^{1-\alpha}\\
+& \implies P(I_t = i) < 2t^{1-\alpha}\\
+& \implies R_n(i) \leq \frac{\Delta_i \alpha}{\alpha -2}
+}
+
+For all other arms with $\Delta_i > 0$
+\eqn{
+R_n(i) \leq  \frac{2\alpha \log(n)}{\Delta_i} + \frac{\Delta_i \alpha}{\alpha -2} 
+}
+
+Assume we observed for $h$ steps. The expected regret from this period is just $h E[\Delta_i]$. Let $T = h+n$ be the total time.
+
+\eqn{
+R_T < \sum_{i=1}^K \Delta_i \left(\frac{h}{K} + \frac{\alpha}{\alpha-2}\right) + \sum_{i:\Delta_i > 0}P(O_i \leq \beta)\frac{2\alpha \log(n)}{\Delta_i}
+}
+
+Using Hoeffding's Inequality:
+
+\eqn {
+P(O_i \leq \beta) \leq \begin{cases}
+2 e^{-2h(\frac{1}{2}-\frac{\beta}{h})^2} & \text{if $h > 2\beta$} \\
+1 & \text{otherwise}
+\end{cases}
+}
+
+Its tricky - selecting the $h$ to switch at based on the inequality can certainly yield a non-optimal answer. Maybe I should figure this out via simulation?? But some theory to tell me what to simulate would certainly help.
+
+ 
+
+\pagebreak
+
+\subsubsection{General rough thoughts}
 
 When observing the confidence interval on all the arms drops approximately with $\sqrt{\frac{1}{n}}$ (provided that the probability of each occurring is the same) - otherwise for each arm it will be weighted by this drop will be weighted by a function of the probability that it occurs. When acting, the interval on a single arm we intervene on drops. What is the informational value of reducing the bounds on various arms (it is higher for arms that are more likely to be good). 
 
