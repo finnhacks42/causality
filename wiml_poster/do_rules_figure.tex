@@ -69,16 +69,15 @@
 \node[main node, below=of 1](2){U};
 \node[main node, left=of 2](3){X};
 \node[main node, right=of 2](4){Y};
-\node[main node, above=of 3](5){T};
+\node[main node, above=of 3](5){V};
 \node[main node, above left=of 3](6){$\hat{X}$};
-\node[main node, below=of 2](7){V};
+
 \path[]
 	(1) edge (3) edge (4)
-	(3) edge (2) edge (7)
+	(3) edge (2)
 	(5) edge (3)
 	(6) edge (3)
-	(2) edge (4)
-	(7) edge (4);
+	(2) edge (4);
 \end{tikzpicture}
 \end{subfigure}
 \begin{subfigure}[t]{0.3\textwidth}
@@ -89,13 +88,13 @@
 \node[main node, below=of 1](2){U};
 \node[main node, left=of 2](3){X};
 \node[main node, right=of 2](4){Y};
-\node[main node, above=of 3](5){T};
-\node[main node, below=of 2](7){V};
+\node[main node, above=of 3](5){V};
+
 \path[]
 	(1) edge (4)
-	(3) edge (2) edge (7)
-	(2) edge (4)
-	(7) edge (4); 
+	(3) edge (2) 
+	(2) edge (4);
+	 
 \end{tikzpicture}
 \end{subfigure}
 \end{figure}

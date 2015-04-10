@@ -106,7 +106,7 @@ Some notation:
 \item $\mu^*$ the true expected reward of  $i^*$ (the best arm)
 \item $\Delta_i = \mu^* - \mu_i$ how much worse arm $i$ is than the best arm
 \item $T_i(s) = \sum_{t=1}^s \ind{I_t = i}$ the number of times arm $i$ was selected upto timestep $s$
-\item $\hat \epsilon_{it} =  (\psi^*)^{-1} \left(\frac{\alpha log(t)}{T_{i}(t-1)}\right)$ an estimate of the uncertainty in the empirical estimator for the expected reward
+\item $\hat \epsilon_{it}$ an estimate of the uncertainty in the empirical estimator for the expected reward
 
 
 \end{itemize}
@@ -119,22 +119,15 @@ R_n  = & n\mu^* - E\left[\sum_{t = 1}^n \mu_{It}\right] \\
 = & \sum_{i=1}^K \Delta_i E[T_i(n)] 
 }
 
+\subsection*{UCB-1}
 
-For the UCB algorithm we make the additional assumption that for each $P(X)$ there exists a convex function $\psi$ such that:
-
-\begin{equation}
-\begin{aligned}
-log(E[e^{\lambda(X-E[X]}]) & \leq \psi(\lambda)\\
-log(E[e^{\lambda(E[X]-X}]) & \leq \psi(\lambda)
-\end{aligned}
-\end{equation}
-This ensures that the moments of the distribution of $X$ are defined and gives us a high probability bound on the how much our sample based estimate of the expected reward can be below the true expected reward. Let  $\hat \mu_{is} = \frac{1}{s}\sum_{t=1}^s X_t$ be the sample average and $\mu_{i} = E[P_i(X)]$ if we select arm $i$ a fixed number of times $s$:
+For simplicity just consider Bernoulli bandits: $P(X_i) \sim Bernoulli(p_i)$. Hoeffding's inequality gives us a high probability bound on the how much our sample based estimate of the expected reward can be below the true expected reward. Let  $\hat \mu_{is} = \frac{1}{s}\sum_{t=1}^s X_t$ be the sample average and $\mu_{i} = E[P_i(X)]$ if we select arm $i$ a fixed number of times $s$:
 
 \eqn {
 \label{eq:hoeff1}
-& P( \mu_{i} - \hat \mu_{is}  > \epsilon) \leq e^{-s\psi^*(\epsilon)} \\
+& P( \mu_{i} - \hat \mu_{is}  > \epsilon) \leq e^{-2s\epsilon^2} \\
 \label{eq:hoeff2}
- \implies & P\left(\mu_{i} - \hat \mu_{is} > (\psi^{*})^{-1}\left( \frac{1}{s}\log\frac{1}{\delta}\right)\right) \leq \delta
+ \implies & P\left(\mu_{i} - \hat \mu_{is} > \sqrt{\frac{\log(1/\delta)}{2s}}\right) \leq \delta
 }
 
 \fbox{\begin{minipage}{\textwidth}%
@@ -143,7 +136,7 @@ This ensures that the moments of the distribution of $X$ are defined and gives u
 Define the upper confidence bound for each arm $i$ at timestep $t$ as:
 
 \eqn {
-ucb_{it} & = \hat \mu_{it} + (\psi^{*})^{-1}\left( \frac{\alpha}{T_{i}(t-1)}\log t\right) \text{ , where $\alpha$ is an input parameter} \\
+ucb_{it} & = \hat \mu_{it} + \sqrt{\frac{2 \log(t)}{T_i(t)}}\\
 & =  \hat \mu_{it} + \hat \epsilon_{it}
 }
 
@@ -154,23 +147,11 @@ At time $t$ select arm $I_t$ with the highest upper confidence bound:
 I_{t} = argmax_{i=1...K}\left(ucb_{it} \right)
 \end{equation}
 
-Then if $\alpha > 2$,
-
-\begin{equation}
-\label{eq:regretBound}
-R_n \leq \sum_{i:\Delta i > 0}\left(\frac{\alpha \Delta i \log(n)}{\psi^{*}(\Delta i/2)}+\frac{\alpha}{\alpha-2}\right)
-\end{equation}
-
-For $[0,1]$ random variables, with $\psi(\lambda) = \frac{\lambda^2}{8}$ gives $\psi^{*}(\epsilon)=2\epsilon^2$,  $(\psi^{*})^{-1}(x)=\sqrt{\frac{x}{2}}$ and:
-
 \eqn{
-ucb_{it} & = \hat \mu_{it} +  \sqrt{\frac{\alpha}{2 T_{i}(t-1)}\log t}
-} 
-
-\begin{equation}
-\label{eq:Bernoulli}
-R_n \leq \sum_{i:\Delta i > 0}\left(\frac{2 \alpha \log(n)}{\Delta_i}+\frac{\alpha}{\alpha-2}\right)
-\end{equation}
+\label{eq:regretBound}
+R_n & \leq \sum_{i:\Delta i > 0}\left(\frac{8\log(n)}{\Delta_i}+(1+\frac{\pi}{3})\Delta_i\right)\\
+R_n & < O(\sqrt{K n \log(n)}), \; \text{ provided $n >> K$} 
+}
 
 \end{minipage}}
 
@@ -178,65 +159,65 @@ The confidence bound we use in the UCB algorithm is clearly related but not iden
 
 We now want to prove the bound in equation \ref{eq:regretBound} holds.
 
-
-
-
 \begin{theorem} If $I_t = i \neq i^*$ at least one of the following statements is true:
 \begin{enumerate}
-\item The estimated UCB on the best arm, $i^*$, is less than or equal to the actual reward for that arm: $\hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t} \leq \mu^*$
-\item The estimated reward for arm $i$ is greater than or equal to the estimated CI higher than the true reward for that arm: $\hat \mu_{it} \geq \mu_i + \hat \epsilon_{it}$
-\item The number of times we have selected arm $i$ in previous timesteps, $T_{i}(t-1)$, is less than some bound (that grows logarithmically with $n$). $T_{i}(t-1) < \frac{\alpha log(n)}{\psi^*(\Delta i/2)} \;\;\; \color{red} \longleftarrow \text{feels odd that this grows with $n$, not $t$. Consequence of union bound?}$
+\item The estimated UB on the best arm, $i^*$, is less than or equal to the actual reward for that arm:
+\eq{
+\hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t} \leq \mu_i+\Delta_i
+}
+\item The UB on the non-optimal arm is too high: 
+\eqn{
+\hat \mu_{it}+ \hat \epsilon_{it} \geq \mu_i + 2 \hat \epsilon_{it}
+}
+\item The uncertainty bound is too wide compared the difference between the payoff of this arm and the optimal one. Since $\hat{\epsilon}_{it}$ is a function of the number of times we have selected arm $i$, this can also be thought of as 'we have not selected arm $i$ enough yet'. 
+\eqn{
+\Delta_i < 2\hat{\epsilon}_{it}  
+}
 \end{enumerate}
 \end{theorem}
 \begin{proof}
 Assume statements 1-3 are all false.
-\eq {
-3. & \implies T_{i}(t-1) > \frac{\alpha log(n)}{\psi^*(\Delta i/2)} \\
-  & \implies \Delta i > 2 (\psi^*)^{-1} \frac{\alpha log(n)}{T_{i}(t-1)} \geq 2 (\psi^*)^{-1} \frac{\alpha log(t)}{T_{i}(t-1)} = 2 \hat \epsilon_{it}\\
-  & \implies \Delta i > 2 \hat \epsilon_{it} \\[10pt]
-1. & \implies \hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t}  >  \mu^*  = \mu_i+\Delta i > \mu_i +  2 \hat \epsilon_{it}\\
-& \implies \hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t}  > \mu_i +  2 \hat \epsilon_{it}\\[10pt]
-2. & \implies \hat \mu_{it} < \mu_i + \hat \epsilon_{it} \\
-   & \implies \hat \mu_{it} + \hat \epsilon_{it} < \mu_i +2 \hat \epsilon_{it} \\
-   & \implies \hat \mu_{it} + \hat \epsilon_{it} <  \hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t} \longleftarrow \text { UCB for arm $i < $ UCB for arm $i^*$, which contradicts $i \neq i^*$}
+
+
+\eq{
+& UB(i^*) \equiv \hat{\mu}_{i^*t} + \hat{\epsilon}_{i^*t} >  \mu_i+\Delta_i > \mu_i+2\hat{\epsilon}_{it} \\
+& UB(i)\equiv \hat{\mu}_{it} + \hat{\epsilon}_{it} < \mu_i+2\hat{\epsilon}_{it}\\
+& \implies UB(i) < UB(i^*) \; \text{ which contradicts the statement that we will play arm $i$, $I_t = i$}
 }
+
 
 \end{proof}
 
-Let $\gamma = \ceil{\frac{\alpha \log(n)}{\psi^*(\Delta i/2)}}$ and suppose we had selected arm $i$ in all timesteps until $\gamma$. This ensures statement (3) is false. In the remaining time-steps, we can then only select a non-optimal arm $i$ if either statement (1) or statement(2) is true. 
+Suppose we had selected a non-optimal arm $i$ in all timesteps until $\gamma$, where we choose a value $\gamma$ that ensures statement 3 is false. In the remaining time-steps, we can then only select arm $i$ if either statement 1 or statement 2 is true.
+
  
 
 \eq{
-\implies E\left[T_{i}(n)\right] & \leq \gamma + E\left[\sum_{t=1}^{n} \mathds{1} \{I_t = i \text{ and (3) is false} \}\right] \\[3pt]
-& \leq \gamma + E\left[\sum_{t=\gamma+1}^{n} \mathds{1} \{\text{(1) or (2) is true} \}\right] \leftarrow \text{since if (3) is false, (1) or (2) must be true}\\[3pt]
-& \leq \gamma + \sum_{t=\gamma+1}^{n} \left[ \mathds{P}(\text{(1) is true}) + \mathds{P}(\text{(2) is true})  \}\right] \color{red} \leftarrow \text{Bubeck has $=$ here but are (1) and (2) disjoint?} 
+E\left[T_{i}(n)\right] & \leq \gamma + E\left[\sum_{t=\gamma+1}^{n} \mathds{1} \{\text{(1) or (2) is true} \}\right] \leftarrow \text{since if (3) is false, (1) or (2) must be true}\\[3pt]
+& \leq \gamma + \sum_{t=\gamma+1}^{n} \left[ \mathds{P}(\text{(1) is true}) + \mathds{P}(\text{(2) is true})  \}\right]
 }
 
 \eq {
-P(\text{(1) is true})  = & P(\hat{\mu}_{i^*t}+ (\psi^*)^{-1}\left( \frac{\alpha \log{t}}{T_i(t-1)} \right) \leq \mu^*)\\
-\leq & P(\exists s \in \{1...t\} : \hat{\mu}_{i^*s}+ (\psi^*)^{-1}\left( \frac{\alpha \log{t}}{s} \right) \leq \mu^*) \color{red} \leftarrow \text {to get around the problem that $T_i(t-1)$ is random}\\
-\leq & \sum_{s=1}^t P\left( \hat{\mu}_{i^*s}+ (\psi^*)^{-1}\left( \frac{\alpha \log{t}}{s} \right) \leq \mu^* \right) \color{red} \leftarrow \text{union bound}\\
+P(\text{(1) is true})  = & P(\hat{\mu}_{i^*t} + \sqrt{\frac{2 \log(t)}{T_i(t)}} \leq \mu^*)\\
+\leq & P(\exists s \in \{1...t\} : \hat{\mu}_{i^*s}+ \sqrt{\frac{2 \log(t)}{s}} \leq \mu^*) \color{red} \leftarrow \text {to get around the problem that $T_i(t)$ is random}\\
+\leq & \sum_{s=1}^t P\left( \hat{\mu}_{i^*s}+ \sqrt{\frac{2 \log(t)}{s}} \leq \mu^* \right) \color{red} \leftarrow \text{union bound}\\
 \text{ From equation (\ref{eq:hoeff2}) we have:}\\
-& P\left( \hat{\mu}_{i^*s}+ (\psi^*)^{-1}\left( \frac{ \log{\frac{1}{\delta}}}{s} \right) \leq \mu^* \right) < \delta\\
-\text{Let } \delta = t^{-\alpha} \implies & P\left( \hat{\mu}_{i^*s}+ (\psi^*)^{-1}\left( \frac{\alpha \log{t}}{s} \right)\leq \mu^* \right) < t^{-\alpha}\\
-\implies & P(\text{(1) is true}) \leq \sum_{s=1}^t t^{-\alpha} = t*t^{-\alpha} =  t^{1-\alpha}
+& P\left(\mu_{i} - \hat \mu_{is} > \sqrt{\frac{\log(1/\delta)}{2s}}\right) \leq \delta \text{, letting $\delta = t^{-4}$,}\\
+\implies & P\left( \hat{\mu}_{i^*s}+\sqrt{\frac{2 \log(t)}{s}}\leq \mu^* \right) < t^{-4}\\
+\implies & P(\text{(1) is true}) \leq \sum_{s=1}^t t^{-4} = t*t^{-4} =  t^{-3}
 }
 
-Similarly, $P(\text{(2) is true}) \leq t^{1-\alpha}$ so we have proved: 
+Similarly, $P(\text{(2) is true}) \leq t^{-3}$ so we have proved: 
 
 \eqn {
- E\left[T_{i}(n)\right] & \leq \gamma + \sum_{t=\gamma+1}^n 2t^{1-\alpha}
+ E\left[T_{i}(n)\right] & \leq \gamma + \sum_{t=\gamma+1}^n 2t^{-3}
 }
 
 Plugging this into the definition of pseudo-regret in equation \ref{eq:regretK} gives:
 
 
 \eqn {
-R_n & \leq \sum_{i=1}^K \Delta_i  \left( \ceil{\frac{\alpha \log(n)}{\psi^*(\Delta i/2)}} + \sum_{t=\gamma+1}^n 2t^{1-\alpha}\right) \\
-& \leq \sum_{i=1}^K \Delta_i  \left( \frac{\alpha \log(n)}{\psi^*(\Delta i/2)}+1+2\int_{t=1}^\infty t^{1-\alpha}dt\right)\\
-& = \sum_{i=1}^K \Delta_i  \left( \frac{\alpha \log(n)}{\psi^*(\Delta i/2)}+1+\frac{2}{\alpha-2}\right)\\
-& = \sum_{i=1}^K \Delta_i  \left( \frac{\alpha \log(n)}{\psi^*(\Delta i/2)}+\frac{\alpha}{\alpha-2}\right)\\
-& \leq \sum_{i=1}^K  \frac{\alpha \Delta_i \log(n)}{\psi^*(\Delta i/2)}+\frac{\alpha}{\alpha-2}
+R_n \leq \sum_{i=1}^K \Delta_i  \left(\gamma + \sum_{t=\gamma+1}^n 2t^{-3}\right) 
 }
 
 

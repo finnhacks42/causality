@@ -22,6 +22,9 @@ class BernoulliEstimator(object):
         self.fail+= (1-reward)
         self.n +=1
 
+
+    
+
    
 def ucbBound(model,alpha,horizon):
     t = np.arange(horizon)
@@ -54,7 +57,7 @@ class TrivialProbabilityModel(object):
         
 
     def sampleX(self):
-        """ sample a vector X from P(X)"""
+        """ sample a vector X from P(X). Returns a vector of length numVars specifying the value (0 or 1) of each variable"""
         return self.px.rvs(size=self.numVars)
         
     def sampleYGivenX(self,X):

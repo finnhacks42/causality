@@ -1,0 +1,209 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      6057,        200]
+NotebookOptionsPosition[      5257,        168]
+NotebookOutlinePosition[      5595,        183]
+CellTagsIndexPosition[      5552,        180]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ClearAll", "[", "\"\<Global`*\>\"", "]"}], "\[IndentingNewLine]", 
+  "\[IndentingNewLine]"}]], "Input",
+ CellChangeTimes->{{3.636760962249956*^9, 3.636760982169828*^9}, {
+  3.636761075396574*^9, 3.636761076135395*^9}, {3.636762367547022*^9, 
+  3.636762367711334*^9}}],
+
+Cell[BoxData[
+ RowBox[{"$Assumptions", "=", 
+  RowBox[{
+   RowBox[{"Element", "[", 
+    RowBox[{"x", ",", "Reals"}], "]"}], "&&", 
+   RowBox[{"Element", "[", 
+    RowBox[{"y", ",", "Reals"}], "]"}], "&&", " ", 
+   RowBox[{"y", " ", ">", " ", "1"}]}]}]], "Input",
+ CellChangeTimes->{{3.636761541631939*^9, 3.63676154163697*^9}, {
+  3.636761579557349*^9, 3.636761598370142*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"x", "\[Element]", "Reals"}], "&&", 
+  RowBox[{"y", "\[Element]", "Reals"}], "&&", 
+  RowBox[{"y", ">", " ", "0"}]}]], "Input",
+ CellChangeTimes->{{3.636761637824337*^9, 3.636761638943738*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"x", "\[Element]", "Reals"}], "&&", 
+  RowBox[{"y", "\[Element]", "Reals"}], "&&", 
+  RowBox[{"y", ">", "0"}]}]], "Output",
+ CellChangeTimes->{3.6367616393820953`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Solve", "[", 
+  RowBox[{
+   RowBox[{"y", " ", "\[Equal]", " ", 
+    RowBox[{"Exp", "[", "x", "]"}]}], ",", "x"}], "]"}]], "Input",
+ CellChangeTimes->{{3.636761547281135*^9, 3.636761557087905*^9}, {
+  3.636761692591991*^9, 3.6367617387135363`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{"x", "\[Rule]", 
+    RowBox[{"ConditionalExpression", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"2", " ", "\[ImaginaryI]", " ", "\[Pi]", " ", 
+        RowBox[{"C", "[", "1", "]"}]}], "+", 
+       RowBox[{"Log", "[", "y", "]"}]}], ",", 
+      RowBox[{
+       RowBox[{"C", "[", "1", "]"}], "\[Element]", "Integers"}]}], "]"}]}], 
+   "}"}], "}"}]], "Output",
+ CellChangeTimes->{3.636761739042857*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Assuming", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"y", " ", ">", " ", "0"}], " ", "&&", " ", 
+    RowBox[{"x", " ", "\[Element]", "Reals"}]}], ",", " ", 
+   RowBox[{"Solve", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Exp", "[", "x", "]"}], " ", "\[Equal]", " ", "y"}], ",", "x"}],
+     "]"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.636761977902213*^9, 3.636762033474037*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{"x", "\[Rule]", 
+    RowBox[{"ConditionalExpression", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"2", " ", "\[ImaginaryI]", " ", "\[Pi]", " ", 
+        RowBox[{"C", "[", "1", "]"}]}], "+", 
+       RowBox[{"Log", "[", "y", "]"}]}], ",", 
+      RowBox[{
+       RowBox[{"C", "[", "1", "]"}], "\[Element]", "Integers"}]}], "]"}]}], 
+   "}"}], "}"}]], "Output",
+ CellChangeTimes->{{3.636762006466095*^9, 3.636762034332328*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Simplify", "[", 
+  RowBox[{
+   RowBox[{"ConditionalExpression", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"2", " ", "\[ImaginaryI]", " ", "\[Pi]", " ", 
+       RowBox[{"C", "[", "1", "]"}]}], "+", 
+      RowBox[{"Log", "[", "y", "]"}]}], ",", 
+     RowBox[{
+      RowBox[{"C", "[", "1", "]"}], "\[Element]", "Integers"}]}], "]"}], ",", 
+   
+   RowBox[{
+    RowBox[{"C", "[", "1", "]"}], " ", "=", " ", "0"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.636762157426578*^9, 3.6367621801621304`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Set", "::", "write"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Tag \[NoBreak]\\!\\(C\\)\[NoBreak] in \[NoBreak]\\!\\(C[1]\
+\\)\[NoBreak] is Protected. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/write\\\", ButtonNote -> \
+\\\"Set::write\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.636762181014721*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Simplify", "::", "bass"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"\[NoBreak]\\!\\(0\\)\[NoBreak] is not a well-formed \
+assumption. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/bass\\\", ButtonNote -> \
+\\\"Simplify::bass\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.63676218103787*^9}],
+
+Cell[BoxData[
+ RowBox[{"ConditionalExpression", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"2", " ", "\[ImaginaryI]", " ", "\[Pi]", " ", 
+     RowBox[{"C", "[", "1", "]"}]}], "+", 
+    RowBox[{"Log", "[", "y", "]"}]}], ",", 
+   RowBox[{
+    RowBox[{"C", "[", "1", "]"}], "\[Element]", "Integers"}]}], 
+  "]"}]], "Output",
+ CellChangeTimes->{3.6367621810433283`*^9}]
+}, Open  ]]
+},
+WindowSize->{1140, 1002},
+WindowMargins->{{Automatic, 231}, {Automatic, 233}},
+FrontEndVersion->"10.0 for Linux x86 (64-bit) (June 27, 2014)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 302, 6, 77, "Input"],
+Cell[863, 28, 376, 9, 32, "Input"],
+Cell[CellGroupData[{
+Cell[1264, 41, 227, 5, 32, InheritFromParent],
+Cell[1494, 48, 201, 5, 32, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1732, 58, 271, 6, 32, "Input"],
+Cell[2006, 66, 461, 13, 32, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2504, 84, 408, 11, 32, "Input"],
+Cell[2915, 97, 485, 13, 32, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3437, 115, 524, 14, 32, "Input"],
+Cell[3964, 131, 462, 10, 23, "Message"],
+Cell[4429, 143, 446, 10, 23, "Message"],
+Cell[4878, 155, 363, 10, 32, "Output"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)

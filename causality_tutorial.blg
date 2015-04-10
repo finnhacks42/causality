@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: causality_tutorial.aux
+The style file: plain.bst
+Database file #1: library.bib
+Warning--I didn't find a database entry for "Vansteelandt2012"
+Warning--I didn't find a database entry for "x"
+Warning--empty journal in Brodersen2013
+Warning--there's a number but no volume in Brodersen2013
+Warning--empty journal in Gretton2008
+Warning--there's a number but no volume in Pearl2012b
+Warning--empty note in Richardson2013
+Warning--empty institution in Verma1993
+You've used 46 entries,
+            2118 wiz_defined-function locations,
+            784 strings with 10784 characters,
+and the built_in function-call counts, 13711 in all, are:
+= -- 1340
+> -- 654
+< -- 3
++ -- 260
+- -- 214
+* -- 973
+:= -- 2395
+add.period$ -- 138
+call.type$ -- 46
+change.case$ -- 242
+chr.to.int$ -- 0
+cite$ -- 52
+duplicate$ -- 500
+empty$ -- 1052
+format.name$ -- 214
+if$ -- 2753
+int.to.chr$ -- 0
+int.to.str$ -- 46
+missing$ -- 47
+newline$ -- 233
+num.names$ -- 92
+pop$ -- 229
+preamble$ -- 1
+purify$ -- 199
+quote$ -- 0
+skip$ -- 326
+stack$ -- 0
+substring$ -- 795
+swap$ -- 51
+text.length$ -- 3
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 176
+warning$ -- 6
+while$ -- 137
+width$ -- 48
+write$ -- 486
+(There were 8 warnings)

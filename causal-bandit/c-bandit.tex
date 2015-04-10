@@ -153,6 +153,7 @@ where $(i^*,j^*) = \argmax_{i,j} \mu_{i,j}$ and $\mu^* = \mu(i^*,j^*)$. The $n$-
 \eq{
 R_n = \E \sum_{t=1}^n \left(\mu^* - \mu_{I_t,J_t}\right).
 }
+\pagebreak
 
 \section{Estimating $\mu_{i,j}$}
 The most natural way to estimate $\mu_{i,j}$ is to compute an empirical estimate based on samples when that action was taken. This approach would
@@ -205,6 +206,11 @@ If $p$ is not known $p_a$ could be replaced with its empirical estimate $\hat{p}
 \eqn{
 \hat{p}_a = \frac{\sum_{s=1}^{t} \ind{X_a=1,I \neq a}_s}{\sum_{s=1}^{t} \ind{I \neq a}_s}
 }
+
+
+
+
+
 
 Now I want to select weights $w$ to minimize the variance in $\hat{\mu}$ and then get some kind of high probability bound for it. However, if I'm not very careful about how I pool things in equation \ref{eqn:pooledEstimators}, the estimator could get very biased, ie estimators $\hat{\mu_a}$ where I have data only for one state of the variable $a$ are not very informative, so should tend to get low weight, but if we choose to sample the second state based on previous payoffs - then we could end up assigning high weights to those estimators that had fluctuated above the true value...
 
@@ -345,6 +351,10 @@ R_n = T \left(\frac{K-(\alpha+1)}{K}\right)
 }
 
 Clearly, this is not quite the right criteria to decide when to switch ...
+
+What about if I 
+
+
 \subsubsection{Regret on observing for h rounds before switching to UCB}
 
 How large the regret is if we initialize with a certain number of counts already in place...
@@ -692,9 +702,18 @@ By the law of iterated logarithms this quantity is finite with probability $\sim
  
 Thus Hoeffdings inequality (equation \ref{eq:HoeffdingsRandom}) does not hold in general if $n$ is not independent of the samples $\{X_i\}$ (The bound does not work if you decide to stop sampling as soon as you reach a point where random walk fluctuations take you outside it)
 
-
-
 \end{proof}
+
+\subsection{Importance weighted estimators}
+
+Now Hoeffdings bound gives us $ P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}|n_i)$
+
+\eqn{
+P(\Delta_{\hat{i^*}} > D) & \leq K \sum_{\boldsymbol{n}}  P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}|n_i)P(\boldsymbol{n}) \\
+& = K \sum_{\boldsymbol{n}}  e^{-n_iD^2/2}P(\boldsymbol{n})
+}
+
+Where $\boldsymbol{n} = [n_1...n_K]$ is a vector of the number of observations we have for each arm and $P(\boldsymbol{n}) \sim multinomial(\boldsymbol{p},h)$ To approximate this, we break the space of $\boldsymbol{n}$ up into those vectors where $n_i > h/4 \forall i$ and those where $\exists i$ such that $n_i < h/4$.
 
 
 \bibliographystyle{plainnat}

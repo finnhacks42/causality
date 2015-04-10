@@ -1,0 +1,557 @@
+or Lattimore
+so Thm1 is not likely to be true
+the estimator can actually be really biased
+and it is indeed because the n's are controlled
+Finnian Lattimore
+Hmm
+Tor Lattimore
+so here is an example
+lets suppose mu_{1,0} = 1/2
+and p_a = 1/2 for all a
+basically just assume everything is 1/2 :)
+and suppose there are a lot of actions
+Finnian Lattimore
+Ok
+Tor Lattimore
+some arbitrarily large number
+Finnian Lattimore
+Yup
+Tor Lattimore
+now I am going to set each arm to zero exactly once
+so n_{a,0} = 1 for all arms
+Finnian Lattimore
+Because it tries each arm first?
+Tor Lattimore
+yes - I will just choose to do that
+Finnian Lattimore
+Ok
+Tor Lattimore
+now some of the arms I sample will also have m_{a,0} = 1
+and some not
+about half will
+Finnian Lattimore
+Ok
+Tor Lattimore
+on my next pass I choose to increase n_{a,1} for all actions where m_{a,0} = 1
+and not the others
+Finnian Lattimore
+Yes
+Tor Lattimore
+now the samples where m_{a,0} = 0 are not being used
+because we have no date about the other half
+Finnian Lattimore
+Ok
+Tor Lattimore
+so we are biassing the samples
+Finnian Lattimore
+Right
+Tor Lattimore
+of course, our algorithm doesn't behave like this
+but if we are to use this estimator
+then any proof will have to exploit how the algorithm is actually behaving
+which might be really really tough
+
+
+
+Hoeffdings and random n
+is there a standard way of fixing this?
+that I should try and understand?
+Tor Lattimore
+easiest way is to union bound over all n
+Finnian Lattimore
+ok
+but is that too loose?
+Tor Lattimore
+but you lose a log n factor this way
+you can get the correct log log n factor using a technique known as peeling
+which is where you use Azuma's maximal inequality combined with an (usually) exponential grid
+
+
+
+
+so I have made some progress I think
+you should pull
+the repo
+Tor Lattimore
+ok
+Finnian Lattimore
+so I'm now trying to figure out the alpha bit
+ie how long untill no more than alpha arms overlap
+Tor Lattimore
+sorry, there was a marketing person at the door
+Finnian Lattimore
+oh how horrible
+Tor Lattimore
+I know
+at 7:15
+ridiculous
+Finnian Lattimore
+indeed
+Tor Lattimore
+I am trying to work out what this regret bound you have proven means
+or if it is actually a regret
+Finnian Lattimore
+so that is only for the case where there are 2 arms
+Tor Lattimore
+ok
+when you have more arms you can union bound
+at small cost
+Finnian Lattimore
+equations 25-29 are like that
+so I was thinking about a union bound
+but it didn't seem quite right
+if we have K arm
+s
+then there are K-1 choose alpha sets of size alpha
+and I don't want to union bound that
+Tor Lattimore
+why do you have to union bound that?
+union bound each of the confidence intervals
+Finnian Lattimore
+so what I have figured out thus far is the probability that after t timesteps, the upper bound of a given arm overlaps with the lower bound of the best arm
+and I want the probability that this is true for at least alpha of the arms
+don't understand what you mean when you say union the confidence intervals?
+Tor Lattimore
+hm
+I am a little confused
+so for each arm you have an estimator
+Finnian Lattimore
+yes
+Tor Lattimore
+based on importance sampling
+Finnian Lattimore
+yes
+Tor Lattimore
+and then you get a confidence interval about that arm
+Finnian Lattimore
+yes
+Tor Lattimore
+which has width sqrt(1/(pn) log(1/d))
+Finnian Lattimore
+roughly
+Tor Lattimore
+so now if you set d = 1/(n*k)
+then this holds for all arms with probability at least 1/n
+sorry, 1 - 1/n
+Finnian Lattimore
+hmm
+alright
+Tor Lattimore
+does that make sense?
+Finnian Lattimore
+plausibly
+Tor Lattimore
+it follows from the union bound
+if d = 1/(n*k)
+then the probability that a single confidence interval fails
+is at most 1/(nk)
+so the probability that any fails is at most k * 1 / (nk) = 1/n
+Finnian Lattimore
+ok
+so what do you think of 29) ?
+that doesn't change anything in the analysis that led to that
+Tor Lattimore
+it is not exactly clear what this represents to me yet
+Finnian Lattimore
+(disregard 23 and 24)
+so look at 10
+Tor Lattimore
+so you explore, then pull the best arm
+and the exploration ends when what?
+Finnian Lattimore
+this is the scenario when you stop exploring once the number of pluasibly optimal arms is less than alpha
+Tor Lattimore
+ah, I see
+Finnian Lattimore
+your union bound thing will yeild that for alpha = 2 and any number of arms
+I still don't quite see how it lets me do other values of alpha
+- it still feels like there are combinatorics to account for there
+anyway the entire section 4 is just trying to get the regret during the observe phase
+ie to figure out how long it can go on for
+vs how big the difference in arms is
+and thus the regret
+Tor Lattimore
+ok, I see
+so for a large the R will become small
+which makes sense
+Finnian Lattimore
+yes
+Tor Lattimore
+ok
+Finnian Lattimore
+so surely I do need to consider all combinations
+of arms that could be outside
+to get an expression with alpha
+Tor Lattimore
+this if you want exploration to stop when there are alpha arms left?
+Finnian Lattimore
+yeah
+Tor Lattimore
+I think the way to do this is
+let Delta_2, Delta_3,...,Delta_K be the gaps between the arms
+Finnian Lattimore
+ok
+you mean between means or between upper and lower confidence bounds?
+Tor Lattimore
+ah, no, sorry, Delta_i is the difference in mean between arm i and the best arm (assumed to be 1)
+Finnian Lattimore
+ok
+Tor Lattimore
+so now arm i will be eliminated after you have sampled it O(1/Delta_i^2 log 1/d) times
+where d is your chosen confidence level
+so the exploration phase will end after 1/Delta_{alpha+1}^2 log(1/d) time-steps
+Finnian Lattimore
+but doesn't seem quite right
+I get probabilities of overlap
+and one could stop overlapping at one point
+and then come in again at another
+and all this happens inside the epxectation
+so there is variance happening
+I see that roughly speaking what you said should somehow come out at the end
+Tor Lattimore
+yes, but the variance can be made extremely small in this instance
+at least, small enough that we do not care for the purposes of regret
+I don't suppose you mic is working now?
+Finnian Lattimore
+we can try
+I'll just move
+Tor Lattimore
+okie dokie
+do you have sound on?
+do you have sound enableD?
+Finnian Lattimore
+yes
+Tor Lattimore
+not muted or anything then?
+like, can you play music or something?
+Finnian Lattimore
+I can't play music either
+Tor Lattimore
+hm
+Finnian Lattimore
+but its not muted in volume control
+Tor Lattimore
+what do you see in alsamixer?
+(it is a terminal command)
+yes
+are the volumes all high and unmated?
+so you can increase them using the arrow keys
+up and down
+up to go up, obviously
+I am not sure which one will be controlling the actual sound
+oh
+hm
+it is not measuring what is being played
+it is a volume control
+what is that?
+Finnian Lattimore
+I can go get my tablet
+Tor Lattimore
+ok
+so annoying
+we had this working before
+I don't understand why this problem isn't solved already
+Finnian Lattimore
+I'll try and fix my laptop on the weekend
+on my tablet I have to use the visitor wireless
+Tor Lattimore
+perhaps we should all give up on research until global video chat is solved
+Finnian Lattimore
+anyway
+Tor Lattimore
+it amazes me that somehow Google and Skype still haven't gotten this perfect
+anyways
+sorry for the rant
+Finnian Lattimore
+I agree but continue with the good stuff
+Tor Lattimore
+so
+I think taking union bounds over a combinatorial set is going to be weak
+and doing something else could be tricky
+but if you take the other approach then you get basically the optimal bound anyway
+and it comes quite easily
+Finnian Lattimore
+ok - what I am doing in 24,25 is not weak but probably is tricky
+ok
+what is the other approach?
+Tor Lattimore
+so the other approach is you set delta = 1/(n*K)
+then the probability that any confidence interval does not contain the true parameter is at most 1/n
+so now we separate the regret analysis into two cases.
+Finnian Lattimore
+where n is the number of timesteps?
+Tor Lattimore
+correct
+Case 1: Some confidence bound does not contain the truth
+in this case the regret could be as much as n
+but the probability of this happening is at most 1/n
+so the regret is bounded by 1
+Case 2: All confidence intervals contain the truth
+now after 1/Delta_{alpha+1}^2 log (1/d) time-steps, the confidence bounds can no longer overlap
+and thus with high-probability you are done with exploration at this point
+Finnian Lattimore
+but it is not enough to be done exploration with high probability
+I need the expected time of exploration
+Tor Lattimore
+why?
+Finnian Lattimore
+which means I need to bound even the low probability tail
+I have to take the expectation from 0,infinity
+Tor Lattimore
+ah, but you can get around that
+so let e be the length of the exploration period
+then we have P(e > 1/Delta^2 log(1/d)) < 1/n
+since we only care about n time-steps anyway, the regret while exploring is at most 1/Delta^2 log(1/d) + 1
+Finnian Lattimore
+where n is what?
+Tor Lattimore
+n is the horizon that we care about
+Finnian Lattimore
+I don't understand
+we don't have a finite horizon
+do we?
+Tor Lattimore
+normally you are proving that the regret up to n time-steps is bounded by something
+Finnian Lattimore
+yes but here I'm not
+because of the way we set up the problem
+at least as initially stated
+Tor Lattimore
+the regret in (9) has n in it
+Finnian Lattimore
+it was we explore until (criteria) then switch to UCB
+Tor Lattimore
+yes, but if the horizon comes first, then we just end
+Finnian Lattimore
+but that n is the number of time steps until we end and is a random variable
+which could be infinity
+Tor Lattimore
+you should fix a horizon n
+the exploration period can be e, which is something random <= n
+and with high-probability it is less than 1/Delta^2 log(1/d)
+Finnian Lattimore
+lets use h for horizon to avoid confusing it with n for the lenght of the exploration phase
+Tor Lattimore
+ok.. (although n or T is more standard)
+Finnian Lattimore
+ok I'll go with T then
+Tor Lattimore
+ok
+so now the exploration period cannot last more than T time-steps
+so if the probability that it lasts long than 1/Delta^2 log(1/d) is less than T
+less than 1/T
+sorry
+then the contribution of this event is negligable
+Finnian Lattimore
+ok
+Tor Lattimore
+then in your proof you can have that the exploration period is at most 1/Delta_{alpha+1}^2 log(1/d)
+where d = 1/(T*k)
+or possibly d = 1/(T^2 k)
+the T^2 will be needed because the confidence bounds must hold over all 1<=t <= T
+and for all 1 <= k <= K
+so you get T * K / (T^2 * K) = 1/T
+as require
+Finnian Lattimore
+I don't think I'm really following
+Tor Lattimore
+your confidence bound at time-step t is Sqrt(1/t log(1/d)) or similar
+but that is for fixed t
+you want it to hold for all t <= T
+which is a total of T time-steps
+Finnian Lattimore
+this is for one of the arms?
+Tor Lattimore
+right
+so for a single arm you have to take T union bounds
+so a total of T*K union bounds are needed
+and since you want the real failure probability to be at most 1/T
+you need d = 1/(T^2 * K)
+Finnian Lattimore
+but wait
+I don't understand why I need these T union bounds
+wasn't the whole point of importance sampling to drop those?
+at some point t the I have a bound on the probability a single arm is outside its confidence bounds
+Tor Lattimore
+no, importance sampling allowed us to make the denominator inside the confidence bound fixed, rather than an r.v.
+Finnian Lattimore
+if I then union over K I have a bound on the probability that any of the arms are outside their bounds
+Tor Lattimore
+the problem is you need the bound to hold over all time-steps
+but you only have it for a fixed time-step
+Finnian Lattimore
+which was why the UCB regret needed union bounds
+Tor Lattimore
+so must union bound over time-steps too
+yes
+Finnian Lattimore
+UCB needed union bounds because of not doing importance sampling
+so why did it not also need an extra lot of union bounds over T then
+Tor Lattimore
+the analysis of UCB allows the confidence bounds to fail sometimes
+Finnian Lattimore
+so just thinking about the regret during the observe phase only
+we just need to find the expected time at which there are less than alpha arms in the plausible set
+it doesn't actually have to be true
+I don't understand where this all t is coming from
+Tor Lattimore
+because if we want to analyze when the confidence intervals cease to overlap we need to know that the true values actually lie inside the confidence intervals
+because we are using the fact that \mu_1 - \mu_i = Delta_i
+and so once the width of the confidence intervals have both dropped below Delta_i/2 *and* the true values are inside the confidence intervals, then the intervals do not overlap
+Finnian Lattimore
+but we suppose we have high probability bounds on this for each time step t
+then we stop observing at the first such timestep where this is true
+so we don't union over all t
+Tor Lattimore
+ah, I see what you are saying
+you're right
+you only need the bounds to hold at n = 1/Delta_{alpha_i}^2 log(1/d)
+Finnian Lattimore
+what is n here?
+Tor Lattimore
+sorry t
+you need it to hold at t = 1/Delta_{alpha_{i+1}}^2 log(1/d)
+Finnian Lattimore
+is that the stopping point?
+Tor Lattimore
+that is the point where with high-probabilihy the exploration will end
+Finnian Lattimore
+ok
+yes then
+Tor Lattimore
+you may still need to introduce the union bound over time-steps in future analysis though
+because you will also want to say that the best arm is not rejected
+Finnian Lattimore
+but its never rejected
+Tor Lattimore
+it could be
+Finnian Lattimore
+even after we finish exploration
+its still there
+and we do ucb
+Tor Lattimore
+ah, yes, OK
+I had in mind to do UCB only on the arms left-over
+Finnian Lattimore
+even if its not in the plausibly optimal set we don't throw it away
+Tor Lattimore
+but probably this is not neccesary
+it probably does not make much difference
+since UCB will not often try the "rejected" arms anyway
+Finnian Lattimore
+yes - exactly
+but on the off-chance we did reject the optimal one
+UCB will discover it eventually
+Tor Lattimore
+right
+OK, so probably we can just union bound over arms
+I am not 100% sure yet that it will not be necessary over time-steps
+but the difference in regret is small anyway
+Finnian Lattimore
+I'm still confused about the union over arms bit
+it still seems to me that gives me the point at which exploration stops if alpha = 2
+I want to union over 'some of them' really if alpha is > 2
+Tor Lattimore
+why not union bound over all?
+Finnian Lattimore
+but I'm not sure if you were suggesting a completly different approach to the proof to what I have
+Tor Lattimore
+or rather all arms i > apha
+and i = 1
+Finnian Lattimore
+consider alpha = K-2
+then we just want the point at which 1 arm drops out
+not all of them
+Tor Lattimore
+yup
+Finnian Lattimore
+if I union over everything I will lose alpha (provided the differences between the means are the same)
+Tor Lattimore
+what do you mean lose alpha?
+Finnian Lattimore
+it will not appear in the final result
+Tor Lattimore
+the difference will be at most a K appearing inside the logarithm
+you can union bound only over the best arm and the arms i > alpha if you want
+then you will see K - alpha in the log
+Finnian Lattimore
+I don't understand that either
+suppose I have arms 1...5
+and alpha = 3
+Tor Lattimore
+ok
+Finnian Lattimore
+its not that I want to find out when arms 4 and 5 specifically drop out
+I need to know when any 2 arms drop out
+(in expectation)
+Tor Lattimore
+I know
+but by far the most likely is that arms 4 and 5 will drop out
+Finnian Lattimore
+so what is this arms i > alpha thing then?
+what why? all the arms are the same
+Tor Lattimore
+even then
+Finnian Lattimore
+except for 1
+Tor Lattimore
+even then
+Finnian Lattimore
+why???
+Tor Lattimore
+because in that case all sub-optimal arms will be dropped at about the same time
+it does not take much longer to wait for specifically arms 4 and 5
+Finnian Lattimore
+ok
+Tor Lattimore
+you should perhaps run some experiments to observe this behaviour
+Finnian Lattimore
+its not that I don't believe it
+the problem is I am trying to prove something
+and translating something that is true into a proof it is true is very hard for me
+Tor Lattimore
+for everyone..
+but can you see why what I am proving implies the result you need?
+i.e, that if 4 and 5 are eliminated, then there are at most 3 arms left
+Finnian Lattimore
+but if there are 100000000 arms
+then waiting for that number -1 and that number -2 to be dropped
+could take a lot longer than waiting for any 2
+Tor Lattimore
+it *could*, but somewhat amazingly it does not!
+you will pay at most a log K
+so log 1000000000
+which is only 10-20 or so
+Finnian Lattimore
+so this is not obvious
+why log(K)?
+Tor Lattimore
+because the arms will all be concentrated about the mean +-sqrt(1/n log(1/d))
+so the tail drops away extremely fast
+to prove this formally requires some technical stuff
+if you wanted to get this exactly right you would use extreme-value theory
+which lets you argue about the min/max (or other ordinals) of some i.i.d random variables
+but we really don't need that
+and it can only be applied in this very special case that you have many many arms with identical means
+Finnian Lattimore
+ok
+Tor Lattimore
+if you do not mind the log K, then union bound is by far the easiest
+Finnian Lattimore
+ok
+I'll try and do that
+Tor Lattimore
+in the extreme case you mention, when alpha = K-1, then you as I mentioned before you can union bound only over i > K - alpha and i = 1
+so then you do not even pay the log K
+(this is because you do not care about the confidence intervals where 2 <= i <= alpha
+Finnian Lattimore
+I think I vaguely follow -basically attack the true binomial distribution from both ends
+Tor Lattimore
+well, just the top, and then the bottom ones that you want to discard
+Finnian Lattimore
+ok
+Tor Lattimore
+that should let you bound the length and regret during the exploration period
+Finnian Lattimore
+ok, thank you
+
