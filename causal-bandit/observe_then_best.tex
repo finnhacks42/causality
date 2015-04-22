@@ -260,6 +260,8 @@ m_{a,b}^{ij} &= \sum_{s \in \{t:I_t=(a,b)\}} Z_{ab,s}^{ij} \text{ and,}\\
 Z_{ab,s}^{ij} &= \ind{X_{i,s} = j,Y_s=1} \in \{0,1\}
 }
 
+TODO check/show this estimator is unbiased
+
 For each arm, specified by the tuple $i,j$, we now have $K$ estimators $[\hat{\mu}_1^{ij}...\hat{\mu}_K^{ij}]$ which we wish to combine to form a single estimator $\hat{\mu}^{ij}$. We will pool them as a weighted average with weights we can optimize based on the $q's$ so as to minimize the variance of the estimator.
 
 \eqn{
@@ -328,6 +330,7 @@ Substitution \ref{eqn:min_sum_ci} back into \ref{eqn:McDiarmid}
 Substituting this into \ref{eqn:probDeltaToLarge}
 
 \eqn{
+\label{eqn:targeted_prob_delta_too_big}
 P(\Delta_{\hat{i^*}} > D) \leq 2 \sum_{(i,j)} exp\left({-\frac{D^2}{2} \sum_{a=1}^K \eta_a^{ij}}\right)
 }
 
@@ -335,31 +338,213 @@ P(\Delta_{\hat{i^*}} > D) \leq 2 \sum_{(i,j)} exp\left({-\frac{D^2}{2} \sum_{a=1
 R_2 \leq (T-h)\left(D+2 \sum_{(i,j)} exp\left({-\frac{D^2}{2} \sum_{a=1}^K \eta_a^{ij}}\right) \right)
 }
 
-Looking at the second term
+Looking at equation \ref{eqn:targeted_prob_delta_too_big}, let $A = \frac{D^2}{2}$ and
 
 \eqn{
- \sum_{(i,j)} exp\left(-\frac{D^2}{2} \left( \tau_{ij} + q_{ij}^2 \sum_{a \neq i} \frac{\tau_{a1}\tau_{a0}}{\tau_{a1}(1-q_a)^2+\tau_{a0}q_a^2}  \right) \right)
+c_a =  \frac{\tau_{a1}\tau_{a0}}{\tau_{a1}(1-q_a)^2+\tau_{a0}q_a^2}
 }
-
-Now let $\tau_a = \tau_{a1}+\tau_{a0}$ then $\frac{\tau_{a1}\tau_{a0}}{\tau_{a1}(1-q_a)^2+\tau_{a0}q_a^2}$ is maximized if $\tau_{a1} = q_a \tau_a$
-
-Changing the ratio will only otherwise effect the terms that have where $a = i$. So compare those two terms ...
 
 \eqn{
-exp(-\frac{D^2}{2}(\tau_{\alpha 1}+q_\alpha g) + exp(-\frac{D^2}{2}(\tau_{\alpha 0}+(1-q_\alpha)g)
+f(\boldsymbol{\tau}) := \frac{1}{2}P(\Delta_{\hat{i^*}} > D)  =  \sum_{i=1}^N e^{-A ( \tau_{i1} + q_{i}^2 \sum_{a \neq i} c_a  )}+\sum_{i=1}^N e^{-A ( \tau_{i0} + (1-q_{i})^2 \sum_{a \neq i} c_a)}
 }
 
-minimize this subject to the constraint, hmm seems to give and on the face of it different answer. 
+The goal is to find some assignment $\boldsymbol{\tau}(\boldsymbol{q})$ to minimize this subject to the constraint that $\sum_i \tau_{i1} + \sum_i \tau_{i0} = h$
 
-Consider splitting it up so that we sum first over the terms where $j = 1$ then over the terms where $j = 0$ (may be clearer). 
+No luck attempting to do this directly (via Lagrange multipliers ...)
+
+Note, letting $\tau_a = \tau_{a1}+\tau_{a0}$ then $c_a$ is maximized to equal $\tau_a$ if $\tau_{a1} = q_a \tau_a$ 
+
+Consider the case where we have only 2 variables.
+
+\eqn{
+f(\boldsymbol{\tau}) = e^{-A(\tau_{11} + q_1^2 c_2)}+
+e^{-A(\tau_{21} + q_2^2 c_1)}+
+e^{-A(\tau_{10} + (1-q_1)^2 c_2)}+
+e^{-A(\tau_{20} + (1-q_2)^2 c_1)}
+}
+
+If we consider the extreme case where $q_1=q_2=1$, ie the arms $X_1=0$ and $X_2=0$ never occur naturally. 
+
+\eqn{
+f(\boldsymbol{\tau}) = 2 e^{-A(\tau_{11} + \tau_{21})}+
+e^{-A(\tau_{10})}+
+e^{-A(\tau_{20})}
+}
+
+Which is minimized subject to the constraint $\tau_{11}+\tau_{10}+\tau_{21}+\tau_{20}=h$ if we let $\tau_{10}=\tau_{20} = \frac{Ah-log(2)}{3A}$. Note that as $h$ gets large, we play the arms that do not occur naturally roughly $\frac{1}{3}$ of the time as opposed to $\frac{1}{4}$ if we were to play uniformly.  We only learn anything about the arms that do not naturally occur when we play them directly. For the other arms we learn something all the time (provided we have some level of balance in all the other arms...) so it makes sense to play the arms that don't occur naturally a little bit more to keep the overall bounds tight. 
+
+Ok, what happens if we just let $\tau_{ij} = \frac{h}{K}$
+
+\eqn {
+c_a = \frac{h}{K}\left(\frac{1}{(1-q_a)^2+q_a^2} \right) \geq \frac{h}{K}
+}
+
+\eqn {
+f \leq \sum_{i=1}^N \left(e^{-A(\frac{h}{K}+q_i^2\frac{(K-1)}{K}h)}+ e^{-A(\frac{h}{K}+(1-q_i)^2\frac{(K-1)}{K}h)}\right) \\
+\leq \sum_{i=1}^N \left(e^{-Ah}+ e^{-A(\frac{h}{K})}\right)
+}
+
+Basically worst case, we learn about half the arms fast.
+
+More generally, it would seem by targeted sampling we should be able to learn all the arms with reasonable natural probability fast - and the remaining arms at the rate $h/K$ (or better if we play them more often). 
+
+Approaches to finding some better sampling function.
+
+\begin{enumerate}
+\item Find something motivated by the two variable example and show that it performs better than the uniform sampling approach.
+\item  Consider some other edge cases 
+\end{enumerate} 
+
+Lets consider the case $q_1 = 1, q_2...q_N = \frac{1}{2}$ We will have $\tau_{11},\tau_{10},\tau_{ij} = \tau \; \forall i > 1,j$
+
+\eqn {
+c_a = \begin{cases}
+\tau_{11} & \text{ if } a=1\\
+2 \tau & \text{ otherwise}
+\end{cases}
+}
+
+
+\eqn{
+f(\boldsymbol{\tau}) & = e^{-A(\tau_{11}+2(N-1)\tau)} + e^{-A\tau_{10}} + 2 (N-1) e^{-A (\tau + \frac{1}{4}(\tau_{11}+2(N-2)\tau))} \\
+& = e^{-A(\tau_{11}+2(N-1)\tau)} + e^{-A\tau_{10}} + 2 (N-1) e^{-A (\frac{\tau_{11}}{4} + \frac{N\tau}{2})} \\
+& <  e^{-A\tau_{10}} + (2 (N-1)+1) e^{-A (\frac{\tau_{11}}{4} + \frac{N\tau}{2})}\\
+& =  e^{-A\tau_{10}} + (2N-1) e^{-A (\frac{\tau_{11}}{4} + \frac{N\tau}{2})}
+}
+
+and the constraint is $\tau_{11}+\tau_{10}+2(N-1)\tau = h$
+
+If we maximize $(\frac{\tau_{11}}{4} + \frac{N\tau}{2})$ subject to $\tau_{11}+2(N-1)\tau = (h-\tau_{10})$ we find $\tau = \frac{h-\tau_{10}}{2(N-1)}$ and $\tau_{11} = 0$. Note, as $N$ gets large the sensitivity to the trade off between $\tau$ and $\tau_{11}$ becomes negligible.
+
+\eqn {
+\frac{\tau_{11}}{4} + \frac{N\tau}{2} = \begin{cases}
+\frac{(h-\tau_{10})N}{4(N-1)} & \text{if } \tau_{11}=0 \\
+\frac{(h-\tau_{10})N}{4(N-1)} - \frac{1}{4(N-1)} &\text{if } \tau_{11}=(h-\tau_{10})
+\end{cases}
+}
+
+\eqn {
+f(\boldsymbol{\tau}) & <e^{-A\tau_{10}} + (2N-1) e^{-A (\frac{1}{4}(h-\tau_{10}))}
+}
+
+Which is minimized if 
+\eqn {
+\tau_{10} = \frac{h}{5} - \frac{4}{5A}log(\frac{2N-1}{4})
+}
+
+Ok - lets look at the reverse case, where $q_1=\frac{1}{2}, q_2...q_N = 1$
+
+\eqn{
+\sum_a c_a = \begin{cases}
+(N-1)\tau_{11} & \text{ if } a = 1 \\
+2\tau+(N-2)\tau_{11} &\text{ otherwise }
+\end{cases}
+}
+
+The constraint is 
+\eqn {
+2\tau+(N-1)\tau_{11} + (N-1)\tau_{10} = h
+}
+
+\eqn{
+f(\boldsymbol{\tau}) = 2e^{-A(\tau+\frac{1}{4}(N-1)\tau_{11})} + (N-1)e^{-A(2\tau+(N-1)\tau_{11})}+(N-1)e^{-A\tau_{10}}
+}
+
+Holding $\tau_{10}$ constant, the 2nd and 3rd terms are constant. The first is maximized by letting $\tau_{11} = 0, \tau = \frac{h - (N-1)\tau_{10}}{2}$
+
+\eqn{
+f(\boldsymbol{\tau}) & = 2e^{-A\tau} + (N-1)e^{-2A\tau}+(N-1)e^{-A\frac{h - 2\tau}{N-1}} \leftarrow \text{ can't minimize analytically} \\
+\label{eqn:case1balancedapprox}
+& \leq (N+1)e^{-A\tau} +(N-1)e^{-A\frac{h - 2\tau}{N-1}}
+}
+
+which is minimized if 
+
+\eqn {
+\tau & = \frac{1}{N+2}\left( h - N + \frac{N}{A} \log(\frac{N(N+1)}{2(N-1)})\right) \\
+\label{eqn:case1balancedapproxsolution}
+& \sim \frac{1}{N+2}\left( h - N + \frac{N}{A} \log(\frac{N}{2})\right)
+}
+
+Equation \ref{eqn:case1balancedapproxsolution} is also the solution that leads to the exponentiated terms in equation \ref{eqn:case1balancedapprox} being equal - which is should intuitively be optimal since the coefficients in front of them are very similar.
+
+Yet another case study - if $q_1...q_N = 1$ So none of the arms $X_i = 0$ occur naturally.
+
+\eqn{
+&c_a  = \tau_1 \; \forall a\\
+&\sum_{i \neq a}c_a  = (N-1)\tau_1 \; \forall a\\
+& N(\tau_0+\tau_1) = h\\
+& f(\boldsymbol{\tau}) = N e^{-A N\tau_1} + N e^{-A\tau_0}
+}
+
+minimized if 
+\eqn{
+\tau_0 = \frac{h}{N+1}-\frac{log(N)}{A(N+1)}
+}
+
+Note as $N$ get large - this equates to $\tau_0 \sim \frac{h}{N}$ ie almost all the actions are allocated to the arms that do not occur naturally. 
+
+
+Another case study $q_1...q_{N_1} = 1,q_{N_1+1}...q_N = \frac{1}{2}$ (should encompass all previous examples ...)
+
+\eqn{
+&c_a  = \begin{cases}
+\tau_{11} &\text{ if } a \leq N_1
+ \\
+2\tau & \text{otherwise}
+\end{cases}\\
+&\sum_{i \neq a}c_a  = \begin{cases}
+(N_1-1)\tau_{11} + 2 N_2 \tau & \text{ if } a \leq N \\
+N_1\tau_{11} + 2(N_2-1)\tau & \text{ otherwise }
+\end{cases}\\
+&N_1\tau_{10}+N_1\tau_{11}+2N_2\tau = h\\
+&f(\boldsymbol{\tau}) =  N_1 e^{-A\tau_{10}}+ N_1 e^{-A(N_1\tau_{11}+2N_2\tau)} + 2N_2 e^{-A(\frac{N_1}{4}\tau_{11}+\frac{N_2+1}{2}\tau)}
+}
+
+The 2nd and 3rd terms are minimized by letting $\tau_{11} = 0$ (although the result is only weakly dependnent on the trade off between $\tau_{11}$ and $\tau$ provided $N_2 >> 2$).
+
+\eqn{
+f(\boldsymbol{\tau}) &=  N_1 e^{-A\tau_{10}}+ N_1 e^{-A2N_2\tau} + 2N_2 e^{-A\frac{N_2+1}{2}\tau}\\
+& \leq N_1 e^{-A\tau_{10}} + (2N_2 + N_1)e^{-A\frac{N_2+1}{2}\tau}\\
+& = N_1 e^{-A\tau_{10}} + (2N_2 + N_1)e^{-A(\frac{(N_2+1)(h-N_1\tau_{10})}{4N_2})} 
+} 
+
+
+\eqn{
+\tau_{10} = \left(\frac{N_2+1}{(N_2+1)N_1+4N_2}\right)h-\frac{4N_2\log(\frac{(N_2+1)(2N_2+N_2)}{4N_2})}{A((N_2+1)N_1+4N_2))}
+}
+
+It seems like this function can be optimized in a greedy way. That is, start with $\boldsymbol{\tau} = \boldsymbol{0}$, and in each timestep select the $\tau_{ij}$ that leads to the greatest reduction in the error bound. This appears to yield broadly consistent results to the analytic solution.
+
+\includegraphics[width=.5\textwidth]{greedy_minimization_close}
+\includegraphics[width=.5\textwidth]{greedy_minimization}
+
+
+Ok - so when we have many unbalanced variables, we assign almost all actions to the arms corresponding to the rare side. However, this will still be $< h/N$ which is only a factor of $2$ better than uniform assignment. Doing something smarter than uniform assignment will make more difference where we have a only a few unbalanced variables. In this case - smart assignment will lead to bounds almost as tight as the perfectly balanced case. Uniform assignment may yield solutions that are almost as bad as the worst case. (still better than without using the structure at all)
+
+I still need to cover more fractional $q$'s... 
+
+
+
+What about if I repeated one of the above analysis but let the unbalanced q = .75?
+
+What can I say overall about worst/best cases/any symmetries in the problem??? Do these solutions lead to the terms in the exponentials being similar?
+
+Goal is to choose something that will give us a simple bound and will be ok for the worst case. Its still not entirely clear to me what the worst case will be - after all it depends on the way you assign to $\tau$.
+
+What happens if we assume $\sum_{a\neq i} c_a$ is constant ... this is reasonable if $N$ is large 
+
+When you look at each term in $c_a$, its maximized if we play the arms according to their natural probabilities. If the arm is balanced, this will also minimize the sum of the two terms for doing $x_i = 0$ and $x_i = 1$. If the arm is unbalanced, then we have to trade of balancing this sum versus contributing to the sum of $c_a$. Consider just how bad the sum of $c_a$ can be even if we focus entirely on balancing the two terms ... maybe its already enough.
+
+Fundamentally the relationship between arms is complex. Its not that we get any direct link from one arm to another - rather pairs of actions tell us something about other arms.   
 
 
 \pagebreak
 
 
+\subsection{Option 2: Some measure of information gain}
 
-
-\subsection{Option 2: Three stage algorithm}
+\subsection{Option 3: Three stage algorithm}
 \begin{enumerate}
 \item Observe randomly
 \item Play low probability arms
