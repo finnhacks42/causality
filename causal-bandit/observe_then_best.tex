@@ -1,3 +1,4 @@
+
 \documentclass{article}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -12,8 +13,6 @@
 \usepackage{accents}
 \usepackage{tikz}
 \usepackage{pgfplots}
-\usepackage[ruled]{algorithm}
-\usepackage{algpseudocode}
 \usepackage{dsfont}
 \usepackage[bf]{caption}
 \usepackage{hyperref}
@@ -119,7 +118,9 @@
 
 \section*{Observe then pick best}
 \begin{itemize}
+\item Avi's point - of all the space of possible functions $f(X_1...X_N)$, most of them will have very similar marginals- so limited? opportunity for regret? Does this mean we effectively only care about a particular subset of the functions where the marginals are significantly different. We could assume we are in that subspace (if we are not then all actions are equally good anyway)
 
+\item How do assumptions/priors about the function $f(X_1...X_N)$ flow through to information about the marginals?%
 
 \item Assume we have $K$ bernoulli arms with means ordered from highest to lowest $\mu_1 ... \mu_K$. Let $\Delta = [\Delta_1...\Delta_K]$ be the differences from the optimal reward $\mu_1$. 
 
@@ -223,46 +224,255 @@ The distribution independent lower bound for optimised UCB is $O(\sqrt{TK})$ (se
 \includegraphics[width=.5\textwidth]{explore_exploit}
 \end{figure}
 
+\section{Generalizing to unbalanced $\boldsymbol{q}$}
+
+When some arms have low natural probability we cannot rely on exploring them adequately by pure observation. We need to explicitly play them during the exploration phase. 
+
+We now have an additional trade off to make, which is how much should be observe (learning something about at least half the arms each timestep) versus playing the low probability arms. 
+
+Without loss of generality, we can assume $q_i \in [0,\frac{1}{2}]$ and $q_1 \leq q_2 ... \leq q_N$. Let $m \in [2,N] = \{m:q_m > \frac{1}{m}\}$ Ie if the problem is completely balanced $q_1...q_N = \frac{1}{2}$ then $m = 2$. If the problem is completely unbalanced, $q_1...q_N = 0$ then $m=N$
+
+Suppose we observe for the first $h/2$ timesteps. This is at worst half the optimal. 
+
+We then have estimates 
+
+\eqn {
+\hat{\mu}_{ij} = \frac{\sum_{t=1}^{h/2}\ind{Y=1,X_i=1}}{\frac{h}{2}q_{ij}}
+}
+
+We take this as our estimate for those arms for which $q_{ij} > \frac{1}{m}$
+
+For these arms the Hoeffdings gives 
+
+\eqn{
+P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}) \leq e^{-hD^2/2m^2}
+}
+
+We play each of the remaining $m$ arms $\frac{h}{2m}$ times so for them we get
+
+\eqn{
+P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}) \leq e^{-hD^2/4m}
+}
+
+So for all the arms 
+
+\eqn{
+P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}) \leq e^{-hD^2/4m^2}
+}
+
+and 
+
+
+
+\eqn{
+\label{eqn:unbalancedHoeffdings}
+P(\Delta_{\hat{i^*}} > D) \leq Ke^{-hD^2/4m^2}
+}
+
+If we let $D = \sqrt{\frac{4m^2\log(hK)}{h}}$
+
+\eqn{
+R_T  \leq h + T\left(\sqrt{\frac{4m^2\log(hK)}{h}} + \frac{1}{h}\right)
+}
+
+Let $h = T^{2/3}m^{2/3}\log(hk)$
+
+
+\eqn {
+R_T  \leq 4T^{\frac{2}{3}}m^{2/3}(log(KT))^{\frac{1}{3}}
+}
+
+Note, I think the $m^{2/3}$ should be improvable to something close to $m^{1/3}$ is I use Berstein's instead of Hoeffdings to bound the estimator for the arms where $q > 1/m$ but I haven't got the equations to quite work out for that yet. 
+
+It should also be possible to generalize to handle the case were the $q$'s are unknown, since we should be able to get a reasonable estimate for them while we are observing. They key will be how the resulting uncertainty in $m$ effects the bounds. 
+
+To get results that degrade to similar order bounds as UCB when the arms are very unbalanced, I will need to drop the explore/exploit strategy. 
+
+
 \pagebreak
 
-\section{Generalizing to unbalanced $\boldsymbol{q}$}
+\end{document}
 
 \subsection{Option 1: Targeted sampling during exploration phase}
 
 The key fact we were utilizing to draw conclusions about multiple arms during each timestep of the explore phase is that, given our assumed causal structure, $P(Y|do(X_i=j)) = P(Y|X_i=j)$ 
 
-If we do some form of targeted sampling, where we say opt to select each action $I = do(X_a = b)$ some specified number of times $\tau_{ab}$, then we can no longer estimate $P(Y|X_i=j)$ simply by from the proportion of successes given $X_i=j$. 
+If we do some form of targeted sampling, where we say opt to select each action $I = do(X_a = b)$ with some probability not equal to $P(X_a=b)$, then we can no longer estimate $P(Y|X_i=j)$ directly from the proportion of successes given $X_i=j$. 
 
 \eqn {
 P(Y|do(X_i=j)) &= P(Y|X_i = j)\\
  &= \sum_{b}P(Y|X_i = j,X_a = b)P(X_a = b|X_i = j) \\
  &= \sum_{b}P(Y|X_i = j,X_a = b)P(X_a = b), \; \forall \, a \in \{1...K\}/i \text{ as } X_a \ci X_i\\
- \label{eqn:marginalizedEstimator}
- &= \sum_{b}P(Y|X_i = j,do(X_a = b))P(X_a = b) 
+ \label{eqn:marginalizedProbability}
+ &= \sum_{b}P(Y|X_i = j,do(X_a = b))P(X_a = b)
 }
 
-Define $\mu^{ij} = E[Y|X_i=j] = P(Y|X_i=j)$
+Define:
+\begin{itemize}
+\item  $\mu^{ij} = E[Y|X_i=j] = P(Y|X_i=j)$
+\item $q_{ab} = P(X_a = b)$, the underlying probability that variable $a$ takes the value $b$
+\item $p_{ab} = P(do(X_a=b)|I=a)$, the probability that we set variable $a$ to $b$ given we are acting on variable $a$
+\end{itemize}
 
-Let $\hat{\mu}_a^{ij}$ be an estimator for $\mu^{ij}$ based on samples where the intervention was on variable $a$.
+\eqn{
+\hat{\mu}_a^{ij} = \begin{cases}
+\frac{Y\ind{X_i=j}}{p_{ij}} & \text{ if } a = i \\
+\frac{Y \ind{X_i=j}}{q_{ij}}\left(\ind{X_a=0}\frac{q_{a0}}{p_{a0}} +\ind{X_a=1}\frac{q_{a1}}{p_{a1}} \right) & \text{ if } a\neq i
+\end{cases}
+}
+
+
+This estimator is unbiased and has variance bounded by (proofs in section \ref{seq:proof_expect_var}) :
+
+\eqn{
+\label{eqn:variance}
+V[\hat{\mu}_a^{ij}] \leq \begin{cases}
+\frac{1}{p_{ij}} & \text{ if } a = i \\
+\frac{1}{q_{ij}}\left(\frac{q_{i0}^2}{p_{i0}}+\frac{q_{i1}^2}{p_{i1}} \right) & \text{ if } a \neq i
+\end{cases}
+}
+
+At each time step, we select and arm $do(X_a=b)$ and then receive estimates for all the arms $i,j$ with variances given by \ref{eqn:variance}. Note that $\left(\frac{q_{i0}^2}{p_{i0}}+\frac{q_{i1}^2}{p_{i1}} \right)$ is minimized to equal $1$ if we set the intervened on variable according to its natural probability, that is we effectively take no action. 
+
+Define  $\bar{q}_i = min_j q_{ij}$, the probability of the most unlikely value for each variable. We can assume without loss of generality that $\bar{q}_1 \leq ... \leq \bar{q}_N$. Define $m = max(N,min\{m: \frac{1}{m}\leq \bar{q}_m\})$ We allocate half our exploration timesteps $\frac{h}{2}$ to observing and allocate the remainder equally to play the unbalanced arms with $i \leq m$. 
+
+At the end of the exploration phase, we combine the estimators from each timestep as a weighted sum with weights selected to minimize the variance of the combined estimator. 
+
+\eqn{
+\hat{\mu}^{ij} = \sum_{t=1}^h w_t \hat{\mu}_{a(t)}^{ij}, \text{ where } w_t = \frac{V_t^{-1}}{\sum_s V_s^{-1}}
+}
+
+We can then use Bernstein's inequality to bound the probability of large deviations
+
+\eqn{
+P\left(\sum_{t=1}^h w_t  \hat{\mu}_{a(t)}^{ij} - \mu \geq \frac{4}{3}\sqrt{\frac{2\log(1/\delta)}{\sum V_t^{-1}}}\right) \leq \delta
+}
+ 
+
 \eqn {
-\hat{\mu}_a^{ij} &=
-\begin{cases}
-\label{eqn:marginalizedEstimator2}
-\frac{1}{q_i(j)}\left(\frac{m_{a,1}^{ij}}{\tau_{a1}}q_a+\frac{m_{a,0}^{ij}}{\tau_{a0}}(1-q_a)\right) & \text{if } a \neq{i} \\
-\frac{m_{i,j}^{ij}}{\tau_{ij}} & \text{if } a=i \\
+\sum_{t=1}^h\frac{1}{V_t} & =  \begin{cases}
+\frac{h}{2}q_{kb} & \text{ if } q_{kb} \geq \frac{1}{m} \\
+\frac{h}{2}q_{kb} + \frac{h}{2m} & \text{ otherwise }
 \end{cases}\\
+& \geq \frac{h}{2m} \; \forall q_{kb}
 }
 
-where 
+\eqn{
+P\left(\sum_{t=1}^n w_t \hat{\mu}_{a(t)}^{ij} - \mu^{ij} \geq \frac{4}{3}\sqrt{\frac{4m\log(1/\delta)}{h}}\right) \leq \delta \; \forall (i,j)
+}
+
+Lower bound?
+
+
+
+
+
+\pagebreak
+
+\subsection{Proofs}
+\label{seq:proof_expect_var}
+\subsubsection{Expectation and variance of the estimators}
+\eq{
+\hat{\mu}_a^{ij} = \begin{cases}
+\frac{Y\ind{X_i=j}}{p_{ij}} & \text{ if } a = i \\
+\frac{Y \ind{X_i=j}}{q_{ij}}\left(\ind{X_a=0}\frac{q_{a0}}{p_{a0}} +\ind{X_a=1}\frac{q_{a1}}{p_{a1}} \right) & \text{ if } a\neq i
+\end{cases}
+}
+
+If $a = i$:
+\eq{
+E[\hat{\mu}_a^{ij}] = \frac{1}{p_{ij}}E[Y\ind{X_i=j}] = \frac{1}{p_{ij}}P(Y,do(X_i=j)) = \frac{1}{p_{ij}}P(Y|X_i=j)P(do(X_i=j)) = P(Y|X_i=j)
+}
+
+\eq{
+V[\hat{\mu}_a^{ij}] = & E[(\hat{\mu}_a^{ij})^2] - (\mu^{ij})^2  = \frac{1}{p_{ij}^2}E[Y\ind{X_i=j}] - (\mu^{ij})^2  = \frac{1}{p_{ij}}\mu^{ij} - (\mu^{ij})^2 = \frac{\mu^{ij}(1-p_{ij}\mu^{ij})}{p_{ij}} \leq \frac{\mu^{ij}}{p_{ij}} \\
+\leq & \frac{1}{p_{ij}}
+}
+
+if $a \neq i$
+
+\eq{
+E[\hat{\mu}_a^{ij}] & = \frac{q_{a0}}{q_{ij}p_{a0}}E[Y\ind{X_i=j,X_a=0}]+\frac{q_{a1}}{q_{ij}p_{a1}}E[Y\ind{X_i=j,X_a=1}] \\
+& = \frac{q_{a0}}{q_{ij}p_{a0}}P(Y|X_i=j,do(X_i=0))q_{ij}p_{i0}+\frac{q_{a1}}{q_{ij}p_{a1}}P(Y|X_i=j,do(X_i=1))q_{ij}p_{i1} \\
+& =P(Y|X_i=j,do(X_i=0))P(X_i=0)+P(Y|X_i=j,do(X_i=1))P(X_i=1)\\
+& = P(Y|X_i=j)
+}
+
+\eq{
+V[\hat{\mu}_a^{ij}] = & E[(\hat{\mu}_a^{ij})^2] - (\mu^{ij})^2 \\
+ = & E[\ind{Y=1,X_i = j,X_a=0}](\frac{q_{a0}}{q_{ij}p_{a0}})^2 + E[\ind{Y=1,X_i = j,X_a=1}](\frac{q_{a1}}{q_{ij}p_{a1}})^2 \\
+& +  2 E[\ind{Y=1,X_i = j,X_a=0}\ind{Y=1,X_i = j,X_a=1}\frac{q_{a0}}{q_{ij}p_{a0}}\frac{q_{a1}}{q_{ij}p_{a1}}] -  (\mu^{ij})^2\\
+=& P(Y|X_i=j,X_a=0)q_{ij}p_{a0}(\frac{q_{a0}}{q_{ij}p_{a0}})^2 + P(Y|X_i=j,X_a=1)q_{ij}p_{a1}(\frac{q_{a1}}{q_{ij}p_{a1}})^2] - (\mu^{ij})^2 \\
+=& \frac{1}{q_{ij}}\left(P(Y|X_i=j,X_a=0)\frac{q_{a0}^2}{p_{a0}} + P(Y|X_i=j,X_a=1)\frac{q_{a1}^2}{p_{a1}}\right)- (\mu^{ij})^2  \\
+\leq & \frac{1}{q_{ij}}\left(\frac{q_{a0}^2}{p_{a0}} + \frac{q_{a1}^2}{p_{a1}}\right) \\
+}
+
+\subsubsection{Bernstein Bound}
+\begin{theorem}{Berstein's Inequality}
+Let $X_t \in \{X_1 ... X_n\}$  be independent, bounded random variables with mean $\mu$ and variance $V_t$ satisfying $|X_t - \mu| \leq b \; \forall t$. Let $V= \frac{1}{n}\sum_{t=1}^n V_t$ 
+\eq{
+& P(\sum_{t=1}^n X_t - \mu \geq \epsilon) \leq \exp(-\frac{\epsilon^2}{2nV+2b\epsilon/3})\\
+\implies & P\left(\sum_{t=1}^n X_t - \mu \geq \frac{2b\log(1/\delta)}{3} + \sqrt{2nV\log(1/\delta)}\right) \leq \delta
+}
+\end{theorem}
+Let $Z_t = w_t V_t$ where $w_t = V_t^{-1}/\sum V_t^{-1}$.
+\eq{
+V[Z_t] = \frac{V_t^{-1}}{(\sum V_t^{-1})^2}\\
+V = \frac{1}{n}\sum V[Z_t] = \frac{1}{n\sum V_t^{-1}}
+}
+
+\eq{
+& P\left(\sum_{t=1}^n w_t X_t - \mu \geq \frac{2b_z\log(1/\delta)}{3} + \sqrt{\frac{2\log(1/\delta)}{\sum V_t^{-1}}}\right) \leq \delta, \text{ where } b_z = max_t \frac{V_t^{-1}b}{\sum V^{-1}}
+}
+
+
+While we are observing, $|\hat{\mu}_{kb}| = |\frac{Y\ind{X_k=b}}{q_{kb}}|\leq \frac{1}{q_{kb}}$ and $V_t^{-1} = q_{kb}$ so $V_t^{-1}b = 1$. 
+
+When we are explicitly setting $X_k=b$, $|\hat{\mu}_{kb}| = |Y|\leq 1$ and $V_t^{-1} =1$ so $V_t^{-1}b = 1$
+
+\eq{
+b_z = \frac{1}{\sum V_t^{-1}}
+}
+
+\eq{
+& P\left(\sum_{t=1}^n w_t X_t - \mu \geq \frac{2\log(1/\delta)}{3\sum V_t^{-1}} + \sqrt{\frac{2\log(1/\delta)}{\sum V_t^{-1}}}\right) \leq \delta \\
+\implies &  P\left(\sum_{t=1}^n w_t X_t - \mu \geq \frac{4}{3}\sqrt{\frac{2\log(1/\delta)}{\sum V_t^{-1}}}\right) \leq \delta
+}
+
+
+\subsection{Notes}
+Based on equation \ref{eqn:marginalizedProbability}, a natural estimator for $\mu^{ij}$, given we acted to set the variable $a$, would be
+
+\eqn{
+\hat{\mu}_a^{ij} = \begin{cases}
+\frac{Y\ind{X_i=j}}{\ind{X_i=j}} & \text{ if } a = i \\
+\frac{Y\ind{X_i=j,X_a=0}}{\ind{X_i=j,X_a=0}}q_{a0}+\frac{Y\ind{X_i=j,X_a=1}}{\ind{X_i=j,X_a=1}}q_{a1} & \text{ if } a\neq i
+\end{cases}
+}
+
+However, this forces us to deal with random variables (which may be 0) in the denominator. We can avoid this issue by using the importance weighted estimator, which replaces these indicators with their expectation. 
+
+\eqn{
+\hat{\mu}_a^{ij} & = \begin{cases}
+\frac{Y\ind{X_i=j}}{p_{ij}} & \text{ if } a = i \\
+\frac{Y\ind{X_i=j,X_a=0}}{q_{ij}p_{a0}}q_{a0}+\frac{Y\ind{X_i=j,X_a=1}}{q_{ij}p_{a1}}q_{a1} & \text{ if } a\neq i
+\end{cases} \\
+&= \begin{cases}
+\frac{Y\ind{X_i=j}}{p_{ij}} & \text{ if } a = i \\
+\frac{Y \ind{X_i=j}}{q_{ij}}\left(\ind{X_a=0}\frac{q_{a0}}{p_{a0}} +\ind{X_a=1}\frac{q_{a1}}{p_{a1}} \right) & \text{ if } a\neq i
+\end{cases}
+}
+
+\subsection{Previous attempt}
+
+For each arm, specified by the tuple $i,j$, we now have $K$ estimators $[\hat{\mu}_1^{ij}...\hat{\mu}_K^{ij}]$ which we wish to combine to form a single estimator $\hat{\mu}^{ij}$. We will pwhere 
 
 \eqn{
 m_{a,b}^{ij} &= \sum_{s \in \{t:I_t=(a,b)\}} Z_{ab,s}^{ij} \text{ and,}\\
 Z_{ab,s}^{ij} &= \ind{X_{i,s} = j,Y_s=1} \in \{0,1\}
 }
 
-TODO check/show this estimator is unbiased
-
-For each arm, specified by the tuple $i,j$, we now have $K$ estimators $[\hat{\mu}_1^{ij}...\hat{\mu}_K^{ij}]$ which we wish to combine to form a single estimator $\hat{\mu}^{ij}$. We will pool them as a weighted average with weights we can optimize based on the $q's$ so as to minimize the variance of the estimator.
+TODO check/show this estimator is unbiasedool them as a weighted average with weights we can optimize based on the $q's$ so as to minimize the variance of the estimator.
 
 \eqn{
 \hat{\mu}^{ij} = \sum_{a=1}^K w_{a} \hat{\mu}_{a}^{ij} \;\;\text{, where } \sum_{a=1}^K w_a = 1
@@ -539,8 +749,22 @@ When you look at each term in $c_a$, its maximized if we play the arms according
 Fundamentally the relationship between arms is complex. Its not that we get any direct link from one arm to another - rather pairs of actions tell us something about other arms.   
 
 
-\pagebreak
+Ok, suppose we spend half our actions, $\frac{h}{2}$, observing - that is selecting variables on which to act uniformly and setting them according to their natural probabilities. This contributes $\frac{h}{2N}$ to each $c_a$. So $\sum_{i\neq a} c_a \sim \frac{h}{2}$ provided $N-1 \sim N$. We don't allocate any more pulls to the more likely arm associated with each variable (this is at most a factor of 2 two few pulls). We now decide how to spend the remaining budget.
 
+We can assume without loss of generality that $q_i \in [0,\frac{1}{2}]$ and $q_1 \leq ... \leq q_N$
+
+\eqn{
+f(\boldsymbol{\tau})  \leq  \sum_{i=1}^N e^{-A ( \tau_{i1} + q_{i}^2 \frac{h}{2})}+\sum_{i=1}^N e^{-A (\frac{h}{8})}
+}
+
+Evenly balanced allocation is $\frac{h}{2N}$. For those arms for which $q_i^2 \geq \frac{1}{N}$ they will already get this much information during the observe phase so we will not allocate them any more (again - at worst a factor or 2 two few). Lets just allocate the remainder evenly. So let $m = min\{m:m\leq N,\frac{1}{m} \leq q_m \}$
+
+\eqn{
+f(\boldsymbol{\tau})  \leq  \sum_{i=1}^N e^{-A ( \tau_{i1} + q_{i}^2 \frac{h}{2})}+N e^{-A (\frac{h}{8})}
+}
+
+
+\pagebreak
 
 \subsection{Option 2: Some measure of information gain}
 
@@ -551,8 +775,7 @@ Fundamentally the relationship between arms is complex. Its not that we get any 
 \item Pick best and exploit
 \end{enumerate}
 
-\pagebreak
 
-\end{document}
+
 
 
