@@ -77,31 +77,63 @@
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{example}[theorem]{Example}
 
-\title{Estimators}
+\title{Concentration Inequalities}
 
 
 \begin{document}
 \def\ci{\perp\!\!\!\perp}
-\maketitle
 
 
-Suppose we have samples $(X_t,Y_t)$ for $t = 1... n$ drawn from the joint distribution $P(X,Y)$ and we want to estimate $\mu = P(Y=1|X=1)$ 
 
-\section{The standard estimator}
+\section{Hoeffding's Inequality}
+If $X_1...X_n$ are independent, bounded random variables with $a_i < X_i < b_i$ and means $\mu_1...\mu_n$, and let $\mu = \frac{1}{n} \sum_{i=1}^n \mu_i$
 
+\eqn {
+P(\frac{1}{n}\sum_{i=1}^n X_i - \mu] \geq \epsilon) \leq \exp{\frac{-2n^2\epsilon^2}{\sum_{i=1}^n(b_i - a_i)^2}}
+}
+
+
+
+\section{Bernstein's Inequality}
+$X_1...X_N$ are independent, bounded random variables with $0 \leq X_i \leq E[X_i]+b$ Let $V = \sum[V[X_i]$
+
+\eqn{
+&P(\sum X_i - \sum E[X_i] \geq \epsilon) \leq e^{-\frac{\epsilon^2}{2\sum V[X_i]+2b\epsilon/3}} \implies P\left(\boldsymbol{.} \geq \frac{2b\log(1/\delta)}{3})+\sqrt{2\log(1/\delta)\sum V[X_i]}\right)\leq \delta\\
+&P(\frac{\sum X_i}{n} - \frac{\sum E[X_i]}{n} \geq \epsilon) \leq e^{-\frac{n\epsilon^2}{2\frac{1}{n}\sum V[X_i]+2b\epsilon/3}} \implies P\left(\boldsymbol{.} \geq \frac{2b\log(1/\delta)}{3n})+\frac{\sqrt{2\log(1/\delta)\sum V[X_i]}}{n}\right)\leq \delta
+}
+
+
+\subsection*{Estimating bounds for sums of bernoulli RV's with random denominator}
+Suppose we have samples $(X_t,Y_t)$ for $t = 1... n$ drawn from the joint distribution $P(X,Y)$, where $X$ and $Y$ are binary random variables and $P(X) = p$ and we want to estimate $\mu = P(Y=1|X=1)$
+
+\subsubsection*{Importance sampling estimate}
+ Let: 
+\eqn{
+&\hat{\mu} = \frac{1}{n}\sum_{t=1}^nZ_t, \text{ where }
+Z_t = \frac{Y_t \ind{X_t=1}}{p} \in \{0,\frac{1}{p}\}\\
+&W_t = pZ_t, \; W_t \in \{0,1\},\; V[W_t] \leq p
+}
+
+
+\eqn{
+&\text{Hoeff. } \implies P(\hat{\mu} - \mu \geq \epsilon) \leq e^{-2np^2\epsilon^2} 
+\implies P(\hat{\mu} - \mu \geq \frac{1}{p}\sqrt{\frac{1}{2n}\log{\frac{1}{\delta}}}) \leq \delta \\
+&\text{Berns. } \implies P(\mu -\hat{\mu}\geq \epsilon) \leq e^{-\frac{np\epsilon^2}{2(1+\epsilon/3)}} 
+\implies P(\mu - \hat{\mu}\geq \frac{2\log(1/\delta)}{3np}+\sqrt{\frac{2}{np}\log{\frac{1}{\delta}}}) \leq \delta
+}
+
+\subsubsection*{Standard Estimator}
+Let 
 \eqn{
 \hat{\mu} = \frac{\sum_{t=1}^n Y_t \ind{X_t=1}}{\sum_{t=1}^n\ind{X_t=1}}
 }
 
-We can't actually say that this estimator is unbiased - as it can be undefined if $n = 0$
+We have a problem if we don't have a lower bound on $\sum_{t=1}^n\ind{X_t=1}$ as the estimator may be undefined. Assume $s = \sum_{t=1}^n\ind{X_t=1} > 0$, then:
 
-\color{red}{Is there an unbiased estimator for this simple problem if the $P(X = 1)$ is not known?}\color{black}
-
-What about if we assume we have $n \geq 1$? For example a bandit algorithm using the empirical estimator could simply be initialized to pull each arm once to ensure this is the case.
-
-Let's consider variance and bounds.
-
-
+\eqn{
+\text{Hoeff.} \implies P(\hat{\mu} - \mu \geq \epsilon) \leq e^{-2s\epsilon^2}
+ \implies P\left(\hat{\mu} - \mu \geq \sqrt{\frac{1}{2s}\log(\frac{1}{\delta})}\right)
+}
 
 \section{The importance sampling estimator}
 If we know the probability that $X=1$ we can instead use importance sampling.

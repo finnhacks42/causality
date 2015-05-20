@@ -289,7 +289,185 @@ It should also be possible to generalize to handle the case were the $q$'s are u
 To get results that degrade to similar order bounds as UCB when the arms are very unbalanced, I will need to drop the explore/exploit strategy. 
 
 
+\subsection{Generalizing to unknown q}
+\begin{itemize}
+\item Assume without loss of generality that $q_i \in [0,\frac{1}{2}]$
+
+\item Assume we observe for the first $h/2$ timesteps.
+
+\item Let $\hat{q}_i = \frac{2}{h}\sum_{t=1}^{h/2}\ind{X_i=1}$
+
+\item Let $\bar{q}_i = min(\hat{q},1-\hat{q})$ We order the $\bar{q}$'s from smallest to largest and estimate $m$ with $\hat{m} = min_j : \bar{q}_j \geq \frac{1}{j}$ 
+
+\item The worst case $\boldsymbol{q}$ for a given fixed $m$ is 
+\eqn{
+q_i = \begin{cases}
+0 & \text{ if } i < m\\
+\frac{1}{m} & \text{ if } i \geq m
+\end{cases}
+}
+
+In this case $\bar{q}_0 ... \bar{q}_{m-1} = 0$
+
+For $i \geq m$
+\eq{
+P(q_i - \bar{q}_i \geq C) = P(q_i - \hat{q}_i \geq C|\hat{q}_i\leq \frac{1}{2})P(\hat{q}_i \leq \frac{1}{2})+P(q_i - (1-\hat{q}_i) \geq C | \hat{q}_i > \frac{1}{2})P(\hat{q}_i>\frac{1}{2})
+}
+
+The first term will dominate for all but very small $m$. Lets just work with that one for now. 
+
+Via Bernstein's Inequality
+\eqn{
+P(q_i - \hat{q}_i \geq C) \leq \exp(-\frac{hC^2}{4q_i+4C/3}) := \gamma \\
+\implies P(q_i - \hat{q}_i \geq \frac{4\log(1/\gamma)}{3h}+\sqrt{\frac{4q_i\log(1/\gamma)}{h}})\leq \gamma
+}
+
+Actually I think I can use the Lower tail version  of Bernsteins
+
+\eqn{
+P(q_i - \hat{q}_i \geq C) \leq \exp(-\frac{hC^2}{4q_i}) := \gamma \\
+\implies P(q_i - \hat{q}_i \geq 2\sqrt{\frac{\log(1/\gamma)}{mh}})\leq \gamma
+}
+
+Define $\hat{m}_i = \frac{1}{\hat{q}_i}$.
+
+\eq{
+\hat{q}_i \geq q_i - C \implies \hat{m}_i \leq \frac{1}{q_i-C} = \frac{1}{\frac{1}{m} - C} \text{, where } C < \frac{1}{m} \\
+\implies q_i - \hat{q}_i \leq C \implies \hat{m}_i - m \leq \frac{m^2C}{1-mC}
+}
+
+If we let $\gamma =  \frac{1}{N}\exp(-{\frac{h}{16m}})$
+
+\eqn {
+C = 2\sqrt{\frac{m\log N}{hm^2}+\frac{1}{16m^2}} \leq \frac{1}{2m} \text{, if } h > 16m\log N \\
+}
+
+Then 
+
+\eqn{
+ q_i - \hat{q}_i \leq \frac{1}{2m} \implies \hat{m}_i - m \leq m \\
+ \implies P(\hat{m}_i - m \geq m) \leq \frac{1}{N}\exp(-{\frac{h}{16m}})
+}
+
+
+
+
+
+
+
+
+
+If $\hat{m}_i - m \geq \varphi$ for at most $\varphi$ of the variables $i \geq m$, then $\hat{m} - m \leq \varphi$
+
+Let $W_i = \ind{\hat{m_i}-m \geq \varphi}$, $E[W_i] \leq \gamma$,$V[W_i] \leq \gamma$ 
+\eqn{
+P(\sum_{i=m}^N W_i \geq (N-m)\gamma + \varepsilon) \leq \exp(-\frac{\varepsilon^2}{2(N-m)\gamma+2\varepsilon/3})
+}
+Letting $(N-m)\gamma + \varepsilon = \varphi \implies \varepsilon = \varphi - (N-m)\gamma$
+\eqn{
+P(\hat{m}-m \geq \varphi) =  P(\sum_{i=m}^N W_i \geq \varphi) &\leq \exp({-\frac{(\varphi-(N-m)\gamma)^2}{2(N-m)\gamma + 2(\varphi-(N-m)\gamma)/3}})\\
+& \leq \exp({-\frac{(\varphi-N\gamma)^2}{2N\gamma + 2\varphi/3}}) \text{, where } N\gamma < \varphi
+} 
+
+
+
+If $P(\hat{m}-m \geq \varphi) \leq \zeta$. 
+
+
+
+\eqn{
+P(\hat{\mu}_i-\mu_i \geq \epsilon) \leq & P(\hat{\mu}_i-\mu_i \geq \epsilon |\hat{m}-m \leq \varphi )P(\hat{m}-m \leq \varphi) \\
+& + P(\hat{\mu}_i-\mu_i \geq \epsilon |\hat{m}-m \geq \beta)P(\hat{m}-m \geq \varphi)\\  \leq & e^{-\frac{h\epsilon^2}{m+\varphi}} + \zeta e^{-\frac{h \epsilon^2}{N}}
+}
+
+Putting it together 
+
+\eqn {
+P(\hat{\mu}_i-\mu_i \geq \epsilon) \leq \exp({-\frac{h\epsilon^2}{m+\varphi}}) + \exp({-\frac{(\varphi-N\gamma)^2}{2N\gamma + 2\varphi/3}}) \exp({-\frac{h \epsilon^2}{N}}) := \delta
+}
+The first term will dominate if 
+
+\eqn{
+\frac{(\varphi-N\gamma)^2}{2N\gamma + 2\varphi/3} \geq \frac{h\epsilon^2}{m+\varphi}
+}
+
+
+Setting them equal and solving for $\varphi$. Roughly,
+
+\eqn{
+\varphi = \frac{h\epsilon^2}{m+\varphi} \implies \varphi = \frac{1}{2}(\sqrt{4\epsilon^2 h+ m^2} - m)\\
+\implies \epsilon = \sqrt{\frac{\log(1/\delta)(\log(1/\delta)+m)}{h}} \leq \frac{\log(1/\delta)}{\sqrt{h}} + \sqrt{\frac{m}{h}\log(1/\delta)}
+}
+
+Now repeating the above but more exactly ...
+
+\eqn{
+\frac{(\varphi-N\gamma)^2}{2N\gamma + 2\varphi/3}  \geq & \frac{\varphi^2-2\varphi N\gamma}{4\varphi/3} \; \text{, if } \varphi > 3N\gamma \\
+= & \frac{3}{4}(\varphi - 2N\gamma)
+}
+
+\eqn{
+\frac{3}{4}(\varphi - 2N\gamma) = \frac{h\epsilon^2}{m+\varphi} \implies \varphi = &\frac{\sqrt{3}}{6}\sqrt{16\epsilon^2 h+3m^2+12N\gamma(m+N\gamma)} + N\gamma - \frac{m}{2}\\
+\leq & \frac{\sqrt{3}}{2}\sqrt{4\epsilon^2 h+3mN\gamma}
+}
+
+If we let $\varphi =\frac{\sqrt{3}}{6}\sqrt{16\epsilon^2 h+3m^2+12N\gamma(m+N\gamma)} + N\gamma - \frac{m}{2} $
+
+\eqn{
+P(\hat{\mu}_i-\mu_i \geq \epsilon) \leq 2\exp(-\frac{3}{4}(\varphi - 2N\gamma))\\
+\implies \epsilon = \sqrt{\frac{4\log^2(2/\delta)+(3m+6N\gamma)\log(2/\delta)}{3h}}\\
+\leq \frac{2\log(2/\delta)}{\sqrt{3h}}+\sqrt{\frac{m+2N\gamma}{h}\log(2/\delta)}
+}
+Ok - but I still need to ensure there exists a $\gamma$ such that  $N\gamma < \frac{\varphi}{3}$ and $P(\hat{m}_i - m > \varphi) \leq \gamma$
+
+\eqn{
+P(\hat{m}_i - m > a) \leq \exp(-\frac{h a^2}{4m(m+a)^2})
+}
+
+
+It feels like I have just gone round and round in circles and pushed the problem to somewhere else ... my expression for $\varphi$ now contains both $\epsilon$ and $\gamma$ ...
+
+\eqn{
+\varphi \geq \frac{1}{2}\sqrt{m^2+4N\gamma(m+N\gamma)} + N\gamma - \frac{m}{2}
+}
+
+
+
+
+
+\end{itemize}
+
+
+
+
+
 \pagebreak
+
+\eqn{
+ \implies & C = \frac{\varphi}{m(\varphi+m)}  \geq \frac{\varphi}{\alpha m^2} \text{ if } \varphi < (\alpha-1)m\\
+\implies & P\left(\hat{m}_i - m \geq \alpha m^2 \left( \frac{4\log(1/\gamma)}{3h}+\sqrt{\frac{4\log(1/\gamma)}{mh}} \right)\right) \leq \gamma
+}
+
+If we let $\gamma = \frac{e^{-h/m}}{N}$
+
+\eqn{
+P\left(\hat{m}_i - m \geq \alpha m^2 \left( \frac{4}{3}(\frac{\log N}{h}+\frac{1}{m})+2\sqrt{\frac{\log N}{mh}+\frac{1}{m^2}} \right)\right) \leq \gamma \\
+\implies P\left(\hat{m}_i - m \geq \alpha m^2 \left( \frac{4}{3}(\frac{2}{m})+2\sqrt{\frac{2}{m^2}} \right)\right) \leq \gamma \; \text{, if } h > m\log N \\
+\implies P\left(\hat{m}_i - m \geq 6\alpha m \right) \leq \gamma
+}
+
+This doesn't work. We need $\hat{m}_i - m < (\alpha-1)m$ in order to get this expression.
+
+Or we could let $\varphi = \frac{\sqrt{3}}{2}\sqrt{4\epsilon^2 h+3mN\gamma}$
+
+\eqn{
+P(\hat{\mu}_i-\mu_i \geq \epsilon) \leq 2\exp({-\frac{h\epsilon^2}{m+\frac{\sqrt{3}}{2}\sqrt{4\epsilon^2 h+3mN\gamma}}})
+}
+\eqn{
+\implies \epsilon = & \frac{1}{\sqrt{2}}\sqrt{\frac{3 \log^2(2/\delta)+2m\log(2/\delta)}{h}+\frac{\sqrt{3}}{h^2}\sqrt{h^2\log^2(2/\delta)(3\log^2(2/\delta)+4m\log(2/\delta)+3mN\gamma)}} \\
+\leq & 
+}
+
 
 \end{document}
 

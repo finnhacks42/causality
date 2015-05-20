@@ -1,0 +1,305 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      9140,        296]
+NotebookOptionsPosition[      8200,        258]
+NotebookOutlinePosition[      8534,        273]
+CellTagsIndexPosition[      8491,        270]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell["Hoeffdings Inequality", "Text",
+ CellChangeTimes->{{3.639443817429699*^9, 3.639443853423676*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"HRHS", " ", "=", " ", 
+  RowBox[{"Exp", "[", 
+   RowBox[{
+    RowBox[{"-", "2"}], "n", "*", 
+    RowBox[{
+     RowBox[{"t", "^", "2"}], "/", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"b", "-", "a"}], ")"}], "^", "2"}]}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.6394438559431868`*^9, 3.639443921904067*^9}}],
+
+Cell[BoxData[
+ SuperscriptBox["\[ExponentialE]", 
+  RowBox[{"-", 
+   FractionBox[
+    RowBox[{"2", " ", "n", " ", 
+     SuperscriptBox["t", "2"]}], 
+    SuperscriptBox[
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "a"}], "+", "b"}], ")"}], "2"]]}]]], "Output",
+ CellChangeTimes->{{3.639443910241427*^9, 3.639443922246539*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"HRHS", " ", "//.", " ", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"a", "\[Rule]", "0"}], ",", 
+    RowBox[{"b", "\[Rule]", 
+     RowBox[{"2", 
+      RowBox[{"m", "/", "h"}]}]}], ",", 
+    RowBox[{"n", "\[Rule]", 
+     RowBox[{"h", "/", "2"}]}]}], "}"}]}]], "Input",
+ CellChangeTimes->{{3.639443923231909*^9, 3.639443962527907*^9}}],
+
+Cell[BoxData[
+ SuperscriptBox["\[ExponentialE]", 
+  RowBox[{"-", 
+   FractionBox[
+    RowBox[{
+     SuperscriptBox["h", "3"], " ", 
+     SuperscriptBox["t", "2"]}], 
+    RowBox[{"4", " ", 
+     SuperscriptBox["m", "2"]}]]}]]], "Output",
+ CellChangeTimes->{3.63944396485185*^9}]
+}, Open  ]],
+
+Cell["Bernsteins Inequality", "Text",
+ CellChangeTimes->{{3.639444272590728*^9, 3.6394442812772837`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"BRHS", " ", "=", " ", 
+  RowBox[{"Exp", "[", 
+   RowBox[{
+    RowBox[{"-", 
+     RowBox[{"n", "^", "2"}]}], "*", 
+    RowBox[{
+     RowBox[{"t", "^", "2"}], "/", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"2", "V"}], "+", 
+       RowBox[{"2", "b", " ", "n", " ", 
+        RowBox[{"t", "/", "3"}]}]}], ")"}]}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.6394442848056383`*^9, 3.6394443259664907`*^9}}],
+
+Cell[BoxData[
+ SuperscriptBox["\[ExponentialE]", 
+  RowBox[{"-", 
+   FractionBox[
+    RowBox[{
+     SuperscriptBox["n", "2"], " ", 
+     SuperscriptBox["t", "2"]}], 
+    RowBox[{
+     FractionBox[
+      RowBox[{"2", " ", "b", " ", "n", " ", "t"}], "3"], "+", 
+     RowBox[{"2", " ", "V"}]}]]}]]], "Output",
+ CellChangeTimes->{3.639444327486167*^9, 3.639445902414277*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["BRHS", "WolframAlphaLong"],
+
+Cell[BoxData[
+ NamespaceBox["WolframAlphaQueryResults",
+  DynamicModuleBox[{Typeset`q$$ = "BRHS", Typeset`opts$$ = {
+   AppearanceElements -> {
+     "Warnings", "Assumptions", "Brand", "Pods", "PodMenus", "Unsuccessful", 
+      "Sources"}, Asynchronous -> All, 
+    TimeConstraint -> {30, Automatic, Automatic, Automatic}, 
+    Method -> {
+     "Formats" -> {"cell", "minput", "msound", "dataformats"}, "Server" -> 
+      "http://api.wolframalpha.com/v1/"}}, Typeset`elements$$ = {
+   "Warnings", "Assumptions", "Brand", "Pods", "PodMenus", "Unsuccessful", 
+    "Sources"}, Typeset`asyncpods$$ = {}, Typeset`nonpods$$ = {
+    XMLElement["tips", {"count" -> "1"}, {"\n  ", 
+      XMLElement["tip", {"text" -> "Try spelling out abbreviations"}, {}], 
+      "\n "}]}, Typeset`initdone$$ = True, Typeset`queryinfo$$ = {
+   "success" -> "false", "error" -> "false", "numpods" -> "0", "datatypes" -> 
+    "", "timedout" -> "", "timedoutpods" -> "", "timing" -> "0.243", 
+    "parsetiming" -> "0.061", "parsetimedout" -> "false", "recalculate" -> "",
+     "id" -> "", "host" -> "http://www5a.wolframalpha.com", "server" -> "60", 
+    "related" -> "", "version" -> "2.6"}, Typeset`sessioninfo$$ = {
+   "TimeZone" -> 10., 
+    "Date" -> {2015, 5, 1, 15, 11, 53.947759`8.484548383423656}, "Line" -> 3, 
+    "SessionID" -> 15326942254266034106}, Typeset`showpods$$ = {}, 
+   Typeset`failedpods$$ = {}, Typeset`chosen$$ = {}, Typeset`open$$ = False, 
+   Typeset`newq$$ = "BRHS"}, 
+   DynamicBox[ToBoxes[
+     AlphaIntegration`FormatAlphaResults[
+      Dynamic[{
+       1, {}, {}, Typeset`chosen$$, Typeset`open$$, Typeset`elements$$, 
+        Typeset`q$$, Typeset`opts$$, Typeset`nonpods$$, Typeset`queryinfo$$, 
+        Typeset`sessioninfo$$, Typeset`showpods$$, Typeset`failedpods$$, 
+        Typeset`newq$$}]], StandardForm],
+    ImageSizeCache->{729., {42., 48.}},
+    TrackedSymbols:>{Typeset`showpods$$, Typeset`failedpods$$}],
+   DynamicModuleValues:>{},
+   Initialization:>If[
+     Not[Typeset`initdone$$], Null; 
+     WolframAlphaClient`Private`doAsyncUpdates[
+       Hold[{}], Typeset`asyncpods$$, 
+       Dynamic[Typeset`failedpods$$]]; Typeset`asyncpods$$ = {}; 
+     Typeset`initdone$$ = True],
+   SynchronousInitialization->False],
+  BaseStyle->{Deployed -> True},
+  DeleteWithContents->True,
+  Editable->False,
+  SelectWithContents->True]], "Print",
+ CellMargins->{{20, 10}, {Inherited, Inherited}},
+ CellChangeTimes->{3.6394459139984303`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"BRHS", " ", "//.", " ", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"V", "\[Rule]", " ", 
+     RowBox[{"2", " ", "n", " ", 
+      RowBox[{"m", "/", "h"}]}]}], ",", 
+    RowBox[{"n", "\[Rule]", 
+     RowBox[{"h", "/", "2"}]}], ",", 
+    RowBox[{"b", "\[Rule]", 
+     RowBox[{"2", 
+      RowBox[{"m", "/", "h"}]}]}]}], "}"}]}]], "Input",
+ CellChangeTimes->{{3.6394443330084352`*^9, 3.639444336449185*^9}, {
+  3.639445866692442*^9, 3.639445895764029*^9}}],
+
+Cell[BoxData[
+ SuperscriptBox["\[ExponentialE]", 
+  RowBox[{"-", 
+   FractionBox[
+    RowBox[{
+     SuperscriptBox["h", "2"], " ", 
+     SuperscriptBox["t", "2"]}], 
+    RowBox[{"4", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"2", " ", "m"}], "+", 
+       FractionBox[
+        RowBox[{"2", " ", "m", " ", "t"}], "3"]}], ")"}]}]]}]]], "Output",
+ CellChangeTimes->{{3.63944589686539*^9, 3.6394459200364017`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Solve", "[", 
+  RowBox[{
+   RowBox[{
+    FractionBox[
+     RowBox[{
+      SuperscriptBox["h", "2"], " ", 
+      SuperscriptBox["t", "2"]}], 
+     RowBox[{"4", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"2", " ", "m"}], "+", 
+        FractionBox[
+         RowBox[{"2", " ", "m", " ", "t"}], "3"]}], ")"}]}]], "\[Equal]", 
+    "D"}], ",", "t"}], "]"}]], "Input",
+ CellChangeTimes->{{3.639445924477202*^9, 3.639445935982431*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"t", "\[Rule]", 
+     FractionBox[
+      RowBox[{"2", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"2", " ", "D", " ", "m"}], "-", 
+         RowBox[{
+          SqrtBox["2"], " ", 
+          SqrtBox[
+           RowBox[{
+            RowBox[{"9", " ", "D", " ", 
+             SuperscriptBox["h", "2"], " ", "m"}], "+", 
+            RowBox[{"2", " ", 
+             SuperscriptBox["D", "2"], " ", 
+             SuperscriptBox["m", "2"]}]}]]}]}], ")"}]}], 
+      RowBox[{"3", " ", 
+       SuperscriptBox["h", "2"]}]]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"t", "\[Rule]", 
+     FractionBox[
+      RowBox[{"2", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"2", " ", "D", " ", "m"}], "+", 
+         RowBox[{
+          SqrtBox["2"], " ", 
+          SqrtBox[
+           RowBox[{
+            RowBox[{"9", " ", "D", " ", 
+             SuperscriptBox["h", "2"], " ", "m"}], "+", 
+            RowBox[{"2", " ", 
+             SuperscriptBox["D", "2"], " ", 
+             SuperscriptBox["m", "2"]}]}]]}]}], ")"}]}], 
+      RowBox[{"3", " ", 
+       SuperscriptBox["h", "2"]}]]}], "}"}]}], "}"}]], "Output",
+ CellChangeTimes->{3.6394459362401133`*^9}]
+}, Open  ]]
+},
+WindowSize->{808, 911},
+WindowMargins->{{402, Automatic}, {9, Automatic}},
+FrontEndVersion->"10.0 for Linux x86 (64-bit) (June 27, 2014)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 103, 1, 33, "Text"],
+Cell[CellGroupData[{
+Cell[686, 25, 341, 10, 32, "Input"],
+Cell[1030, 37, 335, 10, 51, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1402, 52, 354, 10, 32, "Input"],
+Cell[1759, 64, 277, 9, 49, "Output"]
+}, Open  ]],
+Cell[2051, 76, 105, 1, 33, "Text"],
+Cell[CellGroupData[{
+Cell[2181, 81, 431, 13, 32, "Input"],
+Cell[2615, 96, 370, 11, 57, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3022, 112, 32, 0, 43, "WolframAlphaLong"],
+Cell[3057, 114, 2446, 47, 100, "Print"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5540, 166, 473, 13, 32, "Input"],
+Cell[6016, 181, 422, 13, 57, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6475, 199, 465, 15, 73, "Input"],
+Cell[6943, 216, 1241, 39, 127, "Output"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
