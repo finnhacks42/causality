@@ -36,6 +36,7 @@
     filecolor=magenta,      % color of file links
     urlcolor=cyan           % color of external links
 }
+\usepackage{comment}
 \usepackage{amsthm}
 \usepackage{natbib}
 \usepackage[capitalize]{cleveref}
@@ -44,7 +45,7 @@
 \usepackage{tikz} 
 \usetikzlibrary{arrows,positioning} 
 \pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
-%\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MACROS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,8 +74,8 @@
            circle,
            rounded corners,
            draw=black, thick,
-           minimum width=1em,
-           minimum height=1em,
+           minimum width=2.5em,
+           minimum height=2.5em,
            font=\footnotesize,
            text centered,
            fill=blue!20!white},
@@ -87,6 +88,14 @@
            font=\footnotesize,
            text centered,
            fill=black!10!white
+           },
+     empty/.style={
+           circle,
+           rounded corners,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
            },
     % Define arrow style
     pil/.style={
@@ -113,34 +122,139 @@
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{example}[theorem]{Example}
 
+
+
 \begin{document}
 \def\ci{\perp\!\!\!\perp}
 
-\section*{Observe then pick best}
-\begin{itemize}
-\item Avi's point - of all the space of possible functions $f(X_1...X_N)$, most of them will have very similar marginals- so limited? opportunity for regret? Does this mean we effectively only care about a particular subset of the functions where the marginals are significantly different. We could assume we are in that subspace (if we are not then all actions are equally good anyway)
+\begin{comment}
+\section{Random notes}
+Information directed sampling have developed a general framework to construct algorithms that leverege generic structure between arms to minimize Bayesian regret, by explicitly trading off expected regret and information gain at each timestep. 
 
-\item How do assumptions/priors about the function $f(X_1...X_N)$ flow through to information about the marginals?%
+What can be expressed in the partial monitoring framework that cannot be defined by the feedback graph? 
 
-\item Assume we have $K$ bernoulli arms with means ordered from highest to lowest $\mu_1 ... \mu_K$. Let $\Delta = [\Delta_1...\Delta_K]$ be the differences from the optimal reward $\mu_1$. 
+ 
 
-\item The goal is to bound the psuedo-regret upto a total number of timesteps $T$
-
-\item Our algorithm will explore by playing uniformly at random for $h$ timesteps and then select the arm with the highest estimated reward for the remaining timesteps $T-h$.
-
-\item We assume each arm corresponds to setting one binary input variable $X_j$ to a given value. All the input variables are assumed to be independent causes of the binary reward variable $Y$. With this structure the probability of a reward is the same under the observation that a variable takes a given configuration as under the action that assigns it. Therefore, for each exploration timestep, we get data on the performance of half of the arms. 
-
-\item We assume $P(X_j = 1) = \frac{1}{2} \forall j$. With this assumption we will have $n_i \sim Binomial(h,\frac{1}{2})$ observations for each arm $i$ at the end of the exploration stage. Note that this is independent of the number of arms $K$. Relaxing this assumption will require us to have a more targeted exploration phase - as otherwise we do not gain any information about the value of arms that do not occur naturally with reasonable probability. 
-\end{itemize}
+We consider a variant of the stochastic multi-armed bandit problem when we have prior knowledge of the causal structure, but not the functional form, of the relationship between variables. 
 
 
-\subsection*{Regret during explore phase}
+sequential decision process,exploration-exploitation trade off 
+
+
+
+Points to present. Why we use regret against single best arm - it makes sense in the stochastic setting. 
+The difference between observational and interventional distributions. 
+
+terminology for intervention vs observation. Recast bandit algorithm in terms of this. Show limitations to existing approaches by pointing to places were existing algorithms eg UCB/explore-exploit/exp3 require unbiased estimates. Are unbiased estimates actually impossible in our setting?
+
+This paper is about sequentially choosing actions. 
+Modelling sequntial decition processes. 
+
+In the classic multi-armed bandit setting, an ag
+
+General bandit part ... define multi-armed bandit, and importance. Decision making is fundamental. Goal is to select an action to maximize a reward (or minimize a loss). In many settings, such as drug trials, online ad placement, etc we can choose actions sequentially. This introduces an exploration-exploitation trade-off. 
+
+The problem of sequentially choosing actions to minimize some loss wide range of applications in XXXX, YYYY. The multi-armed bandit setting, in which .... . 
+
+Now the required causal stuff should go here. 
+
+Causal structure can be represented as a directed acyclic graph with nodes representing the variables and an edge from $A \rightarrow B$ meaning $A$ causes $B$. Deterministic interventions, consisting of setting variables to some value, are modelled by setting the nodes to the desired values and removing any links coming into them, as their value is now no longer set by other variables in the graph according to the original mechanism. 
+
+If the causal graph is known, such that there are no hidden variables causing 2 or more of the variables and the probabilities are all > 0 then the distribution of any variable after any intervention can be inferred (asymptotically) from data collected in absence of any interventions.
+\end{comment}
+
+\section*{Introduction}
+
+Problems requiring choosing an action under uncertainty are rife in all areas of human endeavour. For many problems, actions may be chosen sequentially, allowing the agent to learn from the outcome of early choices to improve later ones. A widely used framework for sequential decision making is the multi-armed bandit. In the classic multi-armed bandit setting there is a finite set of available actions, each associated with a distribution over rewards which is unknown but stationary and independent of the reward distribution of other actions. At each timestep the agent selects an action and receives a reward sampled iid from the corresponding reward distribution.  
+
+An an alternate approach to selecting actions is causal inference. Frameworks for causal inference provide a mechanism to specify assumptions that allow observational distributions over variables to be mapped to interventional ones. This allows an agent to predict the outcome of an action based on non-experimental data. This approach is common in social science, demography, and economics where explicit experimentation may be difficult. For example, predicting the effect of changes to childcare subsidies on workforce participation or school choice on student grades. 
+
+We take a first step towards unifying these approaches by considering a variant of the stochastic multi-armed bandit problem where we have prior knowledge of the causal structure governing the available actions. This structure creates dependencies between the rewards of different arms such that selecting one action can provide information on the reward for other actions. 
+
+There has been substantial recent work into extending bandit algorithms to incorporate additional assumptions and deal with more complex feedback structures. Algorithms with strong guarantees have been developed for linear bandits [], generalized linear bandits, gaussian process bandits [], etc. There is also an active line of research into bandits with feedback defined by a graph. Actions are modelled as nodes in the graph and the agent observes rewards for each action connected to the selected action []. The novelty of our work is that we assume prior knowledge of the causal structure but not the functional form of the relationship between variables. 
+
+
+\section*{Problem Formulation}
+Assume we have a known causal model with binary variables $\boldsymbol{X} = \{X_{1}..X_{N}\}$ that independently cause a target variable of interest $Y$, figure \ref{fig:causalStructure}. We can run sequential experiments on the system, where at each timestep $t$ we can select a variable on which to intervene and subsequently observe the complete result, $(\boldsymbol{X}_{t},Y_{t})$. As an example, consider a farmer wishing to optimize the yield of her crop. She can invest in a green house to control temperature, a watering system to control soil moisture, fertilizers to set soil nutrients, etc. We assume only a single intervention is feasible due to cost and that each of these variables are independent of one-another (this may not always be the case - temperature could be related to rainfall for example). After having selected which variable to control, she plants her crops and observes the values of the remaining input variables and the yield. This repeats across many growing seasons, and the goal is to maximize the total cumulative yield.
+
+\begin{figure}[h]
+\centering
+\caption{Assumed Causal Structure}
+\label{fig:causalStructure}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed}, hidden/.style={empty}]
+
+ %nodes
+\node[main node](1){$X_{1}$};
+\node[main node, right=of 1](2){$X_{2}$};
+\node[hidden, right=of 2](3){$...$};
+\node[main node, right=of 3](4){$X_{N}$};
+\node[main node, below right=of 2](5){Y};
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge (5)
+    	(2) edge (5)
+    (4) edge (5);
+	
+\end{tikzpicture}
+\end{figure}
+
+
+Let $q \in [0,1]^N$ be a fixed vector where $q_i = P(X_i = 1)$. In each time-step $t$ upto a known end point $T$:
+ 
+\begin{enumerate}
+\item The learner chooses an $I_t \in \set{1,\ldots, N}$ and $J_t \in \set{0,1}$.
+\item Then $X_t \in \set{0,1}^N$ is sampled from a product of Bernoulli distributions, $X_{t,i} \sim \Ber(q_i)$ 
+\item The learner observes $\tilde X_t \in \set{0,1}^K$, which is defined by 
+\eq{
+\tilde X_{t,i} = \begin{cases}
+X_{t,i} &\text{if } i \neq I_t \\
+J_t & \text{otherwise}\,.
+\end{cases}
+}
+\item The learner receives reward $Y_t \sim \Ber(r(\tilde X))$ where $r:\set{0,1}^K \to [0,1]$ is unknown and arbitrary.
+\end{enumerate}
+
+The expected reward of taking action $i,j$ is $\mu_{i,j} = \E[r(X)|do(X_i = j)]$. The optimal reward and action are denoted $\mu^*$ and $(i^*,j^*)$ respectively,
+where $(i^*,j^*) = \argmax_{i,j} \mu_{i,j}$ and $\mu^* = \mu(i^*,j^*)$. The $n$-step cumulative expected regret is
+\eq{
+R_n = \E \sum_{t=1}^n \left(\mu^* - \mu_{I_t,J_t}\right).
+}
+
+The problem can be treated as a classical multi-armed bandit with $K = 2N$ arms. However, this does not utilize the information provided by the causal assumption. 
+
+Now need to expand upon how the assumption gives us extra information. 
+
+The difficulties faced due to bias.
+
+To deal with this issue we use a simple explore-exploit algorithm. Our algorithm will explore for $h$ time-steps, sampling actions in a way that depends on our prior knowledge of $q$ but is independent of the observed rewards. We then select the arm with the highest expected reward for the remaining $T-h$ time steps. 
+
+\section*{Results}
+
+Summarize results here and note differences to classic bandit results
+
+\subsection*{Known and Balanced q}
+
+We begin with the simplest case were we assume that $q_i=\frac{1}{2} \forall i$. During the exploration phase we sample actions uniformly at random. In this case, this is equivalent to purely observing, that is taking no action and allowing all input variables to take their value randomly as  $X_{t,i} \sim \Ber(\frac{1}{2})$. 
+
+
+
+We will have $n_i \sim Binomial(h,\frac{1}{2})$ observations for each arm $i$ at the end of the exploration stage. Note that this is independent of the number of arms $K$.
+
+
+
+Assume we have $K$ bernoulli arms with means ordered from highest to lowest $\mu_1 ... \mu_K$. Let $\Delta = [\Delta_1...\Delta_K]$ be the differences from the optimal reward $\mu_1$. 
+
+
+
+ 
+
+\subsubsection*{Regret during explore phase}
 Since the probability we play each arm is constant and uniform during the exploration phase, the expected regret is simply proportional to the average sub-optimality $\Delta$.
 \eqn{
 R_1 = h\sum_i P(i)\Delta_i = \frac{h}{K}\sum_i \Delta_i = h E[\Delta]
 }
 
-\subsection*{Regret during exploit phase}
+\subsubsection*{Regret during exploit phase}
 The regret during this phase is proportional to the expected sub-optimality of the arm with the highest empirical mean at the end of the explore phase.
 
 \eqn{
@@ -290,16 +404,31 @@ To get results that degrade to similar order bounds as UCB when the arms are ver
 
 
 \subsection{Generalizing to unknown q}
-\begin{itemize}
-\item Assume without loss of generality that $q_i \in [0,\frac{1}{2}]$
+We now consider the case where $\boldsymbol{q}$ is not known in advance. Assume as before that we observe for $h/2$ timesteps. From the observations gained in this phase we estimate $\boldsymbol{q}$.
 
-\item Assume we observe for the first $h/2$ timesteps.
+\eqn{
+\hat{q}_i = \frac{2}{h}\sum_{t=1}^{h/2}\ind{X_i=1}
+}
 
-\item Let $\hat{q}_i = \frac{2}{h}\sum_{t=1}^{h/2}\ind{X_i=1}$
+Let $\bar{q}_i = min(\hat{q},1-\hat{q})$ and construct $\bar{\boldsymbol{q}}$ such that $\bar{q}_1 \leq \bar{q}_2 \leq ...\leq \bar{q}_N$. We then estimate $m$ with $\hat{m} = min_i : \bar{q}_i \geq \frac{1}{i}$  
 
-\item Let $\bar{q}_i = min(\hat{q},1-\hat{q})$ We order the $\bar{q}$'s from smallest to largest and estimate $m$ with $\hat{m} = min_j : \bar{q}_j \geq \frac{1}{j}$ 
+We estimate the reward for the apparently common arms, $i \geq \hat{m}$, as:
 
-\item The worst case $\boldsymbol{q}$ for a given fixed $m$ is 
+\eqn{
+\hat{\mu}_i = \frac{\sum_{t=1}^{h/2}\ind{Y = 1,X_i = 1}}{\frac{h}{2}\hat{q}_i} = \frac{\sum_{t=1}^{h/2}\ind{Y = 1,X_i = 1}}{\sum_{t=1}^{h/2}\ind{X_i=1}}
+}
+
+We play the remaining arms $\frac{h}{2\hat{m}}$ times and estimate their reward as:
+
+\eqn{
+\hat{\mu}_i = \frac{2\hat{m}}{h}\sum_{t=1}^{h/2\hat{m}}\ind{Y = 1|X_i=1}
+}
+
+We now consider how errors in the estimation of $m$ effect our estimates of the arm rewards. For the arms with $i \geq \hat{m}$ we know $\hat{q}_i \geq \frac{1}{\hat{m}}$ and thus our estimate is based on at least $\frac{h}{2\hat{m}}$ observations. Similarly we explicitly play the infrequently observed arms, $i < m$,  $\frac{h}{2\hat{m}}$ times. Thus our estimates will only be worse than the known $\boldsymbol{q}$ case if $\hat{m} > m$. 
+
+For a fixed $m$ the $\boldsymbol{q}$ most likely to lead us to overestimate $m$ is:
+
+
 \eqn{
 q_i = \begin{cases}
 0 & \text{ if } i < m\\
@@ -307,54 +436,39 @@ q_i = \begin{cases}
 \end{cases}
 }
 
-In this case $\bar{q}_0 ... \bar{q}_{m-1} = 0$
+We now bound $P(\hat{m} - m > \varphi)$ for this worst case.
 
-For $i \geq m$
+
+
+For $i < m$,we have $\bar{q}_i = q_i = 0$. For $i \geq m$
 \eq{
-P(q_i - \bar{q}_i \geq C) = P(q_i - \hat{q}_i \geq C|\hat{q}_i\leq \frac{1}{2})P(\hat{q}_i \leq \frac{1}{2})+P(q_i - (1-\hat{q}_i) \geq C | \hat{q}_i > \frac{1}{2})P(\hat{q}_i>\frac{1}{2})
+P(q_i - \bar{q}_i \geq C) & =  P(q_i - \hat{q}_i \geq C|\hat{q}_i\leq \frac{1}{2})P(\hat{q}_i \leq \frac{1}{2})+P(q_i - (1-\hat{q}_i) \geq C | \hat{q}_i > \frac{1}{2})P(\hat{q}_i>\frac{1}{2})\\
+& \leq  2P(q_i - \hat{q}_i \geq C|\hat{q}_i\leq \frac{1}{2})
 }
 
-The first term will dominate for all but very small $m$. Lets just work with that one for now. 
-
-Via Bernstein's Inequality
-\eqn{
-P(q_i - \hat{q}_i \geq C) \leq \exp(-\frac{hC^2}{4q_i+4C/3}) := \gamma \\
-\implies P(q_i - \hat{q}_i \geq \frac{4\log(1/\gamma)}{3h}+\sqrt{\frac{4q_i\log(1/\gamma)}{h}})\leq \gamma
-}
-
-Actually I think I can use the Lower tail version  of Bernsteins
+ 
+Via Bernstein's Inequality:
 
 \eqn{
-P(q_i - \hat{q}_i \geq C) \leq \exp(-\frac{hC^2}{4q_i}) := \gamma \\
-\implies P(q_i - \hat{q}_i \geq 2\sqrt{\frac{\log(1/\gamma)}{mh}})\leq \gamma
+&2P(q_i - \hat{q}_i \geq C | \hat{q}_i \leq \frac{1}{2}) \leq 2\exp(-\frac{hC^2}{4q_i}) := \gamma \\
+\implies &P(q_i - \hat{q}_i \geq 2\sqrt{\frac{\log(2/\gamma)}{mh}})\leq \gamma
 }
 
 Define $\hat{m}_i = \frac{1}{\hat{q}_i}$.
 
-\eq{
-\hat{q}_i \geq q_i - C \implies \hat{m}_i \leq \frac{1}{q_i-C} = \frac{1}{\frac{1}{m} - C} \text{, where } C < \frac{1}{m} \\
-\implies q_i - \hat{q}_i \leq C \implies \hat{m}_i - m \leq \frac{m^2C}{1-mC}
+\eqn{
+\hat{q}_i \geq q_i - C & \implies \hat{m}_i \leq \frac{1}{q_i-C} = \frac{1}{\frac{1}{m} - C} \text{, where } C < \frac{1}{m} \\
+& \implies q_i - \hat{q}_i \leq C \implies \hat{m}_i - m \leq \frac{m^2C}{1-mC}\\
+& \implies P(\hat{m}_i - m \geq \frac{m^2C}{1-mC}) \leq \gamma
 }
 
-If we let $\gamma =  \frac{1}{N}\exp(-{\frac{h}{16m}})$
+Let $\varphi = \frac{m^2C}{1-mC} \implies C = \frac{\varphi}{m(\varphi+m)} \implies \gamma = 2\exp(-\frac{h \varphi^2}{4m(\varphi+m)^2}) \implies \varphi = \frac{2m\sqrt{m\log(2/\gamma)}}{\sqrt{h}-2\sqrt{m \log(2/\gamma)}} $
+
+Note this implies that if $h \geq 16m\log(2/\gamma)$ then $\varphi \leq m$
 
 \eqn {
-C = 2\sqrt{\frac{m\log N}{hm^2}+\frac{1}{16m^2}} \leq \frac{1}{2m} \text{, if } h > 16m\log N \\
+P(\hat{m}_i - m \geq \varphi) \leq 2\exp(-\frac{h \varphi^2}{4m(\varphi+m)^2})
 }
-
-Then 
-
-\eqn{
- q_i - \hat{q}_i \leq \frac{1}{2m} \implies \hat{m}_i - m \leq m \\
- \implies P(\hat{m}_i - m \geq m) \leq \frac{1}{N}\exp(-{\frac{h}{16m}})
-}
-
-
-
-
-
-
-
 
 
 If $\hat{m}_i - m \geq \varphi$ for at most $\varphi$ of the variables $i \geq m$, then $\hat{m} - m \leq \varphi$
@@ -374,17 +488,50 @@ P(\hat{m}-m \geq \varphi) =  P(\sum_{i=m}^N W_i \geq \varphi) &\leq \exp({-\frac
 If $P(\hat{m}-m \geq \varphi) \leq \zeta$. 
 
 
-
 \eqn{
 P(\hat{\mu}_i-\mu_i \geq \epsilon) \leq & P(\hat{\mu}_i-\mu_i \geq \epsilon |\hat{m}-m \leq \varphi )P(\hat{m}-m \leq \varphi) \\
-& + P(\hat{\mu}_i-\mu_i \geq \epsilon |\hat{m}-m \geq \beta)P(\hat{m}-m \geq \varphi)\\  \leq & e^{-\frac{h\epsilon^2}{m+\varphi}} + \zeta e^{-\frac{h \epsilon^2}{N}}
+& + P(\hat{\mu}_i-\mu_i \geq \epsilon |\hat{m}-m \geq \varphi)P(\hat{m}-m \geq \varphi)\\  \leq & e^{-\frac{h\epsilon^2}{m+\varphi}} + \zeta e^{-\frac{h \epsilon^2}{N}}
 }
 
 Putting it together 
 
 \eqn {
-P(\hat{\mu}_i-\mu_i \geq \epsilon) \leq \exp({-\frac{h\epsilon^2}{m+\varphi}}) + \exp({-\frac{(\varphi-N\gamma)^2}{2N\gamma + 2\varphi/3}}) \exp({-\frac{h \epsilon^2}{N}}) := \delta
+P(\hat{\mu}_i-\mu_i \geq \epsilon)& \leq \exp({-\frac{h\epsilon^2}{m+\varphi}}) + \exp({-\frac{(\varphi-N\gamma)^2}{2N\gamma + 2\varphi/3}}) \exp({-\frac{h \epsilon^2}{N}})\\
+& \leq \exp({-\frac{h\epsilon^2}{m+\varphi}}) + \exp({-\frac{(\varphi-N\gamma)^2}{2N\gamma + 2\varphi/3}}) \\
+& \leq \exp({-\frac{h\epsilon^2}{m+\varphi}}) + \exp({-\frac{(\varphi-N\exp(-\frac{h\varphi^2}{4m(\varphi+m)^2}))^2}{2N\exp(-\frac{h\varphi^2}{4m(\varphi+m)^2}) + 2\varphi/3}})
 }
+
+Assume $h > 16m\log(2N)$ and . Let $\varphi = \epsilon\sqrt{h}$. Assume $\epsilon \geq \frac{m}{\sqrt{h}}$ so as to ensure $\varphi > m$
+\eqn{
+P(\hat{\mu}_i-\mu_i \geq \epsilon)& \leq \exp({-\frac{h\epsilon^2}{m+\epsilon\sqrt{h}}}) + \exp({-\frac{(\varphi-N\exp(-\frac{h}{16m}))^2}{2N\exp(-\frac{h}{16m}) + 2\varphi/3}})\\
+& \leq \exp({-\frac{h\epsilon^2}{m+\epsilon\sqrt{h}}}) + \exp({-\frac{(\varphi-\varphi/2)^2}{\varphi + 2\varphi/3}})\\
+& = \exp({-\frac{h\epsilon^2}{m+\epsilon\sqrt{h}}}) + \exp({-\frac{3\varphi}{20}})\\
+& = \exp({-\frac{h\epsilon^2}{m+\epsilon\sqrt{h}}}) + \exp({-\frac{3\epsilon \sqrt{h}}{20}}) := \delta\\
+& \leq \begin{cases}
+2 \exp({-\frac{h\epsilon^2}{m+\epsilon\sqrt{h}}}) & \text{ if } h < \frac{9m^2}{289\epsilon^2} \\
+2\exp({-\frac{3\epsilon\sqrt{h}}{20})} & \text{ otherwise } 
+\end{cases}
+}
+
+\eqn{
+\implies \epsilon \leq \begin{cases}
+\frac{1}{\sqrt{h}}\log(2/\delta) + \sqrt{\frac{m}{h}\log(2/\delta)} & \text{ if } h < \frac{9m^2}{289\epsilon^2}\\
+\frac{20}{3\sqrt{h}}\log(2/\delta) & \text{ otherwise }
+\end{cases}\\
+}
+
+\eqn{
+\implies \epsilon \leq \frac{20}{3\sqrt{h}}\log(2/\delta)+ \sqrt{\frac{m}{h}\log(2/\delta)} 
+}
+
+Does this fit with the assumption we made about $\epsilon$???
+
+\pagebreak
+
+
+
+
+
 The first term will dominate if 
 
 \eqn{
@@ -435,7 +582,6 @@ It feels like I have just gone round and round in circles and pushed the problem
 
 
 
-\end{itemize}
 
 
 
