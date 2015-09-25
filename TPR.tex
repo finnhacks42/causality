@@ -1,0 +1,147 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithm
+\usepackage[noend]{algpseudocode}% http://ctan.org/pkg/algorithmicx
+\usepackage{parskip}
+\usepackage{tikz}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usetikzlibrary{arrows,positioning} 
+\usepackage{subcaption}
+
+
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    punkt/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           text width=1em,
+           minimum height=1em,
+           text centered},
+    punktrect/.style={
+    rectangle, 
+    rounded corners, 
+    % fill=black!10,
+    draw=black, thick,
+    minimum height=1em, 
+    text centered},
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,}
+}
+
+
+\author{Finnian Lattimore}
+\title{Causal Inference in Machine Learning:Thesis Proposal Review}
+
+\begin{document}
+\def\ci{\perp\!\!\!\perp} % from Wikipedia
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\section*{Causal Inference in Machine Learning}
+
+Start with a focus on causal inference and then show how there is a relationship to specifically bandits.
+
+Learning the outcome of an intervention is central to many real world problems. Does de-worming children in poor countries improve health and educational outcomes[worm-wars]? Would increasing the minimum wage benefit lead to higher unemployment? Will offering this customer a discount improve my revenue? These questions are difficult as they require more than identifying a pattern in data. Correlation is not causation. The key challenge is that intervening changes the state of the world and we only get to observe the outcome of the action we select. 
+
+Randomized controlled trials have long been seen as the gold standard in addressing such problems. 
+
+
+
+
+Selecting actions under uncertainty is central to many real world problems, from robotics to policy development. 
+
+Predicting the outcome of actions is central to many real world problems, from robotics to policy development. There are two key approaches to this problem in machine learning: reinforcement learning and causal inference. 
+
+
+
+
+
+Machine learning has made dramatic progress in identifying complex patterns in large datasets as has been demonstrated by recent work on machine translation [], image recognition[] and XXXX[]. However, causal inference poses an additional challenge. Correlation is not causation. Essentially, causal inference can be seen as the problem of inferring a property of the post interventional distribution from data collected prior to taking the intervention. This requires some form of assumption of the way in which the intervention changes the system.
+
+
+
+
+Randomized controlled trials have long been considered the gold standard for inferring causality. However ...
+
+
+Learning the outcome of actions is central to many real world problems from robotics to policy development. 
+
+
+
+In machine learning, there are two separate commonly applied approaches. The first is reinforcement learning, where an agent selects and action and then receives feedback on their performance. In general, the state of the system and feedback both depend on action selected. Causal inference aims to predict the outcome of an action from 
+ 
+Both approaches can be seen as extensions to the concept of randomized controlled trials. Causal inference makes use of assumptions to allow the outcome of interventions to be predicted from non-randomized data. Bandit algorithms take account of the sequential nature of many such decision making processes. 
+
+The similarities between the problems that these techniques have been developed to address raises the obvious question of if there are problems best addressed by a combination of these approaches and how they can be combined. 
+ 
+Importance of causal inference. 
+What is causal inference
+
+Causal inference makes use of assumptions to allow the outcome of interventions to be predicted from observational data. 
+
+Both of these approaches have historically been applied to the problem of determining the effectiveness of a medical treatment. Bandit algorithms deal with the sequential nature of the decision making process. Causal inference with the problem that full randomization is not always feasible. 
+
+Causal inference techniques arose from the recognition that randomized experimentation is not always feasible, affordable or considered ethical. People frequently dislike randomization in important decision making processes. 
+
+Bandit algorithms recognise the sequential nature of many desision making processes. 
+
+The difference between predictive and causal models is fundamental. In a predictive model, we care only about the accuracy of our predictions. we implicitly assume that any actions we take on the basis of our predictions do not influence the data presented to our model. For example, predicting which underground pipe will fail on the basis of geological, and pipe characteristics is predictive if the goal is targeting maintenance to minimize failures. On the other hand if the goal is to select new pipe materials, ...
+
+The problem I always think about when thinking about causal inference is selection bias - that is a back door path from treatment to outcome via a hidden confounder. 
+
+
+
+Areas to explore (maybe throw up more of these in your talk and keep the TPR document more focussed purely on the reinforcement learning side of things). 
+
+	Practical applications of causal inference and discovery
+		- practical applications of causal inference abound (usually not explicitly recognized as such in economics and social science)
+		- very few practical applications or comparisons of causal discovery techniques on real data. 
+
+	Causality, Interpretability and Ethics
+		- 	
+	
+	Relationship between causal inference and reinforcement learning
+		- why bandits
+		- how can structur
+		- specific problem
+
+	Feature selection for causal inference and discovery
+		- learning the graph
+		- learning given the graph. Given a graph, select which features to train on to build a causal model. 
+		- can we infer anything about the causal structure from the distributions over the features (yes - causal discovery tells us we can)
+		- first discover the graph(s) then do inference with each possible graph.
+		- with a predictive model - features selection is to avoid over-fitting. You can create new combinations of features as products etc.
+		This is finding a good representation. A way of breaking up the information available into variables in such a way as to allow a good model to be found. This is what deep networks are apparently doing. Is that right? Because they can effectively represent a very large number of different ways of combining whatever is initially chosen as a feature. So what is a good way to break up data into features for causal inference/discovery. We don't want to much entanglement. Come up with simple examples on generated data. How you take a feature and encode effects what space of models is explored. The 'variables' as they come in in the data are by no means the only description for that data. Do we encode something as a single variable with more levels or as two binary variables. Eg -  
+
+Question on randomized controlled trials - is there an implicit assumption about how many confounding variables there are - does this tie into how much power a study has for a fixed number of participants?
+
+		
+Predicting the outcome of actions is a critical goal in both artificial intelligence and for many 
+
+The goal of causal inference is to predict the outcome of an intervention or action from
+
+Data is being collected on everything. Extract meaningful knowledge. Machine Learning. 
+
+\begin{itemize}
+\item formalize questions, describe problems
+\item literature survey demonstrating problem is not already solved
+\item initial attempts to solve problem
+\end{itemize}
+\end{document}
