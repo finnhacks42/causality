@@ -1,4 +1,4 @@
 all:
-	latexmk -pdf c-bandit
+	latexmk -pdf observe_then_best
 clean:
-	latexmk -C c-bandit
+	latexmk -C observe_then_best

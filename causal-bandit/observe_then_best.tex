@@ -1,6 +1,13 @@
 
 \documentclass{article}
 
+\usepackage{todonotes}
+
+%\usepackage[disable]{todonotes}
+\newcommand{\todot}[2][]{\todo[color=red!20!white,#1]{#2}}
+\newcommand{\todof}[2][]{\todo[color=orange!20!white,#1]{#2}}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PACKAGES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -9,6 +16,8 @@
 \usepackage{latexsym}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage[boxed]{algorithm}
+\usepackage{algpseudocode}
 \usepackage{mathtools}
 \usepackage{accents}
 \usepackage{tikz}
@@ -228,6 +237,142 @@ The difficulties faced due to bias.
 
 To deal with this issue we use a simple explore-exploit algorithm. Our algorithm will explore for $h$ time-steps, sampling actions in a way that depends on our prior knowledge of $q$ but is independent of the observed rewards. We then select the arm with the highest expected reward for the remaining $T-h$ time steps. 
 
+\section{Bounding the Simple Regret}
+
+\begin{itemize}
+\item $N$ is number of variables.
+\item $q_i$ is probability that $X_{i,t} = 1$ for any $t$
+\item $s_i = \min\set{q_i, 1 - q_i}$
+\item $h = T/2$
+\item $\mu : \set{1,\ldots,N} \times \set{0,1} \to [0,1]$.
+\item $I_t \in \set{1,\ldots,N} \times \set{0,1}$ is the intervention
+\end{itemize}
+
+Let $r_T$ be the simple regret after $T$ time steps, which is
+\eq{
+r_q(T) = \E\left[\mu^* - \mu_{I_T}\right]\,,
+}
+where $\mu^*$ is the mean payoff of the optimal intervention and $I_T$ is the intervention chosen in the $T$th round.
+We propose a two part algorithm that is provably order optimal when its performance is measured in terms of the simple regret.
+
+
+\begin{algorithm}[H]
+\caption{Simple Regret Algorithm}\label{alg:simple}
+\begin{algorithmic}[1]
+\State {\bf Input:} $T, N$
+\State $h = T/2$
+\For{$t \in 1,\ldots,h$}
+\State Do nothing and observe $X_{i,t}$ for $i \in \set{1,\ldots,N}$ and $r_t$
+\EndFor
+\State Compute $\hat q_i = \frac{1}{h} \sum_{t=1}^n X_{i,t}$
+\State Compute $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$
+\State Compute $\hat m = \min\set{2 \leq i \leq N : \hat s_{(i)} \geq 1/i}$
+\State Compute $A$ is subset of insufficiently explored arms with $|A| = \hat m$
+\State Compute for all $i \in \set{1,\ldots,N}$ and $j \in \set{0,1}$:
+\eq{
+\hat \mu_{i,j} = \frac{\sum_{t=1}^h \ind{X_i = j} r_t}{\sum_{t=1}^h \ind{X_i = j}}\,.
+}
+\For{$i \in A$}
+\State $j = \ind{\hat q_{I_t} \geq 1/2}$
+\For{$t \in 1,\ldots,h/\hat m$}
+\State Choose $I = i$ and $J = j$
+\State Observe reward $r_t$
+\EndFor
+\State Recompute $\hat \mu_{i,j} = \frac{\hat m}{h} \sum_{t=1}^{\hat m/h} r_t$ 
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}\label{thm:simple-regret}
+Define $m = \min\set{i : q_i \geq 1/i}$.
+Then the algorithm given in \cref{alg:simple} satisfies
+\eq{
+r_q(T) \in O\left(\sqrt{\frac{m}{T} \log \left(\frac{NT}{m}\right)}\right)\,.
+}
+\end{theorem}
+
+\begin{lemma}\label{lem:conc1}
+$\displaystyle \P{\left|\hat q_i - q_i\right| \geq \sqrt{\frac{3q_i}{h} \log \frac{2}{\delta}}} \leq \delta$.
+\end{lemma}
+
+\begin{proof}
+Let $Z_t = \ind{X_{i,t} = 1} \in \set{0,1}$.
+Then
+\eq{
+\hat q_i = \frac{1}{h} \sum_{t=1}^{h} Z_t\,.
+}
+Now $Z_1,\ldots,Z_h$ is an i.i.d.\ sequence of Bernoulli random variables with with mean $q_i$. The result follows from the Chernoff bound.
+\end{proof}
+
+\begin{lemma}\label{lem:conc2}
+Let $\delta >0$ and $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$ and
+define $\hat m = \min\set{2 \leq i \leq N : \hat s_{(i)} \geq 1/i}$.
+If
+\eq{
+h \geq 12m \log\frac{2N}{\delta}\,,
+}
+then
+\eq{
+\P{\hat m \leq 2m} \geq 1 - \delta\,.
+}
+\end{lemma}
+
+\begin{proof}
+It is easy to see that the worst case occurs when 
+\eq{
+q_i = \begin{cases}
+0 & \text{if } i < m \\
+\frac{1}{m} & \text{otherwise}\,.
+\end{cases}
+}
+Now by \cref{lem:conc1} we have with probability at least $1 - \delta$ that 
+\eq{
+(\forall i) \qquad \left| \hat q_i - q_i\right| 
+&\leq \sqrt{\frac{3q_i}{h} \log \frac{2N}{\delta}} \\
+&= \sqrt{\frac{3}{mh} \log\frac{2N}{\delta}}\,. 
+}
+By assumption 
+\eq{
+h \geq 12m \log \frac{2N}{\delta}\,.
+}
+Therefore with probability at least $1 - \delta$ we have
+\eq{
+(\forall i) \qquad \left|\hat q_i - q_i\right| \leq \frac{1}{2m}\,.
+}
+Note that for $i$ with $q_i = 0$ it is easy to see that $\hat q_i = 0$ (the variance is zero). The above guarantee that
+for $i$ with $q_i = 1/m$ we have $\hat q_i \in [1/(2m), 3/(2m)]$ for all $i$ with probability at least $1 - \delta$,
+which implies that $\hat s_i \geq 1/(2m)$ for all $i$ where $q_i = 1/m$.
+Therefore $\hat m \leq 2m$ with probability at least $1 - \delta$. 
+\end{proof}
+
+
+\begin{proof}[Proof of \cref{thm:simple-regret}]
+Given the assumption that
+\eq{
+h \geq 12m \log \frac{N}{\delta}
+}
+we have shown with probability at least $1 - \delta$ that
+\eq{
+(\forall i, j) \qquad \left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{m}{h} \log\frac{N}{\delta}}\,.
+}
+Suppose $h < 12m \log \frac{N}{\delta}$. Then
+\eq{
+\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq 1 \leq \sqrt{\frac{12m}{h} \log \frac{N}{\delta}}\,.
+}
+Therefore
+\eq{
+\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{12m}{h} \log \frac{N}{\delta}}\,.
+}
+Therefore 
+\eq{
+r_q(T) 
+&\leq \delta + \sqrt{\frac{12m}{h} \log \frac{N}{\delta}} \\
+&= \delta + \sqrt{\frac{24m}{T} \log \frac{N}{\delta}} \\
+&\leq \frac{m}{T} + \sqrt{\frac{24m}{T} \log \left(\frac{NT}{m}\right)}
+}
+as required.
+\end{proof}
+
 \section*{Results}
 
 Summarize results here and note differences to classic bandit results
@@ -426,7 +571,7 @@ We play the remaining arms $\frac{h}{2\hat{m}}$ times and estimate their reward 
 
 We now consider how errors in the estimation of $m$ effect our estimates of the arm rewards. For the arms with $i \geq \hat{m}$ we know $\hat{q}_i \geq \frac{1}{\hat{m}}$ and thus our estimate is based on at least $\frac{h}{2\hat{m}}$ observations. Similarly we explicitly play the infrequently observed arms, $i < m$,  $\frac{h}{2\hat{m}}$ times. Thus our estimates will only be worse than the known $\boldsymbol{q}$ case if $\hat{m} > m$. 
 
-For a fixed $m$ the $\boldsymbol{q}$ most likely to lead us to overestimate $m$ is:
+For a fixed $m$ the $\boldsymbol{q}$ most likely to lead us to overestimate $m$ is: \todot{Justify this claim.}
 
 
 \eqn{
@@ -440,7 +585,7 @@ We now bound $P(\hat{m} - m > \varphi)$ for this worst case.
 
 
 
-For $i < m$,we have $\bar{q}_i = q_i = 0$. For $i \geq m$
+For $i < m$,we have $\bar{q}_i = q_i = 0$. For $i \geq m$ \todot{Is this really true, justify}
 \eq{
 P(q_i - \bar{q}_i \geq C) & =  P(q_i - \hat{q}_i \geq C|\hat{q}_i\leq \frac{1}{2})P(\hat{q}_i \leq \frac{1}{2})+P(q_i - (1-\hat{q}_i) \geq C | \hat{q}_i > \frac{1}{2})P(\hat{q}_i>\frac{1}{2})\\
 & \leq  2P(q_i - \hat{q}_i \geq C|\hat{q}_i\leq \frac{1}{2})
@@ -448,7 +593,6 @@ P(q_i - \bar{q}_i \geq C) & =  P(q_i - \hat{q}_i \geq C|\hat{q}_i\leq \frac{1}{2
 
  
 Via Bernstein's Inequality:
-
 \eqn{
 &2P(q_i - \hat{q}_i \geq C | \hat{q}_i \leq \frac{1}{2}) \leq 2\exp(-\frac{hC^2}{4q_i}) := \gamma \\
 \implies &P(q_i - \hat{q}_i \geq 2\sqrt{\frac{\log(2/\gamma)}{mh}})\leq \gamma
