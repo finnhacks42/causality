@@ -263,16 +263,18 @@ We propose a two part algorithm that is provably order optimal when its performa
 \For{$t \in 1,\ldots,h$}
 \State Do nothing and observe $X_{i,t}$ for $i \in \set{1,\ldots,N}$ and $r_t$
 \EndFor
-\State Compute $\hat q_i = \frac{1}{h} \sum_{t=1}^n X_{i,t}$
-\State Compute $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$
-\State Compute $\hat m = \min\set{2 \leq i \leq N : \hat s_{(i)} \geq 1/i}$
-\State Compute $A$ is subset of insufficiently explored arms with $|A| = \hat m$
 \State Compute for all $i \in \set{1,\ldots,N}$ and $j \in \set{0,1}$:
 \eq{
 \hat \mu_{i,j} = \frac{\sum_{t=1}^h \ind{X_i = j} r_t}{\sum_{t=1}^h \ind{X_i = j}}\,.
 }
-\For{$i \in A$}
-\State $j = \ind{\hat q_{I_t} \geq 1/2}$
+\State Compute $\hat q_i = \frac{1}{h} \sum_{t=1}^h X_{i,t}$
+\State Compute $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$
+\State Compute $\hat{s'} = sorted(\hat{s}) : \hat{s'}_1 \leq \hat{s'_2} \leq ... \leq \hat{s'}_N$
+\State Compute $\hat m = \min\set{2 \leq i \leq N : \hat s'_{i} \geq 1/i}$
+\State $i'(i) = $ the index of $\hat s_i$ in $\hat s'$
+\State Compute $A$ as the subset of infrequently observed arms $\{(i,j):i'(i) \leq \hat m, j = \ind{\hat q_{i} \leq \frac{1}{2}} \}$ with $|A| = \hat m$
+
+\For{$(i,j) \in A$}
 \For{$t \in 1,\ldots,h/\hat m$}
 \State Choose $I = i$ and $J = j$
 \State Observe reward $r_t$
@@ -283,7 +285,7 @@ We propose a two part algorithm that is provably order optimal when its performa
 \end{algorithm}
 
 \begin{theorem}\label{thm:simple-regret}
-Define $m = \min\set{i : q_i \geq 1/i}$.
+Define $m = \min\set{2 \leq i \leq N : q_i \geq 1/i}$.
 Then the algorithm given in \cref{alg:simple} satisfies
 \eq{
 r_q(T) \in O\left(\sqrt{\frac{m}{T} \log \left(\frac{NT}{m}\right)}\right)\,.
@@ -350,6 +352,19 @@ Given the assumption that
 \eq{
 h \geq 12m \log \frac{N}{\delta}
 }
+
+\eq {
+\text{ for } (i,j)\in A \qquad \hat \mu_{i,j} = \frac{\hat m}{h} \sum_{t=1}^{\hat m/h} r_t
+}
+Prove bound for this case
+
+\eq {
+\text{ for } (i,j)\notin A \qquad \hat \mu_{i,j} = \frac{\sum_{t=1}^h \ind{X_i = j} r_t}{\sum_{t=1}^h \ind{X_i = j}}
+}
+
+Prove bound for this case
+
+
 we have shown with probability at least $1 - \delta$ that
 \eq{
 (\forall i, j) \qquad \left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{m}{h} \log\frac{N}{\delta}}\,.
