@@ -247,9 +247,9 @@ To deal with this issue we use a simple explore-exploit algorithm. Our algorithm
 \item $I_t \in \set{1,\ldots,N} \times \set{0,1}$ is the intervention
 \end{itemize}
 
-Let $r_T$ be the simple regret after $T$ time steps, which is
+Let $R_T$ be the simple regret after $T$ time steps, which is
 \eq{
-r_q(T) = \E\left[\mu^* - \mu_{I_T}\right]\,,
+R_q(T) = \E\left[\mu^* - \mu_{I_T}\right]\,,
 }
 where $\mu^*$ is the mean payoff of the optimal intervention and $I_T$ is the intervention chosen in the $T$th round.
 We propose a two part algorithm that is provably order optimal when its performance is measured in terms of the simple regret.
@@ -265,7 +265,7 @@ We propose a two part algorithm that is provably order optimal when its performa
 \EndFor
 \State Compute for all $i \in \set{1,\ldots,N}$ and $j \in \set{0,1}$:
 \eq{
-\hat \mu_{i,j} = \frac{\sum_{t=1}^h \ind{X_i = j} r_t}{\sum_{t=1}^h \ind{X_i = j}}\,.
+\hat \mu_{i,j} = \frac{\sum_{t=1}^h \ind{X_{i,t} = j} r_t}{\sum_{t=1}^h \ind{X_{i,t} = j}}\,.
 }
 \State Compute $\hat q_i = \frac{1}{h} \sum_{t=1}^h X_{i,t}$
 \State Compute $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$
@@ -276,10 +276,10 @@ We propose a two part algorithm that is provably order optimal when its performa
 
 \For{$(i,j) \in A$}
 \For{$t \in 1,\ldots,h/\hat m$}
-\State Choose $I = i$ and $J = j$
-\State Observe reward $r_t$
+\State Choose action $X_{i,t} = j$
+\State Observe reward $r_t(X_{i,t}=j)$
 \EndFor
-\State Recompute $\hat \mu_{i,j} = \frac{\hat m}{h} \sum_{t=1}^{\hat m/h} r_t$ 
+\State Recompute $\hat \mu_{i,j} = \frac{\hat m}{h} \sum_{t=1}^{\hat m/h} r_t(X_{i,t}=j)$ 
 \EndFor
 \end{algorithmic}
 \end{algorithm}
@@ -310,7 +310,7 @@ Let $\delta >0$ and $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$ and
 define $\hat m = \min\set{2 \leq i \leq N : \hat s_{(i)} \geq 1/i}$.
 If
 \eq{
-h \geq 12m \log\frac{2N}{\delta}\,,
+h \geq 12m \log\frac{4N}{\delta}\,,
 }
 then
 \eq{
@@ -334,7 +334,7 @@ Now by \cref{lem:conc1} we have with probability at least $1 - \delta$ that
 }
 By assumption 
 \eq{
-h \geq 12m \log \frac{2N}{\delta}\,.
+h \geq 12m \log \frac{4N}{\delta}\,.
 }
 Therefore with probability at least $1 - \delta$ we have
 \eq{
@@ -348,41 +348,70 @@ Therefore $\hat m \leq 2m$ with probability at least $1 - \delta$.
 
 
 \begin{proof}[Proof of \cref{thm:simple-regret}]
-Given the assumption that
-\eq{
-h \geq 12m \log \frac{N}{\delta}
+
+
+for $(i,j)\in A$, the algorithm explicitly selects the action, $X_i = j$,  $\frac{h}{\hat m}$ times.
+\eq {
+\hat \mu_{i,j} = \frac{\hat m}{h} \sum_{t=1}^{\hat m/h} r_t(X_i = j)
 }
+
+Via Hoeffding's Inequality
 
 \eq {
-\text{ for } (i,j)\in A \qquad \hat \mu_{i,j} = \frac{\hat m}{h} \sum_{t=1}^{\hat m/h} r_t
+\P{ \left|\hat \mu_{i,j} - \mu_{i,j}\right| > \epsilon } \leq 2\exp{-\frac{2h\epsilon^2}{\hat{m}}}
 }
-Prove bound for this case
+
+for $(i,j)\notin A$, the algorithm has observed the reward given $X_i = j$ at least $\frac{h}{\hat m}$ times.
 
 \eq {
-\text{ for } (i,j)\notin A \qquad \hat \mu_{i,j} = \frac{\sum_{t=1}^h \ind{X_i = j} r_t}{\sum_{t=1}^h \ind{X_i = j}}
+(i,j)\notin A & \implies \hat{s}_i \geq \frac{1}{\hat m} \\
+& \implies \sum_{t=1}^h \ind{X_i = j} \geq \frac{h}{\hat{m}}
 }
 
-Prove bound for this case
+Let  $Z_{ij} = \sum_{t=1}^h \ind{X_i = j}$ and $t'_1 ... t'_{Z_{ij}} = {t:X_{i,t} = j}$
 
-
-we have shown with probability at least $1 - \delta$ that
-\eq{
-(\forall i, j) \qquad \left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{m}{h} \log\frac{N}{\delta}}\,.
+\eq {
+\hat \mu_{i,j} = \frac{1}{Z_{ij}}\sum_{t'=1}^{Z_{ij}}r_{t'}
 }
-Suppose $h < 12m \log \frac{N}{\delta}$. Then
+
+
+\eq {
+\P{\left| \hat \mu_{i,j} - \mu_{ij} \right| > \epsilon} = & \sum_{z=1}^\infty \P{Z_{ij}=z}\P{\left| \frac{1}{Z_{ij}} \sum_{t'=1}^{Z_{ij}}r_{t'} - \mu_{ij} \right| > \epsilon | Z_{ij} = z} \\
+= & \sum_{z=1}^\infty \P{Z_{ij}=z}\P{\left| \frac{1}{z} \sum_{t'=1}^{z}r_{t'} - \mu_{ij} \right| > \epsilon } \\
+\leq & \P{\left| \frac{\hat m}{h} \sum_{t'=1}^{h/\hat m}r_{t'} - \mu_{ij} \right| > \epsilon } \sum_{z=1}^\infty \P{Z_{ij}=z} \\
+\leq & 2\exp{-\frac{2h\epsilon^2}{\hat{m}}}\\
+}
+
+Applying the union bound over all $2N$ actions.
 \eq{
-\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq 1 \leq \sqrt{\frac{12m}{h} \log \frac{N}{\delta}}\,.
+& \P{\exists (i,j): \left| \hat \mu_{i,j} - \mu_{i,j} \right| > \epsilon} \leq 4N\exp{-\frac{2h\epsilon^2}{\hat{m}}} \\
+\implies & \P{\exists (i,j): \left| \hat \mu_{i,j} - \mu_{i,j} \right| > \sqrt{\frac{\hat m}{2h}\log{\frac{4N}{\delta}}}} \leq \delta \\
+}
+
+Now by \cref{lem:conc2}, 
+\eq{
+h \geq 12m \log \frac{4N}{\delta} \implies \P{\hat m > 2m} \leq \delta
+} 
+
+Therefore if $h \geq 12m \log \frac{4N}{\delta}$, we have shown with probability at least $1 - 2\delta$ that
+
+\eq{
+(\forall i, j) \qquad \left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{m}{h} \log\frac{4N}{\delta}}\,.
+}
+Suppose $h < 12m \log \frac{4N}{\delta}$. Then
+\eq{
+\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq 1 \leq \sqrt{\frac{12m}{h} \log \frac{4N}{\delta}}\,.
 }
 Therefore
 \eq{
-\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{12m}{h} \log \frac{N}{\delta}}\,.
+\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{12m}{h} \log \frac{4N}{\delta}} \qquad \forall h\ \text{ with probability at least } 1-2\delta
 }
 Therefore 
 \eq{
 r_q(T) 
-&\leq \delta + \sqrt{\frac{12m}{h} \log \frac{N}{\delta}} \\
-&= \delta + \sqrt{\frac{24m}{T} \log \frac{N}{\delta}} \\
-&\leq \frac{m}{T} + \sqrt{\frac{24m}{T} \log \left(\frac{NT}{m}\right)}
+&\leq 2\delta + \sqrt{\frac{12m}{h} \log \frac{4N}{\delta}} \\
+&= 2\delta + \sqrt{\frac{24m}{T} \log \frac{4N}{\delta}} \\
+&\leq \frac{8m}{T} + \sqrt{\frac{24m}{T} \log \left(\frac{NT}{m}\right)}
 }
 as required.
 \end{proof}
