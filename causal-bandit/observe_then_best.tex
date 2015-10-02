@@ -236,7 +236,188 @@ The difficulties faced due to bias.
 
 To deal with this issue we use a simple explore-exploit algorithm. Our algorithm will explore for $h$ time-steps, sampling actions in a way that depends on our prior knowledge of $q$ but is independent of the observed rewards. We then select the arm with the highest expected reward for the remaining $T-h$ time steps. 
 
-\section{Bounding the Simple Regret}
+
+
+\section*{Results}
+
+Summarize results here and note differences to classic bandit results
+
+\subsection*{Known and Balanced q}
+
+We begin with the simplest case were we assume that $q_i=\frac{1}{2} \forall i$. During the exploration phase we sample actions uniformly at random. In this case, this is equivalent to purely observing, that is taking no action and allowing all input variables to take their value randomly as  $X_{t,i} \sim \Ber(\frac{1}{2})$. 
+
+
+
+We will have $n_i \sim Binomial(h,\frac{1}{2})$ observations for each arm $i$ at the end of the exploration stage. Note that this is independent of the number of arms $K$.
+
+
+
+Assume we have $K$ bernoulli arms with means ordered from highest to lowest $\mu_1 ... \mu_K$. Let $\Delta = [\Delta_1...\Delta_K]$ be the differences from the optimal reward $\mu_1$. 
+
+
+
+\subsubsection*{Regret during explore phase}
+Since the probability we play each arm is constant and uniform during the exploration phase, the expected regret is simply proportional to the average sub-optimality $\Delta$.
+\eqn{
+R_1 = h\sum_i P(i)\Delta_i = \frac{h}{K}\sum_i \Delta_i = h E[\Delta] < h
+}
+
+\subsubsection*{Regret during exploit phase}
+The regret during this phase is proportional to the expected sub-optimality of the arm with the highest empirical mean at the end of the explore phase.
+
+\eqn{
+\hat{i^*} = argmax_i [\hat{\mu}_i]
+}
+\eqn{
+R_2 = (T-h)E[\Delta_{\hat{i^*}}] = (T-h)\sum_i P(\hat{\mu}_i \geq \hat{\mu}_j \forall j)\Delta_i 
+}
+
+The difficulty with this approach is that it is hard to get bounds that are tight for all $\Delta$. Instead, we will bound the probability that we select an arm with a sub-optimality gap greater than some $D$.
+\eqn{
+R_2 \leq (T-h)\left(P(\Delta_{\hat{i^*}} \leq D) D+P(\Delta_{\hat{i^*}} > D)  \Delta_{max} \right)
+}
+The goal now is to get a bound for $P(\Delta_{\hat{i^*}} > D)$ in terms of Hoeffdings type bounds for each arm. 
+
+Suppose $i = \hat{i^*} \implies \hat{\mu}_i > \hat{\mu}_1$. If we haven't over-estimated $\mu_i$ too much, $\hat{\mu}_i - \mu_{i} < \frac{D}{2}$, and haven't under-estimated $\mu_1$ too much, $\mu_1 - \hat{\mu_1} < \frac{D}{2}$, then $\Delta_{\hat{i^*}} = \mu_1 - \mu_i < D$
+
+\eqn{
+\label{eqn:probDeltaToLarge}
+P(\Delta_{\hat{i^*}} > D) \leq  P(\mu_1 - \hat{\mu_1} > \frac{D}{2})+ \sum_{i=2}^K P(\hat{\mu}_i - \mu_{i} > \frac{D}{2})
+}
+
+If we used the empirical mean as an estimator for $\mu_i$, the bound will depend on the number of times we actually observed each arm, which will be a random variable drawn from a multinomial distribution. Instead we will use an importance weighted estimator.
+
+\eqn{
+\label{eqn:importance_weighted_estimator}
+\hat{\mu}_i = \frac{1}{h}\sum_{t=1}^h \frac{Y_t\ind{\text{arm $i$ active}}}{q_i}
+}
+
+where $q_i = P(\text{arm $i$ active})$
+
+Hoeffdings gives $ P(\hat{\mu}_i - \mu_{i} > \epsilon) \leq e^{-2h\epsilon^2q_i^2}$. In this case we have assumed $q_i = \frac{1}{2} \forall i$. Putting this into equation \ref{eqn:probDeltaToLarge}:
+
+\eqn{
+\label{eqn:balancedHoeffdings}
+P(\Delta_{\hat{i^*}} > D) \leq Ke^{-hD^2/8}
+}
+
+
+\eqn{
+R_2 \leq (T-h)[(1-K e^{-hD^2/8})D + K e^{-hD^2/8}] < (T-h)[D + K e^{-hD^2/8}]
+}
+
+Let $D = \sqrt{\frac{8}{h}\log(hK)}$ 
+
+\eqn{
+R_2 \leq (T-h)\left(\sqrt{\frac{8}{h}\log(hK)} + \frac{1}{h}\right)
+}
+
+
+\subsection*{Total Regret}
+
+Putting together the regret from the exploration and exploitation phases,
+
+\eqn{
+R_T & \leq \frac{h}{K}\sum_i \Delta_i + (T-h)\left(\sqrt{\frac{8}{h}\log(hK)} + \frac{1}{h}\right)\\
+& \leq h + T\left(\sqrt{\frac{8}{h}\log(TK)} + \frac{1}{h}\right)
+}
+
+Now if we let $h = T^{2/3}(\log(KT))^{1/3}$,
+
+
+\eqn {
+R_T \leq 4T^{\frac{2}{3}}(log(KT))^{\frac{1}{3}} + T^{\frac{1}{3}}(log(KT))^{-\frac{1}{3}}
+}
+
+If $T \geq 2$ and $K \geq 2$, the first term dominates and,
+
+\eqn {
+R_T  \leq 5T^{\frac{2}{3}}(log(KT))^{\frac{1}{3}}
+}
+
+The distribution independent lower bound for optimised UCB is $O(\sqrt{TK})$ (see Bubeck sect 2.4.3) so we would expect our algorithm to do better if $K >> T^{\frac{1}{3}}$
+
+
+
+\subsection*{Empirical results}
+\begin{figure}[H]
+\centering
+\caption{Comparison of the UCB and causal-explore-exploit for K=20 and T=10000. Note, $K \sim T^{1/3}$ Plot shows average and standard deviation over 10000 trials.}
+\includegraphics[width=.5\textwidth]{explore_exploit}
+\end{figure}
+
+\section{Generalizing to unbalanced $\boldsymbol{q}$}
+
+When some arms have low natural probability we cannot rely on exploring them adequately by pure observation. We need to explicitly play them during the exploration phase. 
+
+We now have an additional trade off to make, which is how much should be observe (learning something about at least half the arms each timestep) versus playing the low probability arms. 
+
+Without loss of generality, we can assume $q_i \in [0,\frac{1}{2}]$ and $q_1 \leq q_2 ... \leq q_N$. Let $m \in [2,N] = \{m:q_m > \frac{1}{m}\}$ Ie if the problem is completely balanced $q_1...q_N = \frac{1}{2}$ then $m = 2$. If the problem is completely unbalanced, $q_1...q_N = 0$ then $m=N$. Let $q_{ij} = \P{X_i = j}$
+
+Suppose we observe for the first $h/2$ timesteps. This is at worst half the optimal. 
+
+We then have estimates 
+
+\eqn {
+\hat{\mu}_{ij} = \frac{\sum_{t=1}^{h/2}\ind{Y_t=1,X_{t,i}=j}}{\frac{h}{2}q_{ij}}
+}
+
+We take this as our estimate for those arms for which $q_{ij} > \frac{1}{m}$
+
+Let $Z_{t,ij} = \ind{Y_t=1,X_{t,i}=j} \sim Bernoulli(q_{ij}\mu_{ij})$, 
+
+Chernoff's inequality gives
+
+\eqn{
+P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}) \leq e^{-hD^2/24m}
+}
+
+We play each of the remaining $m$ arms $\frac{h}{2m}$ times so for them we get
+
+\eqn{
+P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}) \leq e^{-hD^2/4m}
+}
+
+So for all the arms 
+
+\eqn{
+P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}) \leq e^{-hD^2/24m}
+}
+
+and 
+
+
+
+\eqn{
+\label{eqn:unbalancedHoeffdings}
+P(\Delta_{\hat{i^*}} > D) \leq Ke^{-hD^2/24m}
+}
+
+If we let $D = \sqrt{\frac{24m\log(hK)}{h}}$
+
+\eqn{
+R_T &  \leq h + T\left(\sqrt{\frac{24m\log(hK)}{h}} + \frac{1}{h}\right) \\
+& \leq h + T\left(\sqrt{\frac{24m\log(TK)}{h}} + \frac{1}{h}\right) 
+}
+
+Let $h = T^{2/3}m^{1/3}\log(TK)^{1/3}$
+
+
+\eqn {
+R_T & \leq 6T^{2/3}m^{1/3}log(KT)^{1/3} + T^{1/3}m^{-1/3}log(KT)^{-1/3}\\ 
+& \leq 7T^{2/3}m^{1/3}log(KT)^{1/3}
+}
+
+
+
+It should also be possible to generalize to handle the case were the $q$'s are unknown, since we should be able to get a reasonable estimate for them while we are observing. They key will be how the resulting uncertainty in $m$ effects the bounds. 
+
+To get results that degrade to similar order bounds as UCB when the arms are very unbalanced, I will need to drop the explore/exploit strategy. 
+
+
+\subsection{Generalizing to unknown q}
+
+\subsubsection{Bounding the Simple Regret}
 
 \begin{itemize}
 \item $N$ is number of variables.
@@ -416,182 +597,10 @@ r_q(T)
 as required.
 \end{proof}
 
-\section*{Results}
 
-Summarize results here and note differences to classic bandit results
 
-\subsection*{Known and Balanced q}
 
-We begin with the simplest case were we assume that $q_i=\frac{1}{2} \forall i$. During the exploration phase we sample actions uniformly at random. In this case, this is equivalent to purely observing, that is taking no action and allowing all input variables to take their value randomly as  $X_{t,i} \sim \Ber(\frac{1}{2})$. 
 
-
-
-We will have $n_i \sim Binomial(h,\frac{1}{2})$ observations for each arm $i$ at the end of the exploration stage. Note that this is independent of the number of arms $K$.
-
-
-
-Assume we have $K$ bernoulli arms with means ordered from highest to lowest $\mu_1 ... \mu_K$. Let $\Delta = [\Delta_1...\Delta_K]$ be the differences from the optimal reward $\mu_1$. 
-
-
-
- 
-
-\subsubsection*{Regret during explore phase}
-Since the probability we play each arm is constant and uniform during the exploration phase, the expected regret is simply proportional to the average sub-optimality $\Delta$.
-\eqn{
-R_1 = h\sum_i P(i)\Delta_i = \frac{h}{K}\sum_i \Delta_i = h E[\Delta]
-}
-
-\subsubsection*{Regret during exploit phase}
-The regret during this phase is proportional to the expected sub-optimality of the arm with the highest empirical mean at the end of the explore phase.
-
-\eqn{
-\hat{i^*} = argmax_i [\hat{\mu}_i]
-}
-\eqn{
-R_2 = (T-h)E[\Delta_{\hat{i^*}}] = (T-h)\sum_i P(\hat{\mu}_i \geq \hat{\mu}_j \forall j)\Delta_i 
-}
-
-The difficulty with this approach is that it is hard to get bounds that are tight for all $\Delta$. Instead, we will bound the probability that we select an arm with a sub-optimality gap greater than some $D$.
-\eqn{
-R_2 \leq (T-h)\left(P(\Delta_{\hat{i^*}} \leq D) D+P(\Delta_{\hat{i^*}} > D)  \Delta_{max} \right)
-}
-The goal now is to get a bound for $P(\Delta_{\hat{i^*}} > D)$ in terms of Hoeffdings type bounds for each arm. 
-
-Suppose $i = \hat{i^*} \implies \hat{\mu}_i > \hat{\mu}_1$. If we haven't over-estimated $\mu_i$ too much, $\hat{\mu}_i - \mu_{i} < \frac{D}{2}$, and haven't under-estimated $\mu_1$ too much, $\mu_1 - \hat{\mu_1} < \frac{D}{2}$, then $\Delta_{\hat{i^*}} = \mu_1 - \mu_i < D$
-
-\eqn{
-\label{eqn:probDeltaToLarge}
-P(\Delta_{\hat{i^*}} > D) \leq  P(\mu_1 - \hat{\mu_1} > \frac{D}{2})+ \sum_{i=2}^K P(\hat{\mu}_i - \mu_{i} > \frac{D}{2})
-}
-
-If we used the empirical mean as an estimator for $\mu_i$, the bound will depend on the number of times we actually observed each arm, which will be a random variable drawn from a multinomial distribution. Instead we will use an importance weighted estimator.
-
-\eqn{
-\label{eqn:importance_weighted_estimator}
-\hat{\mu}_i = \frac{1}{h}\sum_{t=1}^h \frac{Y_t\ind{\text{arm $i$ active}}}{q_i}
-}
-
-where $q_i = P(\text{arm $i$ active})$
-
-Hoeffdings gives $ P(\hat{\mu}_i - \mu_{i} > \epsilon) \leq e^{-2h\epsilon^2q_i^2}$. In this case we have assumed $q_i = \frac{1}{2} \forall i$. Putting this into equation \ref{eqn:probDeltaToLarge}:
-
-\eqn{
-\label{eqn:balancedHoeffdings}
-P(\Delta_{\hat{i^*}} > D) \leq Ke^{-hD^2/8}
-}
-
-
-\eqn{
-R_2 \leq (T-h)[(1-K e^{-hD^2/8})D + K e^{-hD^2/8}] < (T-h)[D + K e^{-hD^2/8}]
-}
-
-Let $D = \sqrt{\frac{8}{h}\log(hK)}$ 
-
-\eqn{
-R_2 \leq (T-h)\left(\sqrt{\frac{8}{h}\log(hK)} + \frac{1}{h}\right)
-}
-
-
-\subsection*{Total Regret}
-
-Putting together the regret from the exploration and exploitation phases,
-
-\eqn{
-R_T & \leq \frac{h}{K}\sum_i \Delta_i + (T-h)\left(\sqrt{\frac{8}{h}\log(hK)} + \frac{1}{h}\right)\\
-& \leq h + T\left(\sqrt{\frac{8}{h}\log(TK)} + \frac{1}{h}\right)
-}
-
-Now if we let $h = T^{2/3}(\log(KT))^{1/3}$,
-
-
-\eqn {
-R_T \leq 4T^{\frac{2}{3}}(log(KT))^{\frac{1}{3}} + T^{\frac{1}{3}}(log(KT))^{-\frac{1}{3}}
-}
-
-If $T \geq 2$ and $K \geq 2$, the first term dominates and,
-
-\eqn {
-R_T  \leq 5T^{\frac{2}{3}}(log(KT))^{\frac{1}{3}}
-}
-
-The distribution independent lower bound for optimised UCB is $O(\sqrt{TK})$ (see Bubeck sect 2.4.3) so we would expect our algorithm to do better if $K >> T^{\frac{1}{3}}$
-
-
-
-\subsection*{Empirical results}
-\begin{figure}[H]
-\centering
-\caption{Comparison of the UCB and causal-explore-exploit for K=20 and T=10000. Note, $K \sim T^{1/3}$ Plot shows average and standard deviation over 10000 trials.}
-\includegraphics[width=.5\textwidth]{explore_exploit}
-\end{figure}
-
-\section{Generalizing to unbalanced $\boldsymbol{q}$}
-
-When some arms have low natural probability we cannot rely on exploring them adequately by pure observation. We need to explicitly play them during the exploration phase. 
-
-We now have an additional trade off to make, which is how much should be observe (learning something about at least half the arms each timestep) versus playing the low probability arms. 
-
-Without loss of generality, we can assume $q_i \in [0,\frac{1}{2}]$ and $q_1 \leq q_2 ... \leq q_N$. Let $m \in [2,N] = \{m:q_m > \frac{1}{m}\}$ Ie if the problem is completely balanced $q_1...q_N = \frac{1}{2}$ then $m = 2$. If the problem is completely unbalanced, $q_1...q_N = 0$ then $m=N$
-
-Suppose we observe for the first $h/2$ timesteps. This is at worst half the optimal. 
-
-We then have estimates 
-
-\eqn {
-\hat{\mu}_{ij} = \frac{\sum_{t=1}^{h/2}\ind{Y=1,X_i=1}}{\frac{h}{2}q_{ij}}
-}
-
-We take this as our estimate for those arms for which $q_{ij} > \frac{1}{m}$
-
-For these arms the Hoeffdings gives 
-
-\eqn{
-P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}) \leq e^{-hD^2/2m^2}
-}
-
-We play each of the remaining $m$ arms $\frac{h}{2m}$ times so for them we get
-
-\eqn{
-P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}) \leq e^{-hD^2/4m}
-}
-
-So for all the arms 
-
-\eqn{
-P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}) \leq e^{-hD^2/4m^2}
-}
-
-and 
-
-
-
-\eqn{
-\label{eqn:unbalancedHoeffdings}
-P(\Delta_{\hat{i^*}} > D) \leq Ke^{-hD^2/4m^2}
-}
-
-If we let $D = \sqrt{\frac{4m^2\log(hK)}{h}}$
-
-\eqn{
-R_T  \leq h + T\left(\sqrt{\frac{4m^2\log(hK)}{h}} + \frac{1}{h}\right)
-}
-
-Let $h = T^{2/3}m^{2/3}\log(hk)$
-
-
-\eqn {
-R_T  \leq 4T^{\frac{2}{3}}m^{2/3}(log(KT))^{\frac{1}{3}}
-}
-
-Note, I think the $m^{2/3}$ should be improvable to something close to $m^{1/3}$ is I use Berstein's instead of Hoeffdings to bound the estimator for the arms where $q > 1/m$ but I haven't got the equations to quite work out for that yet. 
-
-It should also be possible to generalize to handle the case were the $q$'s are unknown, since we should be able to get a reasonable estimate for them while we are observing. They key will be how the resulting uncertainty in $m$ effects the bounds. 
-
-To get results that degrade to similar order bounds as UCB when the arms are very unbalanced, I will need to drop the explore/exploit strategy. 
-
-
-\subsection{Generalizing to unknown q}
 We now consider the case where $\boldsymbol{q}$ is not known in advance. Assume as before that we observe for $h/2$ timesteps. From the observations gained in this phase we estimate $\boldsymbol{q}$.
 
 \eqn{
