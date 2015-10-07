@@ -407,15 +407,16 @@ Let $h = T^{2/3}m^{1/3}\log(TK)^{1/3}$
 R_T & \leq 6T^{2/3}m^{1/3}log(KT)^{1/3} + T^{1/3}m^{-1/3}log(KT)^{-1/3}\\ 
 & \leq 7T^{2/3}m^{1/3}log(KT)^{1/3}
 }
+ 
+Again comparing to the UCB bound of $\sqrt{KT}$, we expect the causal algorithm to do better if $K > m^{2/3}T^{1/3}$, or alternatively if $m \leq \frac{K^{3/2}}{\sqrt{T}}$
 
-
-
-It should also be possible to generalize to handle the case were the $q$'s are unknown, since we should be able to get a reasonable estimate for them while we are observing. They key will be how the resulting uncertainty in $m$ effects the bounds. 
 
 To get results that degrade to similar order bounds as UCB when the arms are very unbalanced, I will need to drop the explore/exploit strategy. 
 
 
 \subsection{Generalizing to unknown q}
+We now consider the case where $\boldsymbol{q}$, and thus $m$ is not known in advance. We begin by considering the simple regret 
+
 
 \subsubsection{Bounding the Simple Regret}
 
@@ -423,32 +424,30 @@ To get results that degrade to similar order bounds as UCB when the arms are ver
 \item $N$ is number of variables.
 \item $q_i$ is probability that $X_{i,t} = 1$ for any $t$
 \item $s_i = \min\set{q_i, 1 - q_i}$
-\item $h = T/2$
 \item $\mu : \set{1,\ldots,N} \times \set{0,1} \to [0,1]$.
 \item $I_t \in \set{1,\ldots,N} \times \set{0,1}$ is the intervention
 \end{itemize}
 
-Let $R_T$ be the simple regret after $T$ time steps, which is
+Let $R_s(h)$ be the simple regret after $h$ time steps, which is
 \eq{
-R_q(T) = \E\left[\mu^* - \mu_{I_T}\right]\,,
+R_s(h) = \E\left[\mu^* - \mu_{I_h}\right]\,,
 }
-where $\mu^*$ is the mean payoff of the optimal intervention and $I_T$ is the intervention chosen in the $T$th round.
+where $\mu^*$ is the mean payoff of the optimal intervention and $I_h$ is the intervention chosen in the $h$th round.
 We propose a two part algorithm that is provably order optimal when its performance is measured in terms of the simple regret.
 
 
 \begin{algorithm}[H]
 \caption{Simple Regret Algorithm}\label{alg:simple}
 \begin{algorithmic}[1]
-\State {\bf Input:} $T, N$
-\State $h = T/2$
-\For{$t \in 1,\ldots,h$}
+\State {\bf Input:} $h, N$
+\For{$t \in 1,\ldots,h/2$}
 \State Do nothing and observe $X_{i,t}$ for $i \in \set{1,\ldots,N}$ and $r_t$
 \EndFor
 \State Compute for all $i \in \set{1,\ldots,N}$ and $j \in \set{0,1}$:
 \eq{
-\hat \mu_{i,j} = \frac{\sum_{t=1}^h \ind{X_{i,t} = j} r_t}{\sum_{t=1}^h \ind{X_{i,t} = j}}\,.
+\hat \mu_{i,j} = \frac{\sum_{t=1}^{h/2} \ind{X_{i,t} = j} r_t}{\sum_{t=1}^{h/2} \ind{X_{i,t} = j}}\,.
 }
-\State Compute $\hat q_i = \frac{1}{h} \sum_{t=1}^h X_{i,t}$
+\State Compute $\hat q_i = \frac{2}{h} \sum_{t=1}^{h/2} X_{i,t}$
 \State Compute $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$
 \State Compute $\hat{s'} = sorted(\hat{s}) : \hat{s'}_1 \leq \hat{s'_2} \leq ... \leq \hat{s'}_N$
 \State Compute $\hat m = \min\set{2 \leq i \leq N : \hat s'_{i} \geq 1/i}$
@@ -456,11 +455,11 @@ We propose a two part algorithm that is provably order optimal when its performa
 \State Compute $A$ as the subset of infrequently observed arms $\{(i,j):i'(i) \leq \hat m, j = \ind{\hat q_{i} \leq \frac{1}{2}} \}$ with $|A| = \hat m$
 
 \For{$(i,j) \in A$}
-\For{$t \in 1,\ldots,h/\hat m$}
+\For{$t \in 1,\ldots,h/2\hat m$}
 \State Choose action $X_{i,t} = j$
 \State Observe reward $r_t(X_{i,t}=j)$
 \EndFor
-\State Recompute $\hat \mu_{i,j} = \frac{\hat m}{h} \sum_{t=1}^{\hat m/h} r_t(X_{i,t}=j)$ 
+\State Recompute $\hat \mu_{i,j} = \frac{2\hat m}{h} \sum_{t=1}^{ h/2\hat m} r_t(X_{i,t}=j)$ 
 \EndFor
 \end{algorithmic}
 \end{algorithm}
@@ -469,21 +468,21 @@ We propose a two part algorithm that is provably order optimal when its performa
 Define $m = \min\set{2 \leq i \leq N : q_i \geq 1/i}$.
 Then the algorithm given in \cref{alg:simple} satisfies
 \eq{
-r_q(T) \in O\left(\sqrt{\frac{m}{T} \log \left(\frac{NT}{m}\right)}\right)\,.
+R_s(h) \in O\left(\sqrt{\frac{m}{h} \log \left(\frac{NT}{m}\right)}\right)\,.
 }
 \end{theorem}
 
 \begin{lemma}\label{lem:conc1}
-$\displaystyle \P{\left|\hat q_i - q_i\right| \geq \sqrt{\frac{3q_i}{h} \log \frac{2}{\delta}}} \leq \delta$.
+$\displaystyle \P{\left|\hat q_i - q_i\right| \geq \sqrt{\frac{6q_i}{h} \log \frac{2}{\delta}}} \leq \delta$.
 \end{lemma}
 
 \begin{proof}
 Let $Z_t = \ind{X_{i,t} = 1} \in \set{0,1}$.
 Then
 \eq{
-\hat q_i = \frac{1}{h} \sum_{t=1}^{h} Z_t\,.
+\hat q_i = \frac{2}{h} \sum_{t=1}^{h/2} Z_t\,.
 }
-Now $Z_1,\ldots,Z_h$ is an i.i.d.\ sequence of Bernoulli random variables with with mean $q_i$. The result follows from the Chernoff bound.
+Now $Z_1,\ldots,Z_{h/2}$ is an i.i.d.\ sequence of Bernoulli random variables with with mean $q_i$. The result follows from the Chernoff bound.
 \end{proof}
 
 \begin{lemma}\label{lem:conc2}
@@ -491,7 +490,7 @@ Let $\delta >0$ and $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$ and
 define $\hat m = \min\set{2 \leq i \leq N : \hat s_{(i)} \geq 1/i}$.
 If
 \eq{
-h \geq 12m \log\frac{4N}{\delta}\,,
+h \geq 24m \log\frac{4N}{\delta}\,,
 }
 then
 \eq{
@@ -510,12 +509,12 @@ q_i = \begin{cases}
 Now by \cref{lem:conc1} we have with probability at least $1 - \delta$ that 
 \eq{
 (\forall i) \qquad \left| \hat q_i - q_i\right| 
-&\leq \sqrt{\frac{3q_i}{h} \log \frac{2N}{\delta}} \\
-&= \sqrt{\frac{3}{mh} \log\frac{2N}{\delta}}\,. 
+&\leq \sqrt{\frac{6q_i}{h} \log \frac{2N}{\delta}} \\
+&= \sqrt{\frac{6}{mh} \log\frac{2N}{\delta}}\,. 
 }
 By assumption 
 \eq{
-h \geq 12m \log \frac{4N}{\delta}\,.
+h \geq 24m \log \frac{4N}{\delta}\,.
 }
 Therefore with probability at least $1 - \delta$ we have
 \eq{
@@ -531,25 +530,25 @@ Therefore $\hat m \leq 2m$ with probability at least $1 - \delta$.
 \begin{proof}[Proof of \cref{thm:simple-regret}]
 
 
-for $(i,j)\in A$, the algorithm explicitly selects the action, $X_i = j$,  $\frac{h}{\hat m}$ times.
+for $(i,j)\in A$, the algorithm explicitly selects the action, $X_i = j$,  $\frac{h}{2\hat m}$ times.
 \eq {
-\hat \mu_{i,j} = \frac{\hat m}{h} \sum_{t=1}^{\hat m/h} r_t(X_i = j)
+\hat \mu_{i,j} = \frac{2\hat m}{h} \sum_{t=1}^{h/2\hat m} r_t(X_i = j)
 }
 
 Via Hoeffding's Inequality
 
 \eq {
-\P{ \left|\hat \mu_{i,j} - \mu_{i,j}\right| > \epsilon } \leq 2\exp{-\frac{2h\epsilon^2}{\hat{m}}}
+\P{ \left|\hat \mu_{i,j} - \mu_{i,j}\right| > \epsilon } \leq 2\exp{-\frac{h\epsilon^2}{\hat{m}}}
 }
 
-for $(i,j)\notin A$, the algorithm has observed the reward given $X_i = j$ at least $\frac{h}{\hat m}$ times.
+for $(i,j)\notin A$, the algorithm has observed the reward given $X_i = j$ at least $\frac{h}{2\hat m}$ times.
 
 \eq {
 (i,j)\notin A & \implies \hat{s}_i \geq \frac{1}{\hat m} \\
 & \implies \sum_{t=1}^h \ind{X_i = j} \geq \frac{h}{\hat{m}}
 }
 
-Let  $Z_{ij} = \sum_{t=1}^h \ind{X_i = j}$ and $t'_1 ... t'_{Z_{ij}} = {t:X_{i,t} = j}$
+Let  $Z_{ij} = \sum_{t=1}^{h/2} \ind{X_i = j}$ and $t'_1 ... t'_{Z_{ij}} = {t:X_{i,t} = j}$
 
 \eq {
 \hat \mu_{i,j} = \frac{1}{Z_{ij}}\sum_{t'=1}^{Z_{ij}}r_{t'}
@@ -559,48 +558,79 @@ Let  $Z_{ij} = \sum_{t=1}^h \ind{X_i = j}$ and $t'_1 ... t'_{Z_{ij}} = {t:X_{i,t
 \eq {
 \P{\left| \hat \mu_{i,j} - \mu_{ij} \right| > \epsilon} = & \sum_{z=1}^\infty \P{Z_{ij}=z}\P{\left| \frac{1}{Z_{ij}} \sum_{t'=1}^{Z_{ij}}r_{t'} - \mu_{ij} \right| > \epsilon | Z_{ij} = z} \\
 = & \sum_{z=1}^\infty \P{Z_{ij}=z}\P{\left| \frac{1}{z} \sum_{t'=1}^{z}r_{t'} - \mu_{ij} \right| > \epsilon } \\
-\leq & \P{\left| \frac{\hat m}{h} \sum_{t'=1}^{h/\hat m}r_{t'} - \mu_{ij} \right| > \epsilon } \sum_{z=1}^\infty \P{Z_{ij}=z} \\
-\leq & 2\exp{-\frac{2h\epsilon^2}{\hat{m}}}\\
+\leq & \P{\left| \frac{2\hat m}{h} \sum_{t'=1}^{h/2\hat m}r_{t'} - \mu_{ij} \right| > \epsilon } \sum_{z=1}^\infty \P{Z_{ij}=z} \\
+\leq & 2\exp{-\frac{h\epsilon^2}{\hat{m}}}\\
 }
 
 Applying the union bound over all $2N$ actions.
 \eq{
-& \P{\exists (i,j): \left| \hat \mu_{i,j} - \mu_{i,j} \right| > \epsilon} \leq 4N\exp{-\frac{2h\epsilon^2}{\hat{m}}} \\
-\implies & \P{\exists (i,j): \left| \hat \mu_{i,j} - \mu_{i,j} \right| > \sqrt{\frac{\hat m}{2h}\log{\frac{4N}{\delta}}}} \leq \delta \\
+& \P{\exists (i,j): \left| \hat \mu_{i,j} - \mu_{i,j} \right| > \epsilon} \leq 4N\exp{-\frac{h\epsilon^2}{\hat{m}}} \\
+\implies & \P{\exists (i,j): \left| \hat \mu_{i,j} - \mu_{i,j} \right| > \sqrt{\frac{\hat m}{h}\log{\frac{4N}{\delta}}}} \leq \delta \\
 }
 
 Now by \cref{lem:conc2}, 
 \eq{
-h \geq 12m \log \frac{4N}{\delta} \implies \P{\hat m > 2m} \leq \delta
+h \geq 24m \log \frac{4N}{\delta} \implies \P{\hat m > 2m} \leq \delta
 } 
 
-Therefore if $h \geq 12m \log \frac{4N}{\delta}$, we have shown with probability at least $1 - 2\delta$ that
+Therefore if $h \geq 24m \log \frac{4N}{\delta}$, we have with probability at least $1 - 2\delta$ that
 
-\eq{
-(\forall i, j) \qquad \left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{m}{h} \log\frac{4N}{\delta}}\,.
+\eqn{
+\label{eqn:joint_bound_estimates_m}
+(\forall i, j) \qquad \left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{2m}{h} \log\frac{4N}{\delta}}\, \text { and } \hat{m} \leq 2m
 }
-Suppose $h < 12m \log \frac{4N}{\delta}$. Then
+Suppose $h < 24m \log \frac{4N}{\delta}$. Then
 \eq{
-\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq 1 \leq \sqrt{\frac{12m}{h} \log \frac{4N}{\delta}}\,.
+\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq 1 \leq \sqrt{\frac{2m}{h} \log \frac{4N}{\delta}}\,.
 }
 Therefore
 \eq{
-\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{12m}{h} \log \frac{4N}{\delta}} \qquad \forall h\ \text{ with probability at least } 1-2\delta
+\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{24m}{h} \log \frac{4N}{\delta}} \qquad \forall h\ \text{ with probability at least } 1-2\delta
 }
 Therefore 
 \eq{
-r_q(T) 
-&\leq 2\delta + \sqrt{\frac{12m}{h} \log \frac{4N}{\delta}} \\
-&= 2\delta + \sqrt{\frac{24m}{T} \log \frac{4N}{\delta}} \\
-&\leq \frac{8m}{T} + \sqrt{\frac{24m}{T} \log \left(\frac{NT}{m}\right)}
+R_s(h) 
+&\leq 2\delta + \sqrt{\frac{24m}{h} \log \frac{4N}{\delta}} \\
+&\leq \frac{8m}{h} + \sqrt{\frac{24m}{h} \log \left(\frac{Nh}{m}\right)}
 }
 as required.
 \end{proof}
 
+\subsubsection{Bounding the Bandit Regret}
+
+\begin{itemize}
+\item Use $24Nlog(4N/\delta)$ samples to estimate $m$
+\item If $\hat m > \frac{N^{3/2}}{\sqrt{T}}$ then stop and do UCB with remaining rounds.
+\item Else use causal explore-exploit and let the exploration time $h = T^{2/3}\hat{m}^{1/3}log(TK)^{1/3}$ 
+\end{itemize}
+
+Since we don't know $\boldsymbol{q}$, and thus $m$, we can't set the exploration time $h$ in advance based on $m$ as we did for the known $\boldsymbol{q}$ case. Instead we first use $24Nlog(4N/\delta)$ samples to estimate $m$. If $\hat m < \frac{N^{3/2}}{\sqrt{T}}$ we will continue with the causal algorithm and let the total exploration time $h = T^{2/3}\hat{m}^{1/3}log(TK)^{1/3}$. 
+
+Since $m \leq N$, by \cref{eqn:joint_bound_estimates_m}, we have that with probability at least $1-2\delta$, 
+
+\eqn{
+\label{eqn:bounds_hold}
+(\forall i, j) \qquad \left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{\hat m}{h} \log\frac{4N}{\delta}}\, \text { and } \hat{m} \leq 2m
+}
+
+
+So the regret in this case is bounded by,
+
+\eq {
+R(T) & =  2\delta E\left[R(T)|\text{ not } \cref{eqn:bounds_hold}\right] + (1-2\delta)E[R(T)| \cref{eqn:bounds_hold}]  \\
+& \leq 2\delta T + \left(h + T\sqrt{\frac{\hat m}{h} \log\frac{4N}{\delta}} \right)\\
+ &  \leq \frac{4 \hat m^{1/3}T}{h}  + h + T \left( \sqrt{\frac{\hat m}{h} \log \left(\frac{2Nh}{\hat m^{1/3}}\right)}\right), \text { letting } \delta = \frac{2 \hat m^{1/3}}{h} \\
+&  \leq 4\left(\frac{T}{log(TK)}\right)^{1/3} + h + T \left( \sqrt{\frac{\hat m}{h} \log \left(TK\right)}\right) \\
+&  \leq 4\left(\frac{T}{log(TK)}\right)^{1/3} + 2T^{2/3}(2m)^{1/3}log(TK)^{1/3}  \\
+&  \leq 8T^{2/3}m^{1/3}log(TK)^{1/3}  \\
+}
+
+Now make sure I have all the cases right - then have a go with an implementation.
 
 
 
 
+\subsubsection{ Older Attempts}
 We now consider the case where $\boldsymbol{q}$ is not known in advance. Assume as before that we observe for $h/2$ timesteps. From the observations gained in this phase we estimate $\boldsymbol{q}$.
 
 \eqn{
