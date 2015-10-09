@@ -526,6 +526,48 @@ which implies that $\hat s_i \geq 1/(2m)$ for all $i$ where $q_i = 1/m$.
 Therefore $\hat m \leq 2m$ with probability at least $1 - \delta$. 
 \end{proof}
 
+\begin{lemma}\label{lem:m_est_small_enough}
+Let $\delta >0$ and $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$ and
+define $\hat m = \min\set{2 \leq i \leq N : \hat s_{(i)} \geq 1/i}$.
+If
+\eq{
+h \geq 24m \log\frac{4N}{\delta}\,,
+}
+then
+\eq{
+\P{\hat m < \frac{2}{3}m} \leq \delta\,.
+}
+\end{lemma}
+
+\begin{proof}
+
+To over-estimate $m$, we must identify as balanced some unbalanced arms (ie those with $i < m$. For all arms with $i < m$, by definition, $q_i < \frac{1}{m}$
+
+
+Now by \cref{lem:conc1} we have with probability at least $1 - \delta$ that: \color{red}(this step not quite right - because I haven't said $q_i = 1/m$ as the worst case is that $q_i$ is infintesimally smaller than $1/m$. With smaller $q_i$ the bounds would be slightly tighter but not made up for by the decrease in the mean - ie we are more likely to over-estimate if $q_i = 1/m$ than if $q_i < 1/m$. Need a better way to say this ... ). Should probably just combine this with the other side into one lemma (even though we don't need this side for simple regret. \color{black}
+
+
+\eq{
+(\forall i) \qquad \left| \hat q_i - q_i\right| 
+&\leq \sqrt{\frac{6q_i}{h} \log \frac{2N}{\delta}} \\
+&= \sqrt{\frac{6}{mh} \log\frac{2N}{\delta}}\,. 
+}
+
+
+
+By assumption 
+\eq{
+h \geq 24m \log \frac{4N}{\delta}\,.
+}
+Therefore with probability at least $1 - \delta$ we have
+\eq{
+(\forall i < m) \qquad & \left|\hat q_i - q_i\right| \leq \frac{1}{2m}\,.\\
+ & \hat{q}_i < \frac{3}{2}m \\
+ \implies & \hat{m} > \frac{2}{3}m
+}
+ 
+\end{proof}
+
 
 \begin{proof}[Proof of \cref{thm:simple-regret}]
 
@@ -600,11 +642,75 @@ as required.
 
 \begin{itemize}
 \item Use $24Nlog(4N/\delta)$ samples to estimate $m$
-\item If $\hat m > \frac{N^{3/2}}{\sqrt{T}}$ then stop and do UCB with remaining rounds.
+\item If $\hat m > \lambda = \frac{N^{3/2}}{\sqrt{T}}$ then stop and do UCB with remaining rounds.
 \item Else use causal explore-exploit and let the exploration time $h = T^{2/3}\hat{m}^{1/3}log(TK)^{1/3}$ 
 \end{itemize}
 
-Since we don't know $\boldsymbol{q}$, and thus $m$, we can't set the exploration time $h$ in advance based on $m$ as we did for the known $\boldsymbol{q}$ case. Instead we first use $24Nlog(4N/\delta)$ samples to estimate $m$. If $\hat m < \frac{N^{3/2}}{\sqrt{T}}$ we will continue with the causal algorithm and let the total exploration time $h = T^{2/3}\hat{m}^{1/3}log(TK)^{1/3}$. 
+There will be 3 cases.
+\begin{enumerate}
+\item $m < \lambda/2 \implies \hat{m} < \lambda$ with prob $1-\delta$
+\eq {
+R_T \sim O(T^{2/3}m^{1/3}) + O(\sqrt{NT})\delta \implies \text { want } \delta \leq \frac{T^{1/6}}{\sqrt{N}}
+}
+\item $m > 3\lambda/2 \implies \hat{m} > \lambda$ with prob $1-\delta$
+\eq {
+R_T \sim O(T^{2/3}N^{1/3})\delta + O(\sqrt{NT}) \implies \text { want } \delta \leq \frac{N^{1/6}}{T^{1/6}}
+}
+\item $\lambda/2 < m < 3\lambda/2$, algorithm could end up doing UCB or Explore-Exploit.
+\eq{
+R_T \sim  & O(T^{2/3}m^{1/3}) + O(\sqrt{NT}) \\
+= &  O(\sqrt{NT}) \text { as } m = O(\frac{N^{3/2}}{\sqrt{T}})
+}
+\end{enumerate}
+
+So if $\delta = \frac{1}{T^{1/6}\sqrt{N}}$ (or $\delta = \frac{1}{T^{1/3}}$) that would be enough concentration around $m$ to choose the correct algorithm ... Is it enough to choose a reasonable total exploration time $h$? It seems that $\delta = \frac{1}{T^{1/3}}$ works.
+
+\begin{algorithm}[H]
+\caption{Bandit Regret Algorithm}\label{alg:bandit}
+\begin{algorithmic}[1]
+\State {\bf Input:} $T, N$
+\State $T_1 = 24Nlog\left(4N/\delta\right)$ TODO figure out what $\delta$ should be 
+\For{$t \in 1,T_1$}
+\State Do nothing and observe $X_{i,t}$ for $i \in \set{1,\ldots,N}$ and $r_t$
+\EndFor
+\State Compute $\hat q_i = \frac{2}{h} \sum_{t=1}^{h/2} X_{i,t}$
+\State Compute $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$
+\State Compute $\hat{s'} = sorted(\hat{s}) : \hat{s'}_1 \leq \hat{s'_2} \leq ... \leq \hat{s'}_N$
+\State Compute $\hat m = \min\set{2 \leq i \leq N : \hat s'_{i} \geq 1/i}$
+\If {$\hat{m} > \frac{N^{3/2}}{\sqrt{T}}$}
+\State Switch to the standard UCB algorithm with $K = 2N$ arms.
+\Else
+\State $h = T^{2/3}\hat{m}^{1/3}log(TK)^{1/3}$ 
+\For{$t \in T_1,h/2$}
+\State Do nothing and observe $X_{i,t}$ for $i \in \set{1,\ldots,N}$ and $r_t$
+\EndFor
+\State Compute for all $i \in \set{1,\ldots,N}$ and $j \in \set{0,1}$:
+\eq{
+\hat \mu_{i,j} = \frac{\sum_{t=1}^{h/2} \ind{X_{i,t} = j} r_t}{\sum_{t=1}^{h/2} \ind{X_{i,t} = j}}\,.
+}
+\State Recompute $\hat q_i = \frac{2}{h} \sum_{t=1}^{h/2} X_{i,t}$
+\State Recompute $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$
+\State Recompute $\hat{s'} = sorted(\hat{s}) : \hat{s'}_1 \leq \hat{s'_2} \leq ... \leq \hat{s'}_N$
+\State Recompute $\hat m = \min\set{2 \leq i \leq N : \hat s'_{i} \geq 1/i}$
+\State $i'(i) = $ the index of $\hat s_i$ in $\hat s'$
+\State Compute $A$ as the subset of infrequently observed arms $\{(i,j):i'(i) \leq \hat m, j = \ind{\hat q_{i} \leq \frac{1}{2}} \}$ with $|A| = \hat m$
+
+\For{$(i,j) \in A$}
+\For{$t \in 1,\ldots,h/2\hat m$}
+\State Choose action $X_{i,t} = j$
+\State Observe reward $r_t(X_{i,t}=j)$
+\EndFor
+\State Recompute $\hat \mu_{i,j} = \frac{2\hat m}{h} \sum_{t=1}^{ h/2\hat m} r_t(X_{i,t}=j)$ 
+\EndFor
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+
+
+Since we don't know $\boldsymbol{q}$, and thus $m$, we can't set the exploration time $h$ in advance based on $m$ as we did for the known $\boldsymbol{q}$ case. Instead we first use $24Nlog(4N/\delta)$ samples to estimate $m$. If $\hat m < \frac{N^{3/2}}{\sqrt{T}}$ we will continue with the causal algorithm and let the total exploration time $h = T^{2/3}\hat{m}^{1/3}log(2TK)^{1/3}$. 
+
+
+
 
 Since $m \leq N$, by \cref{eqn:joint_bound_estimates_m}, we have that with probability at least $1-2\delta$, 
 
@@ -619,16 +725,13 @@ So the regret in this case is bounded by,
 \eq {
 R(T) & =  2\delta E\left[R(T)|\text{ not } \cref{eqn:bounds_hold}\right] + (1-2\delta)E[R(T)| \cref{eqn:bounds_hold}]  \\
 & \leq 2\delta T + \left(h + T\sqrt{\frac{\hat m}{h} \log\frac{4N}{\delta}} \right)\\
- &  \leq \frac{4 \hat m^{1/3}T}{h}  + h + T \left( \sqrt{\frac{\hat m}{h} \log \left(\frac{2Nh}{\hat m^{1/3}}\right)}\right), \text { letting } \delta = \frac{2 \hat m^{1/3}}{h} \\
-&  \leq 4\left(\frac{T}{log(TK)}\right)^{1/3} + h + T \left( \sqrt{\frac{\hat m}{h} \log \left(TK\right)}\right) \\
-&  \leq 4\left(\frac{T}{log(TK)}\right)^{1/3} + 2T^{2/3}(2m)^{1/3}log(TK)^{1/3}  \\
-&  \leq 8T^{2/3}m^{1/3}log(TK)^{1/3}  \\
+ &  \leq 2T^{2/3}  + h + T \left( \sqrt{\frac{\hat m}{h} \log \left(4NT^{1/3}\right)}\right), \text { letting } \delta = \frac{1}{T^{1/3}} \\
+&  \leq 2T^{2/3} + h + T \left( \sqrt{\frac{\hat m}{h} \log \left(2TK\right)}\right) \\
+&  \leq 2T^{2/3}  + 2T^{2/3}(2m)^{1/3}log(2TK)^{1/3}  \\
+&  \leq 6T^{2/3}m^{1/3}log(TK)^{1/3}  \\
 }
 
-Now make sure I have all the cases right - then have a go with an implementation.
-
-
-
+Now lets try an implementation ...
 
 \subsubsection{ Older Attempts}
 We now consider the case where $\boldsymbol{q}$ is not known in advance. Assume as before that we observe for $h/2$ timesteps. From the observations gained in this phase we estimate $\boldsymbol{q}$.
