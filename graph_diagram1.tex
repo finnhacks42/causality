@@ -44,6 +44,14 @@
            text centered,
            fill=black!10!white
            },
+            empty/.style={
+           circle,
+           rounded corners,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           },
     % Define arrow style
     pil/.style={
            o->,
@@ -63,11 +71,32 @@
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=3em,thick,main node/.style={observed}, lt/.style={latent}]
 \node[main node](1){A};
-\node[main node,fill=black!20!white, below right=of 1](2){R};
+\node[main node,fill=black!20!white, below right=of 1](2){Y};
 \node[main node, above right=of 2](3){B};
 \path[]
 	(1) edge (2)
 	(3) edge (2);
+\end{tikzpicture}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\caption{Assumed Causal Structure}
+\label{fig:causalStructure}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed}, hidden/.style={empty}]
+
+ %nodes
+\node[main node](1){$X_{1}$};
+\node[main node, right=of 1](2){$X_{2}$};
+\node[hidden, right=of 2](3){$...$};
+\node[main node, right=of 3](4){$X_{N}$};
+\node[main node,fill=black!20!white, below right=of 2](5){Y};
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge (5)
+    	(2) edge (5)
+    (4) edge (5);
+	
 \end{tikzpicture}
 \end{figure}
 

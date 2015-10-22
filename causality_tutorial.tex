@@ -1025,7 +1025,26 @@ With latent variables we are not using all the information - so we could go furt
 
 These are all constraint based methods ... efficient because they stop early, but also may not be robust to errors early on. 
 
+A comparison of algorithms 
 
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{| c | c | p{4cm} | c | c | c |}
+\hline
+  \textbf {Alg.} &\textbf{ Method }& \textbf{Scales (num.vars) }& $\sim $ \textbf {Vars} & \textbf {Latent } & \textbf {Reference} \\
+  \hline
+  IC/SGS & Constraint based & Exponential & 10 & No & Pearl(2000)/Sprites(2000)\\
+  \hline
+  PC & Constraint based & Worst case exponential, polynomial for sparse graphs & 5000 & No & Sprites(2000) \\ 
+  \hline
+  FCI & Constraint based & Worst case exponential, polynomial variant FCI+ for sparse graphs & 30 & Yes & Sprites(2000) \\
+  \hline
+  RFCI & Constraint based & ? & 500 & Yes & Colombo(2012) \\
+  \hline
+  GES & Search \& Score  & Worst case exponential & 50 & No & Chickering(2002) \\
+  \hline
+  MMHC & Hybrid & ? & 5000 & No & Tsamardinos(2006) \\
+ \hline
+\end{tabular}
 
 \subsubsection{Doing conditional independence tests}
 The off-diagonal elements of the standardized inverse of the correlation

@@ -1,0 +1,163 @@
+\documentclass{article}
+
+\usepackage{todonotes}
+
+%\usepackage[disable]{todonotes}
+\newcommand{\todot}[2][]{\todo[color=red!20!white,#1]{#2}}
+\newcommand{\todof}[2][]{\todo[color=orange!20!white,#1]{#2}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[boxed]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{mathtools}
+\usepackage{accents}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{dsfont}
+\usepackage[bf]{caption}
+\usepackage{hyperref}
+\hypersetup{
+    bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in AcrobatÕs bookmarks
+    pdftoolbar=true,        % show AcrobatÕs toolbar?
+    pdfmenubar=true,        % show AcrobatÕs menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={My title},    % title
+    pdfauthor={Author},     % author
+    pdfsubject={Subject},   % subject of the document
+    pdfcreator={Creator},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfkeywords={keyword1} {key2} {key3}, % list of keywords
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=red,          % color of internal links (change box color with linkbordercolor)
+    citecolor=blue,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+\usepackage{comment}
+\usepackage{amsthm}
+\usepackage{natbib}
+\usepackage[capitalize]{cleveref}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{tikz} 
+\usetikzlibrary{arrows,positioning} 
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MACROS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\defined}{\vcentcolon =}
+\newcommand{\rdefined}{=\vcentcolon}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\calF}{\mathcal F}
+\newcommand{\sr}[1]{\stackrel{#1}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\ind}[1]{\mathds{1}\!\!\set{#1}}
+\newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
+\newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
+\newcommand{\floor}[1]{\left \lfloor {#1} \right\rfloor}
+\newcommand{\ceil}[1]{\left \lceil {#1} \right\rceil}
+\newcommand{\eqn}[1]{\begin{align}#1\end{align}}
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+\newcommand{\Ber}{\operatorname{Bernoulli}}
+\renewcommand{\P}[1]{\operatorname{P}\left\{#1\right\}}
+\pagestyle{empty}
+
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=2.5em,
+           minimum height=2.5em,
+           font=\footnotesize,
+           text centered,
+           fill=blue!20!white},
+     latent/.style={
+           circle,
+           rounded corners,
+           draw=black, thick, dashed,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           fill=black!10!white
+           },
+     empty/.style={
+           circle,
+           rounded corners,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 }  
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+
+
+\begin{document}
+\def\ci{\perp\!\!\!\perp}
+
+
+
+
+
+
+
+\begin{itemize}
+\item Need to trade of observing vs explicitly playing low probability arms.
+\item Spend half our exploration time $h$ doing each.
+\item Assume $q_i \in [0,\frac{1}{2}]$ and order variables such that $q_1 \leq q_2 \leq ... \leq q_N$ 
+\item Let $m \in [2,N] = {\min i: q_i \geq \frac{1}{i}}$
+\item Divide the arms into low probability $\{(i,1) : q_i < m\}$ and frequent $\{(i,0) \forall i  \cup (i,1) : q_i > m\}$ 
+\item Divide the $h/2$ explicit play budget between the $m$ low probability arms, giving $\frac{h}{2m}$ samples each.
+\item For the frequent arms, we expect $\sim q_i\frac{h}{2} \geq \frac{h}{2m}$ samples from the observe phase.
+\end{itemize}
+
+
+
+
+
+
+
+
+\end{document}
+

@@ -1,0 +1,174 @@
+\documentclass{article}
+
+\usepackage{todonotes}
+
+%\usepackage[disable]{todonotes}
+\newcommand{\todot}[2][]{\todo[color=red!20!white,#1]{#2}}
+\newcommand{\todof}[2][]{\todo[color=orange!20!white,#1]{#2}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[boxed]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{mathtools}
+\usepackage{accents}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{dsfont}
+\usepackage[bf]{caption}
+\usepackage{hyperref}
+\hypersetup{
+    bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in AcrobatÕs bookmarks
+    pdftoolbar=true,        % show AcrobatÕs toolbar?
+    pdfmenubar=true,        % show AcrobatÕs menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={My title},    % title
+    pdfauthor={Author},     % author
+    pdfsubject={Subject},   % subject of the document
+    pdfcreator={Creator},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfkeywords={keyword1} {key2} {key3}, % list of keywords
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=red,          % color of internal links (change box color with linkbordercolor)
+    citecolor=blue,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+\usepackage{comment}
+\usepackage{amsthm}
+\usepackage{natbib}
+\usepackage[capitalize]{cleveref}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{tikz} 
+\usetikzlibrary{arrows,positioning} 
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MACROS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\defined}{\vcentcolon =}
+\newcommand{\rdefined}{=\vcentcolon}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\calF}{\mathcal F}
+\newcommand{\sr}[1]{\stackrel{#1}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\ind}[1]{\mathds{1}\!\!\set{#1}}
+\newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
+\newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
+\newcommand{\floor}[1]{\left \lfloor {#1} \right\rfloor}
+\newcommand{\ceil}[1]{\left \lceil {#1} \right\rceil}
+\newcommand{\eqn}[1]{\begin{align}#1\end{align}}
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+\newcommand{\Ber}{\operatorname{Bernoulli}}
+\renewcommand{\P}[1]{\operatorname{P}\left\{#1\right\}}
+\pagestyle{empty}
+
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=2.5em,
+           minimum height=2.5em,
+           font=\footnotesize,
+           text centered,
+           fill=blue!20!white},
+     latent/.style={
+           circle,
+           rounded corners,
+           draw=black, thick, dashed,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           fill=black!10!white
+           },
+     empty/.style={
+           circle,
+           rounded corners,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 }  
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+
+
+\begin{document}
+\def\ci{\perp\!\!\!\perp}
+
+
+
+
+
+
+
+Let $q \in [0,1]^N$ be a fixed vector where $q_i = P(X_i = 1)$. In each time-step $t$ upto a known end point $T$:
+ 
+\begin{enumerate}
+\item The learner chooses an $I_t \in \set{0,\ldots, N}$ and $J_t \in \set{0,1}$, setting $X_{I_t,t} = J_t$. Selecting $I_t = 0$ corresponds to taking the nothing action $do()$ and just observing. 
+\item For $i \neq I_t$, $X_{i,t} \sim Bernoulli(q_i)$
+
+\item The learner observes $ X_t = [X_{1,t} ... X_{N,t}] $
+\item The learner receives reward $Y_t \sim \Ber(r(X_t))$, where $r:\set{0,1}^N \to [0,1]$ is unknown and arbitrary.
+\end{enumerate}
+
+\vspace{5mm}
+
+The causal structure gives us:
+\eq {
+P(Y|do(X_i = j)) = & P(Y|X_i = j) \\
+= & P(Y|do(X_a = 1),X_i = j)q_a + P(Y|do(X_a = 0),X_i=j)(1-q_a)
+}
+
+At each timestep, observing will reveal the reward for half the arms.
+ 
+
+
+
+
+
+
+
+
+\end{document}
+

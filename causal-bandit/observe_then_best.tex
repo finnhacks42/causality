@@ -219,7 +219,7 @@ X_{t,i} &\text{if } i \neq I_t \\
 J_t & \text{otherwise}\,.
 \end{cases}
 }
-\item The learner receives reward $Y_t \sim \Ber(r(\tilde X))$ where $r:\set{0,1}^K \to [0,1]$ is unknown and arbitrary.
+\item The learner receives reward $Y_t \sim \Ber(r(\tilde X))$ where $r:\set{0,1}^K \to [0,1]$ is unknown and arbitrary. THIS LOOKS WRONG SHOULD BE N not K.
 \end{enumerate}
 
 The expected reward of taking action $i,j$ is $\mu_{i,j} = \E[r(X)|do(X_i = j)]$. The optimal reward and action are denoted $\mu^*$ and $(i^*,j^*)$ respectively,
@@ -350,9 +350,11 @@ The distribution independent lower bound for optimised UCB is $O(\sqrt{TK})$ (se
 
 When some arms have low natural probability we cannot rely on exploring them adequately by pure observation. We need to explicitly play them during the exploration phase. 
 
-We now have an additional trade off to make, which is how much should be observe (learning something about at least half the arms each timestep) versus playing the low probability arms. 
+We now have an additional trade off to make, which is how much should be observe (learning something about half the arms each timestep) versus playing the low probability arms. 
 
 Without loss of generality, we can assume $q_i \in [0,\frac{1}{2}]$ and $q_1 \leq q_2 ... \leq q_N$. Let $m \in [2,N] = \{m:q_m > \frac{1}{m}\}$ Ie if the problem is completely balanced $q_1...q_N = \frac{1}{2}$ then $m = 2$. If the problem is completely unbalanced, $q_1...q_N = 0$ then $m=N$. Let $q_{ij} = \P{X_i = j}$
+
+
 
 Suppose we observe for the first $h/2$ timesteps. This is at worst half the optimal. 
 
