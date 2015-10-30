@@ -13,6 +13,12 @@ def add_value(dictionary,key,value = None):
 
 def intersection(lst1,lst2):
     return [x for x in lst1 if x in lst2]
+
+def math_sum(variables,exclude):
+    sum_over  = variables - exclude
+    if len(sum_over) > 0:
+        return "\sum_{%s}" % ",".join(sum_over)
+    return ""
     
 
 class Graph():
@@ -132,6 +138,15 @@ class Graph():
             if dest not in district:
                 district.add(dest)
                 self._find_district(dest,district)
+                
+
+    def indentify2(self,y,x,P,G):
+        V = G.nodes()
+        if len(x) == 0:
+            return math_sum(V,y)+P
+
+
+        
 
 
     def identify(self,C,T,Q):

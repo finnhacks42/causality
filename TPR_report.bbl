@@ -1,0 +1,134 @@
+\begin{thebibliography}{10}
+
+\bibitem{Dawid2000}
+AP~Dawid.
+\newblock {Causal inference without counterfactuals}.
+\newblock {\em J. Am. Stat. Assoc.}, 2000.
+
+\bibitem{Dawid2014}
+AP~Dawid.
+\newblock {Statistical Causality from a Decision-Theoretic Perspective}.
+\newblock {\em arXiv Prepr. arXiv1405.2292}, 2014.
+
+\bibitem{Gretton2008}
+Arthur Gretton, K~Fukumizu, CH~Teo, and L~Song.
+\newblock {A kernel statistical test of independence}.
+\newblock pages 1--8, 2008.
+
+\bibitem{Haavelmo1943}
+T~Haavelmo.
+\newblock {The statistical implications of a system of simultaneous equations}.
+\newblock {\em Econom. J. Econom. Soc.}, 11(1):1--12, 1943.
+
+\bibitem{Heckman2008}
+James Heckman.
+\newblock {Econometric causality}.
+\newblock {\em Int. Stat. Rev.}, 2008.
+
+\bibitem{Hoyer2009}
+Patrick Hoyer, Dominik Janzing, and Joris Mooij.
+\newblock {Nonlinear causal discovery with additive noise models}.
+\newblock In {\em NIPS}, 2009.
+
+\bibitem{Imai2010a}
+Kosuke Imai, Luke Keele, and Teppei Yamamoto.
+\newblock {Identification, Inference and Sensitivity Analysis for Causal
+  Mediation Effects}.
+\newblock {\em Stat. Sci.}, 25(1):51--71, February 2010.
+
+\bibitem{Kalisch2012}
+Markus Kalisch, Martin M\"{a}chler, Diego Colombo, Marloes~H. Maathuis, and
+  Peter B\"{u}hlmann.
+\newblock {Causal inference using graphical models with the R package pcalg}.
+\newblock {\em JSS}, VV(Ii), 2012.
+
+\bibitem{Maathuis2010}
+Marloes~H. Maathuis, D~Colombo, Markus Kalisch, and Peter B\"{u}hlmann.
+\newblock {Predicting causal effects in large-scale systems from observational
+  data}.
+\newblock {\em Nat. Methods}, 7(4):247--248, 2010.
+
+\bibitem{Maathuis2009}
+Marloes~H. Maathuis, Markus Kalisch, and Peter B\"{u}hlmann.
+\newblock {Estimating high-dimensional intervention effects from observational
+  data}.
+\newblock {\em Ann. Stat.}, 37(6A):3133--3164, December 2009.
+
+\bibitem{Pearl2000}
+Judea Pearl.
+\newblock {\em {Causality: models, reasoning and inference}}.
+\newblock MIT Press, Cambridge, 2000.
+
+\bibitem{Pearl2014}
+Judea Pearl.
+\newblock {Interpretation and Identification of Causal Mediation.}
+\newblock {\em Psychol. Methods}, June 2014.
+
+\bibitem{Richardson2013}
+Thomas~S. Richardson and James~M. Robins.
+\newblock {Single world intervention graphs (SWIGs): a unification of the
+  counterfactual and graphical approaches to causality}.
+\newblock 2013.
+
+\bibitem{Rosenbaum1983}
+PR~Rosenbaum and DB~Rubin.
+\newblock {The central role of the propensity score in observational studies
+  for causal effects}.
+\newblock {\em Biometrika}, 70(1):41--55, 1983.
+
+\bibitem{Rubin1974}
+DB~Rubin.
+\newblock {Estimating causal effects of treatments in randomized and
+  nonrandomized studies.}
+\newblock {\em J. Educ. Psychol.}, 1974.
+
+\bibitem{Rubin1978}
+DB~Rubin.
+\newblock {Bayesian inference for causal effects: The role of randomization}.
+\newblock {\em Ann. Stat.}, 1978.
+
+\bibitem{Rubin2005}
+DB~Rubin.
+\newblock {Causal Inference Using Potential Outcomes}.
+\newblock {\em J. Am. Stat. Assoc.}, 100(469):322--331, March 2005.
+
+\bibitem{Rubin2008}
+DB~Rubin.
+\newblock {For objective causal inference, design trumps analysis}.
+\newblock {\em Ann. Appl. Stat.}, 2(3):808--840, September 2008.
+
+\bibitem{Sprites}
+Peter Spirtes, Clark~N Glymour, and Richard Scheines.
+\newblock {\em {Causation, prediction, and search}}, volume~81.
+\newblock MIT press, 2000.
+
+\bibitem{VanderWeele2011}
+Tyler~J VanderWeele and Sonia Hern\'{a}ndez-Diaz.
+\newblock {Is there a direct effect of pre-eclampsia on cerebral palsy not
+  through preterm birth?}
+\newblock {\em Paediatr. Perinat. Epidemiol.}, 25(2):111--5, March 2011.
+
+\bibitem{Weisberg2013}
+Deena~S Weisberg and Alison Gopnik.
+\newblock {Pretense, counterfactuals, and Bayesian causal models: why what is
+  not real really matters.}
+\newblock {\em Cogn. Sci.}, 37(7):1368--81, 2013.
+
+\bibitem{Wright1921}
+S~Wright.
+\newblock {Correlation and causation}.
+\newblock {\em J. Agric. Res.}, 1921.
+
+\bibitem{Zhang2008a}
+Kun Zhang and A~Hyv\"{a}rinen.
+\newblock {Distinguishing causes from effects using nonlinear acyclic causal
+  models}.
+\newblock {\em NIPS 2008 Work. Causality. URL http//www \ldots}, 2008.
+
+\bibitem{Zhang2012}
+Kun Zhang, Jonas Peters, Dominik Janzing, and Bernhard Sch\"{o}lkopf.
+\newblock {Kernel-based conditional independence test and application in causal
+  discovery}.
+\newblock {\em pre-print}, 2012.
+
+\end{thebibliography}

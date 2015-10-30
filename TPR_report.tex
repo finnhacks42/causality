@@ -1,0 +1,178 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithm
+\usepackage[noend]{algpseudocode}% http://ctan.org/pkg/algorithmicx
+\usepackage{parskip}
+\usepackage{tikz}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usetikzlibrary{arrows,positioning} 
+\usepackage{subcaption}
+
+
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+           rectangle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=5em,
+           minimum height=2.2em,
+           font=\footnotesize,
+           text centered,
+           },
+     latent/.style={
+           rectangle,
+           rounded corners,
+           draw=black, thick, dashed,
+           minimum width=5em,
+           minimum height=2.2em,
+           font=\footnotesize,
+           text centered,
+           fill=black!10!white
+           },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 }
+    
+}
+
+
+\author{Finnian Lattimore}
+\title{Learning how to act: making good decisions with machine learning}
+
+\begin{document}
+\def\ci{\perp\!\!\!\perp} % from Wikipedia
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\maketitle
+
+\section{Introduction}
+
+Learning the outcome of an action is central to many real world problems. Does de-worming children in poor countries improve health and educational outcomes [worm-wars]? Would increasing the minimum wage benefit lead to higher unemployment? Will offering this customer a discount improve my revenue? These questions are difficult as they require more than identifying a pattern in data.  There are two, very different, major approaches to this problem with the machine learning community: reinforcement learning and causal inference. 
+
+Reinforcement learning addresses the problem of learning from explicitly taking actions. There is typically some state or environment, an agent chooses an action from those available in the current state, the state evolves stochastically as a function of the selected action and the agent then receives some feedback or reward that is a function of the new state. This setting differs from the standard classification problem in that the agent must learn from feedback on the selected action, rather than being presented with the correct action for a given state. A common modelling assumption is to assume that the state evolves only as a function of the previous state and the action chosen, and given these, is independent of the previous history of states and actions. This is known as a Markov decision process or MDP.  A particularly well studied and understood model are MDPs with only a single state. In this case, there are a set of actions, each associated with a fixed but unknown reward distribution and at each time step our agent selects and action and receives corresponding feedback. This is known as the multi-armed bandit problem. 
+
+Causal inference makes use of assumptions to allow the outcome of actions to be predicted from observational data. The key to causal inference is a framework that can model how actions change the state of the world. This framework then allows us to map information collected in one setting to another. 
+
+Both approaches can be seen as extensions to the concept of randomised controlled trials. Bandit algorithms deal with the sequential nature of the decision making process. Causal inference with the problem that full randomisation is not always feasible, affordable or ethical.The similarities between the problems that these techniques have been developed to address raises the question of if there are problems best addressed by a combination of these approaches and how they can be combined. The goal of my thesis is to explore these questions. In the next sections I briefly review the key literature in causal inference and bandits. I then present a general approach to  how causal models might be incorporated into bandit settings and conclude by demonstrating an algorithm that leverages causal assumptions to improve performance in a specific bandit setting. 
+
+\section{Causal Inference}
+
+\subsection{Models of causality and intervention}
+
+Predicting the outcome of actions without explicitly taking them requires assumptions about how the actions will change the system. A very powerful and general model that underlies much of the recent work in causality is the causal bayesian network. A causal Bayesian network, or directed acyclic graph (DAG), is a Bayesian network in which a link $V_{i} \rightarrow V_{j}$, is defined to mean $V_{i}$ directly causes $V_{j}$. This means that if we intervene and change the value of $V_{i}$, we expect $V_{j}$ to change, but if we intervene to change $V_{j}$, $V_{i}$ will not change. More generally, if $G$ is a causal network for a distribution $P$ defined over variables $V_{1}...V_{N}$, then the distribution after an intervention where we set $X \subset V$ to $x$, denoted $do(X=x)$ is obtained by simply dropping the terms for each of the variables in $X$ from the factorization given by the network. This is referred to as the truncated product formula \cite{Pearl2000}. 
+
+If the network contains latent (unobservable) variables we will not be able to calculate all the terms in the truncated product formula. However, it may still be possible to determine the post-interventional distribution of specific variables of interest. A general causal query $P(Y|do(X=x))$ is identifiable if it can be shown to be equivalent to an expression containing only pre-interventional quantities. This means that asymptotically we obtain an unbiased estimate for the distribution after an intervention based on purely observational data. 
+
+The Do Calculus is a set of three rules that allow transformations of interventional terms to non-interventional ones, given a causal graph \cite{}. They are derived directly from d-seperation properties of graphical models and the definition of intervention in causal DAGs. These rules are complete. A query is identifiable if and only if it can be transformed to contain only non-interventional terms via the do-calculus and there is an equivalent algorithm that can take any causal graph and query and determine identifiability \cite {}. I have implemented this algorithm as a simple javascript application to demonstrate XXXX. If a query is not identifiable, it may still be possible to get bounds for causal effects, for example using instrumental variables \cite{} or by making additional assumptions. 
+
+There are two other key frameworks that arise in causal inference. Counterfactuals and structural equation models.  Counterfactuals are statements about imagined or alternate realities, are prevalent in everyday language and may play a role in the development of causal reasoning in humans \cite{Weisberg2013}. Causal effects are differences in counterfactual variables; what is the difference between what would happen if we did one thing versus what would happen if we did something else \cite{Rubin1974,Rubin1978,Rosenbaum1983, Rubin2005,Rubin2008}. 
+
+For example, if we wanted to estimate the causal effect of a medical treatment, then we might let $Y^{1}$ be a counterfactual random variable representing the (binary) potential outcome if treated. The distribution of $Y^{1}$ is the distribution we would see of the outcome, $Y$, if everyone was treated. Similarly $Y^{0}$ represents the potential outcome for the placebo. The causal effect of the drug is the difference between the probability of recovery, across the population, if everyone was treated, and the probability of recovery given placebo $P(Y^{1})-P(Y^{0})$. This quantity is estimable from observational data if we assume $X \ci Y^{0}$ and $X \ci Y^{1}$. These assumptions are referred to as ignoreability assumptions \cite{Rosenbaum1983}. They state that the treatment a each person receives is independent of whether they would recover if treated and if they would recover if not treated. Graphically, this is equivalent to the assumption that there is no variable that is a parent of both the treatment $X$ and the outcome $Y$. 
+
+
+Structural equation models (SEMs) describe a deterministic world, where underlying mechanisms determine the output of any process for a given input. The mechanism (but not the output) is assumed to be independent of what is fed into it. Linear structural equation models have a long history for causal estimation \cite {Wright1921,Haavelmo1943}. Mathematically, each variable is a deterministic function of its direct causes and a noise term that captures unmeasured variables. The noise terms are required to be mutually independent. If there is the possibility that an unmeasured variable influences more than one variable of interest in a study, it must be modelled explicitly as a latent (unobserved) variable. Structural equation models can be represented visually as a network. Each variable is a node and arrows are drawn from causes to their effects. If the network for a structural equation model is acyclic then it implies a recursive factorization of the joint distribution over its variables. In other words, it is a causal bayesian network. 
+
+Remarkably for models developed relatively independently in fields with very different approaches and problems, the models we have discussed are almost equivalent. To determine if and how an interventional query can be non-parametrically identified, it is equivalent to specify assumptions graphically in terms of bayesian networks or as structural equation models or as conditional independence statements involving counterfactual variables (ignorability assumptions). 
+
+It is possible to pose causal queries in terms of counterfactuals that are not interventional and cannot be phrased in terms of the do-notation. The scientific and philosophical validity of such counterfactual queries remains under question \cite{Dawid2000,Dawid2014}, however they are nonetheless widely posed in the form of attribution of causal effects to different pathways and mediation \cite{Pearl2014,Imai2010a,VanderWeele2011}. 
+
+There are differences between the models we have considered when it comes to these non-interventional queries. Counterfactuals are not defined in causal Bayesian networks, as they only encode information on the interventional distribution over variables.  Counterfactuals can be defined in terms of structural equation models \cite{Pearl2000} but there are subtle differences depending on the form of assumptions made. Structural equation models with independent errors allows the identification of quantities in mediation studies, which are not identifiable with the weak ignorability assumptions and cannot be tested experimentally \cite{Richardson2013}.  
+
+In practice, differences in focus and approach across different fields eclipse these actual differences in the models. The work on causal graphical models \cite{Pearl2000,Sprites} focuses on non-parametric estimation in the population limit and rigorous theoretical foundations. The Neyman-Rubin framework builds on our understanding of randomized experiment and generalizes to quasi-exeperimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimating average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \cite{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data so as to support policy decisions is central to the field. Economists are often interested in broader measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \cite{Heckman2008}. In addition, the parametric structural equation models favoured in economics can be extended to analyse cyclic (otherwise referred to as non-recursive) models. 
+
+
+\subsection{Discovering causal structure}
+
+In the previous section we discussed when assumptions about the structure of the variables in a specific problem is sufficient to identify a causal effect. This approach relies on having enough prior knowledge or theory about the problem to allow you to, at least partially, specify the causal network. In this section, we consider the much harder problem of causal inference where you need to learn the network. Causal inference might seem impossible without specific assumptions about the structure of the variables involved but, amazingly, some aspects of causal structure can be determined from much more general assumptions.  
+
+ 
+\subsubsection{Discovery based on conditional independence}
+One general approach is to look for clues about the structure of the network in the conditional independence relations in the distribution. Assume there is some acyclic causal network $G$ that generated the distribution $P(\boldsymbol{V})$ from which our data has been sampled. Our goal is to recover the network from this data. 
+
+Since $G$ is a bayesian network, if $Z$ d-separates $X$ and $Y$ in $G$ then $(X \ci Y|Z)$ in $P$ . However, we want to work in the other direction, from conditional independence in the distribution to the structure of the network. This requires that we assume the reverse condition: $(X \ci Y|Z)$ in $P$ must imply $Z$ d-separates $X$ and $Y$ in $G$. This assumption, commonly referred to as  \textbf{\textit{faithfulness}}, says there are no additional independence relations that are satisfied in $P$ but not in all distributions $\boldsymbol{P'}$ that are compatible with $G$. Stating that $P$ is faithful to $G$ is equivalent to $G$ is a \textbf{\textit{perfect map}} for $P$.
+
+Faithfulness is an assumption. It does not always hold and we cannot verify it from the observational data we wish to use for causal inference. However, most distributions generated by a causal bayesian network will be faithful to that network. For faithfulness to be violated, different causal effects must exactly balance one-another out. For example, consider a simple binary variable model of chocolate consumption, income and obesity (figure). If the coefficients in the conditional probability tables are just right then the direct effect of chocolate on obesity will exactly balance the indirect effect through income and obesity will appear independent of chocolate consumption. However, this independence is not stable. It would disappear under a small perturbation to any of the parameters.  
+
+Given the faithfulness assumption, our causal discovery problem reduces to finding the set of bayesian networks that have exactly the dependency structure as we observe in $P$. A wide range of algorithms have been developed based on this key observation, see table \ref{table:discovery_algorithms}. Constraint based methods such as the PC algorithm \cite{}, FCI algorithm \cite{} and RFCI algorithm \cite{}, perform sequential conditional independence tests and eliminate inconsistent graphs. Search and score based methods, such as GES \cite{}, search over the space of graphs and score them according to how well they fit the independences given a complexity penalising prior. Constraint based methods are faster, particularly for sparse graphs, but can lack robustness as errors in early conditional independence tests can propagate. Search and score based methods are more robust for small samples sizes but difficult to scale to larger graphs. This has led to the development of hybrid approaches, such as the MMHC algorithm \cite{}. A key component of causal discovery is the ability to do high dimensional non-parametric conditional independence tests. Developments in kernalized conditional independence tests \cite{},\cite{Zhang2012},\cite{Gretton2008} have made this possible.
+
+
+\begin{table}[h]
+\centering
+\caption{A comparison of key causal discovery algorithms}
+\label{table:discovery_algorithms}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{| c | c | p{4cm} | c | c |}
+\hline
+  \textbf {Alg.} &\textbf{ Method }& \textbf{Scales (num.vars) }& $\sim $ \textbf {Vars} & \textbf {Latent }  \\
+  \hline
+  PC & Constraint based & Worst case exponential, polynomial for sparse graphs & 5000 & No  \\ 
+  \hline
+  FCI & Constraint based & Worst case exponential, polynomial variant FCI+ for sparse graphs & 30 & Yes\\
+  \hline
+  RFCI & Constraint based & ? & 500 & Yes  \\
+  \hline
+  GES & Search \& Score  & Worst case exponential & 50 & No  \\
+  \hline
+  MMHC & Hybrid & ? & 5000 & No  \\
+ \hline
+\end{tabular}
+\end{table}
+
+ 
+
+If the end goal of causal discovery is to estimate causal effects, then it may not be necessary to learn the entire graph, only the subset of the graph surrounding target variables of interest. Such local causal discovery techniques can be scaled to problems with many more variables \cite{}. Once a set of causal graphs has been identified, causal effects of interest can be bounded by combining the results for the all the networks. This procedure is the IDA algorithm \cite{Maathuis2009} and has been found to outperform standard regularization techniques at finding causal effects in a high-dimensional yeast gene expression data set \cite{Maathuis2010}. An implementation is available in the R package \cite{Kalisch2012}
+
+\subsubsection{Discovery with functional models}
+All of the algorithms we have considered so far return a Markov equivalence class. They cannot distinguish between two models that result in the same set of conditional independence relations. Consider the very simple case where we have only two variables and the only possible causal structures are $X \rightarrow Y$ or $Y \rightarrow X$. These models have the same dependency structure but in one case $P(Y|do(X)) = P(Y|X)$ and in the other $P(Y|do(X)) = P(Y)$. No algorithm relying purely on conditional independence relations can separate these two cases.
+
+One solution is to utilize structural equation models to specify additional assumptions. For example, if we assume that noise is additive, such that $X \rightarrow Y \implies Y = f(X)+\epsilon$, then this will only be invertible such that $X = g(Y) + \epsilon'$ for specific pairs of functions $f$ and noise distributions $\epsilon$. Thus in general we will be able to identify the causal direction \cite{Hoyer2009}. This can be extended to post-non-linear additive noise, $Y = h(f(X)+ \epsilon)$, \cite{Zhang2008a}. These techniques can also be applied over more than two variables \cite{}.
+
+A more general approach is to leverage the assumption that the functions are independent of inputs \cite{}. This leads to the idea that $P(X)$ and $P(Y|X)$ are independent if $X \rightarrow Y$ but not if $Y \rightarrow X$. \cite{} propose testing for this by applying both semi-supervised and standard techniques to estimate $P(Y|X)$. Semi-supervised methods, which utilize additional points from $P(X)$ to learn $P(Y|X)$ should only be able to outperform standard methods if $Y \rightarrow X$. 
+
+Finally, rather than explicitly developing an algorithm based on a specific asymmetry between cause and effect, \cite{} propose learning what causality looks like from data. They take as input a dataset where each row of data is itself a dataset in which either $X \rightarrow Y$ or $Y \rightarrow X$ and a corresponding label. Estimates of the distributions $P(X)$, $P(Y)$ and $P()$ for each row are then mapped to features in some kernel space via mean kernel embeddings and finally a standard classification algorithm can be trained to learn label. New datasets where the direction of causality is unknown are then simply mapped to the kernel space and the causal direction is classified according to the trained classifier. In practice, the classifier is trained mostly on simulated data, as it is difficult to find a sufficient set of causal problems with only two variables where the direction of causality is known. 
+
+ 
+\section{Multi-armed Bandits}
+
+Classical framework. Forms of feedback and structure. Key results graph feedback, etc. 
+
+stochastic vs adversarial. 
+
+
+\section{Unifying the frameworks}
+
+stochastic most natural fit because graphical models are stochasitc. 
+
+what kinds of stuctural assumptions lead to what?
+
+\subsection{Results for a specific problem}
+
+\subsection{Open questions}
+
+
+\bibliographystyle{plain}% Select the citation style e.g. ieeetr
+\bibliography{library}% write the directory to the .bib file
+\end{document}
+
+
+
+
