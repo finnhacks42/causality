@@ -60,7 +60,10 @@
 
 
 \begin{figure}
+\caption{A simple causal graphical model and corresponding action space}
+\label{fig:unify_frameworks}
 \centering
+\begin{subfigure}[c]{0.25\textwidth}
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=3em,thick,main node/.style={observed}, lt/.style={latent}]
 \node[main node](1){A};
 \node[main node,fill=black!20!white, below right=of 1](2){R};
@@ -69,9 +72,8 @@
 	(1) edge (2)
 	(3) edge (2);
 \end{tikzpicture}
-\end{figure}
-
-
+\end{subfigure}
+\begin{subfigure}[t]{0.4\textwidth}
 Actions = \begin{tabular}{|c|}
 	\hline
   do(A=0,B=0) \\
@@ -86,6 +88,10 @@ Actions = \begin{tabular}{|c|}
   do() \\
   \hline
 \end{tabular}
+\end{subfigure}
+\end{figure}
+
+
 
 
 

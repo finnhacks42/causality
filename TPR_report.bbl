@@ -1,74 +1,63 @@
 \begin{thebibliography}{10}
 
-\bibitem{Dawid2000}
-AP~Dawid.
-\newblock {Causal inference without counterfactuals}.
-\newblock {\em J. Am. Stat. Assoc.}, 2000.
+\bibitem{miguel2004}
+Edward Miguel and Michael Kremer.
+\newblock {Worms: identifying impacts on education and health in the presence
+  of treatment externalities}.
+\newblock {\em Econometrica}, pages 159--217, 2004.
 
-\bibitem{Dawid2014}
-AP~Dawid.
-\newblock {Statistical Causality from a Decision-Theoretic Perspective}.
-\newblock {\em arXiv Prepr. arXiv1405.2292}, 2014.
-
-\bibitem{Gretton2008}
-Arthur Gretton, K~Fukumizu, CH~Teo, and L~Song.
-\newblock {A kernel statistical test of independence}.
-\newblock pages 1--8, 2008.
-
-\bibitem{Haavelmo1943}
-T~Haavelmo.
-\newblock {The statistical implications of a system of simultaneous equations}.
-\newblock {\em Econom. J. Econom. Soc.}, 11(1):1--12, 1943.
-
-\bibitem{Heckman2008}
-James Heckman.
-\newblock {Econometric causality}.
-\newblock {\em Int. Stat. Rev.}, 2008.
-
-\bibitem{Hoyer2009}
-Patrick Hoyer, Dominik Janzing, and Joris Mooij.
-\newblock {Nonlinear causal discovery with additive noise models}.
-\newblock In {\em NIPS}, 2009.
-
-\bibitem{Imai2010a}
-Kosuke Imai, Luke Keele, and Teppei Yamamoto.
-\newblock {Identification, Inference and Sensitivity Analysis for Causal
-  Mediation Effects}.
-\newblock {\em Stat. Sci.}, 25(1):51--71, February 2010.
-
-\bibitem{Kalisch2012}
-Markus Kalisch, Martin M\"{a}chler, Diego Colombo, Marloes~H. Maathuis, and
-  Peter B\"{u}hlmann.
-\newblock {Causal inference using graphical models with the R package pcalg}.
-\newblock {\em JSS}, VV(Ii), 2012.
-
-\bibitem{Maathuis2010}
-Marloes~H. Maathuis, D~Colombo, Markus Kalisch, and Peter B\"{u}hlmann.
-\newblock {Predicting causal effects in large-scale systems from observational
-  data}.
-\newblock {\em Nat. Methods}, 7(4):247--248, 2010.
-
-\bibitem{Maathuis2009}
-Marloes~H. Maathuis, Markus Kalisch, and Peter B\"{u}hlmann.
-\newblock {Estimating high-dimensional intervention effects from observational
-  data}.
-\newblock {\em Ann. Stat.}, 37(6A):3133--3164, December 2009.
+\bibitem{davey2015}
+Calum Davey, Alexander~M Aiken, Richard~J Hayes, and James~R Hargreaves.
+\newblock {Re-analysis of health and educational impacts of a school-based
+  deworming programme in western Kenya: a statistical replication of a cluster
+  quasi-randomized stepped-wedge trial}.
+\newblock {\em International journal of epidemiology}, page dyv128, 2015.
 
 \bibitem{Pearl2000}
 Judea Pearl.
 \newblock {\em {Causality: models, reasoning and inference}}.
 \newblock MIT Press, Cambridge, 2000.
 
-\bibitem{Pearl2014}
-Judea Pearl.
-\newblock {Interpretation and Identification of Causal Mediation.}
-\newblock {\em Psychol. Methods}, June 2014.
+\bibitem{Shpitser2006}
+Ilya Shpitser and Judea Pearl.
+\newblock {Identification of conditional interventional distributions}.
+\newblock In Thomas~S. Richardson and R~Dechter, editors, {\em Proceedings of
+  the Twenty-Second Conference on Uncertainty in Artificial Intelligence}. AUAI
+  Press, 2006.
 
-\bibitem{Richardson2013}
-Thomas~S. Richardson and James~M. Robins.
-\newblock {Single world intervention graphs (SWIGs): a unification of the
-  counterfactual and graphical approaches to causality}.
-\newblock 2013.
+\bibitem{Huang2006}
+Yimin Huang and Marco Valtorta.
+\newblock {Pearl's Calculus of Intervention Is Complete}.
+\newblock In Thomas~S. Richardson and R~Dechter, editors, {\em Proceedings of
+  the Twenty-Second Conference on Uncertainty in Artificial Intelligence}. AUAI
+  Press, 2006.
+
+\bibitem{Shpitser2008}
+Ilya Shpitser and Judea Pearl.
+\newblock {Complete identification methods for the causal hierarchy}.
+\newblock {\em The Journal of Machine Learning Research}, 9:1941--1979, 2008.
+
+\bibitem{Angrist2009}
+Joshua Angrist and Jorn-Stephan Pischke.
+\newblock {\em {Mostly Harmless Econometrics}}.
+\newblock Princeton University Press, 2009.
+
+\bibitem{Weisberg2013}
+Deena~S Weisberg and Alison Gopnik.
+\newblock {Pretense, counterfactuals, and Bayesian causal models: why what is
+  not real really matters.}
+\newblock {\em Cognitive science}, 37(7):1368--81, 2013.
+
+\bibitem{Rubin1974}
+DB~Rubin.
+\newblock {Estimating causal effects of treatments in randomized and
+  nonrandomized studies.}
+\newblock {\em Journal of educational Psychology}, 1974.
+
+\bibitem{Rubin1978}
+DB~Rubin.
+\newblock {Bayesian inference for causal effects: The role of randomization}.
+\newblock {\em The Annals of Statistics}, 1978.
 
 \bibitem{Rosenbaum1983}
 PR~Rosenbaum and DB~Rubin.
@@ -76,59 +65,236 @@ PR~Rosenbaum and DB~Rubin.
   for causal effects}.
 \newblock {\em Biometrika}, 70(1):41--55, 1983.
 
-\bibitem{Rubin1974}
-DB~Rubin.
-\newblock {Estimating causal effects of treatments in randomized and
-  nonrandomized studies.}
-\newblock {\em J. Educ. Psychol.}, 1974.
-
-\bibitem{Rubin1978}
-DB~Rubin.
-\newblock {Bayesian inference for causal effects: The role of randomization}.
-\newblock {\em Ann. Stat.}, 1978.
-
 \bibitem{Rubin2005}
 DB~Rubin.
 \newblock {Causal Inference Using Potential Outcomes}.
-\newblock {\em J. Am. Stat. Assoc.}, 100(469):322--331, March 2005.
+\newblock {\em Journal of the American Statistical Association},
+  100(469):322--331, mar 2005.
 
 \bibitem{Rubin2008}
 DB~Rubin.
 \newblock {For objective causal inference, design trumps analysis}.
-\newblock {\em Ann. Appl. Stat.}, 2(3):808--840, September 2008.
-
-\bibitem{Sprites}
-Peter Spirtes, Clark~N Glymour, and Richard Scheines.
-\newblock {\em {Causation, prediction, and search}}, volume~81.
-\newblock MIT press, 2000.
-
-\bibitem{VanderWeele2011}
-Tyler~J VanderWeele and Sonia Hern\'{a}ndez-Diaz.
-\newblock {Is there a direct effect of pre-eclampsia on cerebral palsy not
-  through preterm birth?}
-\newblock {\em Paediatr. Perinat. Epidemiol.}, 25(2):111--5, March 2011.
-
-\bibitem{Weisberg2013}
-Deena~S Weisberg and Alison Gopnik.
-\newblock {Pretense, counterfactuals, and Bayesian causal models: why what is
-  not real really matters.}
-\newblock {\em Cogn. Sci.}, 37(7):1368--81, 2013.
+\newblock {\em The Annals of Applied Statistics}, 2(3):808--840, sep 2008.
 
 \bibitem{Wright1921}
 S~Wright.
 \newblock {Correlation and causation}.
-\newblock {\em J. Agric. Res.}, 1921.
+\newblock {\em Journal of agricultural research}, 1921.
 
-\bibitem{Zhang2008a}
-Kun Zhang and A~Hyv\"{a}rinen.
-\newblock {Distinguishing causes from effects using nonlinear acyclic causal
-  models}.
-\newblock {\em NIPS 2008 Work. Causality. URL http//www \ldots}, 2008.
+\bibitem{Haavelmo1943}
+T~Haavelmo.
+\newblock {The statistical implications of a system of simultaneous equations}.
+\newblock {\em Econometrica, Journal of the Econometric Society}, 11(1):1--12,
+  1943.
+
+\bibitem{Dawid2000}
+AP~Dawid.
+\newblock {Causal inference without counterfactuals}.
+\newblock {\em Journal of the American Statistical Association}, 2000.
+
+\bibitem{Dawid2014}
+AP~Dawid.
+\newblock {Statistical Causality from a Decision-Theoretic Perspective}.
+\newblock {\em arXiv preprint arXiv:1405.2292}, 2014.
+
+\bibitem{Pearl2014}
+Judea Pearl.
+\newblock {Interpretation and Identification of Causal Mediation.}
+\newblock {\em Psychological methods}, jun 2014.
+
+\bibitem{Imai2010a}
+Kosuke Imai, Luke Keele, and Teppei Yamamoto.
+\newblock {Identification, Inference and Sensitivity Analysis for Causal
+  Mediation Effects}.
+\newblock {\em Statistical Science}, 25(1):51--71, feb 2010.
+
+\bibitem{VanderWeele2011}
+Tyler~J VanderWeele and Sonia Hern{\'{a}}ndez-Diaz.
+\newblock {Is there a direct effect of pre-eclampsia on cerebral palsy not
+  through preterm birth?}
+\newblock {\em Paediatric and perinatal epidemiology}, 25(2):111--5, mar 2011.
+
+\bibitem{Richardson2013}
+Thomas~S. Richardson and James~M. Robins.
+\newblock {Single world intervention graphs (SWIGs): a unification of the
+  counterfactual and graphical approaches to causality}.
+\newblock 2013.
+
+\bibitem{Heckman2008}
+James Heckman.
+\newblock {Econometric causality}.
+\newblock {\em International Statistical Review}, 2008.
+
+\bibitem{Sprites2000}
+Peter Spirtes, Clark~N Glymour, and Richard Scheines.
+\newblock {\em {Causation, prediction, and search}}, volume~81.
+\newblock MIT press, 2000.
+
+\bibitem{Colombo2012}
+Diego Colombo, Marloes~H. Maathuis, Markus Kalisch, and Thomas~S. Richardson.
+\newblock {Learning high-dimensional directed acyclic graphs with latent and
+  selection variables}.
+\newblock {\em The Annals of Statistics}, 40(1):294--321, feb 2012.
+
+\bibitem{Chickering2002}
+David~Maxwell Chickering.
+\newblock {Optimal structure identification with greedy search}.
+\newblock {\em The Journal of Machine Learning Research}, 3:507--554, 2002.
+
+\bibitem{Tsamardinos2006}
+Ioannis Tsamardinos, Laura~E. Brown, and Constantin~F. Aliferis.
+\newblock {The max-min hill-climbing Bayesian network structure learning
+  algorithm}.
+\newblock {\em Machine Learning}, 65(1):31--78, mar 2006.
+
+\bibitem{Gretton2008}
+Arthur Gretton, K~Fukumizu, CH~Teo, and L~Song.
+\newblock {A kernel statistical test of independence}.
+\newblock pages 1--8, 2008.
 
 \bibitem{Zhang2012}
-Kun Zhang, Jonas Peters, Dominik Janzing, and Bernhard Sch\"{o}lkopf.
+Kun Zhang, Jonas Peters, Dominik Janzing, and Bernhard Sch{\"{o}}lkopf.
 \newblock {Kernel-based conditional independence test and application in causal
   discovery}.
-\newblock {\em pre-print}, 2012.
+\newblock {\em arXiv preprint arXiv: {\ldots}}, 2012.
+
+\bibitem{Aliferis2002}
+C~F Aliferis and Ioannis Tsamardinos.
+\newblock {Algorithms for Large-Scale Local Causal Discovery and Feature
+  Selection In the Presence Of Limited Sample Or Large Causal Neighbourhoods}.
+\newblock (October):1--9, 2002.
+
+\bibitem{Maathuis2009}
+Marloes~H. Maathuis, Markus Kalisch, and Peter B{\"{u}}hlmann.
+\newblock {Estimating high-dimensional intervention effects from observational
+  data}.
+\newblock {\em The Annals of Statistics}, 37(6A):3133--3164, dec 2009.
+
+\bibitem{Maathuis2010}
+Marloes~H. Maathuis, Diego Colombo, Markus Kalisch, and Peter B{\"{u}}hlmann.
+\newblock {Predicting causal effects in large-scale systems from observational
+  data}.
+\newblock {\em Nature Methods}, 7(4):247--248, 2010.
+
+\bibitem{Kalisch2012}
+Markus Kalisch, Martin M{\"{a}}chler, Diego Colombo, Marloes~H. Maathuis, and
+  Peter B{\"{u}}hlmann.
+\newblock {Causal inference using graphical models with the R package pcalg}.
+\newblock {\em Journal of Statistical Software}, VV(Ii), 2012.
+
+\bibitem{Hoyer2009}
+Patrick Hoyer, Dominik Janzing, and Joris Mooij.
+\newblock {Nonlinear causal discovery with additive noise models}.
+\newblock In {\em Advances in neural information processing systems}, 2009.
+
+\bibitem{Zhang2008a}
+Kun Zhang and A~Hyv{\"{a}}rinen.
+\newblock {Distinguishing causes from effects using nonlinear acyclic causal
+  models}.
+\newblock {\em NIPS 2008 Workshop on Causality. URL http://www {\ldots}}, 2008.
+
+\bibitem{Peters2014}
+Jonas Peters, Joris Mooij, Dominik Janzing, and Bernhard Sch{\"{o}}lkopf.
+\newblock {Causal discovery with continuous additive noise models}.
+\newblock {\em Journal of Machine Learning Research}, 15:2009--2053, 2014.
+
+\bibitem{Janzing2012a}
+Dominik Janzing, Joris Mooij, Kun Zhang, Jan Lemeire, Jakob Zscheischler,
+  Povilas Daniusis, Bastian Steudel, and Bernhard Sch{\"{o}}lkopf.
+\newblock {Information-geometric approach to inferring causal directions}.
+\newblock {\em Artificial Intelligence}, 182-183:1--31, may 2012.
+
+\bibitem{Janzing2012}
+Dominik Janzing and Jonas Peters.
+\newblock {On causal and anticausal learning}.
+\newblock In {\em International Conference on Machine Learning}, 2012.
+
+\bibitem{LopezPaz2014}
+David Lopez-Paz, Krikamol Muandet, and Benjamin Recht.
+\newblock {The Randomized Causation Coefficient}.
+\newblock {\em arXiv preprint arXiv:1409.4366}, sep 2014.
+
+\bibitem{Robbins1952}
+Herbert Robbins.
+\newblock {Some aspects of the sequential design of experiments}.
+\newblock {\em Bulletin of the American Mathematical Society}, 58(5):527--536,
+  1952.
+
+\bibitem{Auer1995}
+P.~Auer, N.~Cesa-Bianchi, Y.~Freund, and R.E. Schapire.
+\newblock {Gambling in a rigged casino: The adversarial multi-armed bandit
+  problem}.
+\newblock {\em Proceedings of IEEE 36th Annual Foundations of Computer
+  Science}, pages 322--331, 1995.
+
+\bibitem{Auer2002}
+P~Auer, N~Cesa-bianchi, and P~Fischer.
+\newblock {Finite time analysis of the multiarmed bandit problem}.
+\newblock {\em Machine Learning}, 47(2-3):235--256, 2002.
+
+\bibitem{Bubeck2012}
+S{\'{e}}bastien Bubeck.
+\newblock {Regret Analysis of Stochastic and Nonstochastic Multi-armed Bandit
+  Problems}.
+\newblock {\em Foundations and Trends® in Machine Learning}, 5(1):1--122,
+  2012.
+
+\bibitem{Audibert2009}
+JY~Audibert and S{\'{e}}bastien Bubeck.
+\newblock {Minimax policies for adversarial and stochastic bandits}.
+\newblock In {\em Proceedings of the 22nd annual Conference On Learning
+  Theory}, pages 773----818, 2009.
+
+\bibitem{Lattimore2015}
+Tor Lattimore.
+\newblock {Optimally Confident UCB : Improved Regret for Finite-Armed Bandits}.
+\newblock (1):1--16, 2015.
+
+\bibitem{Mannor2011}
+Shie Mannor and Ohad Shamir.
+\newblock {From Bandits to Experts: On the Value of Side-Observations}.
+\newblock pages 1--9, 2011.
+
+\bibitem{Lelarge2012}
+Marc Lelarge and Inria Ens.
+\newblock {Leveraging Side Observations in Stochastic Bandits}.
+\newblock {\em Uai}, 2012.
+
+\bibitem{Alon2013}
+Noga Alon and Nicol{\`{o}} Cesa-Bianchi.
+\newblock {From Bandits to Experts: A Tale of Domination and Independence}.
+\newblock {\em arXiv preprint arXiv: {\ldots}}, pages 1--22, 2013.
+
+\bibitem{Buccapatnam2014}
+Swapna Buccapatnam, Atilla Eryilmaz, and B~{Shroff Ness}.
+\newblock {Stochastic Bandits with Side Observations on Networks}.
+\newblock {\em ACM SIGMETRICS'14, June 2014, Austin, Texas}.
+
+\bibitem{Kocak2014}
+Tom{\'{a}}{\v{s}} Koc{\'{a}}k, Gergely Neu, Michal Valko, and R{\'{e}}mi Munos.
+\newblock {Efficient learning by implicit exploration in bandit problems with
+  side observations}.
+\newblock {\em Neural Information Processing Systems}, pages 1--9, 2014.
+
+\bibitem{Alon2015}
+Noga Alon, Nicol{\`{o}} Cesa-Bianchi, Ofer Dekel, and Tomer Koren.
+\newblock {Online Learning with Feedback Graphs : Beyond Bandits}.
+\newblock {\em Colt}, pages 1--26, 2015.
+
+\bibitem{Piccolboni2001}
+Antonio Piccolboni and Christian Schindelhauer.
+\newblock {Discrete prediction games with arbitrary feedback and loss}.
+\newblock In {\em COLT/EuroCOLT}, pages 208--223. Springer, 2001.
+
+\bibitem{Bartok2014}
+G{\'{a}}bor Bart{\'{o}}k, Dean~P Foster, D{\'{a}}vid P{\'{a}}l, Alexander
+  Rakhlin, and Csaba Szepesv{\'{a}}ri.
+\newblock {Partial monitoring-classification, regret bounds, and algorithms}.
+\newblock {\em Mathematics of Operations Research}, 39(4):967--997, 2014.
+
+\bibitem{Koller2009}
+Daphne Koller and Nir Friedman.
+\newblock {\em {Probabilistic graphical models: principles and techniques}}.
+\newblock MIT Press, 2009.
 
 \end{thebibliography}

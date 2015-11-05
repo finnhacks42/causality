@@ -98,7 +98,7 @@
 
 \newcommand{\defined}{\vcentcolon =}
 \newcommand{\rdefined}{=\vcentcolon}
-\newcommand{\E}{\mathbb E}
+\newcommand{\E}[1]{\mathbb E\left[{#1}\right]}
 \newcommand{\Var}{\operatorname{Var}}
 \newcommand{\calF}{\mathcal F}
 \newcommand{\sr}[1]{\stackrel{#1}}
@@ -132,9 +132,9 @@
 
 \section{Introduction}
 
-Learning the outcome of an action is central to many real world problems. Does de-worming children in poor countries improve health and educational outcomes [worm-wars]? Would increasing the minimum wage benefit lead to higher unemployment? Will offering this customer a discount improve my revenue? These questions are difficult as they require more than identifying a pattern in data.  There are two, very different, major approaches to this problem with the machine learning community: reinforcement learning and causal inference. 
+Learning the outcome of an action is central to many real world problems. Does de-worming children in poor countries improve health and educational outcomes \cite{miguel2004,davey2015}? Would increasing the minimum wage lead to higher unemployment? Will offering this customer a discount improve my revenue? These questions are difficult as they require more than identifying a pattern in data.  There are two, very different, approaches to this problem within the machine learning community: reinforcement learning and causal inference. 
 
-Reinforcement learning addresses the problem of learning from explicitly taking actions. There is typically some state or environment, an agent chooses an action from those available in the current state, the state evolves stochastically as a function of the selected action and the agent then receives some feedback or reward that is a function of the new state. This setting differs from the standard classification problem in that the agent must learn from feedback on the selected action, rather than being presented with the correct action for a given state. A common modelling assumption is to assume that the state evolves only as a function of the previous state and the action chosen, and given these, is independent of the previous history of states and actions. This is known as a Markov decision process or MDP.  A particularly well studied and understood model are MDPs with only a single state. In this case, there are a set of actions, each associated with a fixed but unknown reward distribution and at each time step our agent selects and action and receives corresponding feedback. This is known as the multi-armed bandit problem. 
+Reinforcement learning addresses the problem of learning from explicitly taking actions. There is typically some state or environment. An agent chooses an action from those available in the current state. The state then evolves stochastically as a function of the selected action and the agent receives some feedback or reward that is a function of the new state. This setting differs from the standard classification problem in that the agent must learn from feedback on the selected action, rather than being presented with the correct action for a given state. A common modelling assumption is that the state evolves only as a function of the previous state and the action chosen, and given these, is independent of the previous history of states and actions. This is known as a Markov decision process or MDP.  A particularly well studied and understood model is MDPs with only a single state. In this case, there are a set of actions, each associated with a fixed but unknown reward distribution and at each time step our agent selects and action and receives corresponding feedback. This is known as the multi-armed bandit problem. 
 
 Causal inference makes use of assumptions to allow the outcome of actions to be predicted from observational data. The key to causal inference is a framework that can model how actions change the state of the world. This framework then allows us to map information collected in one setting to another. 
 
@@ -144,26 +144,26 @@ Both approaches can be seen as extensions to the concept of randomised controlle
 
 \subsection{Models of causality and intervention}
 
-Predicting the outcome of actions without explicitly taking them requires assumptions about how the actions will change the system. A very powerful and general model that underlies much of the recent work in causality is the causal bayesian network. A causal Bayesian network, or directed acyclic graph (DAG), is a Bayesian network in which a link $V_{i} \rightarrow V_{j}$, is defined to mean $V_{i}$ directly causes $V_{j}$. This means that if we intervene and change the value of $V_{i}$, we expect $V_{j}$ to change, but if we intervene to change $V_{j}$, $V_{i}$ will not change. More generally, if $G$ is a causal network for a distribution $P$ defined over variables $V_{1}...V_{N}$, then the distribution after an intervention where we set $X \subset V$ to $x$, denoted $do(X=x)$ is obtained by simply dropping the terms for each of the variables in $X$ from the factorization given by the network. This is referred to as the truncated product formula \cite{Pearl2000}. 
+Predicting the outcome of actions without explicitly taking them requires assumptions about how the actions will change the system. A very powerful and general model that underlies much of the recent work in causality is the causal bayesian network. A causal Bayesian network, or directed acyclic graph (DAG), is a Bayesian network in which a link $V_{i} \rightarrow V_{j}$ is defined to mean $V_{i}$ directly causes $V_{j}$. This means that if we intervene and change the value of $V_{i}$, we expect $V_{j}$ to change, but if we intervene to change $V_{j}$, $V_{i}$ will not change. More generally, if $G$ is a causal network for a distribution $P$ defined over variables $V_{1}...V_{N}$, then the distribution after an intervention where we set $X \subset V$ to $x$, denoted $do(X=x)$ is obtained by simply dropping the terms for each of the variables in $X$ from the factorization given by the network. This is referred to as the truncated product formula \cite{Pearl2000}. 
 
-If the network contains latent (unobservable) variables we will not be able to calculate all the terms in the truncated product formula. However, it may still be possible to determine the post-interventional distribution of specific variables of interest. A general causal query $P(Y|do(X=x))$ is identifiable if it can be shown to be equivalent to an expression containing only pre-interventional quantities. This means that asymptotically we obtain an unbiased estimate for the distribution after an intervention based on purely observational data. 
+If the network contains latent (unobservable) variables we will not be able to calculate all the terms in the truncated product formula. However, it may still be possible to determine the post-interventional distribution of specific variables of interest. A general causal query $P(Y|do(X=x))$ is identifiable if it can be shown to be equivalent to an expression containing only pre-interventional quantities. This means that, asymptotically, we obtain an unbiased estimate for the distribution after an intervention based on purely observational data. 
 
-The Do Calculus is a set of three rules that allow transformations of interventional terms to non-interventional ones, given a causal graph \cite{}. They are derived directly from d-seperation properties of graphical models and the definition of intervention in causal DAGs. These rules are complete. A query is identifiable if and only if it can be transformed to contain only non-interventional terms via the do-calculus and there is an equivalent algorithm that can take any causal graph and query and determine identifiability \cite {}. I have implemented this algorithm as a simple javascript application to demonstrate XXXX. If a query is not identifiable, it may still be possible to get bounds for causal effects, for example using instrumental variables \cite{} or by making additional assumptions. 
+The do calculus is a set of three rules that allow transformations of interventional terms to non-interventional ones, given a causal graph \cite{Pearl2000}. They are derived directly from d-seperation properties of graphical models and the definition of intervention in causal DAGs. These rules are complete. A query is identifiable if and only if it can be transformed to contain only non-interventional terms via the do-calculus \cite{Shpitser2006,Huang2006} and there is an equivalent algorithm that can take any causal graph and query and determine identifiability \cite {Shpitser2008} (see XXXX for a javascript demonstration of this algorithm). If a query is not identifiable, it may still be possible to get bounds for causal effects, for example using instrumental variables \cite{Angrist2009} or by making additional assumptions. 
 
 There are two other key frameworks that arise in causal inference. Counterfactuals and structural equation models.  Counterfactuals are statements about imagined or alternate realities, are prevalent in everyday language and may play a role in the development of causal reasoning in humans \cite{Weisberg2013}. Causal effects are differences in counterfactual variables; what is the difference between what would happen if we did one thing versus what would happen if we did something else \cite{Rubin1974,Rubin1978,Rosenbaum1983, Rubin2005,Rubin2008}. 
 
-For example, if we wanted to estimate the causal effect of a medical treatment, then we might let $Y^{1}$ be a counterfactual random variable representing the (binary) potential outcome if treated. The distribution of $Y^{1}$ is the distribution we would see of the outcome, $Y$, if everyone was treated. Similarly $Y^{0}$ represents the potential outcome for the placebo. The causal effect of the drug is the difference between the probability of recovery, across the population, if everyone was treated, and the probability of recovery given placebo $P(Y^{1})-P(Y^{0})$. This quantity is estimable from observational data if we assume $X \ci Y^{0}$ and $X \ci Y^{1}$. These assumptions are referred to as ignoreability assumptions \cite{Rosenbaum1983}. They state that the treatment a each person receives is independent of whether they would recover if treated and if they would recover if not treated. Graphically, this is equivalent to the assumption that there is no variable that is a parent of both the treatment $X$ and the outcome $Y$. 
+For example, if we wanted to estimate the causal effect of a medical treatment, then we might let $Y^{1}$ be a counterfactual random variable representing the (binary) potential outcome if treated. The distribution of $Y^{1}$ is the distribution we would see in the outcome $Y$ if everyone was treated. Similarly $Y^{0}$ represents the potential outcome for the placebo. The causal effect of the drug is the difference between the probability of recovery, across the population, if everyone was treated, and the probability of recovery given placebo $P(Y^{1})-P(Y^{0})$. This quantity can be estimated from observational data if we assume $X \ci Y^{0}$ and $X \ci Y^{1}$. These assumptions are referred to as ignoreability assumptions \cite{Rosenbaum1983}. They state that the treatment each person receives is independent of whether they would recover if treated and if they would recover if not treated. Graphically, this is equivalent to the assumption that there is no variable that is a parent of both the treatment $X$ and the outcome $Y$. 
 
 
 Structural equation models (SEMs) describe a deterministic world, where underlying mechanisms determine the output of any process for a given input. The mechanism (but not the output) is assumed to be independent of what is fed into it. Linear structural equation models have a long history for causal estimation \cite {Wright1921,Haavelmo1943}. Mathematically, each variable is a deterministic function of its direct causes and a noise term that captures unmeasured variables. The noise terms are required to be mutually independent. If there is the possibility that an unmeasured variable influences more than one variable of interest in a study, it must be modelled explicitly as a latent (unobserved) variable. Structural equation models can be represented visually as a network. Each variable is a node and arrows are drawn from causes to their effects. If the network for a structural equation model is acyclic then it implies a recursive factorization of the joint distribution over its variables. In other words, it is a causal bayesian network. 
 
-Remarkably for models developed relatively independently in fields with very different approaches and problems, the models we have discussed are almost equivalent. To determine if and how an interventional query can be non-parametrically identified, it is equivalent to specify assumptions graphically in terms of bayesian networks or as structural equation models or as conditional independence statements involving counterfactual variables (ignorability assumptions). 
+Remarkably for models developed relatively independently in fields with very different approaches and problems, the models we have discussed are functionally very similar. To determine if and how an interventional query can be non-parametrically identified, it is equivalent to specify assumptions graphically in terms of bayesian networks or as structural equation models or as conditional independence statements involving counterfactual variables (ignorability assumptions). 
 
 It is possible to pose causal queries in terms of counterfactuals that are not interventional and cannot be phrased in terms of the do-notation. The scientific and philosophical validity of such counterfactual queries remains under question \cite{Dawid2000,Dawid2014}, however they are nonetheless widely posed in the form of attribution of causal effects to different pathways and mediation \cite{Pearl2014,Imai2010a,VanderWeele2011}. 
 
-There are differences between the models we have considered when it comes to these non-interventional queries. Counterfactuals are not defined in causal Bayesian networks, as they only encode information on the interventional distribution over variables.  Counterfactuals can be defined in terms of structural equation models \cite{Pearl2000} but there are subtle differences depending on the form of assumptions made. Structural equation models with independent errors allows the identification of quantities in mediation studies, which are not identifiable with the weak ignorability assumptions and cannot be tested experimentally \cite{Richardson2013}.  
+There are differences between the models we have considered when it comes to these non-interventional queries. Counterfactuals are not defined in causal Bayesian networks, as they only encode information on the interventional distribution over variables.  Counterfactuals can be defined in terms of structural equation models \cite{Pearl2000} but there are subtle differences depending on the form of assumptions made. Structural equation models with independent errors allow the identification of quantities in mediation studies, which are not identifiable with the weak ignorability assumptions and cannot be tested experimentally \cite{Richardson2013}.  
 
-In practice, differences in focus and approach across different fields eclipse these actual differences in the models. The work on causal graphical models \cite{Pearl2000,Sprites} focuses on non-parametric estimation in the population limit and rigorous theoretical foundations. The Neyman-Rubin framework builds on our understanding of randomized experiment and generalizes to quasi-exeperimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimating average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \cite{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data so as to support policy decisions is central to the field. Economists are often interested in broader measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \cite{Heckman2008}. In addition, the parametric structural equation models favoured in economics can be extended to analyse cyclic (otherwise referred to as non-recursive) models. 
+In practice, differences in focus and approach across different fields eclipse the actual differences in the models. The work on causal graphical models \cite{Pearl2000,Sprites} focuses on non-parametric estimation in the population limit and rigorous theoretical foundations. The Neyman-Rubin framework builds on our understanding of randomized experiment and generalizes to quasi-exeperimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimating average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \cite{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data so as to support policy decisions is central to the field. Economists are often interested in broader measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \cite{Heckman2008}. In addition, the parametric structural equation models favoured in economics can be extended to analyse cyclic (otherwise referred to as non-recursive) models. 
 
 
 \subsection{Discovering causal structure}
@@ -176,9 +176,55 @@ One general approach is to look for clues about the structure of the network in 
 
 Since $G$ is a bayesian network, if $Z$ d-separates $X$ and $Y$ in $G$ then $(X \ci Y|Z)$ in $P$ . However, we want to work in the other direction, from conditional independence in the distribution to the structure of the network. This requires that we assume the reverse condition: $(X \ci Y|Z)$ in $P$ must imply $Z$ d-separates $X$ and $Y$ in $G$. This assumption, commonly referred to as  \textbf{\textit{faithfulness}}, says there are no additional independence relations that are satisfied in $P$ but not in all distributions $\boldsymbol{P'}$ that are compatible with $G$. Stating that $P$ is faithful to $G$ is equivalent to $G$ is a \textbf{\textit{perfect map}} for $P$.
 
-Faithfulness is an assumption. It does not always hold and we cannot verify it from the observational data we wish to use for causal inference. However, most distributions generated by a causal bayesian network will be faithful to that network. For faithfulness to be violated, different causal effects must exactly balance one-another out. For example, consider a simple binary variable model of chocolate consumption, income and obesity (figure). If the coefficients in the conditional probability tables are just right then the direct effect of chocolate on obesity will exactly balance the indirect effect through income and obesity will appear independent of chocolate consumption. However, this independence is not stable. It would disappear under a small perturbation to any of the parameters.  
+Faithfulness is an assumption. It does not always hold and we cannot verify it from the observational data we wish to use for causal inference. However, most distributions generated by a causal bayesian network will be faithful to that network. For faithfulness to be violated, different causal effects must exactly balance one-another out. For example, consider a simple binary variable model of chocolate consumption, income and obesity, figure \ref{fig:unfaithful}. If the coefficients in the conditional probability tables are just right then the direct effect of chocolate on obesity will exactly balance the indirect effect through income and obesity will appear independent of chocolate consumption. However, this independence is not stable. It would disappear under a small perturbation to any of the parameters.  
 
-Given the faithfulness assumption, our causal discovery problem reduces to finding the set of bayesian networks that have exactly the dependency structure as we observe in $P$. A wide range of algorithms have been developed based on this key observation, see table \ref{table:discovery_algorithms}. Constraint based methods such as the PC algorithm \cite{}, FCI algorithm \cite{} and RFCI algorithm \cite{}, perform sequential conditional independence tests and eliminate inconsistent graphs. Search and score based methods, such as GES \cite{}, search over the space of graphs and score them according to how well they fit the independences given a complexity penalising prior. Constraint based methods are faster, particularly for sparse graphs, but can lack robustness as errors in early conditional independence tests can propagate. Search and score based methods are more robust for small samples sizes but difficult to scale to larger graphs. This has led to the development of hybrid approaches, such as the MMHC algorithm \cite{}. A key component of causal discovery is the ability to do high dimensional non-parametric conditional independence tests. Developments in kernalized conditional independence tests \cite{},\cite{Zhang2012},\cite{Gretton2008} have made this possible.
+\begin{figure}[h]
+\caption{Example of a data generated from a causal graph violating the faithfulness assumption}
+\label{fig:unfaithful}
+\centering
+\begin{subfigure}[t]{0.99\textwidth}
+\centering
+\caption{True causal graph generating $P$}
+\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=0.45cm,thick,main node/.style={observedrect}]
+\node[main node, align=center,minimum height=4.3em](C){\textbf{Chocolate} \\ \begin{tabular}{| c | c | c |}
+  \hline			
+  Income & H & L \\
+  \hline
+  P(C=H) & .8639 & .2\\
+  \hline
+\end{tabular}};
+\node[main node, above right=of C, align=center](I){\textbf{Income} \\ $P(I=High) = 0.5$};
+\node[main node, below right=of I, align=center,minimum height=4.3em](O){\textbf{Obesity} \\ \begin{tabular}{| c | c | c | c | c |}
+  \hline			
+  Income & \multicolumn{2}{| c |}{H} & \multicolumn{2}{| c |}{L} \\
+  \hline
+  Chocolate & H & L & H & L \\
+  \hline
+  $P(O=Y)$ & .4 & .2 & .7 & .5 \\
+  \hline
+\end{tabular}};
+\path[]
+	(I) edge (C) edge (O)
+	(C) edge (O);
+\end{tikzpicture}
+\vspace{1em}
+\end{subfigure}
+
+\begin{subfigure}[b]{0.99\textwidth}
+\centering
+\caption{Perfect map for $P, \;(C \ci O)$}
+\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=0.45cm,  thick,main node/.style={observedrect}, shaded/.style={latent}]
+\node[main node](C){Chocolate};
+\node[main node, below right=of C](I){Income};
+\node[main node, above right=of I](O){Obesity};
+\path[]
+	(C) edge (I)
+	(O) edge (I);
+\end{tikzpicture}
+\end{subfigure}
+\end{figure}
+
+Given the faithfulness assumption, our causal discovery problem reduces to finding the set of bayesian networks that have exactly the dependency structure as we observe in $P$. A wide range of algorithms have been developed based on this key observation, see table \ref{table:discovery_algorithms}. Constraint based methods such as the PC algorithm \cite{Sprites2000}, FCI algorithm \cite{Sprites2000} and RFCI algorithm \cite{Colombo2012}, perform sequential conditional independence tests and eliminate inconsistent graphs. Search and score based methods, such as GES \cite{Chickering2002}, search over the space of graphs and score them according to how well they fit the independences given a complexity penalising prior. Constraint based methods are faster, particularly for sparse graphs, but can lack robustness as errors in early conditional independence tests can propagate. Search and score based methods are more robust for small samples sizes but difficult to scale to larger graphs. This has led to the development of hybrid approaches, such as the MMHC algorithm \cite{Tsamardinos2006}. A key component of causal discovery is the ability to do high dimensional non-parametric conditional independence tests. Developments in kernalized conditional independence tests,\cite{Gretton2008,Zhang2012} have made this possible.
 
 
 \begin{table}[h]
@@ -205,59 +251,47 @@ Given the faithfulness assumption, our causal discovery problem reduces to findi
 
  
 
-If the end goal of causal discovery is to estimate causal effects, then it may not be necessary to learn the entire graph, only the subset of the graph surrounding target variables of interest. Such local causal discovery techniques can be scaled to problems with many more variables \cite{}. Once a set of causal graphs has been identified, causal effects of interest can be bounded by combining the results for the all the networks. This procedure is the IDA algorithm \cite{Maathuis2009} and has been found to outperform standard regularization techniques at finding causal effects in a high-dimensional yeast gene expression data set \cite{Maathuis2010}. An implementation is available in the R package \cite{Kalisch2012}
+If the end goal of causal discovery is to estimate causal effects, then it may not be necessary to learn the entire graph, only the subset of the graph surrounding target variables of interest. Such local causal discovery techniques can be scaled to problems with many more variables \cite{Aliferis2002}. Once a set of causal graphs has been identified, causal effects of interest can be bounded by combining the results for the all the networks. This procedure is the IDA algorithm \cite{Maathuis2009} and has been found to outperform standard regularization techniques at finding causal effects in a high-dimensional yeast gene expression data set \cite{Maathuis2010}. An implementation is available in the R package \cite{Kalisch2012}
 
 \subsubsection{Discovery with functional models}
 All of the algorithms we have considered so far return a Markov equivalence class. They cannot distinguish between two models that result in the same set of conditional independence relations. Consider the very simple case where we have only two variables and the only possible causal structures are $X \rightarrow Y$ or $Y \rightarrow X$. These models have the same dependency structure but in one case $P(Y|do(X)) = P(Y|X)$ and in the other $P(Y|do(X)) = P(Y)$. No algorithm relying purely on conditional independence relations can separate these two cases.
 
-One solution is to utilize structural equation models to specify additional assumptions. For example, if we assume that noise is additive, such that $X \rightarrow Y \implies Y = f(X)+\epsilon$, then this will only be invertible such that $X = g(Y) + \epsilon'$ for specific pairs of functions $f$ and noise distributions $\epsilon$. Thus in general we will be able to identify the causal direction \cite{Hoyer2009}. This can be extended to post-non-linear additive noise, $Y = h(f(X)+ \epsilon)$, \cite{Zhang2008a}. These techniques can also be applied over more than two variables \cite{}.
+One solution is to utilize structural equation models to specify additional assumptions. For example, if we assume that noise is additive, such that $X \rightarrow Y \implies Y = f(X)+\epsilon$, then this will only be invertible such that $X = g(Y) + \epsilon'$ for specific pairs of functions $f$ and noise distributions $\epsilon$. Thus in general we will be able to identify the causal direction \cite{Hoyer2009}. This can be extended to post-non-linear additive noise, $Y = h(f(X)+ \epsilon)$, \cite{Zhang2008a}. These techniques can also be applied over more than two variables \cite{Peters2014}.
 
-A more general approach is to leverage the assumption that the functions are independent of inputs \cite{}. This leads to the idea that $P(X)$ and $P(Y|X)$ are independent if $X \rightarrow Y$ but not if $Y \rightarrow X$. \cite{} propose testing for this by applying both semi-supervised and standard techniques to estimate $P(Y|X)$. Semi-supervised methods, which utilize additional points from $P(X)$ to learn $P(Y|X)$ should only be able to outperform standard methods if $Y \rightarrow X$. 
+A more general approach is to leverage the assumption that the functions are independent of inputs \cite{Janzing2012a}. This leads to the idea that $P(X)$ and $P(Y|X)$ are independent if $X \rightarrow Y$ but not if $Y \rightarrow X$. \cite{Janzing2012} propose testing for this by applying both semi-supervised and standard techniques to estimate $P(Y|X)$. Semi-supervised methods, which utilize additional points from $P(X)$ to learn $P(Y|X)$ should only be able to outperform standard methods if $Y \rightarrow X$. 
 
-Finally, rather than explicitly developing an algorithm based on a specific asymmetry between cause and effect, \cite{} propose learning what causality looks like from data. They take as input a dataset where each row of data is itself a dataset in which either $X \rightarrow Y$ or $Y \rightarrow X$ and a corresponding label. Estimates of the distributions $P(X)$, $P(Y)$ and $P()$ for each row are then mapped to features in some kernel space via mean kernel embeddings and finally a standard classification algorithm can be trained to learn label. New datasets where the direction of causality is unknown are then simply mapped to the kernel space and the causal direction is classified according to the trained classifier. In practice, the classifier is trained mostly on simulated data, as it is difficult to find a sufficient set of causal problems with only two variables where the direction of causality is known. 
+Finally, rather than explicitly developing an algorithm based on a specific asymmetry between cause and effect, \cite{LopezPaz2014} propose learning what causality looks like from data. They take as input a dataset where each row of data is itself a dataset in which either $X \rightarrow Y$ or $Y \rightarrow X$ and a corresponding label. Estimates of the distributions $P(X)$, $P(Y)$ and $P()$ for each row are then mapped to features in some kernel space via mean kernel embeddings and finally a standard classification algorithm can be trained to learn label. New datasets where the direction of causality is unknown are then simply mapped to the kernel space and the causal direction is classified according to the trained classifier. In practice, the classifier is trained mostly on simulated data, as it is difficult to find a sufficient set of causal problems with only two variables where the direction of causality is known. 
 
  
 \section{Multi-armed Bandits}
 
-In its classic formulation \cite{Robbins1952} the K-armed bandit ...
+In its classic formulation \cite{Robbins1952} the (stochastic) K-armed bandit describes a sequential decision making problem, with $K$ possible actions or arms. Each arm $i$ is associated with a fixed but unknown reward distribution $\nu_i$. For each timestep $t$ upto a horizon $T$ the learner selects an action $I_t \in \set{1...K}$ and receives a reward, $g_{I_t,t}$, sampled i.i.d from $\nu_i$. The goal of the learner is to maximize the total reward they receive. This problem introduces the fundamental exploration-exploitation trade-off. The learner must balance playing arms that have yielded good results previously with exploring arms about which they are uncertain. 
 
-
-Definition of regret
-
-An algorithm is learning if it can obtain sublinear regret.
-
-
-Mention of adversarial and markovian alternatives.
-
-\subsection{Regret bounds for classic K-armed bandit}
-
-\begin{itemize}
-\item the lower bound for any algorithm for the K-armed bandit problem (stochastic or adversarial) is $\bigo{\sqrt{nK}}$ \cite{Auer1995}
-
-\item UCB problem dependent upper bound \cite{Auer2002} 
+The performance of bandit algorithms is generally described by the (pseudo) regret, $R(T)$. This is the difference between the expected reward obtained by the algorithm and the expected reward of selecting the best action in every timestep. 
 
 \eqn {
-R^{ucb}_\mu(n) \in \bigo{\sum_{i=2}^K \frac{1}{\Delta_i}\log(n)}
+R(T) = max_{\set{i=1...K}} \E{\sum_{t=1}^T g_{i,t}} - \E{\sum_{t=1}^T g_{I_t,t}}
 }
-\item UCB problem independent upper bound $\bigo{\sqrt{nK\log(n)}}$ \cite{Bubeck2012}
 
-\item Modifications of UCB can close this gap. \cite{Lattimore2015, Audibert2009}. Subtle modification of the UCB algorithm closes the gap with the lower bound (ie problem independent upper bound of $\bigo{\sqrt{nK}}$, whilst yielding a similar problem dependent upper bound to UCB. \cite{Lattimore2015}
+If we let $\mu_i = \E{\nu_i}$ denote the expected reward for each arm $i$ and $\mu^* = max_{\set{i=1...K}}(\mu_i)$ denote the reward for the best arm:
 
-\item Exp3 achieves $\bigo{\sqrt{nK\log(n)}}$ regret \cite{Auer1995}
+\eqn {
+R(T) = T\mu^* - \sum_{t=1}^T E[\mu_{I_t}] 
+} 
 
-\item $\bigo{\sqrt{nK}}$ has also been achieved for the adversarial setting. \cite{Audibert2009}
-  
-\end{itemize}
+An algorithm is learning if it obtains regret that is sublinear in $T$. The lower bound on the worst case regret for any algorithm (stochastic or adversarial) for the K-armed bandit problem is  $\bigomega{\sqrt{TK}}$ \cite{Auer1995}.
 
+A key algorithm for stochastic bandits, with tractable analysis and strong performance guarantees, is the UCB algorithm \cite{Auer2002}. They key to this algorithm is that it keeps track of an upper confidence bound (hence UCB) on the expected reward for each arm and selects the arm with the highest one. This balances exploration and exploitation as an arm with a high upper confidence bound must have either a high expected reward or large uncertainty on the expected reward. Assume for notational simplicity that $\mu_1 > \mu_2 > ... > \mu_K$, such that $\mu^* = \mu_1$, and let $\Delta_i = \mu_i - \mu^*$ be the sub-optimality for each arm. The (problem dependent) regret for UCB is bounded by: 
 
-\subsection{Extensions to K-armed bandits}
+\eqn {
+R^{ucb}(T) \in \bigo{\sum_{i=2}^K \frac{1}{\Delta_i}\log(T)}
+}
+
+This bound blows up as differences $\Delta_i \rightarrow 0$, however the regret itself does not - since although we may not be able to distinguish arms with very small $\Delta_i$ from the optimal arm, we also do not lose much by selecting them. In the worst case, $R^{ucb}(T) = \bigo{\sqrt{TK\log(T)}}$ \cite{Bubeck2012}. Subtle modifications to the UCB algorithm can eliminate the logarithmic term in this worst case regret bound. This yields $R^{ucb}(T) = \bigo{\sqrt{TK}}$ and closes the gap with the worst case lower bound \cite{Audibert2009,Lattimore2015}, whilst retaining a good problem dependent bound of the form achieved by UCB \cite{Lattimore2015}.
+
+Adversarial bandits are an alternate, widely studied, setting that relaxes the assumption that rewards are generated stochastically. Instead, simultaneously with the learner selecting an action $I_t$, a potentially malicious adversary selects the reward vector $\boldsymbol{g}_t$. As in the stochastic setting, the learner then receives reward $g_{I_t,t}$. The seminal algorithm for adversarial bandits is Exp-3, which, like UCB, obtains regret $\bigo{\sqrt{TK\log(T)}}$ regret \cite{Auer1995}. Optimal algorithms, with $R(T) = \bigo{\sqrt{TK}}$, have also been demonstrated for the adversarial setting \cite{Audibert2009}.
 
 The classic multi-armed bandit is a powerful tool for sequential decision making. However, the regret grows linearly with the number of (sub-optimal) actions and many real world problems have large or even infinite action spaces. This has led to the development of a wide range of models that assume some structure across the reward distributions for different arms, for example linear bandits, dependent bandits, X-armed bandits and gaussian process bandits, or that consider more complex feedback, for example the recent work on graph feedback \cite{Mannor2011,Lelarge2012,Alon2013,Buccapatnam2014,Kocak2014,Alon2015} and partial monitoring \cite{Piccolboni2001,Bartok2014}. 
-
-
-Feedback with expert advice (full feedback) on all actions get $R_n = O(\sqrt{n\log(K)})$
-
-Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It has demonstrated that problems fall into one of four categories, trivial with no regret, easy with $R_n = \bigthetatilde{\sqrt{n}}$ , hard with $R_n = \bigtheta{n^{2/3}}$ and hopeless with $R_n = \bigomega{n}$ \cite{Bartok2014}. Focus on finite sets of actions and feedback signals. Analysis yields algorithms that are optimal with respect to the horizon $n$ but not necessarily other parameters (ie $K$). 
 
 
 \section{Unifying the frameworks}
@@ -425,7 +459,8 @@ We then explicitly play each of the $m$ infrequently occurring arms $\frac{h}{2m
 \hat{\mu}_{ij} = \frac{2m}{h}\sum_{t = 1}^{h/2m}\ind{Y_t = 1|X_i=j}
 }
 
-We then simply play the arm with the highest estimated reward for the remaining $T-h$ timesteps. We can show that we can select an $h$ (based on $T$, $N$ and $m$) that leads to worst case regret $R_T = \bigotilde{T^{2/3}m^{1/3}}$. This result can still be obtained in the case where $\boldsymbol{q}$ is unknown and must be learned during the exploration time. Comparing this to the standard bandit regret, $R_T = \bigo{\sqrt{TK}}$, we expect the causal algorithm to do better if $m < \frac{K^{3/2}}{\sqrt{T}}$.
+We then simply play the arm with the highest estimated reward for the remaining $T-h$ timesteps. We can show that we can select an $h$ (based on $T$, $N$ and $m$) that leads to worst case regret $R_T = \bigotilde{T^{2/3}m^{1/3}}$. This result can still be obtained in the case where $\boldsymbol{q}$ is unknown and must be learned during the exploration time. Comparing this to the standard bandit regret, $R_T = \bigo{\sqrt{TK}}$, we expect the causal algorithm to do better if $m < \frac{K^{3/2}}{\sqrt{T}}$. \footnote{ $\bigotilde{.}$ and $\bigthetatilde{.}$ suppress polylogarithmic factors}
+
 
 In this algorithm, we have only used the side information provided by the $do()$ action about other actions. Since the $do()$ action fully reveals the value of alternate actions we could have incorporated this information via the graph feedback model \cite{}, where at each timestep the feedback graph $G_t$ is selected stochastically, dependent on $\boldsymbol{q}$, and revealed after an action has been chosen. The feedback graph is distinct from the causal graph. A link $A \rightarrow B$ in $G_t$ indicates that selecting the action $A$ reveals the reward for action $B$. For this specific problem, $G_t$ will always be a star graph with the action $do()$ connected to half the remaining actions. The Exp3-IX algorithm \cite{Kocak2014} was developed for the adversarial version of this problem and has regret $\bigo{\sqrt{\bar{\alpha}T}}$, where $\bar{\alpha}$ is the average independence number of $G_t$. In our case $\bar{\alpha} = \frac{N}{2}$ so we again obtain the regret of the standard bandit algorithm. The issue here is that a malicious adversary can select the same graph each time, such that the rewards for half the arms are never revealed by the informative action. This is equivalent to a, nominally, stochastic selection of feedback graph where $\boldsymbol{q} = \boldsymbol{0}$
 
@@ -433,28 +468,18 @@ In this algorithm, we have only used the side information provided by the $do()$
 
 More generally, assuming causal structure creates more complex types of side information, such as that shown in equation \ref{eq:estimation_transfer}. In this case, selecting one action does not fully reveal an alternate action but provides some information towards an estimate. The quality of the estimate notably depends not only on the number of times that action was selected. For example, to get a good estimate for $X_1 = 1$ by intervening on $X_2$ requires us to sample both $X_2=0$ and $X_2=1$, in proportions dependent on $q_2$. This more complex side information does not fit within the graph feedback framework.
 
-
-
-
+Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
 
 
 
 \subsection{Open questions}
 
-\begin{itemize}
-\item derive lower bounds
-\item generalize to arbitrary causal graphs
-\item leverage the more complex form of side information as in equation XXX, that provides only partial information about additional actions.
-\item consider cases where the causal graph is not known.
-\end{itemize}
+There are many open questions still to be addressed. For the specific setting described above I need to derive lower bounds for the worst case regret so as to determine how close the current approach is to optimal. 
 
-\section{Appendices}
+It is clearly desirable to obtain an algorithm that could be generalized to an arbitrary causal graph. This will likely require the development of a bandit algorithm that can leverage more complex forms of side information like that in equation \ref{eq:estimation_transfer}, in addition to an efficient algorithm for eliminating actions that need not be considered at all.
 
-\subsection{Summary of Notation}
-\begin{itemize}
-\item $\bigotilde{.}$ hides polylogarithmic factors in $\bigo{.}$
-\item $\bigthetatilde{.}$ hides polylogarmic factors in $\bigtheta{.}$
-\end{itemize}
+Another open class of problem to consider are cases where the causal structure is not (fully) known and also needs to be learnt within the online setting.
+
 
 \bibliographystyle{unsrt}% Select the citation style e.g. ieeetr
 \bibliography{../library}% write the directory to the .bib file
