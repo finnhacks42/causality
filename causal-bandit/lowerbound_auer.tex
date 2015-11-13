@@ -1,0 +1,272 @@
+\documentclass{article}
+
+\usepackage{todonotes}
+
+%\usepackage[disable]{todonotes}
+\newcommand{\todot}[2][]{\todo[color=red!20!white,#1]{#2}}
+\newcommand{\todof}[2][]{\todo[color=orange!20!white,#1]{#2}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[boxed]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{mathtools}
+\usepackage{accents}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{dsfont}
+\usepackage[bf]{caption}
+\usepackage{hyperref}
+\hypersetup{
+    bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in AcrobatÕs bookmarks
+    pdftoolbar=true,        % show AcrobatÕs toolbar?
+    pdfmenubar=true,        % show AcrobatÕs menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={My title},    % title
+    pdfauthor={Author},     % author
+    pdfsubject={Subject},   % subject of the document
+    pdfcreator={Creator},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfkeywords={keyword1} {key2} {key3}, % list of keywords
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=red,          % color of internal links (change box color with linkbordercolor)
+    citecolor=blue,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+\usepackage{comment}
+\usepackage{amsthm}
+\usepackage{natbib}
+\usepackage[capitalize]{cleveref}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{tikz} 
+\usetikzlibrary{arrows,positioning} 
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MACROS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\defined}{\vcentcolon =}
+\newcommand{\rdefined}{=\vcentcolon}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\calF}{\mathcal F}
+\newcommand{\sr}[1]{\stackrel{#1}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\ind}[1]{\mathds{1}\!\!\set{#1}}
+\newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
+\newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
+\newcommand{\floor}[1]{\left \lfloor {#1} \right\rfloor}
+\newcommand{\ceil}[1]{\left \lceil {#1} \right\rceil}
+\newcommand{\eqn}[1]{\begin{align}#1\end{align}}
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+\newcommand{\Ber}{\operatorname{Bernoulli}}
+\renewcommand{\P}[1]{\operatorname{P}\left\{#1\right\}}
+\newcommand{\bigomega}[1]{\Omega\left( #1 \right)}
+
+\renewcommand{\Pi}[1]{P_i\left( #1 \right)}
+\newcommand{\Pu}[1]{P_{unif}\left( #1 \right)}
+\newcommand{\Ps}[1]{P_{*}\left( #1 \right)}
+\newcommand{\Ei}[1]{\E_i\left[ #1 \right]}
+\newcommand{\Eu}[1]{\E_{unif}\left[ #1 \right]}
+\newcommand{\Es}[1]{\E_{*}\left[ #1 \right]}
+\renewcommand{\r}{\boldsymbol{r}}
+\renewcommand{\log}[1]{lg\left( #1 \right)}
+\newcommand{\kl}[2]{KL\left(#1 || #2 \right)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+
+
+\begin{document}
+\def\ci{\perp\!\!\!\perp}
+
+
+
+\section{Lower bound on regret for K-armed bernoulli bandits}
+
+For any horizon $T$ and number of arms $K$, there exists a strategy for choosing rewards such that the expected regret for any algorithm is $\bigomega{\sqrt{TK}}$. This strategy is oblivious to the algorithm and assigns rewards at random according to some distribution. Thus the regret bound applies to stochastic and adversarial bandits.
+
+\begin{theorem}
+There exits a distribution over rewards such that: 
+\eqn {
+R(T) \geq \frac{1}{20}\min{\{\sqrt{KT},T\}}
+}
+\end{theorem}
+
+\begin{proof}
+
+Consider a set of environments indexed by $i$. In environment $i$ action $i$ is the 'good' action. All other arms are slightly worse. 
+\begin{itemize}
+\item  In environment $i$, $r_{i,t} \sim Bernoulli(\frac{1}{2}+\epsilon)$ and $r_{j,t} \sim Bernoulli(\frac{1}{2}) \;\; \forall j \neq i$ 
+\item $\Pi{.}$ is the probability with respect to environment $i$
+\item $\Pu{.}$ is the probability with respect to an environment in which the expected reward for \textbf{all} arms is $\frac{1}{2}$
+\item $\Ps{.}$ is the probability with respect to an environment sampled uniformly at random from $\set{1...K}$
+\item $r_t$ is the reward received at time $t$
+\item $\boldsymbol{r}^t = <r_1,...,r_t>$ is the history of rewards received upto time $t$
+\item A is the algorithm, maps $\boldsymbol{r}^{t-1} \rightarrow i_t$
+\item $N_i$ is a random variable representing the number of times action $i$ is selected by the algorithm.
+\item $G_A = \sum_{t=1}^T r_t$ is the total reward for the algorithm
+\item $G_{max}$ is the total reward for playing the optimal arm in every timestep. 
+
+\end{itemize}
+
+\begin{lemma}
+\label{lem:N_not_too_big}
+For any arm $i$,
+\eqn{
+\Ei{N_i} -\Eu{N_i} \leq  \frac{T}{2}\sqrt{-\ln({1-4\epsilon^2})\Eu{N_i}}
+}
+
+This says that the number of times we expect to play arm $i$ in the environment in which it is optimal is not too much greater than the number of times we expect to play it if all arms are equal. 
+
+\begin{proof}
+\eqn{
+\Ei{N_i} -\Eu{N_i} = & \sum_{\r \in \set{0,1}^T}N_i(\r)\left(\Pi{\r} - \Pu{\r} \right) \qquad \leftarrow \text{definition of expectation}\\
+\leq & \sum_{\r:\Pi{\r} \geq \Pu{\r}}N_i(\r)\left(\Pi{\r} - \Pu{\r} \right) \qquad \leftarrow \text{dropped only -ive terms}\\
+\leq & T\sum_{\r:\Pi{\r} \geq \Pu{\r}}\left(\Pi{\r} - \Pu{\r} \right) \qquad \leftarrow N_i \leq T \;\; \forall \r\\
+ = & \frac{T}{2}|| \Pi{\r} - \Pu{\r}||_1 \qquad \leftarrow \text{see Thomas\&Cover 11.137}\\
+ \leq & \frac{T}{2}\sqrt{2\ln({2})\kl{\Pu{\r}}{\Pi{\r}}} \qquad \leftarrow \text{see Thomas\&Cover 11.138}\\
+  = & \frac{T}{2}\sqrt{-ln(2)\log{1-4\epsilon^2} \Eu{N_i}} \qquad \leftarrow \text{see section \ref{sec:calculation_of_divergence}}\\
+    = & \frac{T}{2}\sqrt{-\ln({1-4\epsilon^2}) \Eu{N_i}} \qquad \leftarrow \text{change of base}
+}
+
+\end{proof}
+\end{lemma}
+
+\begin{theorem}
+For any algorithm $A$, if the distribution over rewards is selected unifirmly at random from environments $\set{1...K}$:
+
+\eqn {
+E_*[G_{max} - G_A] \geq \epsilon\left(T - \frac{T}{K} - \frac{T}{2}\sqrt{-\frac{T}{K}ln(1-4\epsilon^2)}  \right) 
+}
+
+\begin{proof}
+
+\eqn{
+\Ei{r_t} &= \left(\frac{1}{2}+\epsilon \right)\Pi{i_t = i} + \frac{1}{2}\left(1-\Pi{i_t = i} \right) \\
+& = \frac{1}{2} + \epsilon \Pi{i_t = i}\\
+\implies \Ei{G_A} &= \sum_{t=1}^T \Ei{r_t} = \frac{T}{2}+\epsilon \Ei{N_i}
+}
+
+This gives us the expected gain given action $i$ is the good action in terms of the number of times the algorithm $A$ selects action $i$. The expected gain over all the environments $i$ is:
+
+\eqn{
+\Es{G_A} &= \frac{1}{K}\sum_{i=1}^K \Ei{G_A} \\
+&= \frac{T}{2} + \frac{\epsilon}{K}\sum_{i=1}^K \Ei{N_i}\\
+\Es{G_{max}} &= \left(\frac{1}{2}+\epsilon \right)T
+}
+
+From lemma \ref{lem:N_not_too_big}
+
+\eqn{
+\sum_{i=1}^K\Ei{N_i} & \leq \sum_{i=1}^K \left(\Eu{N_i}+ \frac{T}{2}\sqrt{-\ln({1-4\epsilon^2})\Eu{N_i}}\right)
+}
+
+Now $\sum_{i=1}^K\Eu{N_i} = T$ (because $\sum_{i=1}^K N_i = T$ ? but doesn't that imply $\sum_{i=1}^K\Ei{N_i} = T$?)
+
+\eqn{
+&\implies \sum_{i=1}^K\Ei{N_i} \leq T+ \frac{T}{2} \sqrt{-\ln(1-4\epsilon^2)KT} \qquad \leftarrow \text{via Jenson's Inequality} \\
+&\implies \Es{G_A} \leq \frac{T}{2} + \epsilon\left(\frac{T}{K}+ \frac{T}{2} \sqrt{-\frac{T}{K}\ln(1-4\epsilon^2)} \right) \\ 
+&\implies \Es{G_{max} - G_A} \geq \epsilon\left(T - \frac{T}{K} - \frac{T}{2}\sqrt{-\frac{T}{K}ln(1-4\epsilon^2)}  \right) 
+}
+
+\end{proof}
+
+
+
+\end{theorem}
+
+
+\end{proof}
+
+\subsection{Calculation of KL divergence}
+\label{sec:calculation_of_divergence}
+\eqn{
+& \kl{p(x_1,...,x_n)}{q(x_1,...,x_n)} =  \sum_{i=1}^N \kl{p(x_i|\boldsymbol{x}^{i-1})}{q(x_i|\boldsymbol{x}^{i-1})} \qquad \leftarrow \text{chain rule for KL divergence} \\
+& \text{where } \kl{p(x_i|\boldsymbol{x}^{i-1})}{q(x_i|\boldsymbol{x}^{i-1})} = 
+\sum_{\boldsymbol{x}^{i-1}}p(\boldsymbol{x}^{i-1})\sum_{x_i}p(x_i|\boldsymbol{x}^{i-1})\log{\frac{p(x_i|\boldsymbol{x}^{i-1})}{q(x_i|\boldsymbol{x}^{i-1})}}
+}
+
+So 
+\eqn {
+\kl{P_{unif}}{P_i} = \sum_{t=1}^T\left(
+\underbrace{\sum_{\r^{t-1}}\Pu{\r^{t-1}}}_{\text{expectation over history}}
+\underbrace{\sum_{r_t \in \set{0,1}}\Pu{r_t|\r^{t-1}}\log{\frac{\Pu{r_t|\r^{t-1}}}{\Pi{r_t|\r^{t-1}}}}}_{\text{KL divergence at time t}}
+\right)
+}
+
+Now 
+\eqn{
+\Pu{r_t|\r^{t-1}}& = \frac{1}{2} \;\; \forall \;{r_t,\r^{t-1}} \\
+\Pi{r_t|\r^{t-1}}&=
+\begin{cases}
+(\frac{1}{2}+\epsilon)^{r_t}+(\frac{1}{2}-\epsilon)^{1-r_t} & \text{ if } A(\r^{t-1}) = i\\
+\frac{1}{2} & \text{ otherwise}\\
+\end{cases}
+}
+
+Let $B$ be the set of histories that lead the algorithm to select the good arm, $B =\set{ \r^{t-1}:A(\r^{t-1})=i}$
+
+\eqn {
+\kl{P_{unif}}{P_i} &= \sum_{t=1}^T\left(
+\sum_{B}\Pu{\r^{t-1}}
+\kl{\frac{1}{2}}{\frac{1}{2}+\epsilon}
++ \sum_{B^c}\Pu{\r^{t-1}}
+\kl{\frac{1}{2}}{\frac{1}{2}}
+\right)\\
+&= \kl{\frac{1}{2}}{\frac{1}{2}+\epsilon}\sum_{t=1}^T\left(
+\sum_{B}\Pu{\r^{t-1}}
+\right)\\
+&=\kl{\frac{1}{2}}{\frac{1}{2}+\epsilon} \sum_{t=1}^T\left(
+\Pu{i_t=i}
+\right)\\
+&=\kl{\frac{1}{2}}{\frac{1}{2}+\epsilon}\Eu{N_i}\\
+&=-\frac{1}{2}\log{1-4\epsilon^2}\Eu{N_i}
+}
+\pagebreak
+\subsection{Jenson's inequality}
+Jenson's inequality states that for a concave function $\phi$:
+
+\eqn{
+\frac{\sum_{i=1}^K \phi(x_i)}{K} \leq \phi \left(\frac{\sum_{i=1}^K x_i}{K} \right) \\
+\implies  \sum_{i=1}^K \sqrt{\Eu{N_i}} \leq \sqrt{KT} \\
+\implies \sum_{i=1}^K\Ei{N_i} \leq T+ \frac{T}{2} \sqrt{-\ln(1-4\epsilon^2)KT}
+}
+
+
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
