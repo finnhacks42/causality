@@ -671,7 +671,8 @@ So if $\delta = \frac{1}{T^{1/6}\sqrt{N}}$ (or $\delta = \frac{1}{T^{1/3}}$) tha
 \caption{Bandit Regret Algorithm}\label{alg:bandit}
 \begin{algorithmic}[1]
 \State {\bf Input:} $T, N$
-\State $T_1 = 24Nlog\left(4N/\delta\right)$ TODO figure out what $\delta$ should be 
+\State $\delta = \frac{1}{T^{1/3}}$ 
+\State $T_1 = 24Nlog\left(4N/\delta\right)$ 
 \For{$t \in 1,T_1$}
 \State Do nothing and observe $X_{i,t}$ for $i \in \set{1,\ldots,N}$ and $r_t$
 \EndFor
@@ -733,7 +734,7 @@ R(T) & =  2\delta E\left[R(T)|\text{ not } \cref{eqn:bounds_hold}\right] + (1-2\
 &  \leq 6T^{2/3}m^{1/3}log(TK)^{1/3}  \\
 }
 
-Now lets try an implementation ...
+
 
 \subsubsection{ Older Attempts}
 We now consider the case where $\boldsymbol{q}$ is not known in advance. Assume as before that we observe for $h/2$ timesteps. From the observations gained in this phase we estimate $\boldsymbol{q}$.
