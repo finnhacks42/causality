@@ -98,7 +98,75 @@
 \newtheorem{assumption}[theorem]{Assumption}
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{example}[theorem]{Example}
-
+ \tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=2.2em,
+           minimum height=2.2em,
+           font=\footnotesize,
+           text centered,
+           },
+     latent/.style={
+           circle,
+           rounded corners,
+           draw=black, thick, dashed,
+           minimum width=2.2em,
+           minimum height=2.2em,
+           font=\footnotesize,
+           text centered,
+           fill=black!10!white
+           },
+    target/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=2.2em,
+           minimum height=2.2em,
+           font=\footnotesize,
+           text centered,
+           fill=black!20!white,
+           },
+    observedrect/.style={
+           rectangle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=6em,
+           minimum height=2em,
+           font=\footnotesize,
+           text centered,
+           },
+     targetrect/.style={
+           rectangle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=6em,
+           minimum height=2em,
+           font=\footnotesize,
+           text centered,
+           fill=black!20!white,
+           },
+     empty/.style={
+           circle,
+           rounded corners,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 }   
+}
 
 
 \begin{document}
@@ -186,7 +254,9 @@ From lemma \ref{lem:N_not_too_big}
 \sum_{i=1}^K\Ei{N_i} & \leq \sum_{i=1}^K \left(\Eu{N_i}+ \frac{T}{2}\sqrt{-\ln({1-4\epsilon^2})\Eu{N_i}}\right)
 }
 
-Now $\sum_{i=1}^K\Eu{N_i} = T$ (because $\sum_{i=1}^K N_i = T$ ? but doesn't that imply $\sum_{i=1}^K\Ei{N_i} = T$?)
+Now $\sum_{i=1}^K\Eu{N_i} = \Eu{\sum_{i=1}^K N_i} = \Eu{T} = T$ 
+
+Note: we cannot do the same with $\sum_{i=1}^K\Ei{N_i}$ as $\Ei{.}$ is with respect to a different distribution for each $i$.
 
 \eqn{
 &\implies \sum_{i=1}^K\Ei{N_i} \leq T+ \frac{T}{2} \sqrt{-\ln(1-4\epsilon^2)KT} \qquad \leftarrow \text{via Jenson's Inequality} \\
@@ -229,7 +299,7 @@ Now
 \end{cases}
 }
 
-Let $B$ be the set of histories that lead the algorithm to select the good arm, $B =\set{ \r^{t-1}:A(\r^{t-1})=i}$
+Let $B$ be the set of histories that lead the algorithm to select the good arm, $B =\set{ \r^{t-1}:A(\r^{t-1})=i}$. Note: $\r^{t-1}$ is sufficient to determine $i_t$ for a deterministic algorithm $A$ in the bandit setting. At the first timestep $A$ will select $i_1(A)$, it then receives reward $r_1$, selects $i_2(A,r_1)$ and so on.
 
 \eqn {
 \kl{P_{unif}}{P_i} &= \sum_{t=1}^T\left(
@@ -240,7 +310,7 @@ Let $B$ be the set of histories that lead the algorithm to select the good arm, 
 \right)\\
 &= \kl{\frac{1}{2}}{\frac{1}{2}+\epsilon}\sum_{t=1}^T\left(
 \sum_{B}\Pu{\r^{t-1}}
-\right)\\
+\right) \qquad \leftarrow \text{ as $kl(\frac{1}{2}||\frac{1}{2}) = 0$}\\
 &=\kl{\frac{1}{2}}{\frac{1}{2}+\epsilon} \sum_{t=1}^T\left(
 \Pu{i_t=i}
 \right)\\
@@ -253,16 +323,118 @@ Jenson's inequality states that for a concave function $\phi$:
 
 \eqn{
 \frac{\sum_{i=1}^K \phi(x_i)}{K} \leq \phi \left(\frac{\sum_{i=1}^K x_i}{K} \right) \\
+\implies \sum_{i=1}^K \sqrt{x_i} \leq \sqrt{K\sum_{i=1}^K x_i}\\
 \implies  \sum_{i=1}^K \sqrt{\Eu{N_i}} \leq \sqrt{KT} \\
 \implies \sum_{i=1}^K\Ei{N_i} \leq T+ \frac{T}{2} \sqrt{-\ln(1-4\epsilon^2)KT}
 }
 
+\section{Lower bound for specific feedback graph}
+
+Now we move to considering a Bernoulli bandit problem with the feedback graph shown in figure \ref{fig:feedbackgraph}. The environments specifying rewards over arms $\set{1...K}$ are defined identically to the standard bandit case. The expected reward for $a_0$ (in all environments) is $0$ (this is the worst case).
 
 
+\begin{figure}[h]
+\centering
+\caption{Feedback graph}
+\label{fig:feedbackgraph}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed}, hidden/.style={empty}]
+
+ %nodes
+\node[main node](1){$a_{1}$};
+\node[main node, right=of 1](2){$a_{2}$};
+\node[hidden, right=of 2](3){$...$};
+\node[main node, right=of 3](4){$a_{K}$};
+\node[main node, above right=of 2](5){$a_0$};
+ \path[every node/.style={font=\sffamily\small}]
+    (5) edge (1)
+    	(5) edge (2)
+    (5) edge (4);
+	
+\end{tikzpicture}
+\end{figure}
+
+As for the standard bandit case,
+
+\eqn{
+\Ei{N_i} -\Eu{N_i} \leq & \frac{T}{2}\sqrt{2\ln({2})\kl{\Pu{\boldsymbol{h}}}{\Pi{\boldsymbol{h}}}} 
+}
+
+The only difference is that the sequence of rewards $\r$ is no longer sufficient to determine $N_i$ because when we select $a_0$ we get feedback on all the other arms that does not contribute to the reward but can be leveraged by an algorithm. Therefore the KL divergence is now over distributions over the history $\boldsymbol{h}$ that includes this additional information. 
+
+\subsection{Calculation of KL divergence}
+
+Define 
+
+\eqn{
+h_t = 
+\begin{cases}
+(r_t,o_{1t},...,o_{Kt}) & \text{ if } i = 0 \\
+r_t & \text{ otherwise}\\
+\end{cases}
+}
+
+Where $o_{jt}$ is the observed reward for arm $j$ at timestep $t$.
+
+\eqn {
+\kl{\Pu{\boldsymbol{h}} }{\Pi{\boldsymbol{h}}} = 
+\sum_{t=1}^T \kl{\Pu{h_t|\boldsymbol h^{t-1}}}{\Pi{h_t|\boldsymbol h^{t-1}}}
+}
+
+At each time step $t$, $i_t = A(\boldsymbol h^{t-1})$ There are three cases for the value of the KL divergence. 
+
+\begin{enumerate}
+\item The algorithm selects the optimal action. $i_t = i$ , (as for the standard bandit case)
+\eqn{
+\Pu{h_t|\boldsymbol h^{t-1}} &= \Pu{r_t|\boldsymbol h^{t-1}} = \frac{1}{2} \\
+\Pi{h_t|\boldsymbol h^{t-1}} &= \Pi{r_t|\boldsymbol h^{t-1}} = 
+(\frac{1}{2}+\epsilon)^{r_t}+(\frac{1}{2}-\epsilon)^{1-r_t} \\
+\implies kl(\frac{1}{2} || \frac{1}{2} + \epsilon)
+}
+
+\item The algorithm selects the revealing action. $i_t = 0$
+
+\eqn {
+\Pu{h_t|\boldsymbol h^{t-1}} &= B_0(r_t)\prod_{j \in \set{1...K}} B_{\frac{1}{2}}(o_j) \qquad \text{where} B_\alpha(x) \implies x \sim Bernoulli(\alpha) \\
+\Pi{h_t|\boldsymbol h^{t-1}} &= B_0(r_t) \prod_{j \in \set{1...K}/i} B_{\frac{1}{2}}(o_j)B_{\frac{1}{2}+\epsilon}(o_i) \\
+\implies kl(\frac{1}{2} || \frac{1}{2} + \epsilon)
+}
+
+Since the only term that differs $P_{unif}$ and $P_i$ is that for $o_i$ and,
+
+\eqn{
+\kl{\prod_{i=1}^nP_i(x_i)}{\prod_{i=1}^n Q_i(x_i)} = \sum_{i=1}^n \kl{P_i(x_i)}{Q_i(x_i)}
+}
 
 
+\item Otherwise. $i_t \in \set{1,..,K}/i$ , (as for the standard bandit case)
+\eqn {
+\Pu{h_t|\boldsymbol h^{t-1}} = \Pi{h_t|\boldsymbol h^{t-1}} = \frac{1}{2}\\
+\implies kl(\frac{1}{2} ||\frac{1}{2}) = 0
+}
+\end{enumerate}
 
+We divide the histories into corresponding sets. $S_1 = \set{\boldsymbol h^{t-1}:A(\boldsymbol h^{t-1})=i}$, $S_2 = \set{\boldsymbol h^{t-1}:A(\boldsymbol h^{t-1})=0}$,$S_3 = \set{\boldsymbol h^{t-1}:A(\boldsymbol h^{t-1})\in \set{1,..,K}/i}$
 
+\eqn {
+\kl{P_{unif}}{P_i} =& \sum_{t=1}^T\left(\sum_{S_1}\Pu{\boldsymbol h^{t-1}}kl(\frac{1}{2} || \frac{1}{2} + \epsilon) + 
+\sum_{S_2}\Pu{\boldsymbol h^{t-1}}kl(\frac{1}{2} || \frac{1}{2} + \epsilon) +
+\sum_{S_3}\Pu{\boldsymbol h^{t-1}}kl(\frac{1}{2} ||\frac{1}{2})\right) \\
+=& kl(\frac{1}{2} || \frac{1}{2} + \epsilon)\sum_{t=1}^T\left(\sum_{S_1}\Pu{\boldsymbol h^{t-1}}+\sum_{S_2}\Pu{\boldsymbol h^{t-1}}  \right)\\
+=& kl(\frac{1}{2} || \frac{1}{2} + \epsilon)\sum_{t=1}^T\left(\Pu{i_t = i}+\Pu{i_t=0}  \right)\\
+& kl(\frac{1}{2} || \frac{1}{2} + \epsilon)\left(\Eu{N_i}+\Eu{N_0}  \right)
+}
+
+\subsection{Bounding regret}
+
+\eqn {
+\Ei{r_t} =& (\frac{1}{2}+\epsilon)\Pi{i_t=i)} + 0\Pi{i_t = 0} + \frac{1}{2}\Pi{i_t \in \set{1...K}/i}\\
+\Ei{G_A} =& \sum_{t=1}^T\Ei{r_t} = \frac{T}{2} + \epsilon \Ei{N_i} - \frac{T}{2}\Ei{N_0}\\
+\Es{G_A}  =& \frac{1}{K}\sum_{i = 1}^K\Ei{G_A} = \frac{T}{2} + \frac{\epsilon}{K}\sum_{i=1}^K\Ei{N_i} - \frac{T}{2K}\sum_{i=1}^K\Ei{N_0}\\
+\Es{G_{max}} =& (\frac{1}{2}+\epsilon)T \\
+\implies R(T) =& \epsilon \left(T -\frac{1}{K}\sum_{i=1}^K\Ei{N_i}\right) + \frac{T}{2K}\sum_{i=1}^K\Ei{N_0}\\
+\geq & \epsilon \left(T -\frac{T}{K} - \frac{T}{2}\sqrt{-\frac{1}{K}ln(1-4\epsilon^2) (T + \sum_{i=1}^K \Eu{N_0})} \right) + \frac{T}{2K}\sum_{i=1}^K\Ei{N_0}  
+}
 
 
 \end{document}
