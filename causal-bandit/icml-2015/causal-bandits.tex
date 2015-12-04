@@ -1,0 +1,95 @@
+ %\documentclass[wcp,gray]{jmlr} % test grayscale version
+\documentclass[wcp]{jmlr}
+
+ % The following packages will be automatically loaded:
+ % amsmath, amssymb, natbib, graphicx, url, algorithm2e
+
+ %\usepackage{rotating}% for sideways figures and tables
+\usepackage{longtable}% for long tables
+\usepackage{booktabs}
+% \usepackage[load-configurations=version-1]{siunitx} % newer version
+ %\usepackage{siunitx}
+
+% change the arguments, as appropriate, in the following:
+\jmlrvolume{NNN}
+\jmlryear{2015}
+\jmlrworkshop{ICML}
+
+\title[Causal Bandits]{Causal Bandits}
+
+ % Use \Name{Author Name} to specify the name.
+ % If the surname contains spaces, enclose the surname
+ % in braces, e.g. \Name{John {Smith Jones}} similarly
+ % if the name has a "von" part, e.g \Name{Jane {de Winter}}.
+ % If the first letter in the forenames is a diacritic
+ % enclose the diacritic in braces, e.g. \Name{{\'E}louise Smith}
+
+ % Authors with different addresses:
+ % \author{\Name{Author Name1} \Email{abc@sample.com}\\
+ % \addr Address 1
+ % \AND
+ % \Name{Author Name2} \Email{xyz@sample.com}\\
+ % \addr Address 2
+ %}
+\author{\Name{Author's Name}}
+
+\editor{Editor's name}
+ % \editors{List of editors' names}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+	The abstract
+\end{abstract}
+\begin{keywords}
+	Causality, Bandits, Regret Bounds
+\end{keywords}
+
+\section{Introduction}
+\label{sec:intro}
+
+The aim of this paper is to demonstrate theoretically the utility of having 
+causal knowledge when solving multi-armed bandit (MAB) problems.
+
+We do this by:
+\begin{enumerate}
+	\item Providing some motivating examples as to why it is reasonable to expect
+		to have some knowledge of causal structures when solving a sequential
+		decision making problem such as MAB problems.
+	\item Formalising what we mean by ``causal information'' for a simple
+		class of stochastic multi-armed bandit (MAB) problems. 
+	\item Proposing a simple explore-then-exploit algorithm for this class of
+		problems that makes use of the causal information and proving it
+		has a sublinear regret bound.
+	\item Deriving a matching lower bound for the same class of problems for 
+		algorithms that make use of the causal structure.
+	\item Showing that the upper bound for the ``causally informed'' algorithm
+		is better than the corresponding lower bound for algorithms on this 
+		class of problems that do not use the extra causal information.
+\end{enumerate}
+
+We identify a problem-dependent constant that appears in the upper and lower 
+bounds that can be roughly interpreted as a measure of how much actions reveal
+about other actions via the causal structure.
+
+\subsection{Related Work}
+\label{sub:related_work}
+
+\begin{itemize}
+	\item Bareinboim, Forney \& Pearl, \emph{Bandits with unobserved 
+			confounders}, NIPS 2015
+	\item Salomon, Audibert \& Alaoui, \emph{Lower Bounds and Selectivity of 
+			Weak-Consistent Policies in Stochastic Multi-Armed Bandit Problems},
+			JMLR 2013.
+	\item Alon, Cesa-Bianchi, Dekel, Koren, \emph{Online Learning with Feedback
+			Graphs: Beyond Bandits}, COLT 2015.
+\end{itemize}
+
+
+% \acks{Acknowledgements go here.}
+
+\bibliography{../c-bandit.bib}
+
+\end{document}
