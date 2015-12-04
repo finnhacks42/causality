@@ -294,7 +294,7 @@ Now
 \Pu{r_t|\r^{t-1}}& = \frac{1}{2} \;\; \forall \;{r_t,\r^{t-1}} \\
 \Pi{r_t|\r^{t-1}}&=
 \begin{cases}
-(\frac{1}{2}+\epsilon)^{r_t}+(\frac{1}{2}-\epsilon)^{1-r_t} & \text{ if } A(\r^{t-1}) = i\\
+(\frac{1}{2}+\epsilon)^{r_t}(\frac{1}{2}-\epsilon)^{1-r_t} & \text{ if } A(\r^{t-1}) = i\\
 \frac{1}{2} & \text{ otherwise}\\
 \end{cases}
 }
@@ -388,7 +388,7 @@ At each time step $t$, $i_t = A(\boldsymbol h^{t-1})$ There are three cases for 
 \eqn{
 \Pu{h_t|\boldsymbol h^{t-1}} &= \Pu{r_t|\boldsymbol h^{t-1}} = \frac{1}{2} \\
 \Pi{h_t|\boldsymbol h^{t-1}} &= \Pi{r_t|\boldsymbol h^{t-1}} = 
-(\frac{1}{2}+\epsilon)^{r_t}+(\frac{1}{2}-\epsilon)^{1-r_t} \\
+(\frac{1}{2}+\epsilon)^{r_t}(\frac{1}{2}-\epsilon)^{1-r_t} \\
 \implies kl(\frac{1}{2} || \frac{1}{2} + \epsilon)
 }
 
@@ -422,19 +422,175 @@ We divide the histories into corresponding sets. $S_1 = \set{\boldsymbol h^{t-1}
 \sum_{S_3}\Pu{\boldsymbol h^{t-1}}kl(\frac{1}{2} ||\frac{1}{2})\right) \\
 =& kl(\frac{1}{2} || \frac{1}{2} + \epsilon)\sum_{t=1}^T\left(\sum_{S_1}\Pu{\boldsymbol h^{t-1}}+\sum_{S_2}\Pu{\boldsymbol h^{t-1}}  \right)\\
 =& kl(\frac{1}{2} || \frac{1}{2} + \epsilon)\sum_{t=1}^T\left(\Pu{i_t = i}+\Pu{i_t=0}  \right)\\
-& kl(\frac{1}{2} || \frac{1}{2} + \epsilon)\left(\Eu{N_i}+\Eu{N_0}  \right)
+=& kl(\frac{1}{2} || \frac{1}{2} + \epsilon)\left(\Eu{N_i}+\Eu{N_0}  \right)\\
+=& -\frac{1}{2}lg(1-4\epsilon^2)\left(\Eu{N_i}+\Eu{N_0}  \right)
+} 
+
+Similarly (I think)
+
+\eqn {
+\kl{P_{i}}{P_{unif}} 
+=& kl(\frac{1}{2}+\epsilon || \frac{1}{2})\left(\Ei{N_i}+\Ei{N_0}  \right)\\
+=& (\frac{1}{2}lg((1+2\epsilon)(1-2\epsilon))+ \epsilon lg\left(\frac{1+2\epsilon}{1-2\epsilon}\right))\left(\Ei{N_i}+\Ei{N_0}  \right)\\
+\leq & -\frac{1}{2}lg(1-4\epsilon^2)\left(\Ei{N_i}+\Ei{N_0}  \right)
+} 
+
+
+\subsection{Bounding regret}
+We will consider only algorithms that select $N_0$ at most $\epsilon T$ times. Once an algorithm has selected $N_0$ $\epsilon T$ times, we will truncate it and play any other action at random. The regret for the non-truncated algorithm is at least $\epsilon T(\frac{1}{2}+\epsilon) \geq \frac{\epsilon T}{2}$. Truncating adds at most $(T - \epsilon T)\epsilon \leq \epsilon T$. Thus, the assumption that $N_0 \leq \epsilon T$ increases the regret by at most a constant factor of $3$. 
+
+
+\eqn {
+\Ei{r_t} =& (\frac{1}{2}+\epsilon)\Pi{i_t=i} + 0\Pi{i_t = 0} + \frac{1}{2}\Pi{i_t \in \set{1...K}/i}\\
+=& (\frac{1}{2}+\epsilon)\Pi{i_t=i} + \frac{1}{2}(1-\Pi{i_t=i} - \Pi{i_t=0})\\
+=& \frac{1}{2} + \epsilon \Pi{i_t=i} - \frac{1}{2}\Pi{i_t=0}\\
+\Ei{G_A} =& \sum_{t=1}^T\Ei{r_t} = \frac{T}{2} + \epsilon \Ei{N_i} - \frac{1}{2}\Ei{N_0}\\
+\Es{G_A}  =& \frac{1}{K}\sum_{i = 1}^K\Ei{G_A} = \frac{T}{2} + \frac{\epsilon}{K}\sum_{i=1}^K\Ei{N_i} - \frac{1}{2K}\sum_{i=1}^K\Ei{N_0}\\
+\Es{G_{max}} =& (\frac{1}{2}+\epsilon)T}
+
+\eqn {
+\implies R(T) =& \epsilon \left(T -\frac{1}{K}\sum_{i=1}^K\Ei{N_i}\right) + \frac{1}{2K}\sum_{i=1}^K\Ei{N_0}\\
+\geq & \epsilon \left(T -\frac{T}{K} - \frac{T}{2}\sqrt{-\frac{1}{K}ln(1-4\epsilon^2) (T + \sum_{i=1}^K \Eu{N_0})} \right) + \frac{1}{2K}\sum_{i=1}^K\Ei{N_0}  \\
+\label{eqn:graph_regret1}
+=& \epsilon \left(T -\frac{T}{K} - \frac{T}{2}\sqrt{-ln(1-4\epsilon^2) (\frac{T}{K} +  \Eu{N_0})} \right) + \frac{1}{2}\Es{N_0}\\
+\geq & \epsilon \left(T -\frac{T}{K} - T\epsilon \sqrt{2(\frac{T}{K} +  \Eu{N_0})} \right) + \frac{1}{2}\Es{N_0} \qquad \text{ if } \epsilon < \frac{2}{5} \\
+\geq & \frac{\epsilon}{3} \left(T -\frac{T}{K} - T\epsilon \sqrt{2T(\frac{1}{K} +  \epsilon)} \right) \qquad \text{ assuming } \Eu{N_0} \leq \epsilon T 
+}
+
+Let 
+
+\eqn {
+\epsilon = \begin{cases}
+\frac{1}{4}\sqrt{\frac{K}{T}} & \text{ if } K < (16T)^{1/3}\\
+(16T)^{-1/3} & \text { otherwise }
+\end{cases}
+}
+
+If $K < (16T)^{1/3}$
+
+\eqn {
+R(T) \geq & \frac{1}{3}\left(\frac{1}{4}\sqrt{KT} - \frac{1}{4}\sqrt{\frac{T}{K}} - \frac{1}{16\sqrt{2}}\sqrt{4KT + K^{5/2}T^{1/2}}\right)\\
+\geq & \frac{1}{3}\left(\frac{1}{4}\sqrt{KT} - \frac{1}{4}\sqrt{\frac{T}{K}} - \frac{1}{16\sqrt{2}}\sqrt{8KT}\right)\\
+=& \frac{1}{3}\left(\frac{1}{8}\sqrt{KT} - \frac{1}{4}\sqrt{\frac{T}{K}}\right) \\
+\geq & \frac{1}{72}\sqrt{KT} \qquad \text{ if } K > 2
+}
+
+If  $K \geq (16T)^{1/3}$
+\eqn {
+R(T) \geq & \frac{T^{2/3}}{3(16^{1/3})}\left(1  - \frac{1}{K} - \frac{1}{2(2^{5/6})}\sqrt{\frac{4T^{1/3}}{K}+2^{2/3}}\right)\\
+ \geq & \frac{T^{2/3}}{3(16^{1/3})}\left(1  - \frac{1}{K} - \frac{1}{2(2^{5/6})}\sqrt{2(2^{2/3})}\right)\\
+ = & \frac{T^{2/3}}{3(16^{1/3})}\left(1  - \frac{1}{K} - \frac{1}{2}\right)\\
+ \geq & \frac{1}{46}T^{2/3} \qquad \text {if } K > 2\\
+}
+
+\pagebreak
+
+\section{Graph changes with time}
+
+Same as before we have a single revealing action. However, now at each timestep it reveals the rewards for a half the arms at random according to the prior probability vector $\boldsymbol{q}$
+
+
+\begin{itemize}
+\item Assume that $q_j \in [0,\frac{1}{2}]$ and $q_1 \leq q_2, \leq ...\leq,q_N$ 
+\item Let $m \in \set{2...N} = min_i : q_j \geq \frac{1}{j}$
+\item Let $M = \set{j:j \leq m}$, (the set of unbalanced arms).
+\item let $D_t$ be the set of arms revealed by the revealing action at timestep $t$
+\end{itemize}
+
+
+\subsection{KL divergence}
+As for previous section except now if the revealing action is selected, $\Pu{h_t|\boldsymbol h^{t-1}} = \Pi{h_t|\boldsymbol h^{t-1}}$ unless $i \in D_t$
+
+The probability $P(i \in D_t)$ depends only on $\boldsymbol{q}$ (and is independent of the history at anytime step $\boldsymbol{h}$). 
+
+So:
+
+\eqn {
+\kl{P_{unif}}{P_i} & = kl(\frac{1}{2}||\frac{1}{2}+\epsilon)\left(\Eu{N_i}+\sum_{t=1}^T\Pu{i_t=0}P(i \in D_t)\right)\\
+&\geq \begin{cases}
+kl(\frac{1}{2}||\frac{1}{2}+\epsilon)\left(\Eu{N_i}+\frac{1}{m}\Eu{N_0}\right) & \text{ if } i \notin M \\
+kl(\frac{1}{2}||\frac{1}{2}+\epsilon)\Eu{N_i} & \text{ otherwise }
+\end{cases}
 }
 
 \subsection{Bounding regret}
+Assuming $ \epsilon < \frac{2}{5}$,
+\eqn {
+R(T) &= \epsilon  \left(T -\frac{1}{K}\sum_{i=1}^K\Ei{N_i}\right) + \frac{1}{2K}\sum_{i=1}^K\Ei{N_0} \qquad \leftarrow \text{as before}\\
+&\leq \epsilon \left(T - \frac{T}{K} - T\epsilon\sqrt{\frac{2}{K}\left(\sum_{i\in M}\Eu{N_i} + \sum_{i \notin M}(\Eu{N_i}+\frac{1}{m}\Eu{N_0})  \right)}   \right)+\frac{1}{2}\Es{N_0}\\
+&= \epsilon \left(T - \frac{T}{K} - T\epsilon\sqrt{2\left(\frac{T}{K} + \frac{1}{m}\Eu{N_0}\right)}   \right)+\frac{1}{2}\Es{N_0}\\
+&\geq \frac{\epsilon}{3} \left(T - \frac{T}{K} - T\epsilon\sqrt{2T\left(\frac{1}{K} + \frac{\epsilon}{m}\right)}   \right) \qquad \text{assuming } \Eu{N_0} \leq \epsilon T
+}
+
+Let:
+
+\eqn{
+\epsilon = \begin{cases}
+\frac{1}{4}\sqrt{\frac{K}{T}} & \text{if } K > m^{2/3}(16T)^{1/3} \\
+m^{1/3}(16T)^{-1/3} & \text{otherwise}
+\end{cases}
+}
+If $K < m^{2/3}(16T)^{1/3}$
+\eqn {
+R(T) \geq \frac{\sqrt{KT}}{12}\left(\frac{1}{2} - \frac{1}{K}\right)\\
+\geq \frac{1}{72}\sqrt{KT} \qquad \text{if } K > 2
+}
+
+If  $K \geq m^{2/3}(16T)^{1/3}$
+\eqn{
+R(T)& \geq \frac{m^{1/3}T^{2/3}}{3(16^{1/3})}\left(\frac{1}{2} - \frac{1}{K}\right) \\
+& \geq \frac{1}{46}m^{1/3}T^{2/3} \qquad \text{ if } K > 2
+}
+
+\pagebreak
+\subsection{Previous Attempt at bounding regret}
+
+If I just let $\Eu{N_0} = T$ and $\Es{N_0} = 0$, I get $R \sim \bigomega{\sqrt{T}}$ - so not tight enough. 
+
+By similar appeal to KL divergence, we get
 
 \eqn {
-\Ei{r_t} =& (\frac{1}{2}+\epsilon)\Pi{i_t=i)} + 0\Pi{i_t = 0} + \frac{1}{2}\Pi{i_t \in \set{1...K}/i}\\
-\Ei{G_A} =& \sum_{t=1}^T\Ei{r_t} = \frac{T}{2} + \epsilon \Ei{N_i} - \frac{T}{2}\Ei{N_0}\\
-\Es{G_A}  =& \frac{1}{K}\sum_{i = 1}^K\Ei{G_A} = \frac{T}{2} + \frac{\epsilon}{K}\sum_{i=1}^K\Ei{N_i} - \frac{T}{2K}\sum_{i=1}^K\Ei{N_0}\\
-\Es{G_{max}} =& (\frac{1}{2}+\epsilon)T \\
-\implies R(T) =& \epsilon \left(T -\frac{1}{K}\sum_{i=1}^K\Ei{N_i}\right) + \frac{T}{2K}\sum_{i=1}^K\Ei{N_0}\\
-\geq & \epsilon \left(T -\frac{T}{K} - \frac{T}{2}\sqrt{-\frac{1}{K}ln(1-4\epsilon^2) (T + \sum_{i=1}^K \Eu{N_0})} \right) + \frac{T}{2K}\sum_{i=1}^K\Ei{N_0}  
+\Ei{N_0} & \geq \Eu{N_0} - \frac{T}{2}\sqrt{-ln(1-4\epsilon^2)(\Eu{N_i}+\Eu{N_0})} \\
+\implies \frac{1}{K}\sum_{i=1}^K\Ei{N_0} & \geq \frac{1}{K}\sum_{i=1}^K\Eu{N_0} - \frac{T}{2K}\sum_{i=1}^K\sqrt{-ln(1-4\epsilon^2)(\Eu{N_i}+\Eu{N_0})}\\
+\implies \Es{N_0} & \geq \Eu{N_0} - \frac{T}{2}\sqrt{-ln(1-4\epsilon^2)(\frac{1}{K}\sum_{i=1}^K\Eu{N_i}+\frac{1}{K}\sum_{i=1}^K\Eu{N_0})}\\
+ & = \Eu{N_0} - \frac{T}{2}\sqrt{-ln(1-4\epsilon^2)(\frac{T}{K}+\Eu{N_0})}
 }
+
+\eqn{
+\label{eqn:graph_regret2}
+\implies R(T) \geq & 
+\epsilon(T - \frac{T}{K})-(\epsilon + \frac{1}{2})\frac{T}{2}\sqrt{-ln(1-4\epsilon^2)(\frac{T}{K}+\Eu{N_0})} +\frac{1}{2}\Eu{N_0} 
+}
+
+For comparison, if we assumed $\Eu{N_0}=\Es{N_0}$ in equation \ref{eqn:graph_regret1} we would have:
+
+\eqn{
+R(T) \geq & 
+\epsilon(T - \frac{T}{K})-\epsilon\frac{T}{2}\sqrt{-ln(1-4\epsilon^2)(\frac{T}{K}+\Eu{N_0})} +\frac{1}{2}\Eu{N_0} 
+}
+
+So the regret bound is pulled down by an extra  $\frac{T}{4}\sqrt{-ln(1-4\epsilon^2)(\frac{T}{K}+\Eu{N_0})}$ 
+
+
+Argument that we cannot get a regret bound starting from equation \ref{eqn:graph_regret2}
+
+Let: 
+\eqn {
+R_1 &= \epsilon(T - \frac{T}{K})-(\epsilon+\frac{1}{2})\frac{T}{2}\sqrt{-ln(1-4\epsilon^2)(\frac{T}{K}+\Eu{N_0})} +\frac{1}{2}\Eu{N_0} 
+}
+
+such that  $R(T) \geq R_1$ 
+
+\eqn {
+R_1 & \leq \epsilon T-(\epsilon+\frac{1}{2})\frac{T}{2}\sqrt{-ln(1-4\epsilon^2)(\frac{T}{K}+\Eu{N_0})} +\frac{1}{2}\Eu{N_0} \\
+& \leq \epsilon T-\frac{1}{2}\frac{T}{2}\sqrt{-ln(1-4\epsilon^2)(\frac{T}{K}+\Eu{N_0})} +\frac{1}{2}\Eu{N_0} \\
+& \leq \epsilon T-\frac{T}{4}\sqrt{4\epsilon^2(\frac{T}{K}+\Eu{N_0})} +\frac{1}{2}\Eu{N_0} \\
+& \leq \epsilon T-\epsilon\frac{T}{2}\sqrt{\Eu{N_0}} +\frac{1}{2}\Eu{N_0} \\
+& \leq \frac{1}{2}\left(T-\frac{T}{2}\sqrt{\Eu{N_0}}\right) +\frac{1}{2}\Eu{N_0} \\
+&= \frac{1}{2}\left(2T-\frac{T^{3/2}}{2}\right) \qquad \text{if $\Eu{N_0} = T$}\\ 
+& \leq 0 \qquad \text{if $T > 16$}
+}
+
 
 
 \end{document}
