@@ -1,0 +1,424 @@
+\documentclass{article}
+
+\usepackage{todonotes}
+
+%\usepackage[disable]{todonotes}
+\newcommand{\todot}[2][]{\todo[color=red!20!white,#1]{#2}}
+\newcommand{\todof}[2][]{\todo[color=orange!20!white,#1]{#2}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[boxed]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{mathtools}
+\usepackage{accents}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{dsfont}
+\usepackage[bf]{caption}
+\usepackage{hyperref}
+\hypersetup{
+    bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in AcrobatÕs bookmarks
+    pdftoolbar=true,        % show AcrobatÕs toolbar?
+    pdfmenubar=true,        % show AcrobatÕs menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={My title},    % title
+    pdfauthor={Author},     % author
+    pdfsubject={Subject},   % subject of the document
+    pdfcreator={Creator},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfkeywords={keyword1} {key2} {key3}, % list of keywords
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=red,          % color of internal links (change box color with linkbordercolor)
+    citecolor=blue,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+\usepackage{comment}
+\usepackage{amsthm}
+\usepackage{natbib}
+\usepackage[capitalize]{cleveref}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{tikz} 
+\usetikzlibrary{arrows,positioning} 
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MACROS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\defined}{\vcentcolon =}
+\newcommand{\rdefined}{=\vcentcolon}
+\newcommand{\E}[1]{\mathbb E\left[#1\right]}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\calF}{\mathcal F}
+\newcommand{\sr}[1]{\stackrel{#1}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\ind}[1]{\mathds{1}\!\!\set{#1}}
+\newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
+\newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
+\newcommand{\floor}[1]{\left \lfloor {#1} \right\rfloor}
+\newcommand{\ceil}[1]{\left \lceil {#1} \right\rceil}
+\newcommand{\eqn}[1]{\begin{align}#1\end{align}}
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+\newcommand{\Ber}{\operatorname{Bernoulli}}
+\renewcommand{\P}[1]{\operatorname{P}\left(#1\right)}
+\newcommand{\bigo}[1]{\mathcal{O}\left( #1 \right)}
+\newcommand{\bigotilde}[1]{\tilde{\mathcal{O}}\left( #1 \right)}
+\newcommand{\bigtheta}[1]{\Theta\left( #1 \right)}
+\newcommand{\bigthetatilde}[1]{\tilde{\Theta}\left( #1 \right)}
+\newcommand{\bigomega}[1]{\Omega\left( #1 \right)}
+
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=2.5em,
+           minimum height=2.5em,
+           font=\footnotesize,
+           text centered,
+           fill=blue!20!white},
+     latent/.style={
+           circle,
+           rounded corners,
+           draw=black, thick, dashed,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           fill=black!10!white
+           },
+     empty/.style={
+           circle,
+           rounded corners,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 }  
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+
+
+\begin{document}
+\def\ci{\perp\!\!\!\perp}
+
+\section{Proof of Theorem 1}
+\begin{theorem}\label{thm:known_q_regret}
+Define $m =   min\set{1 \leq i \leq N:q_{i+1} \geq \frac{1}{i}}$
+Then Algorithm 1 satisfies
+\eq{
+R(T) \in \bigo{T^{2/3}m^{1/3}log(KT)^{1/3}}\,.
+}
+\end{theorem}
+
+Let $A = \set{(i,j) : i \leq m, j = 1}$ be the set of infrequently observed arms
+
+For the frequently observed arms, $(i,j) \notin A$ we have:
+
+\eqn {
+\hat{\mu}_{i,j} = \frac{2}{h}\frac{\sum_{t=1}^{h/2}\ind{X_{i,t}=j}r_t}{q_i^j(1-q_i)^{1-j}}
+}
+
+Let $Z_{t,ij} = \ind{Y_t=1,X_{t,i}=j} \sim Bernoulli(q_{ij}\mu_{ij})$, 
+
+Chernoff's inequality gives
+
+\eqn{
+P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}) \leq e^{-hD^2/24m}
+}
+
+The algorithm explicitly plays each of the infrequently observed arms, $(i,j) \in A$, $\frac{h}{2m}$ times. So:
+
+\eqn{
+P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}) \leq e^{-hD^2/4m}
+}
+
+So for all the arms 
+
+\eqn{
+P(\hat{\mu}_i - \mu_{i} > \frac{D}{2}) \leq e^{-hD^2/24m}
+}
+
+and 
+
+
+
+\eqn{
+\label{eqn:unbalancedHoeffdings}
+P(\Delta_{\hat{i^*}} > D) \leq Ke^{-hD^2/24m}
+}
+
+If we let $D = \sqrt{\frac{24m\log(hK)}{h}}$
+
+\eqn{
+R_T &  \leq h + T\left(\sqrt{\frac{24m\log(hK)}{h}} + \frac{1}{h}\right) \\
+& \leq h + T\left(\sqrt{\frac{24m\log(TK)}{h}} + \frac{1}{h}\right) 
+}
+
+Let $h = T^{2/3}m^{1/3}\log(TK)^{1/3}$
+
+
+\eqn {
+R_T & \leq 6T^{2/3}m^{1/3}log(KT)^{1/3} + T^{1/3}m^{-1/3}log(KT)^{-1/3}\\ 
+& \leq 7T^{2/3}m^{1/3}log(KT)^{1/3}
+}
+ 
+\section{Proof of Theorem 2}
+
+\begin{theorem}\label{thm:simple-regret}
+Define $m = \min\set{2 \leq i \leq N : q_i \geq 1/i}$.
+Then Algorithm 2 satisfies
+\eq{
+R^{simple}(T) \in O\left(\sqrt{\frac{m}{T} \log \left(\frac{NT}{m}\right)}\right)\,.
+}
+\end{theorem}
+
+\begin{lemma}\label{lem:conc1}
+$\displaystyle \P{\left|\hat q_i - q_i\right| \geq \sqrt{\frac{6q_i}{T} \log \frac{2}{\delta}}} \leq \delta$.
+\end{lemma}
+
+\begin{proof}
+Let $Z_t = \ind{X_{i,t} = 1} \in \set{0,1}$.
+Then
+\eq{
+\hat q_i = \frac{2}{T} \sum_{t=1}^{T/2} Z_t\,.
+}
+Now $Z_1,\ldots,Z_{T/2}$ is an i.i.d.\ sequence of Bernoulli random variables with with mean $q_i$. The result follows from the Chernoff bound.
+\end{proof}
+\begin{lemma}\label{lem:m_est}
+Let $\delta >0.$ 
+If $h \geq 24m \log\frac{4N}{\delta}$
+
+then
+\eq{
+\P{\hat m < \frac{2}{3}m} \leq \delta\ \text{ and } \P{\hat m > 2m} \leq \delta\,.
+}
+\end{lemma}
+
+
+
+\begin{proof}
+
+Let $\boldsymbol{q}^b$ and $\boldsymbol{q}^{ub}$ and be the maximally balanced and unbalanced $\boldsymbol{q}$ for a given $m$ respectively.
+
+\eq{
+q^{ub}_i = \begin{cases}
+0 & \text{if } i \leq m \\
+\frac{1}{m} & \text{otherwise}\,.
+\end{cases}\\
+q^b_i < \begin{cases}
+\frac{1}{m} & \text{if } i \leq m \\
+1 & \text{otherwise}\,.
+\end{cases}  
+}
+For $\hat{m}$ to over-estimate $m$, we must identify some balanced arms as unbalanced. For $\hat{m}$ to under-estimate $m$, we must identify some unbalanced arms as balanced.
+\eq{
+\P{\hat m > 2m} \leq \P{\hat m > 2m|\boldsymbol{q} = \boldsymbol{q}^{ub}}\\
+\P{\hat m < \frac{2}{3}m} \leq \P{\hat m < \frac{2}{3}m|\boldsymbol{q} = \boldsymbol{q}^{b}}
+}
+
+Given $\boldsymbol{q} = \boldsymbol{q}^{ub}$, we have by \cref{lem:conc1}, with probability at least $1 - \delta$ that: 
+
+\eq{
+& \left| \hat q_i - q_i\right| 
+ \leq \begin{cases}
+0 & \text{if } i \leq m\\
+\sqrt{\frac{6}{mh} \log\frac{2}{\delta}} & \text{otherwise} \\
+\end{cases}\\
+\implies &
+\begin{cases}
+(\forall i \leq m) \qquad \left| \hat q_i - 0\right| = 0 \\
+(\forall i > m) \qquad \left| \hat q_i - \frac{1}{m}\right| \leq \frac{1}{2m} \; \text{, taking the union bound and assuming } h \geq 24m \log\frac{4N}{\delta}\\
+\end{cases}\\
+\implies &
+\begin{cases}
+(\forall i \leq m) \qquad  \hat q_i  = 0 \\
+(\forall i > m) \qquad \hat q_i \in [\frac{1}{2m}, \frac{3}{2m}]\\
+\end{cases}\\
+\implies & \hat{m} \leq 2m
+}
+
+Given $\boldsymbol{q} = \boldsymbol{q}^{b}$, we have by \cref{lem:conc1}, with probability at least $1 - \delta$ that: 
+
+\eq{
+& \left| \hat q_i - q_i\right| 
+ \leq \sqrt{\frac{6}{mh} \log\frac{2}{\delta}} \qquad \text{if } i \leq m \\
+\implies &
+(\forall i \leq m) \qquad  \hat q_i \leq \frac{3}{2m} \\
+\implies & \hat{m} \geq \frac{2m}{3}
+}
+
+\end{proof}
+
+\begin{proof}[Proof of \cref{thm:simple-regret}]
+
+
+for $(i,j)\in A$, the algorithm explicitly selects the action, $X_i = j$,  $\frac{h}{2\hat m}$ times.
+\eq {
+\hat \mu_{i,j} = \frac{2\hat m}{h} \sum_{t=1}^{h/2\hat m} r_t(X_i = j)
+}
+
+Via Hoeffding's Inequality
+
+\eq {
+\P{ \left|\hat \mu_{i,j} - \mu_{i,j}\right| > \epsilon } \leq 2\exp{-\frac{h\epsilon^2}{\hat{m}}}
+}
+
+for $(i,j)\notin A$, the algorithm has observed the reward given $X_i = j$ at least $\frac{h}{2\hat m}$ times.
+
+\eq {
+(i,j)\notin A & \implies \hat{s}_i \geq \frac{1}{\hat m} \\
+& \implies \sum_{t=1}^h \ind{X_i = j} \geq \frac{h}{\hat{m}}
+}
+
+Let  $Z_{ij} = \sum_{t=1}^{h/2} \ind{X_i = j}$ and $t'_1 ... t'_{Z_{ij}} = {t:X_{i,t} = j}$
+
+\eq {
+\hat \mu_{i,j} = \frac{1}{Z_{ij}}\sum_{t'=1}^{Z_{ij}}r_{t'}
+}
+
+
+\eq {
+\P{\left| \hat \mu_{i,j} - \mu_{ij} \right| > \epsilon} = & \sum_{z=1}^\infty \P{Z_{ij}=z}\P{\left| \frac{1}{Z_{ij}} \sum_{t'=1}^{Z_{ij}}r_{t'} - \mu_{ij} \right| > \epsilon | Z_{ij} = z} \\
+= & \sum_{z=1}^\infty \P{Z_{ij}=z}\P{\left| \frac{1}{z} \sum_{t'=1}^{z}r_{t'} - \mu_{ij} \right| > \epsilon } \\
+\leq & \P{\left| \frac{2\hat m}{h} \sum_{t'=1}^{h/2\hat m}r_{t'} - \mu_{ij} \right| > \epsilon } \sum_{z=1}^\infty \P{Z_{ij}=z} \\
+\leq & 2\exp{-\frac{h\epsilon^2}{\hat{m}}}\\
+}
+
+Applying the union bound over all $2N$ actions.
+\eq{
+& \P{\exists (i,j): \left| \hat \mu_{i,j} - \mu_{i,j} \right| > \epsilon} \leq 4N\exp{-\frac{h\epsilon^2}{\hat{m}}} \\
+\implies & \P{\exists (i,j): \left| \hat \mu_{i,j} - \mu_{i,j} \right| > \sqrt{\frac{\hat m}{h}\log{\frac{4N}{\delta}}}} \leq \delta \\
+}
+
+Now by \cref{lem:m_est}, 
+\eq{
+h \geq 24m \log \frac{4N}{\delta} \implies \P{\hat m > 2m} \leq \delta
+} 
+
+Therefore if $h \geq 24m \log \frac{4N}{\delta}$, we have with probability at least $1 - 2\delta$ that
+
+\eqn{
+\label{eqn:joint_bound_estimates_m}
+(\forall i, j) \qquad \left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{2m}{h} \log\frac{4N}{\delta}}\, \text { and } \hat{m} \leq 2m
+}
+Suppose $h < 24m \log \frac{4N}{\delta}$. Then
+\eq{
+\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq 1 \leq \sqrt{\frac{2m}{h} \log \frac{4N}{\delta}}\,.
+}
+Therefore
+\eq{
+\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{24m}{h} \log \frac{4N}{\delta}} \qquad \forall h\ \text{ with probability at least } 1-2\delta
+}
+Therefore 
+\eq{
+R_s(h) 
+&\leq 2\delta + \sqrt{\frac{24m}{h} \log \frac{4N}{\delta}} \\
+&\leq \frac{8m}{h} + \sqrt{\frac{24m}{h} \log \left(\frac{Nh}{m}\right)}
+}
+as required.
+\end{proof}
+
+\section{Proof of Theorem 3}
+
+\begin{theorem}\label{thm:unknown_q_regret}
+Define $m =   min\set{1 \leq i \leq N:q_{i+1} \geq \frac{1}{i}}$
+Then Algorithm 3 satisfies
+\eq{
+R(T) \in \bigo{T^{2/3}m^{1/3}log(KT)^{1/3}}\,.
+}
+\end{theorem}
+
+\begin{itemize}
+\item Use $24Nlog(4N/\delta)$ samples to estimate $m$
+\item If $\hat m > \lambda = \frac{N^{3/2}}{\sqrt{T}}$ then stop and do UCB with remaining rounds.
+\item Else use causal explore-exploit and let the exploration time $h = T^{2/3}\hat{m}^{1/3}log(TK)^{1/3}$ 
+\end{itemize}
+
+There will be 3 cases.
+\begin{enumerate}
+\item $m < \lambda/2 \implies \hat{m} < \lambda$ with prob $1-\delta$
+\eq {
+R_T \sim O(T^{2/3}m^{1/3}) + O(\sqrt{NT})\delta \implies \text { want } \delta \leq \frac{T^{1/6}}{\sqrt{N}}
+}
+\item $m > 3\lambda/2 \implies \hat{m} > \lambda$ with prob $1-\delta$
+\eq {
+R_T \sim O(T^{2/3}N^{1/3})\delta + O(\sqrt{NT}) \implies \text { want } \delta \leq \frac{N^{1/6}}{T^{1/6}}
+}
+\item $\lambda/2 < m < 3\lambda/2$, algorithm could end up doing UCB or Explore-Exploit.
+\eq{
+R_T \sim  & O(T^{2/3}m^{1/3}) + O(\sqrt{NT}) \\
+= &  O(\sqrt{NT}) \text { as } m = O(\frac{N^{3/2}}{\sqrt{T}})
+}
+\end{enumerate}
+
+So if $\delta = \frac{1}{T^{1/6}\sqrt{N}}$ (or $\delta = \frac{1}{T^{1/3}}$) that would be enough concentration around $m$ to choose the correct algorithm ... Is it enough to choose a reasonable total exploration time $h$? It seems that $\delta = \frac{1}{T^{1/3}}$ works.
+
+
+
+
+Since we don't know $\boldsymbol{q}$, and thus $m$, we can't set the exploration time $h$ in advance based on $m$ as we did for the known $\boldsymbol{q}$ case. Instead we first use $24Nlog(4N/\delta)$ samples to estimate $m$. If $\hat m < \frac{N^{3/2}}{\sqrt{T}}$ we will continue with the causal algorithm and let the total exploration time $h = T^{2/3}\hat{m}^{1/3}log(2TK)^{1/3}$. 
+
+
+Since $m \leq N$, by \cref{eqn:joint_bound_estimates_m}, we have that with probability at least $1-2\delta$, 
+
+\eqn{
+\label{eqn:bounds_hold}
+(\forall i, j) \qquad \left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{\hat m}{h} \log\frac{4N}{\delta}}\, \text { and } \hat{m} \leq 2m
+}
+
+
+So the regret in this case is bounded by,
+
+\eq {
+R(T) & =  2\delta E\left[R(T)|\text{ not } \cref{eqn:bounds_hold}\right] + (1-2\delta)E[R(T)| \cref{eqn:bounds_hold}]  \\
+& \leq 2\delta T + \left(h + T\sqrt{\frac{\hat m}{h} \log\frac{4N}{\delta}} \right)\\
+ &  \leq 2T^{2/3}  + h + T \left( \sqrt{\frac{\hat m}{h} \log \left(4NT^{1/3}\right)}\right), \text { letting } \delta = \frac{1}{T^{1/3}} \\
+&  \leq 2T^{2/3} + h + T \left( \sqrt{\frac{\hat m}{h} \log \left(2TK\right)}\right) \\
+&  \leq 2T^{2/3}  + 2T^{2/3}(2m)^{1/3}log(2TK)^{1/3}  \\
+&  \leq 6T^{2/3}m^{1/3}log(TK)^{1/3}  \\
+}
+
+
+\end{document}
+
+
+
