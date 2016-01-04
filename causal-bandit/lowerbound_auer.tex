@@ -507,14 +507,62 @@ So:
 
 \eqn {
 \kl{P_{unif}}{P_i} & = kl(\frac{1}{2}||\frac{1}{2}+\epsilon)\left(\Eu{N_i}+\sum_{t=1}^T\Pu{i_t=0}P(i \in D_t)\right)\\
-&\geq \begin{cases}
-kl(\frac{1}{2}||\frac{1}{2}+\epsilon)\left(\Eu{N_i}+\frac{1}{m}\Eu{N_0}\right) & \text{ if } i \notin M \\
-kl(\frac{1}{2}||\frac{1}{2}+\epsilon)\Eu{N_i} & \text{ otherwise }
+& = kl(\frac{1}{2}||\frac{1}{2}+\epsilon)\left(\Eu{N_i}+q_i\Eu{N_0}\right)\\
+\implies \Ei{N_i} & \leq \Eu{N_i} + \sqrt{2}T\epsilon \sqrt{\Eu{N_i}+q_i\Eu{N_0}} \qquad \text{assuming }  \epsilon < \frac{2}{5}
+}
+Let $\Es{N_i} = \sum_{i=1}^K w_i\Ei{N_i}$
+
+
+\eqn {
+\Es{N_i} & \leq \sum_i w_i\Eu{N_i} + \sqrt{2}T\epsilon \sqrt{\sum_i w_i\Eu{N_i}+\Eu{N_0}\sum_i w_i q_i} 
+}
+
+Choose the weights such that $P(i \in M) = \frac{1}{2}$ ie, there is a 50\% chance of choosing an environment in which the optimal arm is in the set $M$.
+\eqn {
+w_i = \begin{cases}
+\frac{1}{2(m-1)} & \text{ if } i \leq m \\
+\frac{1}{2(K-m+1)} & \text{ otherwise}
 \end{cases}
 }
 
+Now $\sum_i w_i\Eu{N_i} = \Eu{\frac{1}{2(m-1)}\sum_{i=1}^{m-1}N_i+\frac{1}{2(K-m+1)}\sum_{i=m}^{K}N_i} \leq \frac{T}{2(m-1)}$, as  $m-1 < K-m+1$, since for every unbalanced arm in $m$ its partner is balanced.
+
+\eqn {
+\Es{N_i} & \leq \frac{T}{2(m-1)} + \sqrt{2}T\epsilon \sqrt{\frac{T}{2(m-1)}+\Eu{N_0}\sum_i w_i q_i}
+}
+
+\eqn{
+\sum_i w_i q_i & \leq \frac{1}{2(m-1)}\sum_{i < m} \frac{1}{m} + \frac{1}{2(k-m+1)}\sum_{i \geq m} 1 = \frac{1}{2}\left(\frac{1}{m} +1\right)
+}
+
+
+
 \subsection{Bounding regret}
-Assuming $ \epsilon < \frac{2}{5}$,
+
+
+We can now assume that the algorithm doesn't select $N_0$ more than $\epsilon T(1-\frac{1}{2(m-1)})$ times, since we can truncate all algorithms at that point and then play arms from $i \in M$ at random.
+
+\eqn {
+R(T) &= \epsilon  \left(T -\Es{N_i}\right) + \frac{1}{2}\Es{N_0}\\
+& \geq \epsilon \left (T - \frac{T}{2(m-1)} - \sqrt{2}T\epsilon \sqrt{\frac{T}{2(m-1)}+\frac{1}{2}\left(\frac{1}{m} + 1\right)\Eu{N_0}} \right)\\
+& \geq \frac{\epsilon}{3} \left (T - \frac{T}{2(m-1)} - \sqrt{2}T\epsilon \sqrt{\frac{T}{2(m-1)}+\frac{1}{2}\left(\frac{1}{m} + 1\right)\epsilon T (1 - \frac{1}{2(m-1)})} \right)\\
+& = \frac{\epsilon}{3} \left (T - \frac{T}{2(m-1)} - \sqrt{2}T\epsilon \sqrt{\frac{T}{2(m-1)}+\epsilon T \frac{m(2m-1)-3}{4m(m-1)}} \right)\\
+& \sim \frac{\epsilon}{3} \left (T - \frac{T}{2(m-1)} - \sqrt{2}T\epsilon \sqrt{\frac{T}{2(m-1)}+\frac{\epsilon T}{2} } \right) \qquad \frac{m(2m-1)-3}{4m(m-1)} \leq \frac{9}{17} \sim \frac{1}{2}
+}
+
+No dependence on $K$ this just cannot work.
+
+
+\pagebreak
+
+\eqn {
+R(T) &= \epsilon  \left(T -\frac{1}{K}\sum_{i=1}^K\Ei{N_i}\right) + \frac{1}{2K}\sum_{i=1}^K\Ei{N_0} \qquad \leftarrow \text{as before}\\
+&\geq \epsilon \left(T - \frac{T}{K} - T\epsilon\sqrt{\frac{2}{K}\left(\sum_i \Eu{N_i} + \sum_{i\in M}\frac{1}{m}\Eu{N_0} + \sum_{i \notin M}\Eu{N_0} \right)}   \right)+\frac{1}{2}\Es{N_0}\\
+&= \epsilon \left(T - \frac{T}{K} - T\epsilon\sqrt{2\left(\frac{T}{K} + \frac{1}{m}\Eu{N_0}\right)}   \right)+\frac{1}{2}\Es{N_0}\\
+&\geq \frac{\epsilon}{3} \left(T - \frac{T}{K} - T\epsilon\sqrt{2T\left(\frac{1}{K} + \frac{\epsilon}{m}\right)}   \right) \qquad \text{assuming } \Eu{N_0} \leq \epsilon T
+}
+
+
 \eqn {
 R(T) &= \epsilon  \left(T -\frac{1}{K}\sum_{i=1}^K\Ei{N_i}\right) + \frac{1}{2K}\sum_{i=1}^K\Ei{N_0} \qquad \leftarrow \text{as before}\\
 &\leq \epsilon \left(T - \frac{T}{K} - T\epsilon\sqrt{\frac{2}{K}\left(\sum_{i\in M}\Eu{N_i} + \sum_{i \notin M}(\Eu{N_i}+\frac{1}{m}\Eu{N_0})  \right)}   \right)+\frac{1}{2}\Es{N_0}\\

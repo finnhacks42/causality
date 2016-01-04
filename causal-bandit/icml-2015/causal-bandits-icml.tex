@@ -40,6 +40,8 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{cleveref}
+
+\graphicspath{ {figures/} }
 \usetikzlibrary{arrows,positioning} 
 \tikzset{
     %Define standard arrow tip
@@ -164,9 +166,19 @@ If we receive feedback on additional nodes the problem can be more interesting. 
 
 We consider a bandit problem where the actions and reward are represented by a specific causal graph that demonstrates this interesting structure. We develop an algorithm to leverage the information provided by this structure and demonstrate it substantially outperforms standard bandit algorithms applied to the same problem where the number of actions is large.
 
+There has been substantial recent work into extending bandit algorithms to incorporate additional assumptions and deal with more complex feedback structures. Algorithms with strong guarantees have been developed for linear bandits [], generalized linear bandits, gaussian process bandits [], etc. There is also an active line of research into bandits with feedback defined by a graph. Actions are modelled as nodes in the graph and the agent observes rewards for each action connected to the selected action []. The novelty of our work is that we assume prior knowledge of the causal structure but not the functional form of the relationship between variables.   
+
+Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
+
+ALSO NEED TO MENTION ANY OTHER COMBINATIONS OF BANDITS+CAUSAL (eg the Elias NIPS paper and Generalized Thompson Sampling paper)
+
+Key to Elias' paper is: observing the action an agent would take if it were allowed to make its natural choice can provide some information about hidden confounders that influence both the reward and the choice of action. Therefore, incorporating an agents natural choice as context may outperform a standard bandit that does not use that context. (Note: even in the presence of hidden confounders, including the agents natural choice as context only may improve the results. It is easy to come up with a counter example in which it does not).
+
 \section{Problem setup}
 
-Assume we have a known causal model with binary variables $\boldsymbol{X} = \{X_{1}..X_{N}\}$ that independently cause a target variable of interest $Y$, figure \ref{fig:causalStructure}. We can run sequential experiments on the system, where at each timestep $t$ we can either do nothing, $do()$, or select a single variable, $X_i$, on which to intervene, $do(X_{t,i} = J_t)$, and subsequently observe the complete result, $(\boldsymbol{X}_{t},Y_{t})$. 
+Assume we have a known causal model with binary variables $\boldsymbol{X} = \{X_{1}..X_{N}\}$ that independently cause a target variable of interest $Y$, figure \ref{fig:causalStructure}. We can run sequential experiments on the system, where at each timestep $t$ we can either do nothing, $do()$ \footnote{A note on notation: In the bandit community it is implicit that algorithms selecting actions are intervening in the system. So it is sufficient to index actions according to the variable and value. However, in causal graphs, it is essential to differentiate observing (or conditioning) on a variable taking a certain value, from intervening to set that variable. Although in the specific causal graph we consider, observation and intervention are the same, we deliberately introduce the do-notation \cite{Pearl2000} that makes this distinction clear so as to help provide a bridge between the bandit and causal inference communities.} , or select a single variable, $X_i$, on which to intervene, $do(X_{t,i} = J_t)$, and subsequently observe the complete result, $(\boldsymbol{X}_{t},Y_{t})$. 
+
+
 
 As an example, consider a farmer wishing to optimize the yield of her crop. She can invest in a green house to control temperature, a watering system to control soil moisture, fertilizers to set soil nutrients, etc. We assume only a single intervention is feasible due to cost and that each of these variables are independent of one-another (this may not always be the case - temperature could be related to rainfall for example). After having selected which variable to control, she plants her crops and observes the values of the remaining input variables and the yield. This repeats across many growing seasons, and the goal is to maximize the total cumulative yield.
 
@@ -235,8 +247,8 @@ We can also learn about the reward for intervening on one variable from rounds i
 
 \eqn {
 \label{eq:estimation_transfer}
-P(Y_t|do(X_{i,t} = j))=\\
- \sum_{j'} P(Y_t|do(X_{l,t} = j'),X_{i,t} = j)P(X_{l_t} = j')
+P(Y_t|do(X_{i,t} = j))= & \nonumber \\
+ \sum_{j'}  P(Y_t|do(X_{l,t} & = j'),X_{i,t} = j)P(X_{l_t} = j')
 }
 
 We propose a simple explore-exploit based algorithm that leverages  \eqref{eq:observe}. Without loss of generality, we assume $q_i \in [0,\frac{1}{2}]$ and $q_1 \leq q_2 ... \leq q_N$. 
@@ -279,7 +291,7 @@ R(T) \in \bigo{T^{2/3}m^{1/3}log(KT)^{1/3}}\,.
 
 The lower bound for the standard bandit problem is $R_t \in \bigomega{\sqrt{TK}}$ \cite{Auer1995}. Comparing these results shows exploiting the extra information provided by the causal structure should outperform standard bandit algorithms when the number of arms is large, $K >> m^{2/3}T^{1/3}$. The parameter $m$ summarizes the vector $\boldsymbol{q}$, and represents the number of actions that occur rarely naturally and thus must be explicitly explored. If $q_1,...,q_N = 0$, the problem is completely unbalanced and $m = N$. If $q_1,...,q_N = \frac{1}{2}$, the problem is completely balanced and $m = 1$.
 
-Algorithm \ref{alg:known_q} tries to learn the rewards for all the arms during an exploration phase $h$ and then picks the arm with the highest empirical mean for all remaining timesteps. During its exploration phase, it learns all the frequently occurring actions by observation and the remaining, infrequently occurring actions, by explicitly playing them. This leads to Chernoff type high probability bounds on the difference between the empirical and true rewards for all arms of the form $P(\hat{\mu}_{i,j} - \mu_{i,j} > D) \leq e^{-hD^2/m}$. By choosing optimal values for $D$ and $h$ we obtain the regret bound given in \cref{thm:known_q_regret}. A full proof is given in the supplementary materials. (\color{red} or should we put it here? \color{black})
+Algorithm \ref{alg:known_q} tries to learn the rewards for all the arms during an exploration phase $h$ and then picks the arm with the highest empirical mean for all remaining timesteps. During its exploration phase, it learns all the frequently occurring actions by observation and the remaining, infrequently occurring actions, by explicitly playing them. This leads to Chernoff type high probability bounds on the difference between the empirical and true rewards for all arms of the form $P(\hat{\mu}_{i,j} - \mu_{i,j} > D) \leq e^{-hD^2/m}$. By choosing optimal values for $D$ and $h$ we obtain the regret bound given in \cref{thm:known_q_regret}. A full proof is given in the supplementary materials. 
 
 Algorithm \ref{alg:known_q} relies on $\boldsymbol{q}$ and thus $m$ being known. We now consider the case where $\boldsymbol{q}$ is unknown. We begin by considering the simple regret, defined as the expected difference between the mean payoff of the optimal action and that of the action estimated to be optimal in $T$th round. 
 
@@ -359,8 +371,23 @@ R(T) \in \bigo{T^{2/3}m^{1/3}log(KT)^{1/3}}\,.
 
 \section{Experiments}
 
-\section{Related Work}
-There has been substantial recent work into extending bandit algorithms to incorporate additional assumptions and deal with more complex feedback structures. Algorithms with strong guarantees have been developed for linear bandits [], generalized linear bandits, gaussian process bandits [], etc. There is also an active line of research into bandits with feedback defined by a graph. Actions are modelled as nodes in the graph and the agent observes rewards for each action connected to the selected action []. The novelty of our work is that we assume prior knowledge of the causal structure but not the functional form of the relationship between variables.   
+\begin{figure}
+\caption{Final regret versus number of variables $N$ for UCB with $\alpha = 2$, Causal-Explore-Exploit with $m=2$ and with $m=N$ and horizon $T = 10,000$ . Error bars show standard deviation over 100 simulations. The regret for UCB grows linearly with the number of variables, whist for Causal-Explore-Exploit with fixed $m$, the growth is sub-logarthmic.  }
+\label{fig:known_q_r_vs_N}
+\centering
+\includegraphics[width=.5\textwidth]{exp_regret_vs_N_T10000_sims100_20151229_113550.pdf}
+\end{figure}
+
+\begin{figure}
+\caption{Cumulative regret over time for $N = 17$ for UCB with $\alpha=2$, Causal-Explore-Exploit with $m=2$ and Causal-Explore-Exploit with $m=N$. Shaded region shows standard deviation over 100 simulations. The Causal-Explore-Exploit algorithm incurs linear regret during the exploration phase, after which it selects the optimal arm with high probability. For $m=2$, we have $K \sim m^{2/3}T^{1/3}$ and see that we are in the regime in which Causal-Explore-Exploit outperforms UCB.}
+\label{fig:known_q_r_vs_t}
+\centering
+\includegraphics[width=.5\textwidth]{exp_regret_vs_t_T10000_N17_sims100_20151229_120647.pdf}
+\end{figure}
+
+
+\section{Discussion}
+
 
 In our algorithm, we have only used the side information provided by the $do()$ action about other actions. Since the $do()$ action fully reveals the value of alternate actions we could have incorporated this information via the graph feedback model \cite{Mannor2011}, where at each timestep the feedback graph $G_t$ is selected stochastically, dependent on $\boldsymbol{q}$, and revealed after an action has been chosen. The feedback graph is distinct from the causal graph. A link $A \rightarrow B$ in $G_t$ indicates that selecting the action $A$ reveals the reward for action $B$. For this specific problem, $G_t$ will always be a star graph with the action $do()$ connected to half the remaining actions. The Exp3-IX algorithm \cite{Kocak2014} was developed for the adversarial version of this problem and has regret $\bigo{\sqrt{\bar{\alpha}T}}$, where $\bar{\alpha}$ is the average independence number of $G_t$. In our case $\bar{\alpha} = \frac{N}{2}$ so we again obtain the regret of the standard bandit algorithm. The issue here is that a malicious adversary can select the same graph each time, such that the rewards for half the arms are never revealed by the informative action. This is equivalent to a, nominally, stochastic selection of feedback graph where $\boldsymbol{q} = \boldsymbol{0}$
 
@@ -368,12 +395,12 @@ In our algorithm, we have only used the side information provided by the $do()$ 
 
 More generally, assuming causal structure creates more complex types of side information, such as that shown in equation \ref{eq:estimation_transfer}. In this case, selecting one action does not fully reveal an alternate action but provides some information towards an estimate. The quality of the estimate notably depends not only on the number of times that action was selected. For example, to get a good estimate for $X_1 = 1$ by intervening on $X_2$ requires us to sample both $X_2=0$ and $X_2=1$, in proportions dependent on $q_2$. This more complex side information does not fit within the graph feedback framework.
 
-Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
 
-ALSO NEED TO MENTION ANY OTHER COMBINATIONS OF BANDITS+CAUSAL (eg the Elias NIPS paper and Generalized Thompson Sampling paper)
-
-Key to Elias' paper is: observing the action an agent would take if it were allowed to make its natural choice can provide some information about hidden confounders that influence both the reward and the choice of action. Therefore, incorporating an agents natural choice as context may outperform a standard bandit that does not use that context. (Note: even in the presence of hidden confounders, including the agents natural choice as context only may improve the results. It is easy to come up with a counter example in which it does not).
-
+\section{Future Open Questions}
+\begin{itemize}
+\item Known but arbitrary structure
+\item Learning structure then exploiting
+\end{itemize}
 \section{Conclusion}
 
 

@@ -115,20 +115,21 @@ Tyler~J VanderWeele and Sonia Hern{\'{a}}ndez-Diaz.
 \newblock {\em Paediatric and perinatal epidemiology}, 25(2):111--5, mar 2011.
 
 \bibitem{Richardson2013}
-Thomas~S. Richardson and James~M. Robins.
-\newblock {Single world intervention graphs (SWIGs): a unification of the
+Thomas~S Richardson and James~M Robins.
+\newblock {Single World Intervention Graphs (SWIGs): A unification of the
   counterfactual and graphical approaches to causality}.
-\newblock 2013.
-
-\bibitem{Heckman2008}
-James Heckman.
-\newblock {Econometric causality}.
-\newblock {\em International Statistical Review}, 2008.
+\newblock {\em Center for the Statistics and the Social Sciences, University of
+  Washington Series. Working Paper}, 128(128), 2013.
 
 \bibitem{Sprites2000}
 Peter Spirtes, Clark~N Glymour, and Richard Scheines.
 \newblock {\em {Causation, prediction, and search}}, volume~81.
 \newblock MIT press, 2000.
+
+\bibitem{Heckman2008}
+James Heckman.
+\newblock {Econometric causality}.
+\newblock {\em International Statistical Review}, 2008.
 
 \bibitem{Colombo2012}
 Diego Colombo, Marloes~H. Maathuis, Markus Kalisch, and Thomas~S. Richardson.
@@ -148,9 +149,11 @@ Ioannis Tsamardinos, Laura~E. Brown, and Constantin~F. Aliferis.
 \newblock {\em Machine Learning}, 65(1):31--78, mar 2006.
 
 \bibitem{Gretton2008}
-Arthur Gretton, K~Fukumizu, CH~Teo, and L~Song.
+Arthur Gretton, Kenji Fukumizu, Choon~H Teo, Le~Song, Bernhard Sch{\"{o}}lkopf,
+  and Alex~J Smola.
 \newblock {A kernel statistical test of independence}.
-\newblock pages 1--8, 2008.
+\newblock In {\em Advances in Neural Information Processing Systems}, pages
+  585--592, 2007.
 
 \bibitem{Zhang2012}
 Kun Zhang, Jonas Peters, Dominik Janzing, and Bernhard Sch{\"{o}}lkopf.
@@ -159,10 +162,11 @@ Kun Zhang, Jonas Peters, Dominik Janzing, and Bernhard Sch{\"{o}}lkopf.
 \newblock {\em arXiv preprint arXiv: {\ldots}}, 2012.
 
 \bibitem{Aliferis2002}
-C~F Aliferis and Ioannis Tsamardinos.
-\newblock {Algorithms for Large-Scale Local Causal Discovery and Feature
-  Selection In the Presence Of Limited Sample Or Large Causal Neighbourhoods}.
-\newblock (October):1--9, 2002.
+Constantin~F Aliferis and Ioannis Tsamardinos.
+\newblock {Algorithms for large-scale local causal discovery and feature
+  selection in the presence of limited sample or large causal neighbourhoods}.
+\newblock Technical Report October, Technical report, Technical report
+  DSL-02-08, Department of Biomedical Informatics, Vanderbilt University, 2002.
 
 \bibitem{Maathuis2009}
 Marloes~H. Maathuis, Markus Kalisch, and Peter B{\"{u}}hlmann.
@@ -249,6 +253,54 @@ JY~Audibert and S{\'{e}}bastien Bubeck.
 Tor Lattimore.
 \newblock {Optimally Confident UCB : Improved Regret for Finite-Armed Bandits}.
 \newblock (1):1--16, 2015.
+
+\bibitem{Bubeck2009}
+S{\'{e}}bastien Bubeck, R{\'{e}}mi Munos, and Gilles Stoltz.
+\newblock {Pure exploration in multi-armed bandits problems}.
+\newblock In {\em Algorithmic Learning Theory}, pages 23--37. Springer, 2009.
+
+\bibitem{Audibert2010}
+Jean-Yves Audibert and S{\'{e}}bastien Bubeck.
+\newblock {Best arm identification in multi-armed bandits}.
+\newblock In {\em COLT-23th Conference on Learning Theory-2010}, pages 13----p,
+  2010.
+
+\bibitem{Gabillon2012}
+Victor Gabillon, Mohammad Ghavamzadeh, and Alessandro Lazaric.
+\newblock {Best arm identification: A unified approach to fixed budget and
+  fixed confidence}.
+\newblock In {\em Advances in Neural Information Processing Systems}, pages
+  3212--3220, 2012.
+
+\bibitem{Karnin2013}
+Zohar Karnin, Tomer Koren, and Oren Somekh.
+\newblock {Almost optimal exploration in multi-armed bandits}.
+\newblock In {\em Proceedings of the 30th International Conference on Machine
+  Learning (ICML-13)}, pages 1238--1246, 2013.
+
+\bibitem{filippi2010parametric}
+Sarah Filippi, Olivier Cappe, Aur{\'{e}}lien Garivier, and Csaba
+  Szepesv{\'{a}}ri.
+\newblock {Parametric bandits: The generalized linear case}.
+\newblock In {\em Advances in Neural Information Processing Systems}, pages
+  586--594, 2010.
+
+\bibitem{Pandey2007}
+Sandeep Pandey, Deepayan Chakrabarti, and Deepak Agarwal.
+\newblock {Multi-armed bandit problems with dependent arms}.
+\newblock {\em Proceedings of the 24th international conference on Machine
+  learning - ICML '07}, pages 721--728, 2007.
+
+\bibitem{Bubeck2010}
+S{\'{e}}bastien Bubeck, R~Munos, Gilles Stoltz, and C~Szepesv{\'{a}}ri.
+\newblock {X-armed bandits}.
+\newblock {\em Multi-Armed Bandits}, pages 1--38, 2010.
+
+\bibitem{srinivas2009gaussian}
+Niranjan Srinivas, Andreas Krause, Sham~M Kakade, and Matthias Seeger.
+\newblock {Gaussian process optimization in the bandit setting: No regret and
+  experimental design}.
+\newblock {\em arXiv preprint arXiv:0912.3995}, 2009.
 
 \bibitem{Mannor2011}
 Shie Mannor and Ohad Shamir.

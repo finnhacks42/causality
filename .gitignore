@@ -14,8 +14,11 @@
 
 #python
 *.pyc
+*.pickle
 
 #latex 
 *.aux
 *.gz
 *.log
+graph
+graph2
