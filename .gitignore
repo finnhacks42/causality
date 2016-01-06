@@ -20,5 +20,7 @@
 *.aux
 *.gz
 *.log
+*.fls
+*.fdb_latexmk
 graph
 graph2
