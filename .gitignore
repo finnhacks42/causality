@@ -20,5 +20,9 @@
 *.aux
 *.gz
 *.log
+*.bbl
+*.blg
+
+# other
 graph
 graph2
