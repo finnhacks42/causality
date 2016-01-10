@@ -22,5 +22,9 @@
 *.log
 *.fls
 *.fdb_latexmk
+*.bbl
+*.blg
+
+# other
 graph
 graph2
