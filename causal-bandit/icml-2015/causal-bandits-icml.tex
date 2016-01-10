@@ -369,8 +369,9 @@ r_T \in \bigo{\sqrt{\frac{m}{T}\log\left(\frac{NT}{m}\right)}}\,.
 }
 \end{theorem}
 
-Note that algorithms designed for finite-armed bandits would explore interventions more uniformly and achieve a regret of $\Omega\left(\sqrt{N/T}\right)$.
-This is a significant improvement, since $m \leq N$ is usually substantially smaller than $N$.
+Note that algorithms designed for finite-armed bandits would explore interventions more uniformly and achieve a regret of $\Omega(\sqrt{N/T})$.
+Since $m$ is typically much smaller than $N$ we anticipate that the new algorithm will significantly outperform classical bandit algorithms in
+this setting.
 
 \todot{Do we have a proof for this in another doc?}
 \begin{proof}
