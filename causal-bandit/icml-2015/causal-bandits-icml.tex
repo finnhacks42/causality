@@ -18,6 +18,7 @@
 % resulting PDF.  If this breaks your system, please commend out the
 % following usepackage line and replace \usepackage{icml2015} with
 % \usepackage[nohyperref]{icml2015} above.
+\usepackage{cleveref}
 \usepackage{hyperref}
 
 % Packages hyperref and algorithmic misbehave sometimes.  We can fix
@@ -39,7 +40,17 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
-\usepackage{cleveref}
+
+
+\setlength{\marginparwidth}{10ex}%added by Yifan so that the todos can fit in the margin
+%\usepackage[obeyFinal]{todonotes}
+\usepackage{todonotes}
+
+\newcommand{\tinytodo}[2][]{\todo[size=\tiny]{#2}}
+%\newcommand{\tinytodo}[2][]{\todo[size=\tiny, #1]{\begin{spacing}{1.0}#2\end{spacing}}}
+\newcommand{\todot}[2][]{\tinytodo[color=blue!20, #1]{T: #2}} % Csaba
+\newcommand{\todof}[2][]{\tinytodo[color=red!20, #1]{F:\@#2}} % Roshan
+
 
 \graphicspath{ {figures/} }
 \usetikzlibrary{arrows,positioning} 
@@ -87,6 +98,7 @@
 \newcommand{\defined}{\vcentcolon =}
 \newcommand{\rdefined}{=\vcentcolon}
 \newcommand{\E}[1]{\mathbb E\left[#1\right]}
+\newcommand{\R}{\mathbb R}
 \newcommand{\Var}{\operatorname{Var}}
 \newcommand{\calF}{\mathcal F}
 \newcommand{\sr}[1]{\stackrel{#1}}
@@ -146,15 +158,31 @@
 ]
 
 \begin{abstract} 
-
+\todot{This can use some work}
+We study the problem of learning an optimal intervention. Our approach combines the theory of multi-armed bandits
+and causal inference. The main contribution is the new setting as well as algorithms that minimise both the simple and cumulative regret.
 \end{abstract} 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INTRODUCTION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
-Problems requiring choosing an action under uncertainty are rife in all areas of human endeavour. For many problems, actions may be chosen sequentially, allowing the agent to learn from the outcome of early choices to improve later ones. 
+
+A classical problem in economics and operations research is how to choose interventions that maximise utility. 
+We study an idealised model of such interventions using a combination of the multi-armed bandit framework \citep{Robbins1952} and the theory/language of causal inference 
+\citep{Pearl2000}.
+
+The idea is best illustrated with an example. Consider a farmer wishing to optimise the yield of her crop. In each season she can invest in a green house (to control
+the temperature), cover her plants with nets (to prevent loss to birds), use expensive fertilizers, or install a high-tech watering system. We will assume for
+simplicity that she does not have the resources to make more than one intervention. Of course, the watering system will only be useful if the rainfall is low and
+the nets will be useful if the bird population is large. These things are random events that change from season to season, which makes the impact of each intervention
+difficulty to measure. The goal of this paper is to design an optimal strategy for the farmer to learn which intervention will be most profitable.
+
+%Problems requiring choosing an action under uncertainty are rife in all areas of human endeavour. For many problems, actions may be chosen sequentially, allowing the agent to learn from the outcome of early choices to improve later ones. 
 
 A widely used framework for sequential decision making is the multi-armed bandit. In the classic multi-armed bandit setting there is a finite set of available actions, each associated with a distribution over rewards which is unknown but stationary. At each timestep the agent selects an action and receives a reward sampled i.i.d from the corresponding reward distribution. The performance of bandit algorithms is described by the regret: the difference in the expected reward obtained by the algorithm and the reward that could be obtained if the optimal action was selected at every timestep. 
 
-An an alternate approach to selecting actions is causal inference. Frameworks for causal inference provide a mechanism to specify assumptions that allow observational distributions over variables to be mapped to interventional ones. This allows an agent to predict the outcome of an action based on non-experimental data. This approach is common in social science, demography, and economics where explicit experimentation may be difficult. For example, predicting the effect of changes to childcare subsidies on workforce participation or school choice on student grades. 
+An alternate approach to selecting actions is causal inference. Frameworks for causal inference provide a mechanism to specify assumptions that allow observational distributions over variables to be mapped to interventional ones. This allows an agent to predict the outcome of an action based on non-experimental data. This approach is common in social science, demography, and economics where explicit experimentation may be difficult. For example, predicting the effect of changes to childcare subsidies on workforce participation or school choice on student grades. 
 
 We take a first step towards unifying these approaches by considering a variant of the stochastic multi-armed bandit problem where we have prior knowledge of the causal structure governing the available actions. 
 
@@ -168,20 +196,22 @@ We consider a bandit problem where the actions and reward are represented by a s
 
 There has been substantial recent work into extending bandit algorithms to incorporate additional assumptions and deal with more complex feedback structures. Algorithms with strong guarantees have been developed for linear bandits [], generalized linear bandits, gaussian process bandits [], etc. There is also an active line of research into bandits with feedback defined by a graph. Actions are modelled as nodes in the graph and the agent observes rewards for each action connected to the selected action []. The novelty of our work is that we assume prior knowledge of the causal structure but not the functional form of the relationship between variables.   
 
-Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
+Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
 
 ALSO NEED TO MENTION ANY OTHER COMBINATIONS OF BANDITS+CAUSAL (eg the Elias NIPS paper and Generalized Thompson Sampling paper)
 
 Key to Elias' paper is: observing the action an agent would take if it were allowed to make its natural choice can provide some information about hidden confounders that influence both the reward and the choice of action. Therefore, incorporating an agents natural choice as context may outperform a standard bandit that does not use that context. (Note: even in the presence of hidden confounders, including the agents natural choice as context only may improve the results. It is easy to come up with a counter example in which it does not).
 
-\section{Problem setup}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PROBLEM SETUP
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Problem Setup}
 
-Assume we have a known causal model with binary variables $\boldsymbol{X} = \{X_{1}..X_{N}\}$ that independently cause a target variable of interest $Y$, figure \ref{fig:causalStructure}. We can run sequential experiments on the system, where at each timestep $t$ we can either do nothing, $do()$ \footnote{A note on notation: In the bandit community it is implicit that algorithms selecting actions are intervening in the system. So it is sufficient to index actions according to the variable and value. However, in causal graphs, it is essential to differentiate observing (or conditioning) on a variable taking a certain value, from intervening to set that variable. Although in the specific causal graph we consider, observation and intervention are the same, we deliberately introduce the do-notation \cite{Pearl2000} that makes this distinction clear so as to help provide a bridge between the bandit and causal inference communities.} , or select a single variable, $X_i$, on which to intervene, $do(X_{t,i} = J_t)$, and subsequently observe the complete result, $(\boldsymbol{X}_{t},Y_{t})$. 
+\newcommand{\bernoulli}{\operatorname{Bernoulli}}
+\newcommand{\dirac}{\operatorname{Dirac}}
 
-
-
-As an example, consider a farmer wishing to optimize the yield of her crop. She can invest in a green house to control temperature, a watering system to control soil moisture, fertilizers to set soil nutrients, etc. We assume only a single intervention is feasible due to cost and that each of these variables are independent of one-another (this may not always be the case - temperature could be related to rainfall for example). After having selected which variable to control, she plants her crops and observes the values of the remaining input variables and the yield. This repeats across many growing seasons, and the goal is to maximize the total cumulative yield.
-
+Assume we have a known causal model with binary variables $\boldsymbol{X} = \{X_{1},\ldots,X_{N}\}$ that independently cause a 
+target variable of interest $Y \in \R$ (see Figure \ref{fig:causalStructure}).
 \begin{figure}[h]
 \centering
 \caption{Assumed Causal Structure}
@@ -204,52 +234,156 @@ As an example, consider a farmer wishing to optimize the yield of her crop. She 
 \end{figure}
 
 
-
-Let $\boldsymbol{q} \in [0,1]^N$ be a fixed vector where $q_i = P(X_i = 1)$. In each time-step $t$ upto a known end point $T$:
- 
-\begin{enumerate}
-\item The learner chooses $I_t \in \set{0...N}$ and $J_t \in \set{0,1}$, corresponding to setting the variable $X_{I_t}=J_t$, also denoted $do(X_{I_t} = J_t)$. Selecting $I_t = 0$ represents not intervening on any variable and simply observing, also denoted $do()$.
-
-\item The remaining variables take their values stochastically according to their natural probabilities $\boldsymbol{q}$
-
+The game proceeds over $T$ identical rounds (or time-steps).
+In each round $t$ the learner can choose either to do nothing or they can choose a variable $I_t \in \set{1,\ldots,N}$ and
+an intervention $J_t \in \set{0,1}$. After the learner has chosen an intervention they observe $X_{t,i} \in \set{0,1}$ for all $i$ where
 \eq{
-X_{i,t} = \begin{cases}
-\sim Bernoulli(q_i) &\text{if } i \neq I_t \\
-J_t & \text{otherwise}\,.
+X_{t,i} \sim \begin{cases}
+\dirac(J_t) & \text{if } I_t = i \\
+\bernoulli(q_i) & \text{otherwise}\,.
 \end{cases}
 }
-
-\item The learner receives reward $Y_t \sim \Ber(r(\boldsymbol{X}_t))$ where $r:\set{0,1}^N \to [0,1]$ is unknown and arbitrary.
-\end{enumerate}
-
-The expected reward of taking action $i,j$ is $\mu_{i,j} = \E{r(X)|do(X_i = j)}$. The optimal reward and action are denoted $\mu^*$ and $(i^*,j^*)$ respectively,
-where $(i^*,j^*) = \argmax_{i,j} \mu_{i,j}$ and $\mu^* = \mu(i^*,j^*)$. The $n$-step cumulative expected regret is
+where $\boldsymbol{q} \in [0,1]^N$ is a (possibly unknown) vector of probabilities with $q_i = \P{X_i = 1}$. Note that if the learner did not choose an intervention then $I_t$ is undefined
+and $X_{t,i} \sim \bernoulli(q_i)$ for all variables $i \in \set{1,\ldots,N}$.
+Finally the learner observes the reward $Y_t = r(X_t) + \eta_t$ where 
 \eq{
-R_n = \E {\sum_{t=1}^n \left(\mu^* - \mu_{I_t,J_t}\right)}.
+r : \set{0,1}^N \to \R
 }
+is arbitrary (and unknown) 
+and $\eta_t$ is a $1$-subgaussian noise
+term (with the distribution possibly dependent on $X_t$). 
 
-The problem could be treated as a classical multi-armed bandit with $K = 2N+1$ arms, yielding a regret $\bigo{\sqrt{TN}}$. However, this doesn't leverage the side information induced by the causal structure.
+The expected reward for intervening on variable $i$ by setting it to $j$ is defined by
+\eq{
+\mu_{i,j} 
+&= \E{r(X)|do(X_i = j)} \\
+&= \sum_{\boldsymbol{x} \in \set{0,1}^N : x_i = j} r(\boldsymbol{x})  \prod_{k \neq i} q_k^{x_k} (1 - q_k)^{1-x_k} \,. 
+}
+The optimal intervention is $(i^*,j^*) = \argmax_{i,j} \mu_{i,j}$ and the corresponding optimal reward is $\mu^* = \mu_{i^*,j^*}$. 
+Note that the expected reward of the optimal intervention is at least as large as the expected reward for doing nothing.
 
-\section{Causal Bandits}
+It is worth mentioning that the problem may be treated as a multi-armed bandit with $2N$ arms, one corresponding to each intervention.
+As we shall shortly see, this approach is usually not practical because the resulting algorithms do not exploit the structure in
+the covariates.
 
-Given the assumed causal structure, the probability of $Y_t$ given we intervene to set $X_{i,t} = j$ is the same as if we don't set any variables and observe $X_{i,t} = j$. 
+We consider two standard performance measures. The first is the cumulative regret, which measures the difference between the reward expected under
+the omnipotent strategy that knows the optimal action in advance and the expected reward of the learner. 
+\eqn{
+\label{eq:regret}
+R_T = T \mu^* - \E{\sum_{t=1}^T Y_t}\,.
+}
+The second performance measure is the simple regret, which measures the performance of the learner on the final round only.
+\eqn{
+\label{eq:regret-simple}
+r_T = \mu^* - \E{\mu_{I_T,J_T}}\,.
+}
+Both versions of the regret are useful in different circumstances. The first is most useful when the learner is truly online and can change their policy over time.
+The second is useful when the exploration budget is limited and a fixed policy should eventually be chosen. \todot{make this nicer}
 
+\todot{this remark feels out of place, but where to put it?}
+\begin{remark}
+In order to be consistent with the literature on causal inference we use the notation $do()$ to denote the action of doing nothing and $do(X_{t,I_t} = J_t)$
+the action of intervening on the $I_t$th variable and setting it to equal $J_t$. 
+In the bandit community it is implicit that 
+algorithms selecting actions are intervening in the system. So it is sufficient to index actions according to the variable and value. 
+However, in causal graphs, it is essential to differentiate observing (or conditioning) on a variable taking a certain value, from 
+intervening to set that variable. Although in the specific causal graph we consider, observation and intervention are the same, we 
+deliberately introduce the do-notation \cite{Pearl2000} that makes this distinction clear so as to help provide a bridge between the 
+bandit and causal inference communities.
+\end{remark}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% UPPER BOUND ON SIMPLE REGRET
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Upper Bounds on the Simple Regret}
+
+In this section we develop and analyse an algorithm for minimising the simple regret in the
+causal bandit problem.  
+
+From a causal perspective the key insight is that the assumed causal structure implies that
+the law of $Y_t$ given we intervene to set $X_{t,i} = j$ is the same as the law of $Y_t$ conditioned
+on $X_{t,i} = j$. Formally,
 \eqn {
 \label{eq:observe}
-P(Y_t|do(X_{i,t} = j)) = P(Y_t|do(),X_{i,t} = j)
+\P{Y_t \leq y|do(X_{t,i} = j)} = \P{Y_t \leq y|do(),X_{t,i} = j}\,.
 }
+This follows from application of the do-calculus \cite{Pearl2000} to our specific causal graph. It is not the case in general. 
+For example if there was a variable $X'$ that caused both $X_{t,i}$ and $Y$ (or $X_{t,i}$ and any other variable $X_{t,l}$), 
+that would introduce a backdoor path from $X_{t,i} \rightarrow Y_t$ and we would have to condition on $X'$ to derive the 
+interventional distribution of $Y_t$ from the observational one.
 
-This follows from application of the do-calculus \cite{Pearl2000} to our specific causal graph. It is not the case in general. For example if there was a variable $X'$ that caused both $X_i$ and $Y$ (or $X_i$ and any other variable $X_l$), that would introduce a backdoor path from $X_i \rightarrow Y$ and we would have to condition on $X'$ to derive the interventional distribution of $Y$ from the observational one.
-
+\todot{Or just give a reference or hide in the appendix depending on space in the end}
 \color{red} Probably should define causal model and back-door rule to properly show this.\color{black}
 
 We can also learn about the reward for intervening on one variable from rounds in which we actually set a different variable.
 
 \eqn {
 \label{eq:estimation_transfer}
-P(Y_t|do(X_{i,t} = j))= & \nonumber \\
- \sum_{j'}  P(Y_t|do(X_{l,t} & = j'),X_{i,t} = j)P(X_{l_t} = j')
+P(Y_t|do(X_{t,i} = j))= & \nonumber \\
+ \sum_{j'}  P(Y_t|do(X_{t,l} & = j'),X_{t,i} = j)P(X_{t,l} = j')
 }
+
+
+The main idea of the algorithm is that by making no intervention (doing nothing) it is possible to estimate simultaneously the returns of all interventions.
+Unfortunately interventions that occur with low probability ($\P{X_{t,i} = j}$ is small) suffer from a high approximation error and should be
+explored separately by actually making the intervention. The algorithm works by optimally balancing the collection of observational data (when
+no action is taken) and making interventions to learn about low probability events. The problem is more challenging because $\boldsymbol{q}$ is
+unknown and must also be estimated.
+
+\begin{algorithm}[h]
+\caption{Causal Best Arm Identification}\label{alg:simple}
+\begin{algorithmic}[1]
+\STATE {\bf Input:} $T, N$
+\FOR{$t \in 1,\ldots,(T - 1) / 2$}
+\STATE Choose the action $do()$ and observe $\boldsymbol{X}_t$ and $r_t$
+\ENDFOR
+\STATE Estimate $\mu$ using observation data:
+\eq{
+(\forall i,j) \qquad \hat \mu_{i,j} = \frac{\sum_{t=1}^{T/2} \ind{X_{t,i} = j} r_t}{\sum_{t=1}^{T/2} \ind{X_{t,i} = j}}\,.
+}
+\STATE Compute $\hat q_i = \frac{2}{T} \sum_{t=1}^{T/2} X_{t,i}$
+\STATE Compute $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$
+\STATE Compute $\hat{s'} = sorted(\hat{s}) : \hat{s'}_1 \leq \hat{s'_2} \leq ... \leq \hat{s'}_N$
+\STATE Compute $\hat m = \min\set{1 \leq i \leq N : \hat s'_{i+1} \geq \frac{1}{i}}$
+\STATE $i'(i) = $ the index of $\hat s_i$ in $\hat s'$
+\STATE Compute $A$ as the subset of infrequently observed arms $\{(i,j):i'(i) \leq \hat m, j = \ind{\hat q_{i} \leq \frac{1}{2}} \}$ with $|A| = \hat m$
+
+\FOR{$(i,j) \in A$}
+\FOR{$t \in 1,\ldots,\frac{T - 1)}{2\hat m}$}
+\STATE Choose action $do(X_{t,i} = j)$ and observe $r_t$
+\ENDFOR
+\STATE Recompute $\hat \mu_{i,j} = \frac{2\hat m}{T} \sum_{t=1}^{ T/2\hat m} r_t(X_{t,i}=j)$ 
+\ENDFOR
+\STATE Estimated optimal action is $\hat i^*, \hat j^* = \argmax_{i,j} \hat \mu_{i,j}$
+\STATE Choose action $do(X_{t,\hat i^*} = \hat j^*)$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}\label{thm:unknown_q_simpleregret}
+Define $m = \min\set{1 \leq i \leq N:q_{i+1} \geq \frac{1}{i}}$.
+Then Algorithm \ref{alg:simple} satisfies
+\eq{
+r_T \in \bigo{\sqrt{\frac{m}{T}\log\left(\frac{NT}{m}\right)}}\,.
+}
+\end{theorem}
+
+Note that algorithms designed for finite-armed bandits would explore interventions more uniformly and achieve a regret of $\Omega\left(\sqrt{N/T}\right)$.
+This is a significant improvement, since $m \leq N$ is usually substantially smaller than $N$.
+
+\todot{Do we have a proof for this in another doc?}
+\begin{proof}
+\end{proof}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% UPPER BOUND ON CUMULATIVE REGRET
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Upper Bound on the Cumulative Regret}
+
+We now tackle the case where the objective is to minimise the cumulative regret.
+This is significantly more challenging since the algorithm can no longer explore naively for $O(T)$ rounds without suffering linear regret.
 
 We propose a simple explore-exploit based algorithm that leverages  \eqref{eq:observe}. Without loss of generality, we assume $q_i \in [0,\frac{1}{2}]$ and $q_1 \leq q_2 ... \leq q_N$. 
 
@@ -259,7 +393,7 @@ We propose a simple explore-exploit based algorithm that leverages  \eqref{eq:ob
 \begin{algorithmic}
    \STATE {\bfseries Input:} $T,\boldsymbol{q}$
    \STATE Let $m =   min\set{1 \leq i \leq N:q_{i+1} \geq \frac{1}{i}}$
-   \STATE Let $h = T^{2/3}m^{1/3}log(TK)^{1/3}$
+   \STATE Let $h = T^{2/3}m^{1/3} \log(TK)^{1/3}$
    \STATE Let $A = \set{(i,j) : i \leq m, j = 1}$ be the set of infrequently observed arms
    \FOR{$t=1$ {\bfseries to} $h/2$}
    \STATE Choose the action $do()$ and observe $\boldsymbol{X}_t$ and $r_t$
@@ -283,9 +417,9 @@ We propose a simple explore-exploit based algorithm that leverages  \eqref{eq:ob
 
 \begin{theorem}\label{thm:known_q_regret}
 Define $m =   min\set{1 \leq i \leq N:q_{i+1} \geq \frac{1}{i}}$
-Then \cref{alg:known_q} satisfies
+Then Algorithm \ref{alg:known_q} satisfies
 \eq{
-R(T) \in \bigo{T^{2/3}m^{1/3}log(KT)^{1/3}}\,.
+R(T) \in \bigo{T^{2/3}m^{1/3} \log(KT)^{1/3}}\,.
 }
 \end{theorem}
 
@@ -295,48 +429,6 @@ Algorithm \ref{alg:known_q} tries to learn the rewards for all the arms during a
 
 Algorithm \ref{alg:known_q} relies on $\boldsymbol{q}$ and thus $m$ being known. We now consider the case where $\boldsymbol{q}$ is unknown. We begin by considering the simple regret, defined as the expected difference between the mean payoff of the optimal action and that of the action estimated to be optimal in $T$th round. 
 
-\eqn{
-R^{simple}(h) = \E{\mu^* - max_{(i,j)}\hat{\mu}_{i,j}(h)}
-}
-
-\begin{algorithm}[h]
-\caption{Causal Best Arm Identification}\label{alg:simple}
-\begin{algorithmic}[1]
-\STATE {\bf Input:} $T, N$
-\FOR{$t \in 1,\ldots,T/2$}
-\STATE Choose the action $do()$ and observe $\boldsymbol{X}_t$ and $r_t$
-\ENDFOR
-\STATE Compute for all $i \in \set{1,\ldots,N}$ and $j \in \set{0,1}$:
-\eq{
-\hat \mu_{i,j} = \frac{\sum_{t=1}^{T/2} \ind{X_{i,t} = j} r_t}{\sum_{t=1}^{T/2} \ind{X_{i,t} = j}}\,.
-}
-\STATE Compute $\hat q_i = \frac{2}{T} \sum_{t=1}^{T/2} X_{i,t}$
-\STATE Compute $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$
-\STATE Compute $\hat{s'} = sorted(\hat{s}) : \hat{s'}_1 \leq \hat{s'_2} \leq ... \leq \hat{s'}_N$
-\STATE Compute $\hat m = \min\set{1 \leq i \leq N : \hat s'_{i+1} \geq \frac{1}{i}}$
-\STATE $i'(i) = $ the index of $\hat s_i$ in $\hat s'$
-\STATE Compute $A$ as the subset of infrequently observed arms $\{(i,j):i'(i) \leq \hat m, j = \ind{\hat q_{i} \leq \frac{1}{2}} \}$ with $|A| = \hat m$
-
-\FOR{$(i,j) \in A$}
-\FOR{$t \in 1,\ldots,T/2\hat m$}
-\STATE Choose action $do(X_{i,t} = j)$ and observe $r_t$
-\ENDFOR
-\STATE Recompute $\hat \mu_{i,j} = \frac{2\hat m}{T} \sum_{t=1}^{ T/2\hat m} r_t(X_{i,t}=j)$ 
-\ENDFOR
-\end{algorithmic}
-\end{algorithm}
-
-\begin{theorem}\label{thm:unknown_q_simpleregret}
-Define $m =   min\set{1 \leq i \leq N:q_{i+1} \geq \frac{1}{i}}$.
-Then \cref{alg:simple} satisfies
-\eq{
-R^{simple}(T) \in \bigo{\sqrt{\frac{m}{T}log\left(\frac{NT}{m}\right)}}\,.
-}
-\end{theorem}
-
-The simple regret for a K-armed bandit is lower bounded by $\bigo{\sqrt{K/T}}$ \cite{Bubeck2009}. By utilizing the causal structure the dependence on $K$ is reduced to a dependence on $m$, which may be much smaller. The intuition behind \cref{alg:simple} is that we can use data collected during rounds where we select the $do()$ action to estimate $m$ and determine which arms we must play explicitly. 
-
-For the bandit problem problem we need to collect some data to estimate $m$ before determining if we should use the causal explore-exploit algorithm or a standard bandit algorithm. 
 
 
 \begin{algorithm}[h]
@@ -345,12 +437,12 @@ For the bandit problem problem we need to collect some data to estimate $m$ befo
 \STATE {\bf Input:} $T, N$
 \STATE $\delta = \frac{1}{T^{1/3}}$ 
 \STATE $T_1 = 48Nlog\left(4N/\delta\right)$ 
-\STATE Run \cref{alg:simple} to line 11 with input $T_1,N$.
+\STATE Run Algorithm \ref{alg:simple} to line 11 with input $T_1,N$.
 \IF {$\hat{m} > \frac{N^{3/2}}{\sqrt{T}}$}
 \STATE Switch to the standard UCB algorithm.
 \ELSE
 \STATE $h = T^{2/3}\hat{m}^{1/3}log(TK)^{1/3}$ 
-\STATE Run \cref{alg:simple} with input $h,N$.
+\STATE Run Algorithm \ref{alg:simple} with input $h,N$.
 \STATE Compute $(\hat{i}^*,\hat{j}^*) = \argmax_{(i,j)} \hat{\mu}_{i,j}$
 \FOR{$t=h$ {\bfseries to} $T$}
 \STATE Choose the action $do(X_{\hat{i}^*,t} = \hat{j}^*)$
@@ -361,14 +453,23 @@ For the bandit problem problem we need to collect some data to estimate $m$ befo
 
 \begin{theorem}\label{thm:unknown_q_regret}
 Define $m =   min\set{1 \leq i \leq N:q_{i+1} \geq \frac{1}{i}}$
-Then \cref{alg:bandit} satisfies
+Then Algorithm \ref{alg:bandit} satisfies
 \eq{
 R(T) \in \bigo{T^{2/3}m^{1/3}log(KT)^{1/3}}\,.
 }
 \end{theorem}
 
-\subsection{Lower Bounds}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LOWER BOUND
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Lower Bounds}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EXPERIMENTS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiments}
 
 \begin{figure}
@@ -386,6 +487,9 @@ R(T) \in \bigo{T^{2/3}m^{1/3}log(KT)^{1/3}}\,.
 \end{figure}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DISCUSSION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
 
 
