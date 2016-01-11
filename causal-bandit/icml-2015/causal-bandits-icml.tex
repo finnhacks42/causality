@@ -266,6 +266,19 @@ It is worth mentioning that the problem may be treated as a multi-armed bandit w
 As we shall shortly see, this approach is usually not practical because the resulting algorithms do not exploit the structure in
 the covariates.
 
+
+\begin{remark}
+In order to be consistent with the literature on causal inference we use the notation $do()$ to denote the action of doing nothing and $do(X_{t,I_t} = J_t)$
+the action of intervening on the $I_t$th variable and setting it to equal $J_t$. 
+In the bandit community it is implicit that 
+algorithms selecting actions are intervening in the system. So it is sufficient to index actions according to the variable and value. 
+However, in causal graphs, it is essential to differentiate observing (or conditioning) on a variable taking a certain value, from 
+intervening to set that variable. Although in the specific causal graph we consider, observation and intervention are the same, we 
+deliberately introduce the do-notation \cite{Pearl2000} that makes this distinction clear so as to help provide a bridge between the 
+bandit and causal inference communities.
+\end{remark}
+
+
 We consider two standard performance measures. The first is the cumulative regret, which measures the difference between the reward expected under
 the omnipotent strategy that knows the optimal action in advance and the expected reward of the learner. 
 \eqn{
@@ -279,19 +292,6 @@ r_T = \mu^* - \E{\mu_{I_T,J_T}}\,.
 }
 Both versions of the regret are useful in different circumstances. The first is most useful when the learner is truly online and can change their policy over time.
 The second is useful when the exploration budget is limited and a fixed policy should eventually be chosen. \todot{make this nicer}
-
-\todot{this remark feels out of place, but where to put it?}
-\begin{remark}
-In order to be consistent with the literature on causal inference we use the notation $do()$ to denote the action of doing nothing and $do(X_{t,I_t} = J_t)$
-the action of intervening on the $I_t$th variable and setting it to equal $J_t$. 
-In the bandit community it is implicit that 
-algorithms selecting actions are intervening in the system. So it is sufficient to index actions according to the variable and value. 
-However, in causal graphs, it is essential to differentiate observing (or conditioning) on a variable taking a certain value, from 
-intervening to set that variable. Although in the specific causal graph we consider, observation and intervention are the same, we 
-deliberately introduce the do-notation \cite{Pearl2000} that makes this distinction clear so as to help provide a bridge between the 
-bandit and causal inference communities.
-\end{remark}
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -386,7 +386,7 @@ this setting.
 We now tackle the case where the objective is to minimise the cumulative regret.
 This is significantly more challenging since the algorithm can no longer explore naively for $O(T)$ rounds without suffering linear regret.
 
-We propose a simple explore-exploit based algorithm that leverages  \eqref{eq:observe}. Without loss of generality, we assume $q_i \in [0,\frac{1}{2}]$ and $q_1 \leq q_2 ... \leq q_N$. 
+We begin by considering the case where $\boldsymbol{q}$ is known and propose a simple explore-exploit based algorithm that leverages  \eqref{eq:observe}. Without loss of generality, we assume $q_i \in [0,\frac{1}{2}]$ and $q_1 \leq q_2 ... \leq q_N$. 
 
 \begin{algorithm}[h]
    \caption{Causal Explore-Exploit}
@@ -428,9 +428,7 @@ The lower bound for the standard bandit problem is $R_t \in \bigomega{\sqrt{TK}}
 
 Algorithm \ref{alg:known_q} tries to learn the rewards for all the arms during an exploration phase $h$ and then picks the arm with the highest empirical mean for all remaining timesteps. During its exploration phase, it learns all the frequently occurring actions by observation and the remaining, infrequently occurring actions, by explicitly playing them. This leads to Chernoff type high probability bounds on the difference between the empirical and true rewards for all arms of the form $P(\hat{\mu}_{i,j} - \mu_{i,j} > D) \leq e^{-hD^2/m}$. By choosing optimal values for $D$ and $h$ we obtain the regret bound given in \cref{thm:known_q_regret}. A full proof is given in the supplementary materials. 
 
-Algorithm \ref{alg:known_q} relies on $\boldsymbol{q}$ and thus $m$ being known. We now consider the case where $\boldsymbol{q}$ is unknown. We begin by considering the simple regret, defined as the expected difference between the mean payoff of the optimal action and that of the action estimated to be optimal in $T$th round. 
-
-
+We now demonstrate we can obtain the same order of regret for the case where $\boldsymbol{q}$ is unknown. 
 
 \begin{algorithm}[h]
 \caption{Bandit Regret Algorithm}\label{alg:bandit}
@@ -472,6 +470,24 @@ R(T) \in \bigo{T^{2/3}m^{1/3}log(KT)^{1/3}}\,.
 % EXPERIMENTS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiments}
+In all experiments, the reward is generated according to:
+\eq{
+Y_t \sim \begin{cases}
+\bernoulli(.5+\epsilon) & \text{if } X_1 = 1 \\
+\bernoulli(\frac{.5-(.5+\epsilon)q_1}{1-q_1}) & \text{otherwise}\,.
+\end{cases}
+}
+
+With $\epsilon \in (0,.5)$. This ensures that 
+\eq {
+\P{Y|do(X_i = j)} = \begin{cases}
+.5+\epsilon & \text{if } (i,j)=(1,1) \\
+\frac{.5-(.5+\epsilon)q_1}{1-q_1} & \text{if } (i,j) = (1,0) \\
+.5 & \text{otherwise}
+\end{cases}
+}
+
+This allows us to rapidly simulate rewards and conditional rewards for large numbers of variables and to change the value of $\boldsymbol{q}$ with minimal impact on the reward function \footnote{$\boldsymbol{q}$ only effects the reward of a single, non-optimal arm, which becomes insignificant with large numbers of variables.}. 
 
 \begin{figure}
 \caption{Final regret versus number of variables $N$ for UCB with $\alpha = 2$, Causal-Explore-Exploit with $m=2$ and with $m=N$ and horizon $T = 10,000$ . Error bars show standard deviation over 100 simulations. The regret for UCB grows linearly with the number of variables, whist for Causal-Explore-Exploit with fixed $m$, the growth is sub-logarthmic.  }
