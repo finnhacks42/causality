@@ -20,6 +20,8 @@
 *.aux
 *.gz
 *.log
+*.fls
+*.fdb_latexmk
 *.bbl
 *.blg
 
