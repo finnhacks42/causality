@@ -48,8 +48,9 @@
 
 \newcommand{\tinytodo}[2][]{\todo[size=\tiny]{#2}}
 %\newcommand{\tinytodo}[2][]{\todo[size=\tiny, #1]{\begin{spacing}{1.0}#2\end{spacing}}}
-\newcommand{\todot}[2][]{\tinytodo[color=blue!20, #1]{T: #2}} % Csaba
-\newcommand{\todof}[2][]{\tinytodo[color=red!20, #1]{F:\@#2}} % Roshan
+\newcommand{\todot}[2][]{\tinytodo[color=blue!20, #1]{T: #2}} % Tor
+\newcommand{\todof}[2][]{\tinytodo[color=red!20, #1]{F:\@#2}} % Finn
+\newcommand{\todom}[2][]{\tinytodo[color=green!20, #1]{M:\@#2}} % Mark
 
 
 \graphicspath{ {figures/} }
@@ -118,6 +119,10 @@
 \newcommand{\bigthetatilde}[1]{\tilde{\Theta}\left( #1 \right)}
 \newcommand{\bigomega}[1]{\Omega\left( #1 \right)}
 
+\newcommand{\etc}{\textit{etc}}
+\newcommand{\ie}{\textit{i.e.}}
+\newcommand{\eg}{\textit{e.g.}}
+
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}
 \newtheorem{proposition}[theorem]{Proposition}
@@ -158,9 +163,9 @@
 ]
 
 \begin{abstract} 
-\todot{This can use some work}
-We study the problem of learning an optimal intervention. Our approach combines the theory of multi-armed bandits
-and causal inference. The main contribution is the new setting as well as algorithms that minimise both the simple and cumulative regret.
+We study the problem of using causal models to improve the rate at which good interventions can be learned online in a stochastic environment. 
+Our formalism combines multi-arm bandits and causal inference to models a novel type of bandit feedback that is not exploited by existing approaches.
+We propose a new algorithm that can make use of the causal feedback and prove that it achieves bounds on both simple and cumulative regret that are strictly better (in dependence on the number of possible interventions and number of rounds) than algorithms which do not use the additional causal information.
 \end{abstract} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -172,12 +177,21 @@ A classical problem in economics and operations research is how to choose interv
 We study an idealised model of such interventions using a combination of the multi-armed bandit framework \citep{Robbins1952} and the theory/language of causal inference 
 \citep{Pearl2000}.
 
-The challenge is best illustrated with an example. Consider a farmer wishing to optimise the yield of her crop. In each season she can invest in a green house (to control
-the temperature), cover her plants with nets (to prevent loss to birds), use expensive fertilizers, or install a high-tech watering system. We will assume for
-simplicity that she does not have the resources to make more than one intervention. Of course, the watering system will only be useful if the rainfall is low and
-the nets will be useful if the bird population is large. These things are random events that change from season to season, which makes the impact of each intervention
-difficulty to measure. The goal of this paper is to design an optimal strategy for the farmer to learn which intervention will be most profitable.
+The challenge is best illustrated with an example. Consider a farmer wishing to optimise the yield of her crop. 
+She knows that crop yield is only affected by temperature, a particular soil nutrient, and moisture level but the precise effect of their combination is unknown.
+In each season the farmer has enough time and money to intervene and control exactly one of these variables:
+deploying shade or heat lamps will set the temperature to be low or high; the nutrient can be added or removed a through a choice of fertilizer; and irrigation or rain-proof covers will keep the soil wet or dry.
+When not intervened upon, the temperature, soil, and moisture vary naturally from season to season due to weather conditions and these are all observed along with the final crop yield at the end of each season.
+How might the farmer best experiment to identify the single, highest yielding intervention without sacrificing too much crop yield in the process?
 
+% protect her plants from birds with nets, use expensive fertilizers, or deploy a high-tech watering system. We will assume for
+% simplicity that she does not have the resources to make more than one intervention per season and that each intervention only lasts a single season. Of course, the watering system will only be useful if the rainfall is low, the nets will be useful if the bird population is large, and fertilizing only helps when the soil is poor. 
+% Rainfall, bird populations, and soil quality are extrinsic random events that change from season to season. This makes the impact of each intervention difficult to measure. 
+% Crucially however, the farmer is able to observe the rainfall, birds, and soil and their effect on yield regardless of whether an intervention was made to control for those factors.
+% Using these observations and the knowledge that water, birds, and soil are the only factors which cause the crop yield to change, how might the farmer identify the single most cost-effective intervention to make every season?
+% The goal of this paper is to design an optimal strategy for the farmer to solve this learning problem.
+
+%\todom{Other examples of why we would want to model this (e.g., medical).}
 %Problems requiring choosing an action under uncertainty are rife in all areas of human endeavour. For many problems, actions may be chosen sequentially, allowing the agent to learn from the outcome of early choices to improve later ones. 
 
 A widely used framework for sequential decision making is the multi-armed bandit. In the classic multi-armed bandit setting there is a finite set of available actions, each associated with a distribution over rewards which is unknown but stationary. At each timestep the agent selects an action and receives a reward sampled i.i.d from the corresponding reward distribution. The performance of bandit algorithms is described by the regret: the difference in the expected reward obtained by the algorithm and the reward that could be obtained if the optimal action was selected at every timestep. 
