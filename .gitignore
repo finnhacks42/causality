@@ -24,7 +24,9 @@
 *.fdb_latexmk
 *.bbl
 *.blg
+*.synctex.gz
 
 # other
 graph
 graph2
+causal-bandit/icml-2015/*.pdf
