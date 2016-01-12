@@ -522,14 +522,14 @@ This allows us to rapidly simulate rewards and conditional rewards for large num
 \end{figure}
 
 \begin{figure}
-\caption{Cumulative regret over time for $N = 17$ for UCB with $\alpha=2$, Causal-Explore-Exploit with $m=2$ and Causal-Explore-Exploit with $m=N$. Shaded region shows standard deviation over 100 simulations. The Causal-Explore-Exploit algorithm incurs linear regret during the exploration phase, after which it selects the optimal arm with high probability. For $m=2$, we have $K \sim m^{2/3}T^{1/3}$ and see that we are in the regime in which Causal-Explore-Exploit outperforms UCB.}
+\caption{Simple regret vs horizon, $T$, for $N = 30$ for UCB with $\alpha=2$, Causal-Best-Arm-Identification with $m=2$ and Causal-Best-Arm-Identification with $m=N$. Error bars show estimated 95\% confidence interval from 1000 simulations.}
 \label{fig:simple_vs_T}
 \centering
 \includegraphics[width=.5\textwidth]{exp_simpleregret_vs_T_N30_sims1000_20160113_010512.pdf}
 \end{figure}
 
 \begin{figure}
-\caption{Cumulative regret over time for $N = 17$ for UCB with $\alpha=2$, Causal-Explore-Exploit with $m=2$ and Causal-Explore-Exploit with $m=N$. Shaded region shows standard deviation over 100 simulations. The Causal-Explore-Exploit algorithm incurs linear regret during the exploration phase, after which it selects the optimal arm with high probability. For $m=2$, we have $K \sim m^{2/3}T^{1/3}$ and see that we are in the regime in which Causal-Explore-Exploit outperforms UCB.}
+\caption{Simple regret vs number of variables, $N$, for $T=500$, for UCB with $\alpha=2$, Causal-Best-Arm-Identification with $m=2$ and Causal-Best-Arm-Identification with $m=N$. Error bars show estimated 95\% confidence interval from 1000 simulations.}
 \label{fig:simple_vs_N}
 \centering
 \includegraphics[width=.5\textwidth]{exp_simpleregret_vs_N_T500_sims1000_20160113_010511.pdf}
