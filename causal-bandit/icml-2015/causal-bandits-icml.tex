@@ -164,7 +164,7 @@
 
 \begin{abstract} 
 We study the problem of using causal models to improve the rate at which good interventions can be learned online in a stochastic environment. 
-Our formalism combines multi-arm bandits and causal inference to models a novel type of bandit feedback that is not exploited by existing approaches.
+Our formalism combines multi-arm bandits and causal inference to model a novel type of bandit feedback that is not exploited by existing approaches.
 We propose a new algorithm that can make use of the causal feedback and prove that it achieves bounds on both simple and cumulative regret that are strictly better (in dependence on the number of possible interventions and number of rounds) than algorithms which do not use the additional causal information.
 \end{abstract} 
 
@@ -177,28 +177,31 @@ A classical problem in economics and operations research is how to choose interv
 We study an idealised model of such interventions using a combination of the multi-armed bandit framework \citep{Robbins1952} and the theory/language of causal inference 
 \citep{Pearl2000}.
 
+\todom{Describe feature of class of problem; highlight with examples.}
+
 The challenge is best illustrated with an example. Consider a farmer wishing to optimise the yield of her crop. 
 She knows that crop yield is only affected by temperature, a particular soil nutrient, and moisture level but the precise effect of their combination is unknown.
-In each season the farmer has enough time and money to intervene and control exactly one of these variables:
+In each season the farmer has enough time and money to intervene and control at most one of these variables:
 deploying shade or heat lamps will set the temperature to be low or high; the nutrient can be added or removed a through a choice of fertilizer; and irrigation or rain-proof covers will keep the soil wet or dry.
 When not intervened upon, the temperature, soil, and moisture vary naturally from season to season due to weather conditions and these are all observed along with the final crop yield at the end of each season.
-How might the farmer best experiment to identify the single, highest yielding intervention without sacrificing too much crop yield in the process?
+How might the farmer best experiment to identify the single, highest yielding intervention without sacrificing too much crop yield (relative to always choosing the best intervention) in the process?
 
-% protect her plants from birds with nets, use expensive fertilizers, or deploy a high-tech watering system. We will assume for
-% simplicity that she does not have the resources to make more than one intervention per season and that each intervention only lasts a single season. Of course, the watering system will only be useful if the rainfall is low, the nets will be useful if the bird population is large, and fertilizing only helps when the soil is poor. 
-% Rainfall, bird populations, and soil quality are extrinsic random events that change from season to season. This makes the impact of each intervention difficult to measure. 
-% Crucially however, the farmer is able to observe the rainfall, birds, and soil and their effect on yield regardless of whether an intervention was made to control for those factors.
-% Using these observations and the knowledge that water, birds, and soil are the only factors which cause the crop yield to change, how might the farmer identify the single most cost-effective intervention to make every season?
-% The goal of this paper is to design an optimal strategy for the farmer to solve this learning problem.
+One obvious approach would be to cast the above example as a stochastic multi-armed bandit problem~\cite{Robbins1952} -- each of the six possible interventions is an arm and the crop yield is the reward -- and apply an algorithm such as UCB~\cite{Auer1995} with well understood regret guarantees.
+However, as we show in \S\ref{sec:results}, this approach ignores the extra information available in the non-intervened variables and subsequently yields a worst-case regret with a sub-optimal dependence on the number of possible interventions.
 
-%\todom{Other examples of why we would want to model this (e.g., medical).}
+There has been a significant amount of recent work which proposes alternative modes of feedback within the bandit setting \cite{TODO} as well as results for partial monitoring which, as first glance, may appear applicable. As we show in Section~\ref{}, applying these results to our problem also exhibit a sub-optimal dependence on the number of available interventions.
+
+\todom{Rework rest of intro}
+
 %Problems requiring choosing an action under uncertainty are rife in all areas of human endeavour. For many problems, actions may be chosen sequentially, allowing the agent to learn from the outcome of early choices to improve later ones. 
 
-A widely used framework for sequential decision making is the multi-armed bandit. In the classic multi-armed bandit setting there is a finite set of available actions, each associated with a distribution over rewards which is unknown but stationary. At each timestep the agent selects an action and receives a reward sampled i.i.d from the corresponding reward distribution. The performance of bandit algorithms is described by the regret: the difference in the expected reward obtained by the algorithm and the reward that could be obtained if the optimal action was selected at every timestep. 
+% A widely used framework for sequential decision making is the multi-armed bandit. In the classic multi-armed bandit setting there is a finite set of available actions, each associated with a distribution over rewards which is unknown but stationary. At each timestep the agent selects an action and receives a reward sampled i.i.d from the corresponding reward distribution. The performance of bandit algorithms is described by the regret: the difference in the expected reward obtained by the algorithm and the reward that could be obtained if the optimal action was selected at every timestep. 
 
 An alternate approach to selecting actions is causal inference. Frameworks for causal inference provide a mechanism to specify assumptions that allow observational distributions over variables to be mapped to interventional ones. This allows an agent to predict the outcome of an action based on non-experimental data. This approach is common in social science, demography, and economics where explicit experimentation may be difficult. For example, predicting the effect of changes to childcare subsidies on workforce participation or school choice on student grades. 
 
 We take a first step towards unifying these approaches by considering a variant of the stochastic multi-armed bandit problem where we have prior knowledge of the causal structure governing the available actions. 
+
+\todom{Summarise results \& give intuition for algorithm}
 
 A natural way to connect the causal framework with the bandit setting is to model the problem as a causal directed acyclic graph. Each possible assignment of variables to values is an action (bandit arm). The reward could be a general function of the action selected and the final state of the graph. However for simplicity, we will consider the reward to be the value of a single specified node minus the cost of the selected action. The number of actions grows exponentially with the number of variables in the graph, making it important to use algorithms that take account of the graph structure to reduce the search space. 
 
@@ -266,6 +269,7 @@ r : \set{0,1}^N \to \R
 is arbitrary (and unknown) 
 and $\eta_t$ is a $1$-subgaussian noise
 term (with the distribution possibly dependent on $X_t$). 
+\todom{Connect to opening ex.}
 
 The expected reward for intervening on variable $i$ by setting it to $j$ is defined by
 \eq{
