@@ -2,6 +2,7 @@
 
 We prove a lower bound on the simple regret that matches up to logarithmic factors the upper bound given in \cref{thm:simple}
 
+\todot{Remark that the Gaussian assumption is convenient but that other noise models will also work. Eg., Bernoulli.}
 \begin{theorem}\label{thm:lower}
 Suppose $\eta_t \sim \mathcal N(0, 1)$ and $\boldsymbol{q}$ satisfies $m(\boldsymbol{q}) = m$.
 Then for all strategies there exists a reward function such that
@@ -30,6 +31,7 @@ on all observations over all $T$ rounds and $\mathbb E_i$ the expectation with r
 where $\KL(P_0, P_i)$ is the KL divergence between measures $P_0$ and $P_i$.
 Let $T_i(T) = \sum_{t=1}^T \ind{I_t = i}$ be the total number of times the learner intervenes on variable $i$ (with any intervention). 
 Then for $i \leq m$ a computation shows that 
+\todot{Need to add at minimum some citations here}
 \eq{
 \KL(P_0, P_i) 
 &= \frac{\epsilon^2}{2} \mathbb E_0\left[\sum_{t=1}^T \ind{X_{t,i} = 1}\right] \\
