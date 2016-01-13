@@ -1,0 +1,87 @@
+\newcommand{\bernoulli}{\operatorname{Bernoulli}}
+\newcommand{\dirac}{\operatorname{Dirac}}
+
+Assume we have a known causal model with binary variables $\boldsymbol{X} = \{X_{1},\ldots,X_{N}\}$ that independently cause a 
+target variable of interest $Y \in \R$ (see Figure \ref{fig:causalStructure}).
+\begin{figure}[h]
+\centering
+\caption{Assumed Causal Structure}
+\label{fig:causalStructure}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed}, hidden/.style={empty}]
+
+ %nodes
+\node[main node](1){$X_{1}$};
+\node[main node, right=of 1](2){$X_{2}$};
+\node[hidden, right=of 2](3){$...$};
+\node[main node, right=of 3](4){$X_{N}$};
+\node[main node, below right=of 2](5){Y};
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge (5)
+    	(2) edge (5)
+    (4) edge (5);
+	
+\end{tikzpicture}
+\end{figure}
+
+
+The game proceeds over $T$ identical rounds (or time-steps).
+In each round $t$ the learner can choose either to do nothing or they can choose a variable $I_t \in \set{1,\ldots,N}$ and
+an intervention $J_t \in \set{0,1}$. After the learner has chosen an intervention they observe $X_{t,i} \in \set{0,1}$ for all $i$ where
+\eq{
+X_{t,i} \sim \begin{cases}
+\dirac(J_t) & \text{if } I_t = i \\
+\bernoulli(q_i) & \text{otherwise}\,.
+\end{cases}
+}
+where $\boldsymbol{q} \in [0,1]^N$ is a (possibly unknown) vector of probabilities with $q_i = \P{X_i = 1}$. Note that if the learner did not choose an intervention then $I_t$ is undefined
+and $X_{t,i} \sim \bernoulli(q_i)$ for all variables $i \in \set{1,\ldots,N}$.
+Finally the learner observes the reward $Y_t = r(X_t) + \eta_t$ where 
+\eq{
+r : \set{0,1}^N \to \R
+}
+is arbitrary (and unknown) 
+and $\eta_t$ is a $1$-subgaussian noise
+term (with the distribution possibly dependent on $X_t$). 
+\todom{Connect to opening ex.}
+
+The expected reward for intervening on variable $i$ by setting it to $j$ is defined by
+\eq{
+\mu_{i,j} 
+&= \E{r(X)|do(X_i = j)} \\
+&= \sum_{\boldsymbol{x} \in \set{0,1}^N : x_i = j} r(\boldsymbol{x})  \prod_{k \neq i} q_k^{x_k} (1 - q_k)^{1-x_k} \,. 
+}
+The optimal intervention is $(i^*,j^*) = \argmax_{i,j} \mu_{i,j}$ and the corresponding optimal reward is $\mu^* = \mu_{i^*,j^*}$. 
+Note that the expected reward of the optimal intervention is at least as large as the expected reward for doing nothing.
+
+It is worth mentioning that the problem may be treated as a multi-armed bandit with $2N$ arms, one corresponding to each intervention.
+As we shall shortly see, this approach is usually not practical because the resulting algorithms do not exploit the structure in
+the covariates.
+
+
+\begin{remark}
+In order to be consistent with the literature on causal inference we use the notation $do()$ to denote the action of doing nothing and $do(X_{t,I_t} = J_t)$
+the action of intervening on the $I_t$th variable and setting it to equal $J_t$. 
+In the bandit community it is implicit that 
+algorithms selecting actions are intervening in the system. So it is sufficient to index actions according to the variable and value. 
+However, in causal graphs, it is essential to differentiate observing (or conditioning) on a variable taking a certain value, from 
+intervening to set that variable. Although in the specific causal graph we consider, observation and intervention are the same, we 
+deliberately introduce the do-notation \cite{Pearl2000} that makes this distinction clear so as to help provide a bridge between the 
+bandit and causal inference communities.
+\end{remark}
+
+
+We consider two standard performance measures. The first is the cumulative regret, which measures the difference between the reward expected under
+the omnipotent strategy that knows the optimal action in advance and the expected reward of the learner. 
+\eqn{
+\label{eq:regret}
+R_T = T \mu^* - \E{\sum_{t=1}^T Y_t}\,.
+}
+The second performance measure is the simple regret, which measures the performance of the learner on the final round only.
+\eqn{
+\label{eq:regret-simple}
+r_T = \mu^* - \E{\mu_{I_T,J_T}}\,.
+}
+Both versions of the regret are useful in different circumstances. The first is most useful when the learner is truly online and can change their policy over time.
+The second is useful when the exploration budget is limited and a fixed policy should eventually be chosen. \todot{make this nicer}
+

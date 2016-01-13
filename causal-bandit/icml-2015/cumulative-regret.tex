@@ -1,0 +1,75 @@
+We now tackle the case where the objective is to minimise the cumulative regret.
+This is significantly more challenging since the algorithm can no longer explore naively for $O(T)$ rounds without suffering linear regret.
+
+We begin by considering the case where $\boldsymbol{q}$ is known and propose a simple explore-exploit based algorithm that leverages  \eqref{eq:observe}. Without loss of generality, we assume $q_i \in [0,\frac{1}{2}]$ and $q_1 \leq q_2 ... \leq q_N$. 
+
+\begin{algorithm}[h]
+   \caption{Causal Explore-Exploit}
+   \label{alg:known_q}
+\begin{algorithmic}
+   \STATE {\bfseries Input:} $T,\boldsymbol{q}$
+   \STATE Let $m =   min\set{1 \leq i \leq N:q_{i+1} \geq \frac{1}{i}}$
+   \STATE Let $h = T^{2/3}m^{1/3} \log(TK)^{1/3}$
+   \STATE Let $A = \set{(i,j) : i \leq m, j = 1}$ be the set of infrequently observed arms
+   \FOR{$t=1$ {\bfseries to} $h/2$}
+   \STATE Choose the action $do()$ and observe $\boldsymbol{X}_t$ and $r_t$
+   \ENDFOR
+   \STATE Compute for all arms $(i,j) \notin A$:
+   \eq{
+   \hat{\mu}_{i,j} = \frac{2}{h}\frac{\sum_{t=1}^{h/2}\ind{X_{i,t}=j}r_t}{q_i^j(1-q_i)^{1-j}}
+   }
+   \FOR{$(i,j) \in A$}
+    \FOR{$t'=1$ {\bfseries to} $h/2m$}
+    \STATE Choose the action $do(X_{i,t'} = j)$ and observe $r_t$
+    \ENDFOR
+    \STATE Compute $\hat{\mu}_{i,j} = \frac{2m}{h}\sum_{t'=1}^{h/2m}\ind{X_{i,t'} = j}r_{t'}$
+   \ENDFOR
+   \STATE Compute $(\hat{i}^*,\hat{j}^*) = \argmax_{(i,j)} \hat{\mu}_{i,j}$
+   \FOR{$t=h$ {\bfseries to} $T$}
+   \STATE Choose the action $do(X_{\hat{i}^*,t} = \hat{j}^*)$
+   \ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}\label{thm:known_q_regret}
+Define $m =   min\set{1 \leq i \leq N:q_{i+1} \geq \frac{1}{i}}$
+Then Algorithm \ref{alg:known_q} satisfies
+\eq{
+R(T) \in \bigo{T^{2/3}m^{1/3} \log(KT)^{1/3}}\,.
+}
+\end{theorem}
+
+The lower bound for the standard bandit problem is $R_t \in \bigomega{\sqrt{TK}}$ \cite{Auer1995}. Comparing these results shows exploiting the extra information provided by the causal structure should outperform standard bandit algorithms when the number of arms is large, $K >> m^{2/3}T^{1/3}$. The parameter $m$ summarizes the vector $\boldsymbol{q}$, and represents the number of actions that occur rarely naturally and thus must be explicitly explored. If $q_1,...,q_N = 0$, the problem is completely unbalanced and $m = N$. If $q_1,...,q_N = \frac{1}{2}$, the problem is completely balanced and $m = 1$.
+
+Algorithm \ref{alg:known_q} tries to learn the rewards for all the arms during an exploration phase $h$ and then picks the arm with the highest empirical mean for all remaining timesteps. During its exploration phase, it learns all the frequently occurring actions by observation and the remaining, infrequently occurring actions, by explicitly playing them. This leads to Chernoff type high probability bounds on the difference between the empirical and true rewards for all arms of the form $P(\hat{\mu}_{i,j} - \mu_{i,j} > D) \leq e^{-hD^2/m}$. By choosing optimal values for $D$ and $h$ we obtain the regret bound given in \cref{thm:known_q_regret}. A full proof is given in the supplementary materials. 
+
+We now demonstrate we can obtain the same order of regret for the case where $\boldsymbol{q}$ is unknown. 
+
+\begin{algorithm}[h]
+\caption{Bandit Regret Algorithm}\label{alg:bandit}
+\begin{algorithmic}[1]
+\STATE {\bf Input:} $T, N$
+\STATE $\delta = \frac{1}{T^{1/3}}$ 
+\STATE $T_1 = 48Nlog\left(4N/\delta\right)$ 
+\STATE Run Algorithm \ref{alg:simple} to line 11 with input $T_1,N$.
+\IF {$\hat{m} > \frac{N^{3/2}}{\sqrt{T}}$}
+\STATE Switch to the standard UCB algorithm.
+\ELSE
+\STATE $h = T^{2/3}\hat{m}^{1/3}log(TK)^{1/3}$ 
+\STATE Run Algorithm \ref{alg:simple} with input $h,N$.
+\STATE Compute $(\hat{i}^*,\hat{j}^*) = \argmax_{(i,j)} \hat{\mu}_{i,j}$
+\FOR{$t=h$ {\bfseries to} $T$}
+\STATE Choose the action $do(X_{\hat{i}^*,t} = \hat{j}^*)$
+\ENDFOR
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}\label{thm:unknown_q_regret}
+Define $m =   min\set{1 \leq i \leq N:q_{i+1} \geq \frac{1}{i}}$
+Then Algorithm \ref{alg:bandit} satisfies
+\eq{
+R(T) \in \bigo{T^{2/3}m^{1/3}log(KT)^{1/3}}\,.
+}
+\end{theorem}
+

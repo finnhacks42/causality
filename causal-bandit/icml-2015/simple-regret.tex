@@ -1,0 +1,78 @@
+In this section we develop and analyse an algorithm for minimising the simple regret in the
+causal bandit problem.  
+
+From a causal perspective the key insight is that the assumed causal structure implies that
+the law of $Y_t$ given we intervene to set $X_{t,i} = j$ is the same as the law of $Y_t$ conditioned
+on $X_{t,i} = j$. Formally,
+\eqn {
+\label{eq:observe}
+\P{Y_t \leq y|do(X_{t,i} = j)} = \P{Y_t \leq y|do(),X_{t,i} = j}\,.
+}
+This follows from application of the do-calculus \cite{Pearl2000} to our specific causal graph. It is not the case in general. 
+For example if there was a variable $X'$ that caused both $X_{t,i}$ and $Y$ (or $X_{t,i}$ and any other variable $X_{t,l}$), 
+that would introduce a backdoor path from $X_{t,i} \rightarrow Y_t$ and we would have to condition on $X'$ to derive the 
+interventional distribution of $Y_t$ from the observational one.
+
+\todot{Or just give a reference or hide in the appendix depending on space in the end}
+\color{red} Probably should define causal model and back-door rule to properly show this.\color{black}
+
+We can also learn about the reward for intervening on one variable from rounds in which we actually set a different variable.
+
+\eqn {
+\label{eq:estimation_transfer}
+P(Y_t|do(X_{t,i} = j))= & \nonumber \\
+ \sum_{j'}  P(Y_t|do(X_{t,l} & = j'),X_{t,i} = j)P(X_{t,l} = j')
+}
+
+
+The main idea of the algorithm is that by making no intervention (doing nothing) it is possible to estimate simultaneously the returns of all interventions.
+Unfortunately interventions that occur with low probability ($\P{X_{t,i} = j}$ is small) suffer from a high approximation error and should be
+explored separately by actually making the intervention. The algorithm works by optimally balancing the collection of observational data (when
+no action is taken) and making interventions to learn about low probability events. The problem is more challenging because $\boldsymbol{q}$ is
+unknown and must also be estimated.
+
+\begin{algorithm}[h]
+\caption{Causal Best Arm Identification}\label{alg:simple}
+\begin{algorithmic}[1]
+\STATE {\bf Input:} $T, N$
+\FOR{$t \in 1,\ldots,(T - 1) / 2$}
+\STATE Choose the action $do()$ and observe $\boldsymbol{X}_t$ and $r_t$
+\ENDFOR
+\STATE Estimate $\mu$ using observation data:
+\eq{
+(\forall i,j) \qquad \hat \mu_{i,j} = \frac{\sum_{t=1}^{T/2} \ind{X_{t,i} = j} r_t}{\sum_{t=1}^{T/2} \ind{X_{t,i} = j}}\,.
+}
+\STATE Compute $\hat q_i = \frac{2}{T} \sum_{t=1}^{T/2} X_{t,i}$
+\STATE Compute $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$
+\STATE Compute $\hat{s'} = sorted(\hat{s}) : \hat{s'}_1 \leq \hat{s'_2} \leq ... \leq \hat{s'}_N$
+\STATE Compute $\hat m = \min\set{1 \leq i \leq N : \hat s'_{i+1} \geq \frac{1}{i}}$
+\STATE $i'(i) = $ the index of $\hat s_i$ in $\hat s'$
+\STATE Compute $A$ as the subset of infrequently observed arms $\{(i,j):i'(i) \leq \hat m, j = \ind{\hat q_{i} \leq \frac{1}{2}} \}$ with $|A| = \hat m$
+
+\FOR{$(i,j) \in A$}
+\FOR{$t \in 1,\ldots,\frac{T - 1)}{2\hat m}$}
+\STATE Choose action $do(X_{t,i} = j)$ and observe $r_t$
+\ENDFOR
+\STATE Recompute $\hat \mu_{i,j} = \frac{2\hat m}{T} \sum_{t=1}^{ T/2\hat m} r_t(X_{t,i}=j)$ 
+\ENDFOR
+\STATE Estimated optimal action is $\hat i^*, \hat j^* = \argmax_{i,j} \hat \mu_{i,j}$
+\STATE Choose action $do(X_{t,\hat i^*} = \hat j^*)$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}\label{thm:unknown_q_simpleregret}
+Define $m = \min\set{1 \leq i \leq N:q_{i+1} \geq \frac{1}{i}}$.
+Then Algorithm \ref{alg:simple} satisfies
+\eq{
+r_T \in \bigo{\sqrt{\frac{m}{T}\log\left(\frac{NT}{m}\right)}}\,.
+}
+\end{theorem}
+
+Note that algorithms designed for finite-armed bandits would explore interventions more uniformly and achieve a regret of $\Omega(\sqrt{N/T})$.
+Since $m$ is typically much smaller than $N$ we anticipate that the new algorithm will significantly outperform classical bandit algorithms in
+this setting.
+
+\todot{Do we have a proof for this in another doc?}
+\begin{proof}
+\end{proof}
+
