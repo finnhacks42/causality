@@ -26,7 +26,7 @@ target variable of interest $Y \in \R$ (see Figure \ref{fig:causalStructure}).
 
 
 The game proceeds over $T$ identical rounds (or time-steps).
-In each round $t$ the learner can choose either to do nothing or they can choose a variable $I_t \in \set{1,\ldots,N}$ and
+In each round $t$ the learner can choose either to do nothing (denoted by $I_t = \bot$) or they can choose $I_t \in \set{1,\ldots,N}$ and
 an intervention $J_t \in \set{0,1}$. After the learner has chosen an intervention they observe $X_{t,i} \in \set{0,1}$ for all $i$ where
 \eq{
 X_{t,i} \sim \begin{cases}
@@ -34,8 +34,9 @@ X_{t,i} \sim \begin{cases}
 \bernoulli(q_i) & \text{otherwise}\,.
 \end{cases}
 }
-where $\boldsymbol{q} \in [0,1]^N$ is a (possibly unknown) vector of probabilities with $q_i = \P{X_i = 1}$. Note that if the learner did not choose an intervention then $I_t$ is undefined
-and $X_{t,i} \sim \bernoulli(q_i)$ for all variables $i \in \set{1,\ldots,N}$.
+where $\boldsymbol{q} \in [0,1]^N$ is a (possibly unknown) vector of probabilities with $q_i = \P{X_i = 1}$. 
+Note that if the learner did not choose an intervention ($I_t =  \bot$), then
+$X_{t,i} \sim \bernoulli(q_i)$ for all variables $i \in \set{1,\ldots,N}$.
 Finally the learner observes the reward $Y_t = r(X_t) + \eta_t$ where 
 \eq{
 r : \set{0,1}^N \to \R
@@ -43,7 +44,8 @@ r : \set{0,1}^N \to \R
 is arbitrary (and unknown) 
 and $\eta_t$ is a $1$-subgaussian noise
 term (with the distribution possibly dependent on $X_t$). 
-\todom{Connect to opening ex.}
+In the farming example $X_{t,1}$ might represent whether the plants had sufficient water in the $t$th season (controllable by installing irrigation) 
+while $X_{t,2}$ might be whether or not there was a spring frost (controllable with heat-lamps or covers).
 
 The expected reward for intervening on variable $i$ by setting it to $j$ is defined by
 \eq{
@@ -80,8 +82,8 @@ R_T = T \mu^* - \E{\sum_{t=1}^T Y_t}\,.
 The second performance measure is the simple regret, which measures the performance of the learner on the final round only.
 \eqn{
 \label{eq:regret-simple}
-r_T = \mu^* - \E{\mu_{I_T,J_T}}\,.
+\simpleregret = \mu^* - \E{\mu_{I_T,J_T}}\,.
 }
-Both versions of the regret are useful in different circumstances. The first is most useful when the learner is truly online and can change their policy over time.
-The second is useful when the exploration budget is limited and a fixed policy should eventually be chosen. \todot{make this nicer}
+The simple regret typically makes more sense when the learning agent has a fixed learning budget after which its policy will be fixed indefintely. The cumulative
+regret is more appropriate for online agents that may continue to adapt their policy.
 
