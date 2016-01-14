@@ -25,7 +25,7 @@ We abbreviate $R_{T,i}^{\text{simple}}$ to be the expected simple regret incurre
 environment determined by $\boldsymbol{q}$ and $r_i$. Let $P_i$ be the corresponding measure
 on all observations over all $T$ rounds and $\mathbb E_i$ the expectation with respect to $P_i$. By Lemma 2.6 by \cite{Tsy08} we have
 \eq{
-\Prz{I_t = i} + \Pri{I_t \neq i} \geq \exp\left(-\KL(P_0, P_i)\right)\,,
+\Prz{I_T = i} + \Pri{I_T \neq i} \geq \exp\left(-\KL(P_0, P_i)\right)\,,
 }
 where $\KL(P_0, P_i)$ is the KL divergence between measures $P_0$ and $P_i$.
 Let $T_i(T) = \sum_{t=1}^T \ind{I_t = i}$ be the total number of times the learner intervenes on variable $i$ (with any intervention). 
