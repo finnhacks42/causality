@@ -11,10 +11,17 @@ deploying shade or heat lamps will set the temperature to be low or high; the nu
 When not intervened upon, the temperature, soil, and moisture vary naturally from season to season due to weather conditions and these are all observed along with the final crop yield at the end of each season.
 How might the farmer best experiment to identify the single, highest yielding intervention without sacrificing too much crop yield (relative to always choosing the best intervention) in the process?
 
-One obvious approach would be to cast the above example as a stochastic multi-armed bandit problem~\cite{Robbins1952} -- each of the six possible interventions is an arm and the crop yield is the reward -- and apply an algorithm such as UCB~\cite{Auer1995} with well understood regret guarantees.
-However, as we show in \S\ref{sec:results}, this approach ignores the extra information available in the non-intervened variables and subsequently yields a worst-case regret with a sub-optimal dependence on the number of possible interventions.
 
-There has been a significant amount of recent work which proposes alternative modes of feedback within the bandit setting \cite{TODO} as well as results for partial monitoring which, as first glance, may appear applicable. As we show in Section~\ref{}, applying these results to our problem also exhibit a sub-optimal dependence on the number of available interventions.
+This paper can be seen as a first step towards formalising and solving problems such as these. In \S\ref{sec:defs} we introduce \emph{causal bandit problems} and focus on a 
+
+\subsection{Related Work}
+
+One obvious approach would be to cast the above example as a stochastic multi-armed bandit problem~\cite{Robbins1952} -- each of the six possible interventions is an arm and the crop yield is the reward -- and apply an algorithm such as UCB~\cite{Auer1995} with well understood regret guarantees.
+However, as we show in \S\ref{sec:results}, this approach ignores the extra information available in the non-intervened variables and subsequently yields a worst-case regret after $T$ round of $\bigomega{\sqrt{NT}}$ with a sub-optimal dependence on $N$, the number of possible interventions.
+
+\todom{Note that feedback work as uses graphs}
+
+There has been a significant amount of recent work which proposes alternative modes of feedback within the bandit setting \cite{TODO} as well as results for partial monitoring which, at first glance, may appear applicable. As we show in Section~\ref{}, applying these results to our problem also exhibit a sub-optimal dependence on the number of available interventions.
 
 \todom{Rework rest of intro}
 
