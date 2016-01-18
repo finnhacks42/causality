@@ -2,13 +2,16 @@
 \newcommand{\dirac}{\operatorname{Dirac}}
 \renewcommand{\vec}[1]{\boldsymbol{#1}}
 
-We now introduce a novel class of stochastic sequential decision problems which we call \emph{causal bandit problems}. In these problems, rewards are given for repeated interventions on a fixed causal model~\cite{Pearl2000}. 
-The \emph{causal model} is given by a directed acyclic graph $\mathcal{G}$ over a set of random variables $\mathcal{X}$ and a joint distribution $\mathrm{P}$ over $\mathcal{X}$ that factorises over $\mathcal{G}$. An edge from variable $X$ to $X'$ is interpreted to mean that a change in the value of $X$ directly causes a change to the value of $X'$. 
+We now introduce a novel class of stochastic sequential decision problems which we call \emph{causal bandit problems}. 
+In these problems, rewards are given for repeated interventions on a fixed causal model~\cite{Pearl2000}. 
+The \emph{causal model} is given by a directed acyclic graph $\mathcal{G}$ over a set of random variables $\mathcal{X}$ and a joint distribution $\mathrm{P}$ over $\mathcal{X}$ that factorises over $\mathcal{G}$. 
+An edge from variable $X$ to $X'$ is interpreted to mean that a change in the value of $X$ directly causes a change to the value of $X'$. 
 An \emph{intervention (of size $n$)}, denoted $do(\vec{X}=\vec{x})$, assigns the values $\vec{x}=\{x_1, \ldots, x_n\}$ to the corresponding variables $\vec{X}=\{X_1, \ldots, X_n\} \subset \mathcal{X}$ with the empty intervention (where no variable is set) denoted $do()$.
 An intervention ``mutilates'' the original graph by removing edges into the variables in $\vec{X}$ and the resulting graph defines a probability distribution $\P{\vec{X}^c | do(\vec{X}=\vec{x})}$ over $\vec{X}^c := \mathcal{X} - \vec{X}$. 
 Further details can be found in Chapter 21 of~\cite{Koller2009}.
 
-A learner for a casual bandit problem is given the casual model's graph $\mathcal{G}$, a set of \emph{observable} variables $\mathcal{O} \subseteq \mathcal{X}$, a set of \emph{allowed interventions} $\mathcal{A}$, a \emph{reward variable} $Y$. The following game is played over $T$ rounds. 
+A learner for a casual bandit problem is given the casual model's graph $\mathcal{G}$, a set of \emph{observable} variables $\mathcal{O} \subseteq \mathcal{X}$, a set of \emph{allowed interventions} $\mathcal{A}$, a \emph{reward variable} $Y$. 
+The following game is played over $T$ rounds. 
 In round $t$, the learner selects an allowed intervention $do(\vec{X}_t = \vec{x}_t)$ from $\mathcal{A}$.
 Values for all non-intervened variables $\vec{X}^c_t$ are sampled from $\P{\vec{X}^c_t | do(\vec{X}_t = \vec{x}_t)}$. Finally, the learner is shown the sampled values of all the observable variables in $\vec{X}^c_t \cap \mathcal{O}$ and receives the reward $Y_t$.
 
@@ -24,14 +27,14 @@ Performance for the second goal is measured by \emph{cumulative regret}, the dif
 \label{eq:regret}
 R_T = T \mu^* - \E{\sum_{t=1}^T Y_t}\,.
 }
-Simple regret typically makes more sense when the learning agent has a fixed learning budget after which its policy will be fixed indefintely. Cumulative
-regret is more appropriate for online agents that may continue to adapt their policy. We analyse both cases in
-\S\ref{sec:simple-regret} and \S\ref{sec:cum-regret}, respectively.
+Simple regret typically makes more sense when the learning agent has a fixed learning budget after which its policy will be fixed indefintely. 
+Cumulative regret is more appropriate for online agents that may continue to adapt their policy. 
+We analyse both cases in \S\ref{sec:simple-regret} and \S\ref{sec:cum-regret}, respectively.
 
 \todom{Mention pruning of actions?}
 We note that classical $K$-armed stochastic bandit problem can be recovered in our framework by considering a simple causal model with one edge connecting a single variable $X$ that can take on $K$ values to a reward variable $Y = r(X) + \eta$ for some arbitrary but unknown, real-valued function $r$ and a noise term $\eta$ that may depend on $X$.
 The set of allowed interventions in this case is $\mathcal{A} = \{ do(X = k) \colon k \in \{1, \ldots, K\}\}$.
-Furthermore, any causal bandit problem can reduced to a classical stochastic bandit problem by treating each possible intervention as an arm and ignoring all sampled values for the observed variables except for the reward.
+Conversely, any causal bandit problem can reduced to a classical stochastic $|\mathcal{A}|$-armed bandit problem by treating each possible intervention as an arm and ignoring all sampled values for the observed variables except for the reward.
 Intuitively though, one would expect to perform better by making use of the extra observations.
 
 In the remainder of this paper we focus on a causal model that is sufficient to demonstrate the separation of regret bounds between algorithms that make use of the additional causal information and those which do not.
@@ -44,7 +47,8 @@ It is simple enough to admit a thorough analysis but rich enough to model the ty
 
 The causal model for this class of problems has $N$ binary variables $\{ X_1, \ldots, X_N \}$ where each $X_i \in \{0,1\}$ are independent causes of a reward variable $Y \in \R$, as shown in Figure~\ref{fig:causalStructure}.
 All variables are observable (\ie, $\mathcal{O} = \{Y, X_1, \ldots, X_N\}$) and the set of allowable interventions are all size 1 interventions on a given $X_i$ variable (\ie, $\mathcal{A} = \{ do(X_i = j) \colon i \in \{1, \ldots, N\}, j \in \{0,1\}\}$).
-In the farming example from the introduction, $X_1$ represent temperature with $X_1=0$ denoting low and $X_1=1$ high temperature. In this case, the interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ might represent the use of shades or heat lamps to keep the temperature low or high, respectively.
+In the farming example from the introduction, $X_1$ represent temperature with $X_1=0$ denoting low and $X_1=1$ high temperature. 
+In this case, the interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ might represent the use of shades or heat lamps to keep the temperature low or high, respectively.
 
 
 \begin{figure}[h]
@@ -67,28 +71,11 @@ In the farming example from the introduction, $X_1$ represent temperature with $
 \caption{Causal model for the parallel bandits problem.\label{fig:causalStructure}}
 \end{figure}
 
-When not intervened upon, we assume that each $X_i \sim \bernoulli(q_i)$ where $\vec{q} = (q_1, \ldots, q_N) \in [0,1]^N$ so that $q_i = \P{X_i = 1}$.
+In each round of the game, the learner selects a single variable to intervene on and the value to set it to while the remainder of the variables are simultaneously set by independently biased coin flips. 
+The value of all variables are then used to determine the distribution of rewards for that round.
+Formally, when not intervened upon we assume that each $X_i \sim \bernoulli(q_i)$ where $\vec{q} = (q_1, \ldots, q_N) \in [0,1]^N$ so that $q_i = \P{X_i = 1}$.
 The value of the reward variable is distributed as $Y = r(\vec{X}) + \eta$ where $r : \{0,1\}^N \to \R$ is an arbitrary, fixed, and unknown function and $\eta$ is $1$-subgaussian noise with a distribution that may depend on $\vec{X}$.
 In the farming example, this choice of $Y$ models the fixed, noisy but unknown dependence of crop yield on the temperature, soil, and moisture.
-
-% \eq{
-% X_{t,i} \sim \begin{cases}
-% \dirac(J_t) & \text{if } I_t = i \\
-% \bernoulli(q_i) & \text{otherwise}\,.
-% \end{cases}
-% }
-% where $\boldsymbol{q} \in [0,1]^N$ is a (possibly unknown) vector of probabilities with $q_i = \P{X_i = 1}$. 
-% Note that if the learner did not choose an intervention ($I_t =  \bot$), then
-% $X_{t,i} \sim \bernoulli(q_i)$ for all variables $i \in \set{1,\ldots,N}$.
-% Finally the learner observes the reward $Y_t = r(X_t) + \eta_t$ where 
-% \eq{
-% r : \set{0,1}^N \to \R
-% }
-% is arbitrary (and unknown) 
-% and $\eta_t$ is a $1$-subgaussian noise
-% term (with the distribution possibly dependent on $X_t$). 
-% In the farming example $X_{t,1}$ might represent whether the plants had sufficient water in the $t$th season (controllable by installing irrigation) 
-% while $X_{t,2}$ might be whether or not there was a spring frost (controllable with heat-lamps or covers).
 
 In our analysis below, we will often use the pair $(i,j)$ for $i \in \{1, \ldots, N\}$ and $j \in \{0,1\}$ as a shorthand for the intervention $do(X_i = j)$.
 We will also make use of the expansion of the expected reward for $do(X_i = j)$:
@@ -101,24 +88,9 @@ The sum and product use the restrictions $x_i = j$ and $k \ne i$ because the int
 The optimal intervention is denoted $(i^*,j^*) = \argmax_{i,j} \mu_{i,j}$ and the corresponding optimal reward is $\mu^* = \mu_{i^*,j^*}$. 
 Note that the expected reward of the optimal intervention is at least as large as the expected reward for doing nothing.
 
-% It is worth mentioning that the problem may be treated as a multi-armed bandit with $2N$ arms, one corresponding to each intervention.
-% As we shall shortly see, this approach is usually not practical because the resulting algorithms do not exploit the structure in
-% the covariates.
 
-
-% \begin{remark}
-% In order to be consistent with the literature on causal inference we use the notation $do()$ to denote the action of doing nothing and $do(X_{t,I_t} = J_t)$
-% the action of intervening on the $I_t$th variable and setting it to equal $J_t$. 
-% In the bandit community it is implicit that 
-% algorithms selecting actions are intervening in the system. So it is sufficient to index actions according to the variable and value. 
-% However, in causal graphs, it is essential to differentiate observing (or conditioning) on a variable taking a certain value, from 
-% intervening to set that variable. Although in the specific causal graph we consider, observation and intervention are the same, we 
-% deliberately introduce the do-notation \cite{Pearl2000} that makes this distinction clear so as to help provide a bridge between the 
-% bandit and causal inference communities.
-% \end{remark}
 
 \subsection{Exploiting the Causal Model}
-
 
 From a causal perspective the key insight is that the assumed causal structure implies that
 the law of $Y_t$ given we intervene to set $X_{t,i} = j$ is the same as the law of $Y_t$ conditioned
@@ -144,3 +116,16 @@ P(Y_t|do(X_{t,i} = j))= & \nonumber \\
 }
 
 
+\begin{definition}
+Let $\boldsymbol{q} \in [0,1]^N$. Then define $q^{(i)}$ to be the $i$th largest value of the set $\set{\min \set{q_j, 1 - q_j} : 1 \leq j \leq N}$.
+For example
+\eq{
+\boldsymbol{q} &= (0,\, 2/3,\, 1/2,\, 1) \\
+q^{(1)} &= 0,\,\, q^{(2)} = 0,\,\, q^{(3)} = 1/3,\,\, q^{(4)} = 1/2\,.
+}
+Define 
+\eqn{
+\label{def:m}
+m(\boldsymbol{q}) = \min\set{1 \leq i \leq N: q^{(i+1)} \geq \frac{1}{i}}\,.
+}
+\end{definition}
