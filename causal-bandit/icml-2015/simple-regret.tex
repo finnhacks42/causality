@@ -1,29 +1,6 @@
 In this section we develop and analyse an algorithm for minimising the simple regret in the
 causal bandit problem.  
 
-From a causal perspective the key insight is that the assumed causal structure implies that
-the law of $Y_t$ given we intervene to set $X_{t,i} = j$ is the same as the law of $Y_t$ conditioned
-on $X_{t,i} = j$. Formally,
-\eqn {
-\label{eq:observe}
-\P{Y_t \leq y|do(X_{t,i} = j)} = \P{Y_t \leq y|do(),X_{t,i} = j}\,.
-}
-This follows from application of the do-calculus \cite{Pearl2000} to our specific causal graph. It is not the case in general. 
-For example if there was a variable $X'$ that caused both $X_{t,i}$ and $Y$ (or $X_{t,i}$ and any other variable $X_{t,l}$), 
-that would introduce a backdoor path from $X_{t,i} \rightarrow Y_t$ and we would have to condition on $X'$ to derive the 
-interventional distribution of $Y_t$ from the observational one.
-
-\todot{Or just give a reference or hide in the appendix depending on space in the end}
-\color{red} Probably should define causal model and back-door rule to properly show this.\color{black}
-
-We can also learn about the reward for intervening on one variable from rounds in which we actually set a different variable.
-
-\eqn {
-\label{eq:estimation_transfer}
-P(Y_t|do(X_{t,i} = j))= & \nonumber \\
- \sum_{j'}  P(Y_t|do(X_{t,l} & = j'),X_{t,i} = j)P(X_{t,l} = j')
-}
-
 
 The main idea of the algorithm is that by making no intervention (doing nothing) it is possible to estimate simultaneously the returns of all interventions.
 Unfortunately interventions that occur with low probability ($\P{X_{t,i} = j}$ is small) suffer from a high approximation error and should be
