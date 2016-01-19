@@ -11,7 +11,7 @@ An intervention ``mutilates'' the original graph by removing edges into the vari
 Further details can be found in Chapter 21 of~\cite{Koller2009}.
 
 A learner for a casual bandit problem is given the casual model's graph $\mathcal{G}$, a set of \emph{observable} variables $\mathcal{O} \subseteq \mathcal{X}$, a set of \emph{allowed interventions} $\mathcal{A}$, a \emph{reward variable} $Y$. 
-The following game is played over $T$ rounds. 
+The following game is then played over $T$ rounds. 
 In round $t$, the learner selects an allowed intervention $do(\vec{X}_t = \vec{x}_t)$ from $\mathcal{A}$.
 Values for all non-intervened variables $\vec{X}^c_t$ are sampled from $\P{\vec{X}^c_t | do(\vec{X}_t = \vec{x}_t)}$. Finally, the learner is shown the sampled values of all the observable variables in $\vec{X}^c_t \cap \mathcal{O}$ and receives the reward $Y_t$.
 
@@ -40,14 +40,18 @@ Intuitively though, one would expect to perform better by making use of the extr
 In the remainder of this paper we focus on a causal model that is sufficient to demonstrate the separation of regret bounds between algorithms that make use of the additional causal information and those which do not.
 
 
+
 \subsection{The Parallel Bandit Problem}
 
 We now consider a class of a causal bandit problems which we call \emph{parallel bandits}.
 It is simple enough to admit a thorough analysis but rich enough to model the type of problem discussed in \S\ref{sec:intro}, including the farming example.
 
 The causal model for this class of problems has $N$ binary variables $\{ X_1, \ldots, X_N \}$ where each $X_i \in \{0,1\}$ are independent causes of a reward variable $Y \in \R$, as shown in Figure~\ref{fig:causalStructure}.
-All variables are observable (\ie, $\mathcal{O} = \{Y, X_1, \ldots, X_N\}$) and the set of allowable interventions are all size 1 interventions on a given $X_i$ variable (\ie, $\mathcal{A} = \{ do(X_i = j) \colon i \in \{1, \ldots, N\}, j \in \{0,1\}\}$).
-In the farming example from the introduction, $X_1$ represent temperature with $X_1=0$ denoting low and $X_1=1$ high temperature. 
+All variables are observable (\ie, $\mathcal{O} = \{Y, X_1, \ldots, X_N\}$) and the set of allowable actions are all size 0 and size 1 interventions: 
+\[
+	\mathcal{A} = \{do()\} \cup \{ do(X_i = j) \colon i \in \{1, \ldots, N\}, j \in \{0,1\}\}.
+\]
+In the farming example from the introduction, $X_1$ might represent temperature (\eg, $X_1=0$ for low and $X_1=1$ for high). 
 In this case, the interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ might represent the use of shades or heat lamps to keep the temperature low or high, respectively.
 
 
@@ -71,7 +75,8 @@ In this case, the interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ might represent 
 \caption{Causal model for the parallel bandits problem.\label{fig:causalStructure}}
 \end{figure}
 
-In each round of the game, the learner selects a single variable to intervene on and the value to set it to while the remainder of the variables are simultaneously set by independently biased coin flips. 
+In each round of the game, the learner either purely observes by selecting $do()$ or chooses a single variable to intervene on and the value to set it to. 
+The remainder of the variables are simultaneously set by independently biased coin flips. 
 The value of all variables are then used to determine the distribution of rewards for that round.
 Formally, when not intervened upon we assume that each $X_i \sim \bernoulli(q_i)$ where $\vec{q} = (q_1, \ldots, q_N) \in [0,1]^N$ so that $q_i = \P{X_i = 1}$.
 The value of the reward variable is distributed as $Y = r(\vec{X}) + \eta$ where $r : \{0,1\}^N \to \R$ is an arbitrary, fixed, and unknown function and $\eta$ is $1$-subgaussian noise with a distribution that may depend on $\vec{X}$.
@@ -99,7 +104,7 @@ on $X_{t,i} = j$. Formally,
 \label{eq:observe}
 \P{Y_t \leq y|do(X_{t,i} = j)} = \P{Y_t \leq y|do(),X_{t,i} = j}\,.
 }
-This follows from application of the do-calculus \cite{Pearl2000} to our specific causal graph. It is not the case in general. 
+This follows from application of the do-calculus \cite{Pearl2000} to the causal graph for the parallel bandits problem (Fig.~\ref{fig:causalStructure}). It is not the case in general. 
 For example if there was a variable $X'$ that caused both $X_{t,i}$ and $Y$ (or $X_{t,i}$ and any other variable $X_{t,l}$), 
 that would introduce a backdoor path from $X_{t,i} \rightarrow Y_t$ and we would have to condition on $X'$ to derive the 
 interventional distribution of $Y_t$ from the observational one.
