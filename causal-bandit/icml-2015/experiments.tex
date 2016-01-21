@@ -32,16 +32,30 @@ This allows us to rapidly simulate rewards and conditional rewards for large num
 \end{figure}
 
 \begin{figure}
-\caption{Simple regret vs horizon, $T$, for $N = 30$ for UCB with $\alpha=2$, Causal-Best-Arm-Identification with $m=2$ and Causal-Best-Arm-Identification with $m=N$. Error bars show estimated 95\% confidence interval from 1000 simulations.}
+\caption{Simple regret vs horizon, $T$, with $N = 20$ and fixed $\epsilon = .4$ for Successive Rejects and Causal-Best-Arm-Identification. Error bars show standard error over 100000 simulations.}
 \label{fig:simple_vs_T}
 \centering
-\includegraphics[width=.5\textwidth]{exp_simpleregret_vs_T_N30_sims1000_20160113_010512.pdf}
+\includegraphics[width=.5\textwidth]{exp_simpleregret_vs_T_N20_sims100000_20160121_140227}
 \end{figure}
 
 \begin{figure}
-\caption{Simple regret vs number of variables, $N$, for $T=500$, for UCB with $\alpha=2$, Causal-Best-Arm-Identification with $m=2$ and Causal-Best-Arm-Identification with $m=N$. Error bars show estimated 95\% confidence interval from 1000 simulations.}
-\label{fig:simple_vs_N}
+\caption{Simple regret vs horizon, $T$, with $N = 20$ and $\epsilon \propto \sqrt{1/T}$ for Successive Rejects and Causal Best Arm Identification. Error bars show standard error over 10000 simulations.}
+\label{fig:simple_vs_T_vary_epsilon}
 \centering
-\includegraphics[width=.5\textwidth]{exp_simpleregret_vs_N_T500_sims1000_20160113_010511.pdf}
+\includegraphics[width=.5\textwidth]{exp_simpleregret_vs_T_N20_sims10000_20160122_010802.pdf}
 \end{figure}
 
+\begin{figure}
+\caption{Simple regret vs number of variables, $N$, for $T=250$, for Successive Rejects and, Causal-Best-Arm-Identification. Error bars show standard error from 10000 simulations.}
+\label{fig:simple_vs_N}
+\centering
+\includegraphics[width=.5\textwidth]{exp_simpleregret_vs_N_T250_sims10000_20160122_024459.pdf}
+\end{figure}
+
+
+\begin{figure}
+\caption{Simple regret vs number of variables, $m$, for $T=300$ and $N = 50$, for Successive Rejects and Causal-Best-Arm-Identification. Error bars show standard error over 10000 simulations.}
+\label{fig:simple_vs_m}
+\centering
+\includegraphics[width=.5\textwidth]{exp_simpleregret_vs_m_T300_N50_sims10000_10000.pdf}
+\end{figure}
