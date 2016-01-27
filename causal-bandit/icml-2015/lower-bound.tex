@@ -48,18 +48,18 @@ Then for $i \in A$ and choosing $\epsilon = \sqrt{2m/3T}$ we have
 Now $\sum_{i=1}^m \mathbb E_0 T_i(T) \leq T$, which implies that $|A| \geq m/2$.
 Therefore
 \eq{
-\sum_{i \in A} \Pri{I_t \neq i} 
+\sum_{i \in A} \Pri{I_T \neq i} 
 &\geq \sum_{i \in A} \exp\left(-\KL(P_0, P_i)\right) - 1\\
 &\geq \frac{|A|}{e} - 1 
 \geq \frac{m}{2e} - 1\,.
 }
 Therefore there exists an $i \in A$ such that
 \eq{
-\Pri{I_t \neq i} \geq \frac{\frac{m}{2e} - 1}{m}\,.
+\Pri{I_T \neq i} \geq \frac{\frac{m}{2e} - 1}{m}\,.
 }
 Therefore
 \eq{
-R^{\text{simple}}_{T,i} \geq \frac{1}{2} P_i(I_t \neq i) \epsilon \geq \frac{\frac{m}{2e} - 1}{2m} \sqrt{\frac{2m}{3T}}
+R^{\text{simple}}_{T,i} \geq \frac{1}{2} P_i(I_T \neq i) \epsilon \geq \frac{\frac{m}{2e} - 1}{2m} \sqrt{\frac{2m}{3T}}
 }
 as required.
 \end{proof}

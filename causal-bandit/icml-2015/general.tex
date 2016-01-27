@@ -1,0 +1,75 @@
+
+\newcommand{\calP}{\mathcal P}
+
+Assume $Y \in \set{0,1}$. Let $\calP_i : \set{0,1}^N \to \set{0,1}^{N_i}$ be the
+projection that selections the $N_i$ parents of variable $i$. Then we can write
+\eq{
+\P{X = x} = \prod_{k=1}^N \P{X_k = x_k|\calP_k(X) = \calP_k(x)}\,.
+}
+If we intervene by setting $X_i = j$ where $i \in \set{1,\ldots,N}$ and $j \in \set{0,1}$, then
+\eq{
+\P{X = x|do(X_i = j)} = \prod_{k \neq i} \P{X_k = x_k|\calP_k(X) = \calP_k(x)}\,.
+}
+Let $r(x) = \P{Y = 1|X = x}$. Then
+\eq{
+\P{Y = 1} = \sum_{x \in \set{0,1}^N} \P{X = x} r(x)
+}
+and
+\eq{
+\mu_{ij} 
+& = \P{Y = 1|do(X_i = j)} \\
+& = \sum_{x \in \set{0,1}^N : x_i = j} \P{X = x|do(X_i = j)} r(x)\,.
+}
+We wish to devise an estimator for $\mu_{ij}$ using $X$ and $Y$ without
+intervening to set $X_i = j$. A natural choice is the importance weighted estimator
+\eq{
+Z_{ij} 
+&= \frac{Y \ind{X_i = j}}{\P{X_i = j|\calP_i(X)}}\,. 
+}
+Checking:
+\eq{
+&\E{Z_{ij}} 
+= \sum_x \frac{\P{X = x} r(x) \P{X = x | do(X_i = j)}}{\P{X = x}} \\
+&= \P{Y = 1| do(X_i = j)} \,. 
+}
+The variance of $Z_{ij}$ may also be bounded
+\eq{
+&\Var[Z_{ij}]
+\leq \E{Z_{ij}^2} \\
+&\leq \sum_x \P{X = x} \left(\frac{\ind{X_i = j}}{\P{X_i = j|\calP_i(X) = \calP_i(x)}}\right)^2 \\
+&= \E{\frac{1}{\P{X_i = j|\calP_i(X)}}} \\
+&= V_{ij}\,.
+}
+In the general graph setting the dimension $m$ has a slightly different definition.
+\eq{
+m = \min\set{m : \sum_{ij} \ind{V_{ij} \leq 1/m} = m}\,.
+}
+
+\begin{algorithm}[H]
+\caption{General Algorithm}
+\begin{algorithmic}
+\STATE {\bf Input:} $N$, $\mathcal P$
+\STATE Compute $m$:
+\eq{
+m = \min\set{m : \sum_{ij} \ind{V_{ij} \leq 1/m} = m}
+}
+\STATE Collect $T/2$ observational samples and estimate $\hat \mu_{ij}$:
+\eq{
+\hat \mu_{ij} = \sum_{t=1}^{T/2} \frac{Y_t \ind{X_{t,i} = j}}{\P{X_{t,i} = j | \mathcal P_i(X_t)}}
+}
+\FOR{$i \in \set{1,\ldots,m}$}
+\STATE For each $i,j $ with $V_{ij} < 1/m$ take action $do(X_i = j)$ for $T/(2m)$ samples $Y^{(ij)}_1,\ldots,Y^{(ij)}_{T/2m}$
+\STATE Update estimate:
+\eq{
+\eta &= \frac{V_{ij}}{V_{ij} + m} \\
+\hat \mu_{ij} &= \eta \left(\frac{2m}{T} \sum_{t=1}^{T/(2m)} Y^{(ij)}_t\right) + (1 - \eta) \hat \mu_{ij}
+}
+\ENDFOR
+\STATE Choose $do(X_i = j)$ for $ij = \argmax_{ij} \hat \mu_{ij}$
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+
