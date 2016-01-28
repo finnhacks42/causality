@@ -1,0 +1,85 @@
+
+\newcommand{\calP}{\mathcal P}
+\newcommand{\x}{\boldsymbol{x}}
+
+We now consider single variable interventions on general causal graphs over variables $\boldsymbol{V}$. Let $Y \in \set{0,1}$ be the target variable and $\boldsymbol{X} = V/\set{Y \cup Desendants(Y)}$. 
+
+If all the variables in $\boldsymbol{X}$ are observable, we can compute the distribution $P(Y,\boldsymbol{X}|do(X_i = j)$ for any intervention $i,j$ from data collected without intervening via the truncated product formula \cite{Pearl2000} 1.37.
+
+\eq {
+P(Y,X) = \prod_{k \neq i}\P{x_k|\calP_k(\x)}\P{Y|\calP_Y(\x)}\, \text{  $\forall \,\x$ consistent with $X_i = j$}  
+} 
+
+Where $\calP_i : \set{0,1}^N \to \set{0,1}^{N_i}$ is the
+projection that selections the $N_i$ parents of variable $i$. 
+
+We can then marginalize to obtain $P(Y|do(X_i = j))$
+
+\eq {
+P(Y|do(X_i = j)) =& \sum_{\x:x_i=j} \prod_{k \neq i}\P{x_k|\calP_k(\x)}\P{Y|\calP_Y(\x)}\\
+ =& \sum_{\x:x_i=j} \prod_{k \neq i}\P{x_k|\calP_k(\x)}\P{Y|\x}\\
+ =& \sum_{\x:x_i=j} \P{\boldsymbol{X}|do(X_i=j)}\P{Y|\x}
+}
+
+Let $r(x) = \P{Y = 1|X = x}$. Then
+
+\eq {
+\mu_{ij} = P(Y = 1|do(X_i = j)) = \sum_{\x:x_i=j} \P{\boldsymbol{X}|do(X_i=j)}r(x)
+}
+
+
+We wish to devise an estimator for $\mu_{ij}$ using $X$ and $Y$ without
+intervening to set $X_i = j$. A natural choice is the importance weighted estimator
+
+\eq{
+Z_{ij} 
+&= \frac{Y \ind{X_i = j}}{\P{X_i = j|\calP_i(X)}}\,. 
+}
+
+Checking:
+\eq{
+&\E{Z_{ij}} 
+= \sum_x \frac{\P{X = x} r(x) \P{X = x | do(X_i = j)}}{\P{X = x}} \\
+&= \P{Y = 1| do(X_i = j)} \,. 
+}
+The variance of $Z_{ij}$ may also be bounded
+\eq{
+&\Var[Z_{ij}]
+\leq \E{Z_{ij}^2} \\
+&\leq \sum_x \P{X = x} \left(\frac{\ind{X_i = j}}{\P{X_i = j|\calP_i(X) = \calP_i(x)}}\right)^2 \\
+&= \E{\frac{1}{\P{X_i = j|\calP_i(X)}}} \\
+&= V_{ij}\,.
+}
+In the general graph setting the dimension $m$ has a slightly different definition.
+\eq{
+m = \min\set{m : \sum_{ij} \ind{V_{ij} \leq 1/m} = m}\,.
+}
+
+\begin{algorithm}[H]
+\caption{General Algorithm}
+\begin{algorithmic}
+\STATE {\bf Input:} $N$, $\mathcal P$
+\STATE Compute $m$:
+\eq{
+m = \min\set{m : \sum_{ij} \ind{V_{ij} \leq 1/m} = m}
+}
+\STATE Collect $T/2$ observational samples and estimate $\hat \mu_{ij}$:
+\eq{
+\hat \mu_{ij} = \sum_{t=1}^{T/2} \frac{Y_t \ind{X_{t,i} = j}}{\P{X_{t,i} = j | \mathcal P_i(X_t)}}
+}
+\FOR{$i \in \set{1,\ldots,m}$}
+\STATE For each $i,j $ with $V_{ij} < 1/m$ take action $do(X_i = j)$ for $T/(2m)$ samples $Y^{(ij)}_1,\ldots,Y^{(ij)}_{T/2m}$
+\STATE Update estimate:
+\eq{
+\eta &= \frac{V_{ij}}{V_{ij} + m} \\
+\hat \mu_{ij} &= \eta \left(\frac{2m}{T} \sum_{t=1}^{T/(2m)} Y^{(ij)}_t\right) + (1 - \eta) \hat \mu_{ij}
+}
+\ENDFOR
+\STATE Choose $do(X_i = j)$ for $ij = \argmax_{ij} \hat \mu_{ij}$
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+
