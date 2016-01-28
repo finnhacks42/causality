@@ -1,8 +1,11 @@
-A classical problem in economics and operations research is how to choose interventions that maximise utility. 
-We study an idealised model of such interventions using a combination of the multi-armed bandit framework \citep{Robbins1952} and the theory/language of causal inference 
-\citep{Pearl2000}.
+Medical drug testing, economic policy setting, and other scientific processes are commonly framed and analysed in the language of sequential experimental design and, in special cases, as bandit problems~\citep{Robbins1952,Chernoff1958}. 
+In this framework, single actions or experiments from a pre-determined set are repeatedly performed in order to determine the most effective one via feedback from a single, real-valued reward signal. 
+We consider the more general setting for sequential experiments where the feedback after each action consists of the reward signal as well as the values of other variables drawn from a probabilistic causal model~\citep{Pearl2000}.
+By explicitly modeling this extra information (\eg, drug side-effects, secondary economic indicators) we show, theoretically and empircally, how it can be used to improve the rate at which effective actions can be identified.
 
-\todom{Describe feature of class of problem; highlight with examples.}
+% A classical problem in economics and operations research is how to choose interventions that maximise utility. 
+% We study an idealised model of such interventions using a combination of the multi-armed bandit framework \citep{Robbins1952} and the theory/language of causal inference 
+% \citep{Pearl2000}.
 
 The challenge is best illustrated with an example. Consider a farmer wishing to optimise the yield of her crop. 
 She knows that crop yield is only affected by temperature, a particular soil nutrient, and moisture level but the precise effect of their combination is unknown.
@@ -12,12 +15,19 @@ When not intervened upon, the temperature, soil, and moisture vary naturally fro
 How might the farmer best experiment to identify the single, highest yielding intervention without sacrificing too much crop yield (relative to always choosing the best intervention) in the process?
 
 
-This paper can be seen as a first step towards formalising and solving problems such as these. In \S\ref{sec:defs} we introduce \emph{causal bandit problems} and focus on a 
+This paper can be seen as a first step towards formalising and solving problems such as these. In \S\ref{sec:defs} we introduce \emph{causal bandit problems} in which interventions are treated as arms in a bandit problem but their inlfuence on the reward --- along with any other non-interventional observations --- is assumed to conform to a known causal graph. 
+Although the general problem subsumes classical stochastic bandit problems as well as stochastic contextual bandits ... focus on parallel bandit problem.
+
+Our algorithm simply observes without intervening for some initial period and then plays the undersampled actions in order to get good estimates of their reward. 
+These estimates rely on results from causal inference that relate the distributions obtained through interventions to those based only on observations.
+
+We provide matching upper and lower bounds on the simple regret of this algorithm that have a better dependence on the number of actions than any algorithm that ignores the extra observations. 
+Central to our new bounds is a quantity that measures how ``balanced'' the distributions over the observed variables are.
 
 \subsection{Related Work}
 
 One obvious approach would be to cast the above example as a stochastic multi-armed bandit problem~\cite{Robbins1952} -- each of the six possible interventions is an arm and the crop yield is the reward -- and apply an algorithm such as UCB~\cite{Auer1995} with well understood regret guarantees.
-However, as we show in \S\ref{sec:results}, this approach ignores the extra information available in the non-intervened variables and subsequently yields a worst-case regret after $T$ round of $\bigomega{\sqrt{NT}}$ with a sub-optimal dependence on $N$, the number of possible interventions.
+However, as we show in \S\ref{sec:simple-regret}, this approach ignores the extra information available in the non-intervened variables and subsequently yields a worst-case regret after $T$ round of $\bigomega{\sqrt{NT}}$ with a sub-optimal dependence on $N$, the number of possible interventions.
 
 \todom{Note that feedback work as uses graphs}
 
