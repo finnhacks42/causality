@@ -63,10 +63,9 @@ There has been substantial recent work into extending bandit algorithms to incor
 
 % Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
 
-\citet{Bareinboim2015} very recently presented work that also combines bandits and causal inference. Their work differs from our in two key ways. Firstly, their focus is on correcting the effects of unobserved confounding variables whereas we assume all variables are observable. Secondly, they do not assume their learning algorithm has access to a causal graph and instead use a form of contextual randomization to improve reward estimates. Combining their handling of unobserved variables with our analysis is left as future work.
-
-\citet{Ortega2014} 
-
+Two pieces of recent work also consider using causal models in bandit problems.
+Although \citet{Bareinboim2015} also use causal inference to improve the chance of choosing an optimal arm, their work differs from our in two key ways. Firstly, their focus is on correcting the effects of unobserved confounding variables whereas we assume all variables are observable. Secondly, they do not assume their learning algorithm has access to a causal graph and instead use a form of contextual randomization to improve reward estimates in a Thompson sampling-style algorithm. \citet{Ortega2014} also present an analysis and extension of Thompson sampling assuming actions are causal interventions. Their focus, however, is on causal induction (\ie, learning an unknown causal model) instead of exploiting a known causal model. Neither work provides a regret analysis. 
+Combining their handling of unobserved variables and causal induction with our analysis is left as future work.
 % Key to Elias' paper is: observing the action an agent would take if it were allowed to make its natural choice can provide some information about hidden confounders that influence both the reward and the choice of action. Therefore, incorporating an agents natural choice as context may outperform a standard bandit that does not use that context. (Note: even in the presence of hidden confounders, including the agents natural choice as context only may improve the results. It is easy to come up with a counter example in which it does not).
 
 
