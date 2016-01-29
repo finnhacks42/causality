@@ -20,15 +20,17 @@ How might the farmer best experiment to identify the single, highest yielding in
 
 \subsection{Contributions}
 
-This paper can be seen as a first step towards formalising and solving problems such as these. 
+This paper can be seen as a first step towards formalising and solving problems such as the one above. 
 In \S\ref{sec:defs} we formally introduce \emph{causal bandit problems} in which interventions are treated as arms in a bandit problem but their influence on the reward --- along with any other observations --- is assumed to conform to a known causal graph. 
-We show that our general model subsumes classical stochastic bandit problems as well as stochastic contextual bandits before focusing on a special case where, like the above example, the 
+We show that our causal bandit framework subsumes the classical bandits (no additional observations) and contextual stochastic bandit problems (observations are revealed before an intervention is chosen) before focusing on the case where, like the above example, observations occur \emph{after} each intervention is made.
 
-Our algorithm simply observes without intervening for some initial period and then plays the undersampled actions in order to get good estimates of their reward. 
-These estimates rely on results from causal inference that relate the distributions obtained through interventions to those based only on observations.
+Our main results for this case are: an upper bound on the (simple) regret (Theorem~\ref{thm:}) for a general, fully observable causal model (TODO?); an upper bound on the cumulative regret (Theorem~\ref{thm:}) for a specific causal model that has a better dependence on the number of available actions then the best possible algorithm which ignores the causal model; and a matching lower bound (Theorem~\ref{thm:}) for any algorithm which does use the additional causal information.
+Our analysis relies on results from causal inference that relate the distributions obtained through interventions to those based only on observations.
+Central to our new bounds is a quantity that replaces the number of possible actions with a measure of how ``informative'' the observations are for estimating the rewards for interventions.
 
-We provide matching upper and lower bounds on the simple regret of this algorithm that have a better dependence on the number of actions than any algorithm that ignores the extra observations. 
-Central to our new bounds is a quantity that measures how ``balanced'' the distributions over the observed variables are.
+Although the witness (Algorithm~\ref{alg:}) for our upper bound is very simple (\ie, observe without intervening for some initial period and then play undersampled actions in order to get good estimates) our key point is that algorithms which use causal information when available have a clear, theoretical improvement over those which do not.
+These results are experimentally validated in \S\ref{sec}.
+
 
 \subsection{Related Work}
 
@@ -64,7 +66,7 @@ There has been substantial recent work into extending bandit algorithms to incor
 % Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
 
 Two pieces of recent work also consider using causal models in bandit problems.
-Although \citet{Bareinboim2015} also use causal inference to improve the chance of choosing an optimal arm, their work differs from our in two key ways. Firstly, their focus is on correcting the effects of unobserved confounding variables whereas we assume all variables are observable. Secondly, they do not assume their learning algorithm has access to a causal graph and instead use a form of contextual randomization to improve reward estimates in a Thompson sampling-style algorithm. \citet{Ortega2014} also present an analysis and extension of Thompson sampling assuming actions are causal interventions. Their focus, however, is on causal induction (\ie, learning an unknown causal model) instead of exploiting a known causal model. Neither work provides a regret analysis. 
+Although \citet{Bareinboim2015} also use causal inference to improve the chance of choosing an optimal arm, their work differs from our in two key ways. Firstly, their focus is on correcting the effects of unobserved confounding variables whereas we assume all variables are observable. Secondly, they do not assume their learning algorithm has access to a causal graph and instead use a form of contextual randomization to improve reward estimates in a Thompson sampling-style algorithm. \citet{Ortega2014thompson} also present an analysis and extension of Thompson sampling assuming actions are causal interventions. Their focus, however, is on causal induction (\ie, learning an unknown causal model) instead of exploiting a known causal model. Neither work provides a regret analysis. 
 Combining their handling of unobserved variables and causal induction with our analysis is left as future work.
 % Key to Elias' paper is: observing the action an agent would take if it were allowed to make its natural choice can provide some information about hidden confounders that influence both the reward and the choice of action. Therefore, incorporating an agents natural choice as context may outperform a standard bandit that does not use that context. (Note: even in the presence of hidden confounders, including the agents natural choice as context only may improve the results. It is easy to come up with a counter example in which it does not).
 
