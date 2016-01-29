@@ -1,29 +1,46 @@
-A classical problem in economics and operations research is how to choose interventions that maximise utility. 
-We study an idealised model of such interventions using a combination of the multi-armed bandit framework \citep{Robbins1952} and the theory/language of causal inference 
-\citep{Pearl2000}.
+Medical drug testing, policy setting, and other scientific processes are commonly framed and analysed in the language of sequential experimental design and, in special cases, as bandit problems~\citep{Robbins1952,Chernoff1959}. 
+In this framework, single actions (\eg, experiments or interventions) from a pre-determined set are repeatedly performed in order to determine the most effective one via feedback from a single, real-valued reward signal. 
+We propose generalizing such sequential experiments by assuming that, in additional to the reward signal, values of other variables are drawn from a probabilistic causal model~\citep{Pearl2000} and observed.
+These causal models are common in social science, demography, and economics where explicit experimentation may be difficult. 
+For example, predicting the effect of changes to childcare subsidies on workforce participation or school choice on student grades. 
+Results from causal inference relate observational distributions to interventional ones, allowing us to predict the outcome of intervention without explicitly performing it. 
+By combining causal inference using a causal graph we show, theoretically and empirically, how non-interventional observations can be used to improve the rate at which high-reward actions can be identified.
 
-\todom{Describe feature of class of problem; highlight with examples.}
+% A classical problem in economics and operations research is how to choose interventions that maximise utility. 
+% We study an idealised model of such interventions using a combination of the multi-armed bandit framework \citep{Robbins1952} and the theory/language of causal inference 
+% \citep{Pearl2000}.
 
-The challenge is best illustrated with an example. Consider a farmer wishing to optimise the yield of her crop. 
+The type of problem we are concerned with is best illustrated with an example. 
+Consider a farmer wishing to optimise the yield of her crop. 
 She knows that crop yield is only affected by temperature, a particular soil nutrient, and moisture level but the precise effect of their combination is unknown.
 In each season the farmer has enough time and money to intervene and control at most one of these variables:
 deploying shade or heat lamps will set the temperature to be low or high; the nutrient can be added or removed a through a choice of fertilizer; and irrigation or rain-proof covers will keep the soil wet or dry.
 When not intervened upon, the temperature, soil, and moisture vary naturally from season to season due to weather conditions and these are all observed along with the final crop yield at the end of each season.
 How might the farmer best experiment to identify the single, highest yielding intervention without sacrificing too much crop yield (relative to always choosing the best intervention) in the process?
 
+\subsection{Contributions}
 
-This paper can be seen as a first step towards formalising and solving problems such as these. In \S\ref{sec:defs} we introduce \emph{causal bandit problems} and focus on a 
+This paper can be seen as a first step towards formalising and solving problems such as the one above. 
+In \S\ref{sec:defs} we formally introduce \emph{causal bandit problems} in which interventions are treated as arms in a bandit problem but their influence on the reward --- along with any other observations --- is assumed to conform to a known causal graph. 
+We show that our causal bandit framework subsumes the classical bandits (no additional observations) and contextual stochastic bandit problems (observations are revealed before an intervention is chosen) before focusing on the case where, like the above example, observations occur \emph{after} each intervention is made.
+
+Our main results for this case are: an upper bound on the (simple) regret (Theorem~\ref{thm:}) for a general, fully observable causal model (TODO?); an upper bound on the cumulative regret (Theorem~\ref{thm:}) for a specific causal model that has a better dependence on the number of available actions then the best possible algorithm which ignores the causal model; and a matching lower bound (Theorem~\ref{thm:}) for any algorithm which does use the additional causal information.
+Our analysis relies on results from causal inference that relate the distributions obtained through interventions to those based only on observations.
+Central to our new bounds is a quantity that replaces the number of possible actions with a measure of how ``informative'' the observations are for estimating the rewards for interventions.
+
+Although the witness (Algorithm~\ref{alg:}) for our upper bound is very simple (\ie, observe without intervening for some initial period and then play undersampled actions in order to get good estimates) our key point is that algorithms which use causal information when available have a clear, theoretical improvement over those which do not.
+These results are experimentally validated in \S\ref{sec}.
+
 
 \subsection{Related Work}
 
-One obvious approach would be to cast the above example as a stochastic multi-armed bandit problem~\cite{Robbins1952} -- each of the six possible interventions is an arm and the crop yield is the reward -- and apply an algorithm such as UCB~\cite{Auer1995} with well understood regret guarantees.
-However, as we show in \S\ref{sec:results}, this approach ignores the extra information available in the non-intervened variables and subsequently yields a worst-case regret after $T$ round of $\bigomega{\sqrt{NT}}$ with a sub-optimal dependence on $N$, the number of possible interventions.
+One obvious approach would be to cast the above example as a stochastic multi-armed bandit problem (\eg, the six possible farming interventions is an arm and the crop yield is the reward) and apply an algorithm such as UCB~\cite{Auer1995} with well understood regret guarantees.
+However, as we show in \S\ref{sec:simple-regret}, this approach ignores the extra information available in the non-intervened variables and subsequently yields a worst-case regret after $T$ round of $\bigomega{\sqrt{NT}}$ with a sub-optimal dependence on $N$, the number of possible interventions.
 
-\todom{Note that feedback work as uses graphs}
 
-Our framework also bears a superficial similarity to contextual bandit problems \cite{Agarwal2014} since the extra observations on non-intervened variables might be viewed as context for selecting an intervention. However, a crucial difference is that in our model the extra observations are only revealed \emph{after} selecting an intevention and cannot be used as context.
+Our framework also bears a superficial similarity to contextual bandit problems \cite{Langford2008,Agarwal2014} since the extra observations on non-intervened variables might be viewed as context for selecting an intervention. However, a crucial difference is that in our model the extra observations are only revealed \emph{after} selecting an intevention and cannot be used as context.
 
-There has been a significant amount of recent work which proposes alternative modes of feedback within the bandit setting \cite{TODO} as well as results for partial monitoring which, at first glance, may appear applicable. As we show in Section~\ref{}, applying these results to our problem also exhibit a sub-optimal dependence on the number of available interventions.
+There has been a significant amount of recent work which proposes alternative modes of feedback within the bandit setting \cite{TODO} as well as results for partial monitoring which, at first glance, may appear applicable. Indeed, we show in Section~\ref{}, that it is possible to applying these existing results to our problem, however the resulting regret is $\bigo{\sqrt{NT}}$, again with a sub-optimal dependence on $N$.
 
 \todom{Rework rest of intro}
 
@@ -31,26 +48,26 @@ There has been a significant amount of recent work which proposes alternative mo
 
 % A widely used framework for sequential decision making is the multi-armed bandit. In the classic multi-armed bandit setting there is a finite set of available actions, each associated with a distribution over rewards which is unknown but stationary. At each timestep the agent selects an action and receives a reward sampled i.i.d from the corresponding reward distribution. The performance of bandit algorithms is described by the regret: the difference in the expected reward obtained by the algorithm and the reward that could be obtained if the optimal action was selected at every timestep. 
 
-An alternate approach to selecting actions is causal inference. Frameworks for causal inference provide a mechanism to specify assumptions that allow observational distributions over variables to be mapped to interventional ones. This allows an agent to predict the outcome of an action based on non-experimental data. This approach is common in social science, demography, and economics where explicit experimentation may be difficult. For example, predicting the effect of changes to childcare subsidies on workforce participation or school choice on student grades. 
 
 We take a first step towards unifying these approaches by considering a variant of the stochastic multi-armed bandit problem where we have prior knowledge of the causal structure governing the available actions. 
 
 \todom{Summarise results \& give intuition for algorithm}
 
-A natural way to connect the causal framework with the bandit setting is to model the problem as a causal directed acyclic graph. Each possible assignment of variables to values is an action (bandit arm). The reward could be a general function of the action selected and the final state of the graph. However for simplicity, we will consider the reward to be the value of a single specified node minus the cost of the selected action. The number of actions grows exponentially with the number of variables in the graph, making it important to use algorithms that take account of the graph structure to reduce the search space. 
+% A natural way to connect the causal framework with the bandit setting is to model the problem as a causal directed acyclic graph. Each possible assignment of variables to values is an action (bandit arm). The reward could be a general function of the action selected and the final state of the graph. However for simplicity, we will consider the reward to be the value of a single specified node minus the cost of the selected action. The number of actions grows exponentially with the number of variables in the graph, making it important to use algorithms that take account of the graph structure to reduce the search space. 
 
-Problems framed in this way take on characteristics of different bandit settings depending on the assumptions we make about what subset of actions can be taken, what variables are observable and whether they are observed before or after an action is selected. If feedback is received only on the reward node then the do-calculus can be applied to eliminate some actions immediately, before any experiments are performed and then a standard bandit algorithm can be run on the remaining actions. 
+% Problems framed in this way take on characteristics of different bandit settings depending on the assumptions we make about what subset of actions can be taken, what variables are observable and whether they are observed before or after an action is selected. If feedback is received only on the reward node then the do-calculus can be applied to eliminate some actions immediately, before any experiments are performed and then a standard bandit algorithm can be run on the remaining actions. 
 
-If we receive feedback on additional nodes the problem can be more interesting. In addition to being able to eliminate some actions prior to sampling any data as in the previous case, taking one action may give us some information on actions that were not selected. 
+% If we receive feedback on additional nodes the problem can be more interesting. In addition to being able to eliminate some actions prior to sampling any data as in the previous case, taking one action may give us some information on actions that were not selected. 
 
-We consider a bandit problem where the actions and reward are represented by a specific causal graph that demonstrates this interesting structure. We develop an algorithm to leverage the information provided by this structure and demonstrate it substantially outperforms standard bandit algorithms applied to the same problem where the number of actions is large.
+% We consider a bandit problem where the actions and reward are represented by a specific causal graph that demonstrates this interesting structure. We develop an algorithm to leverage the information provided by this structure and demonstrate it substantially outperforms standard bandit algorithms applied to the same problem where the number of actions is large.
 
 There has been substantial recent work into extending bandit algorithms to incorporate additional assumptions and deal with more complex feedback structures. Algorithms with strong guarantees have been developed for linear bandits [], generalized linear bandits, gaussian process bandits [], etc. There is also an active line of research into bandits with feedback defined by a graph. Actions are modelled as nodes in the graph and the agent observes rewards for each action connected to the selected action []. The novelty of our work is that we assume prior knowledge of the causal structure but not the functional form of the relationship between variables.   
 
-Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
+% Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
 
-ALSO NEED TO MENTION ANY OTHER COMBINATIONS OF BANDITS+CAUSAL (eg the Elias NIPS paper and Generalized Thompson Sampling paper)
-
-Key to Elias' paper is: observing the action an agent would take if it were allowed to make its natural choice can provide some information about hidden confounders that influence both the reward and the choice of action. Therefore, incorporating an agents natural choice as context may outperform a standard bandit that does not use that context. (Note: even in the presence of hidden confounders, including the agents natural choice as context only may improve the results. It is easy to come up with a counter example in which it does not).
+Two pieces of recent work also consider using causal models in bandit problems.
+Although \citet{Bareinboim2015} also use causal inference to improve the chance of choosing an optimal arm, their work differs from our in two key ways. Firstly, their focus is on correcting the effects of unobserved confounding variables whereas we assume all variables are observable. Secondly, they do not assume their learning algorithm has access to a causal graph and instead use a form of contextual randomization to improve reward estimates in a Thompson sampling-style algorithm. \citet{Ortega2014thompson} also present an analysis and extension of Thompson sampling assuming actions are causal interventions. Their focus, however, is on causal induction (\ie, learning an unknown causal model) instead of exploiting a known causal model. Neither work provides a regret analysis. 
+Combining their handling of unobserved variables and causal induction with our analysis is left as future work.
+% Key to Elias' paper is: observing the action an agent would take if it were allowed to make its natural choice can provide some information about hidden confounders that influence both the reward and the choice of action. Therefore, incorporating an agents natural choice as context may outperform a standard bandit that does not use that context. (Note: even in the presence of hidden confounders, including the agents natural choice as context only may improve the results. It is easy to come up with a counter example in which it does not).
 
 
