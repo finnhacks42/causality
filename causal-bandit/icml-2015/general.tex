@@ -55,6 +55,14 @@ In the general graph setting the dimension $m$ has a slightly different definiti
 m = \min\set{m : \sum_{ij} \ind{V_{ij} \leq 1/m} = m}\,.
 }
 
+\todof{I think the above should be}
+
+\eq {
+m = \min \set{m: \sum_{ij} \ind{V_{ij} \geq m} = m}\,.
+}
+
+That is, $m$ should be chosen such that the size of the set variances greater than $m$ is $m$. This ensures all the variances of the remaining arms are smaller than $m$. This definition would also seem equivalent to sorting the variances such that $V^{(0)} \geq V^{(1)} ... \geq V^{(2N)}$ and then defining $m = \min m: V^{(m)} \leq m$ which is in turn equivalent to the definition in terms of $q$ for parallel bandits. 
+
 \begin{algorithm}[H]
 \caption{General Algorithm}
 \begin{algorithmic}
