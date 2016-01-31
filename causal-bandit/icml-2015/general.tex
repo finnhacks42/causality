@@ -17,7 +17,7 @@ If all the variables in $\boldsymbol{X}$ are observable, we can compute the dist
 Where $\calP_i : \set{0,1}^N \to \set{0,1}^{N_i}$ is the
 projection that selections the $N_i$ parents of variable $i$. 
 
-Since estimating $\P{Y|do(X_i=j)}$ from observational data requires conditioning on the parents of $X_i$, the variance of our estimators depends on $\P{X_i=j|\calP_i}$, rather than simply being a function of the number of times we observe $X_i=j$ as in the parallel bandit case. For example consider the graph in \cref{fig:causalStructure_confounded}. In this model 
+Since estimating $\P{Y|do(X_i=j)}$ from observational data requires conditioning on the parents of $X_i$, the variance of our estimators depends on $\P{X_i=j|\calP_i}$, rather than simply being a function of the number of times we observe $X_i=j$ as in the parallel bandit case. For example consider the graph in Figure \ref{fig:causalStructure_confounded}. In this model 
 $P(Y|do(X_i = j) = \sum_z P(Y|X_i = j,Z)P(Z)$. Let $P(z=1)=.5$, $P(X_i = 1|z = 1) = 1$, and $P(X_i = 0|z = 0) = 1$ then $P(X_i = 1) = .5$ but we will be unable to estimate $P(Y|do(X_i = 1))$ as we will never get any data for the term $P(Y|X_i = 1, Z = 0)$.
 
 \begin{figure}[h]
@@ -51,7 +51,7 @@ P(Y_t|do(X_{t,i} = j))= & \nonumber \\
  \sum_{j'}  P(Y_t|do(X_{t,l} & = j'),X_{t,i} = j)P(X_{t,l} = j')
 }
 
-Consider the graph in \cref{fig:causalchain}, where each variable deterministically takes the value of its parent,$X_k = X_{k-1}$ for $k\in {N...2}$ and $\P{X_1} = 0$. We can learn the reward for all the arms $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$. If we only considered information transfer from one action to another for the case of the $do()$ action, we would have to explicitly play each of these arms individually to estimate their rewards. 
+Consider the graph in Figure \ref{fig:causalchain}, where each variable deterministically takes the value of its parent,$X_k = X_{k-1}$ for $k\in {N...2}$ and $\P{X_1} = 0$. We can learn the reward for all the arms $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$. If we only considered information transfer from one action to another for the case of the $do()$ action, we would have to explicitly play each of these arms individually to estimate their rewards. 
 
 \begin{figure}[h]
 \centering

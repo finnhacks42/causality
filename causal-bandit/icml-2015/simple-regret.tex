@@ -38,152 +38,21 @@ Algorithm \ref{alg:simple} satisfies
 Note that algorithms designed for finite-armed bandits would explore interventions more uniformly and achieve a regret of $\Omega(\sqrt{N/T})$.
 Since $m$ is typically much smaller than $N$ we anticipate that the new algorithm will significantly outperform classical bandit algorithms in
 this setting.
+We prove a lower bound on the simple regret that matches up to logarithmic factors the upper bound given in Theorem \ref{thm:uq-simple}
 
-The proof of Theorem \ref{thm:uq-simple} requires some lemmas, the first of which is an immediate consequence of the Chernoff bound.
-
-\begin{lemma}\label{lem:conc1}
-Let $i \in \set{1,\ldots, N}$ and $\delta > 0$. Then
+\begin{theorem}\label{thm:lower}
+Suppose $\boldsymbol{q}$ satisfies $m(\boldsymbol{q}) = m$.
+Then for all strategies there exists a reward function such that
 \eq{
-\P{\left|\hat q_i - q_i\right| \geq \sqrt{\frac{6q_i}{T} \log \frac{2}{\delta}}} \leq \delta\,.
+\simpleregret \geq \frac{\frac{m}{2e} - 1}{m} \sqrt{\frac{2m}{3T}} = \Omega\left(\sqrt{\frac{m}{T}}\right)\,.
 }
-\end{lemma}
+\end{theorem}
 
-\iffalse
-\begin{proof}
-Let $Z_t = \ind{X_{i,t} = 1} \in \set{0,1}$.
-Then
-\eq{
-\hat q_i = \frac{2}{T} \sum_{t=1}^{T/2} Z_t\,.
-}
-Now $Z_1,\ldots,Z_{T/2}$ is an i.i.d.\ sequence of Bernoulli random variables with with mean $q_i$. The result follows from the Chernoff bound.
-\end{proof}
+\ifsup
+The proof of Theorems \ref{thm:uq-simple} and \ref{thm:lower} may be found in Sections \ref{sec:thm:uq-simple} and \ref{sec:thm:lower}.
+\else
+The proof of Theorems \ref{thm:uq-simple} and \ref{thm:lower} may be found in the supplementary material.
 \fi
 
-\begin{lemma}\label{lem:m_est}
-Let $\delta >0$ and assume $T \geq 48m \log\frac{4N}{\delta}$. Then
-\eq{
-\P{\hat m < \frac{2}{3}m} \leq \delta\ \text{ and } \P{\hat m > 2m} \leq \delta\,.
-}
-\end{lemma}
-
-\begin{proof}
-Let $\boldsymbol{q}^b$ and $\boldsymbol{q}^{ub}$ and be the maximally balanced and unbalanced $\boldsymbol{q}$ for a given $m$ respectively.
-\eq{
-q^{ub}_i = \begin{cases}
-0 & \text{if } i \leq m \\
-\frac{1}{m} & \text{otherwise}\,.
-\end{cases} \\
-q^b_i < \begin{cases}
-\frac{1}{m} & \text{if } i \leq m \\
-1 & \text{otherwise}\,.
-\end{cases}  
-}
-For $\hat{m}$ to over-estimate $m$, we must identify some balanced arms as unbalanced. For $\hat{m}$ to under-estimate $m$, we must identify some unbalanced arms as balanced.
-\eq{
-\P{\hat m > 2m} \leq \P{\hat m > 2m|\boldsymbol{q} = \boldsymbol{q}^{ub}}\\
-\P{\hat m < \frac{2}{3}m} \leq \P{\hat m < \frac{2}{3}m|\boldsymbol{q} = \boldsymbol{q}^{b}}
-}
-
-Given $\boldsymbol{q} = \boldsymbol{q}^{ub}$, we have by Lemma \ref{lem:conc1}, with probability at least $1 - \delta$ that: 
-
-\eq{
-& \left| \hat q_i - q_i\right| 
- \leq \begin{cases}
-0 & \text{if } i \leq m\\
-\sqrt{\frac{6}{mh} \log\frac{2}{\delta}} & \text{otherwise} \\
-\end{cases}\\
-\implies &
-\begin{cases}
-(\forall i \leq m) \qquad \left| \hat q_i - 0\right| = 0 \\
-(\forall i > m) \qquad \left| \hat q_i - \frac{1}{m}\right| \leq \frac{1}{2m} \\ %\; \text{, taking the union bound and assuming } h \geq 24m \log\frac{4N}{\delta}\\
-\end{cases}\\
-\implies &
-\begin{cases}
-(\forall i \leq m) \qquad  \hat q_i  = 0 \\
-(\forall i > m) \qquad \hat q_i \in [\frac{1}{2m}, \frac{3}{2m}]\\
-\end{cases}\\
-\implies & \hat{m} \leq 2m
-}
-
-Given $\boldsymbol{q} = \boldsymbol{q}^{b}$, we have by Lemma \ref{lem:conc1}, with probability at least $1 - \delta$ that: 
-
-\eq{
-& \left| \hat q_i - q_i\right| 
- \leq \sqrt{\frac{6}{mh} \log\frac{2}{\delta}} \qquad \text{if } i \leq m \\
-\implies &
-(\forall i \leq m) \qquad  \hat q_i \leq \frac{3}{2m} \\
-\implies & \hat{m} \geq \frac{2m}{3}
-}
-
-\end{proof}
-
-\begin{proof}[Proof of \cref{thm:simple-regret}]
-
-
-for $(i,j)\in A$, the algorithm explicitly selects the action, $X_i = j$,  $\frac{h}{2\hat m}$ times.
-\eq {
-\hat \mu_{i,j} = \frac{2\hat m}{h} \sum_{t=1}^{h/2\hat m} r_t(X_i = j)
-}
-
-Via Hoeffding's Inequality
-
-\eq {
-\P{ \left|\hat \mu_{i,j} - \mu_{i,j}\right| > \epsilon } \leq 2\exp{-\frac{h\epsilon^2}{\hat{m}}}
-}
-
-for $(i,j)\notin A$, the algorithm has observed the reward given $X_i = j$ at least $\frac{h}{2\hat m}$ times.
-
-\eq {
-(i,j)\notin A & \implies \hat{s}_i \geq \frac{1}{\hat m} \\
-& \implies \sum_{t=1}^h \ind{X_i = j} \geq \frac{h}{\hat{m}}
-}
-
-Let  $Z_{ij} = \sum_{t=1}^{h/2} \ind{X_i = j}$ and $t'_1 ... t'_{Z_{ij}} = {t:X_{i,t} = j}$
-
-\eq {
-\hat \mu_{i,j} = \frac{1}{Z_{ij}}\sum_{t'=1}^{Z_{ij}}r_{t'}
-}
-
-
-\eq {
-\P{\left| \hat \mu_{i,j} - \mu_{ij} \right| > \epsilon} = & \sum_{z=1}^\infty \P{Z_{ij}=z}\P{\left| \frac{1}{Z_{ij}} \sum_{t'=1}^{Z_{ij}}r_{t'} - \mu_{ij} \right| > \epsilon | Z_{ij} = z} \\
-= & \sum_{z=1}^\infty \P{Z_{ij}=z}\P{\left| \frac{1}{z} \sum_{t'=1}^{z}r_{t'} - \mu_{ij} \right| > \epsilon } \\
-\leq & \P{\left| \frac{2\hat m}{h} \sum_{t'=1}^{h/2\hat m}r_{t'} - \mu_{ij} \right| > \epsilon } \sum_{z=1}^\infty \P{Z_{ij}=z} \\
-\leq & 2\exp{-\frac{h\epsilon^2}{\hat{m}}}\\
-}
-
-Applying the union bound over all $2N$ actions.
-\eq{
-& \P{\exists (i,j): \left| \hat \mu_{i,j} - \mu_{i,j} \right| > \epsilon} \leq 4N\exp{-\frac{h\epsilon^2}{\hat{m}}} \\
-\implies & \P{\exists (i,j): \left| \hat \mu_{i,j} - \mu_{i,j} \right| > \sqrt{\frac{\hat m}{h}\log{\frac{4N}{\delta}}}} \leq \delta \\
-}
-
-Now by \cref{lem:m_est}, 
-\eq{
-h \geq 24m \log \frac{4N}{\delta} \implies \P{\hat m > 2m} \leq \delta
-} 
-
-Therefore if $h \geq 24m \log \frac{4N}{\delta}$, we have with probability at least $1 - 2\delta$ that
-
-\eqn{
-\label{eqn:joint_bound_estimates_m}
-(\forall i, j) \qquad \left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{2m}{h} \log\frac{4N}{\delta}}\, \text { and } \hat{m} \leq 2m
-}
-Suppose $h < 24m \log \frac{4N}{\delta}$. Then
-\eq{
-\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq 1 \leq \sqrt{\frac{2m}{h} \log \frac{4N}{\delta}}\,.
-}
-Therefore
-\eq{
-\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{24m}{h} \log \frac{4N}{\delta}} \qquad \forall h\ \text{ with probability at least } 1-2\delta
-}
-Therefore 
-\eq{
-R_s(h) 
-&\leq 2\delta + \sqrt{\frac{24m}{h} \log \frac{4N}{\delta}} \\
-&\leq \frac{8m}{h} + \sqrt{\frac{24m}{h} \log \left(\frac{Nh}{m}\right)}
-}
-as required.
-\end{proof}
 
 

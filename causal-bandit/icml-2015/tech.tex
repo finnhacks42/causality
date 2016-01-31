@@ -5,8 +5,211 @@
 \newcommand{\EE}{\mathbb E}
 \newcommand{\Pn}[2]{\operatorname{P}_{#1}\left\{#2\right\}}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PROOF OF SIMPLE REGRET UPPER BOUND
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Proof of Theorem \ref{thm:uq-simple}}\label{sec:thm:uq-simple}
 
-\subsection*{Truncated Importance Sampling}
+The proof of Theorem \ref{thm:uq-simple} requires some lemmas, the first of which is an immediate consequence of the Chernoff bound.
+
+\begin{lemma}\label{lem:conc1}
+Let $i \in \set{1,\ldots, N}$ and $\delta > 0$. Then
+\eq{
+\P{\left|\hat q_i - q_i\right| \geq \sqrt{\frac{6q_i}{T} \log \frac{2}{\delta}}} \leq \delta\,.
+}
+\end{lemma}
+
+
+\begin{lemma}\label{lem:m_est}
+Let $\delta >0$ and assume $T \geq 48m \log\frac{4N}{\delta}$. Then
+\eq{
+\P{\hat m < \frac{2}{3}m} \leq \delta\ \text{ and } \P{\hat m > 2m} \leq \delta\,.
+}
+\end{lemma}
+
+\begin{proof}
+Let $\boldsymbol{q}^b$ and $\boldsymbol{q}^{ub}$ and be the maximally balanced and unbalanced $\boldsymbol{q}$ for a given $m$ respectively.
+\eq{
+q^{ub}_i = \begin{cases}
+0 & \text{if } i \leq m \\
+\frac{1}{m} & \text{otherwise}\,.
+\end{cases} \\
+q^b_i < \begin{cases}
+\frac{1}{m} & \text{if } i \leq m \\
+1 & \text{otherwise}\,.
+\end{cases}  
+}
+For $\hat{m}$ to over-estimate $m$, we must identify some balanced arms as unbalanced. For $\hat{m}$ to under-estimate $m$, we must identify some unbalanced arms as balanced.
+\eq{
+\P{\hat m > 2m} \leq \P{\hat m > 2m|\boldsymbol{q} = \boldsymbol{q}^{ub}}\\
+\P{\hat m < \frac{2}{3}m} \leq \P{\hat m < \frac{2}{3}m|\boldsymbol{q} = \boldsymbol{q}^{b}}
+}
+
+Given $\boldsymbol{q} = \boldsymbol{q}^{ub}$, we have by Lemma \ref{lem:conc1}, with probability at least $1 - \delta$ that: 
+
+\eq{
+& \left| \hat q_i - q_i\right| 
+ \leq \begin{cases}
+0 & \text{if } i \leq m\\
+\sqrt{\frac{6}{mh} \log\frac{2}{\delta}} & \text{otherwise} \\
+\end{cases}\\
+\implies &
+\begin{cases}
+(\forall i \leq m) \qquad \left| \hat q_i - 0\right| = 0 \\
+(\forall i > m) \qquad \left| \hat q_i - \frac{1}{m}\right| \leq \frac{1}{2m} \\ %\; \text{, taking the union bound and assuming } h \geq 24m \log\frac{4N}{\delta}\\
+\end{cases}\\
+\implies &
+\begin{cases}
+(\forall i \leq m) \qquad  \hat q_i  = 0 \\
+(\forall i > m) \qquad \hat q_i \in [\frac{1}{2m}, \frac{3}{2m}]\\
+\end{cases}\\
+\implies & \hat{m} \leq 2m
+}
+
+Given $\boldsymbol{q} = \boldsymbol{q}^{b}$, we have by Lemma \ref{lem:conc1}, with probability at least $1 - \delta$ that: 
+
+\eq{
+& \left| \hat q_i - q_i\right| 
+ \leq \sqrt{\frac{6}{mh} \log\frac{2}{\delta}} \qquad \text{if } i \leq m \\
+\implies &
+(\forall i \leq m) \qquad  \hat q_i \leq \frac{3}{2m} \\
+\implies & \hat{m} \geq \frac{2m}{3}
+}
+
+\end{proof}
+
+\begin{proof}[Proof of Theorem \ref{thm:simple-regret}]
+
+
+for $(i,j)\in A$, the algorithm explicitly selects the action, $X_i = j$,  $\frac{h}{2\hat m}$ times.
+\eq {
+\hat \mu_{i,j} = \frac{2\hat m}{h} \sum_{t=1}^{h/2\hat m} r_t(X_i = j)
+}
+
+Via Hoeffding's Inequality
+
+\eq {
+\P{ \left|\hat \mu_{i,j} - \mu_{i,j}\right| > \epsilon } \leq 2\exp{-\frac{h\epsilon^2}{\hat{m}}}
+}
+
+for $(i,j)\notin A$, the algorithm has observed the reward given $X_i = j$ at least $\frac{h}{2\hat m}$ times.
+
+\eq {
+(i,j)\notin A & \implies \hat{s}_i \geq \frac{1}{\hat m} \\
+& \implies \sum_{t=1}^h \ind{X_i = j} \geq \frac{h}{\hat{m}}
+}
+
+Let  $Z_{ij} = \sum_{t=1}^{h/2} \ind{X_i = j}$ and $t'_1 ... t'_{Z_{ij}} = {t:X_{i,t} = j}$
+
+\eq {
+\hat \mu_{i,j} = \frac{1}{Z_{ij}}\sum_{t'=1}^{Z_{ij}}r_{t'}
+}
+
+
+\eq {
+\P{\left| \hat \mu_{i,j} - \mu_{ij} \right| > \epsilon} = & \sum_{z=1}^\infty \P{Z_{ij}=z}\P{\left| \frac{1}{Z_{ij}} \sum_{t'=1}^{Z_{ij}}r_{t'} - \mu_{ij} \right| > \epsilon | Z_{ij} = z} \\
+= & \sum_{z=1}^\infty \P{Z_{ij}=z}\P{\left| \frac{1}{z} \sum_{t'=1}^{z}r_{t'} - \mu_{ij} \right| > \epsilon } \\
+\leq & \P{\left| \frac{2\hat m}{h} \sum_{t'=1}^{h/2\hat m}r_{t'} - \mu_{ij} \right| > \epsilon } \sum_{z=1}^\infty \P{Z_{ij}=z} \\
+\leq & 2\exp{-\frac{h\epsilon^2}{\hat{m}}}\\
+}
+
+Applying the union bound over all $2N$ actions.
+\eq{
+& \P{\exists (i,j): \left| \hat \mu_{i,j} - \mu_{i,j} \right| > \epsilon} \leq 4N\exp{-\frac{h\epsilon^2}{\hat{m}}} \\
+\implies & \P{\exists (i,j): \left| \hat \mu_{i,j} - \mu_{i,j} \right| > \sqrt{\frac{\hat m}{h}\log{\frac{4N}{\delta}}}} \leq \delta \\
+}
+
+Now by Lemma \ref{lem:m_est}, 
+\eq{
+h \geq 24m \log \frac{4N}{\delta} \implies \P{\hat m > 2m} \leq \delta
+} 
+
+Therefore if $h \geq 24m \log \frac{4N}{\delta}$, we have with probability at least $1 - 2\delta$ that
+
+\eqn{
+\label{eqn:joint_bound_estimates_m}
+(\forall i, j) \qquad \left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{2m}{h} \log\frac{4N}{\delta}}\, \text { and } \hat{m} \leq 2m
+}
+Suppose $h < 24m \log \frac{4N}{\delta}$. Then
+\eq{
+\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq 1 \leq \sqrt{\frac{2m}{h} \log \frac{4N}{\delta}}\,.
+}
+Therefore
+\eq{
+\left|\hat \mu_{i,j} - \mu_{i,j}\right| \leq \sqrt{\frac{24m}{h} \log \frac{4N}{\delta}} \qquad \forall h\ \text{ with probability at least } 1-2\delta
+}
+Therefore 
+\eq{
+R_s(h) 
+&\leq 2\delta + \sqrt{\frac{24m}{h} \log \frac{4N}{\delta}} \\
+&\leq \frac{8m}{h} + \sqrt{\frac{24m}{h} \log \left(\frac{Nh}{m}\right)}
+}
+as required.
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LOWER BOUND
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Proof of Theorem \ref{thm:lower}}\label{sec:thm:lower}
+
+\todot{Change this to Bernoulli}
+Assume without loss of generality that $q_i \leq 1/2$ for all $i$ and that $q_1 \leq q_2 \leq \ldots \leq q_N$.
+For each $i$ define reward function $r_i$ by
+\eq{
+r_0(\boldsymbol{X}) &= 0 &
+r_i(\boldsymbol{X}) &= \begin{cases}
+\epsilon & \text{if } X_i = 1 \\
+0 & \text{otherwise}\,,
+\end{cases}
+}
+where $\epsilon > 0$ is some constant to be chosen later.
+We abbreviate $R_{T,i}^{\text{simple}}$ to be the expected simple regret incurred when interacting with the
+environment determined by $\boldsymbol{q}$ and $r_i$. Let $P_i$ be the corresponding measure
+on all observations over all $T$ rounds and $\mathbb E_i$ the expectation with respect to $P_i$. By Lemma 2.6 by \cite{Tsy08} we have
+\eq{
+\Prz{I_T = i} + \Pri{I_T \neq i} \geq \exp\left(-\KL(P_0, P_i)\right)\,,
+}
+where $\KL(P_0, P_i)$ is the KL divergence between measures $P_0$ and $P_i$.
+Let $T_i(T) = \sum_{t=1}^T \ind{I_t = i}$ be the total number of times the learner intervenes on variable $i$ (with any intervention). 
+Then for $i \leq m$ a computation shows that 
+\todot{Need to add at minimum some citations here}
+\eq{
+\KL(P_0, P_i) 
+&= \frac{\epsilon^2}{2} \mathbb E_0\left[\sum_{t=1}^T \ind{X_{t,i} = 1}\right] \\
+&\leq \frac{\epsilon^2}{2} \left(\mathbb E_0 T_i(T) + q_i T\right) \\
+&\leq \frac{\epsilon^2}{2} \left(\mathbb E_0 T_i(T) + \frac{T}{m}\right)\,.
+}
+Define set $A$ by
+\eq{
+A = \set{i \leq m : \mathbb E_0 T_i(T) \leq 2T / m}\,.
+}
+Then for $i \in A$ and choosing $\epsilon = \sqrt{2m/3T}$ we have
+\eq{
+\KL(P_0, P_i) \leq \frac{3T\epsilon^2}{2m} = 1\,. 
+}
+Now $\sum_{i=1}^m \mathbb E_0 T_i(T) \leq T$, which implies that $|A| \geq m/2$.
+Therefore
+\eq{
+\sum_{i \in A} \Pri{I_T \neq i} 
+&\geq \sum_{i \in A} \exp\left(-\KL(P_0, P_i)\right) - 1\\
+&\geq \frac{|A|}{e} - 1 
+\geq \frac{m}{2e} - 1\,.
+}
+Therefore there exists an $i \in A$ such that
+\eq{
+\Pri{I_T \neq i} \geq \frac{\frac{m}{2e} - 1}{m}\,.
+}
+Therefore
+\eq{
+R^{\text{simple}}_{T,i} \geq \frac{1}{2} P_i(I_T \neq i) \epsilon \geq \frac{\frac{m}{2e} - 1}{2m} \sqrt{\frac{2m}{3T}}
+}
+as required.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TRUNCATED IMPORTANCE SAMPLING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Truncated Importance Sampling}
 
 Let $P$ and $Q$ be distributions on $\Omega = \set{0,1}^N$ and let $Y \in \set{0,1}$ be defined in terms of its conditional expectation given $X \in \Omega$.
 \eq{
@@ -142,8 +345,8 @@ N_{ij} = \max\set{0, \ceil{\frac{1}{\epsilon^2} - \sum_{k \in \calP_i} \sum_{l \
 
 
 \begin{theorem}
-Let $\delta = 1/(2NT)$ and $\epsilon$ be the smallest value for which \cref{alg:alloc} returns true. 
-Let $N_{ij}$ as computed by \cref{alg:alloc} be the number of times the algorithm selects the action $do(X_i = j)$ 
+Let $\delta = 1/(2NT)$ and $\epsilon$ be the smallest value for which Algorithm \ref{alg:alloc} returns true. 
+Let $N_{ij}$ as computed by Algorithm \ref{alg:alloc} be the number of times the algorithm selects the action $do(X_i = j)$ 
 and computes estimates using the mixture estimator described in the previous section. Choosing $I_T = \argmax_{ij} \hat \mu_{ij}$ leads
 to
 \eq{

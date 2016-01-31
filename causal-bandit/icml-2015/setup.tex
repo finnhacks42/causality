@@ -17,7 +17,8 @@ Values for all non-intervened variables $\vec{X}^c_t$ are sampled from $\P{\vec{
 
 Although we will focus on the intervene-observe-reward ordering of events within each round, others are also possible. 
 If the non-intervened variables are observed before an intervention is selected our framework reduces to stochastic contextual bandits, which are already well understood~\citep{Agarwal2014}. 
-Even if no observations are made during the rounds, the causal model may still allow offline pruning of the set of allowable interventions thereby reducing the complexity.
+Even if no observations are made during the rounds, the causal model may still allow offline pruning of the set of 
+allowable interventions thereby reducing the complexity.
 
 We will consider and analyse two different goals for the learner: 1) identifying the intervention with highest expected reward by round $T$, and 2) maximising the total expected reward over all $T$ rounds. 
 We denote the expected reward for the intervention $do(\vec{X} = \vec{x})$ by $\mu_{\vec{x}} := \E{Y | do(\vec{X} = \vec{x})}$ and the optimal expected reward by $\mu^* := \max_{\vec{x}} \mu_{\vec{x}}$.
@@ -108,7 +109,7 @@ on $X_{t,i} = j$. Formally,
 \label{eq:observe}
 \P{Y_t \leq y|do(X_{t,i} = j)} = \P{Y_t \leq y|do(),X_{t,i} = j}\,.
 }
-This follows from application of the do-calculus \cite{Pearl2000} to the causal graph for the parallel bandits problem (\cref{fig:causalStructure}). It is not the case in general. 
+This follows from application of the do-calculus \cite{Pearl2000} to the causal graph for the parallel bandits problem (Figure \ref{fig:causalStructure}). It is not the case in general. 
 For example if there was a variable $X'$ that caused both $X_{t,i}$ and $Y$ (or $X_{t,i}$ and any other variable $X_{t,l}$),that would introduce a backdoor path from $X_{t,i} \rightarrow Y_t$ and we would have to condition on $X'$ to derive the interventional distribution of $Y_t$ from the observational one.
 
 This enables us to estimate the the rewards for multiple interventions simultaneously by observing the values taken by the variables when we select the $do()$ action. Unfortunately interventions that occur with low probability ($\P{X_{t,i} = j}$ is small) suffer from a high approximation error and need to be explored separately, by explicitly making the intervention. 
