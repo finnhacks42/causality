@@ -25,7 +25,7 @@ where $\Omega = \set{0,1}^N$. The problem of learning the optimal intervention i
 by the dependencies between the random variables. Learning from observational data is no longer straightforward
 because variables can be correlated through their parents. Consider, for example, the causual model below where $X_1$
 deterministically causes $X_2$ and $X_3$, which ensures that $X_2 = X_3$ for all observational data. Now suppose $r(X) = \ind{X_2 \neq X_3}$,
-then intervening on either $X_2$ or $X_3$ is optimal. But the positive reward is never observed from observational samples only, despite
+then intervening on either $X_2$ or $X_3$ is optimal. But the positive reward is never observed from observational samples, despite
 the fact that $\P{X_2 = 1} = \P{X_3 = 1} = \frac{1}{2}$.
 \begin{figure}[h]
 \centering
@@ -130,10 +130,14 @@ a mixture of truncated importance weighted estimators.
 \hat \mu_{ij} 
 = 
 \frac{
-  \eta_{ij} \sum_{t=1}^{T/2} \frac{Z_{ij}(t)}{T/2} + \sum_{kl \in \calA_i} \eta_{ijkl} \sum_{t=1}^{N_{kl}} \frac{Z_{ijkl}(t)}{N_{kl}}}
-    {\eta_{ij} + \sum_{kl \in \calA_i} \eta_{ijkl}}\,,
+  \eta_{ij} \sum_{t=1}^{T/2} \frac{Z_{ij}(t)}{T/2} + \sum_{kl \in \calA_{ij}} \eta_{ijkl} \sum_{t=1}^{N_{kl}} \frac{Z_{ijkl}(t)}{N_{kl}}}
+    {\eta_{ij} + \sum_{kl \in \calA_{ij}} \eta_{ijkl}}\,,
 }
-where $\calA_i = \set{k, l : k \text{ is a ancestor of } i \text{ and } l \in \set{0,1}}$ and
+where 
+\eq{
+\calA_{ij} = \set{ij} \cup \set{kl : k \text{ is a ancestor of } i \text{ and } l \in \set{0,1}}
+}
+and
 \eq{
 \eta_{ij} &= \frac{T/2}{V_{ij}} &
 V_{ij} &= \EE_{\operatorname{P}_{ij}} \left[\frac{\Pn{ij}{X = x}}{\P{X = x}}\right] \\
@@ -151,7 +155,7 @@ The proof follows from an application of Bernstein's inequality and may be found
 \begin{theorem}\label{thm:estimate}
 The estimator $\hat \mu_{ij}$ satisfies:
 \eq{
-\P{\left|\hat \mu_{ij} - \mu\right| \geq \sqrt{\frac{1}{\sum_{k \in \calA_i, l \in \set{0,1}} \frac{N_{kl}}{V_{ijkl}}} \log\frac{1}{\delta}}} \leq \delta\,.
+\P{\left|\hat \mu_{ij} - \mu\right| \geq \sqrt{\frac{1}{\sum_{kl \in \calA_{ij}} \frac{N_{kl}}{V_{ijkl}}} \log\frac{1}{\delta}}} \leq \delta\,.
 }
 \end{theorem}
 
@@ -164,7 +168,7 @@ This is acheived by finding the smallest $\epsilon > 0$ such that {\sc CheckVali
 \caption{CheckValid}\label{alg:alloc}
 \begin{algorithmic}
 \STATE {\bf Input:} $\epsilon > 0$, $\delta > 0$, $\operatorname P_{ij}$ for all $ij$
-\STATE Compute $o_1,\ldots,o_N \in \set{1,\ldots,N}$ such that $\calA_i \subseteq \set{o_k : k < i}$ for all $i$
+\STATE Compute $o_1,\ldots,o_N \in \set{1,\ldots,N}$
 \FOR{$i \in \set{o_1,\ldots,o_N}$ and $j \in \set{0,1}$}
 \STATE Compute variances:
 \eq{
