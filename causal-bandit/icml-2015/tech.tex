@@ -1,0 +1,166 @@
+
+\newcommand{\Pij}[1]{\operatorname{P}_{ij}\!\left\{#1\right\}}
+\newcommand{\Pkl}[1]{\operatorname{P}_{kl}\!\left\{#1\right\}}
+\newcommand{\Q}[1]{\operatorname{Q}\left\{#1\right\}}
+\newcommand{\EE}{\mathbb E}
+\newcommand{\Pn}[2]{\operatorname{P}_{#1}\left\{#2\right\}}
+
+
+\subsection*{Truncated Importance Sampling}
+
+Let $P$ and $Q$ be distributions on $\Omega = \set{0,1}^N$ and let $Y \in \set{0,1}$ be defined in terms of its conditional expectation given $X \in \Omega$.
+\eq{
+\forall x \in \Omega \qquad \EE[Y|X = x] = r(x)\,,
+}
+where $r:\Omega \to [0,1]$ is some unknown function.
+We tackle the problem of estimating $\mu = \EE_Q r = \sum_x \Q{x} r(x)$ using
+samples of $X$ and $Y$ with $X$ sampled from $P$.
+Define random variable $R(x) = Q(x)/P(x)$ and estimator $Z$ by
+\eqn{
+\label{eq:truncated}
+Z = Y R \ind{R < B}\,,
+}
+which trivially satisfies $|Z| \leq B$ surely.
+Note that the usual importance weighted estimator would be $YR$, which if $Q$ is absolutely continuous with respect to $P$ satisfies $\EE_P YR = \mu$. Unfortunately
+this estimator may suffer from poor concentration, a problem that can be mitigated via the truncation in (\ref{eq:truncated}) at the cost of some bias.
+Computing the expectation we see
+\eq{
+\EE_P[Z] = \mu - \beta\,.
+}
+where $\beta \geq 0$ is the negative bias and satisfies
+\eq{
+\beta \leq \Q{R \geq B}\,.
+}
+Bounding the variance is also straightforward.
+\eq{
+\Var[Z] 
+\leq \EE[Z^2] 
+=\sum_x \P{X = x} Z(x)^2 
+\leq \sum_x \P{X = x} \left(\frac{\Q{X = x}}{\P{X = x}}\right)^2 
+\leq \sum_x \Q{X = x} \frac{\Q{X = x}}{\P{X = x}} 
+= V\,.
+}
+The bias can be controlled in terms of $V$ via Markov's inequality.
+\eq{
+\beta 
+\leq \Q{R \geq B} 
+\leq \frac{\EE_Q[R]}{B}
+= \frac{V}{B}\,.
+}
+Finally let $\delta > 0$ be the desired confidence level and choose 
+\eq{
+B = \sqrt{\frac{V n}{\log\frac{1}{\delta}}}\,,
+}
+which implies that the negative bias satisfies
+\eq{
+\beta \leq \sqrt{\frac{V}{n} \log \frac{1}{\delta}}\,. 
+}
+Let $Z_1,\ldots,X_n$ be $n$ i.i.d.\ copies of $Z$. Then by the Bernstein inequality we have
+\eq{
+\P{\left|\frac{1}{n} \sum_{t=1}^n Z - \mu\right| \geq \sqrt{\frac{V}{n} \log\frac{1}{\delta}}} \leq \delta\,.
+}
+
+\subsection*{Mixing Truncate Importance Sampling}
+
+Now we study the problem of estimating $\mu = \EE_Q \P{Y = 1|X}$ from samples drawn
+from a set of sampling distributions $\operatorname{P}_1,\ldots,\operatorname{P}_k$ with $N_i$ samples
+drawn of $\operatorname{P}_i$.
+Let $R_i(x) = \Q{x} / \Pn{i}{x}$ and
+\eq{
+V_i = \sum_{x \in \Omega} \Q{X = x} \frac{\Q{X = x}}{\Pn{i}{X = x}}
+}
+and
+\eq{
+Z_i = Y R_i \ind{R_i < B_i}\,,
+}
+where
+\eq{
+B_i = V_i \sqrt{\frac{\sum_{i=1}^k \frac{N_i}{V_i}}{\log \frac{1}{\delta}}}\,,
+}
+which for $k = 1$ reduces to the choice of $B$ in the previous section.
+Then $\EE_{\operatorname{P_i}} Z_i = \mu - \beta$ where
+\eq{
+0 \leq \beta_i 
+\leq \frac{V_i}{B_i}
+= \sqrt{\frac{1}{\sum_{i=1}^k \frac{N_i}{V_i}} \log\frac{1}{\delta}}\,.
+}
+Let $\eta_i \in [0,1]$ be a mixture coefficient that minimises the variance of the mixture 
+estimator, which weights samples from $\operatorname{P_i}$ by a bound on its inverse variance, which is $V_i / N_i$.
+\eq{
+\eta_i = \frac{\frac{N_i}{V_i}}{\sum_k \frac{N_k}{V_k}}\,.
+}
+Let $Z_{i,1},\ldots,Z_{i,N_i}$ be $N_i$ copies of $Z_i$ for each $i$.
+Then we define the mixture estimator by
+\eq{
+\hat \mu = \frac{\sum_i \eta_i \sum_{t=1}^{N_i} \frac{Z_{it}}{N_i}}{\sum_i \eta_i} 
+}
+Now we prepare to use Bernstein's inequality to control the concentration of $\hat \mu$ about its mean.
+\eq{
+b 
+= \max_i \frac{\frac{\eta_i B_i}{N_i}}{\sum_i \eta_i} 
+= \max_i \frac{\alpha}{\sum_i \frac{N_i}{V_i}} 
+= \frac{1}{\alpha \sqrt{\log\frac{1}{\delta}}}\,.
+}
+Therefore
+\eq{
+\P{\left|\hat \mu - \mu\right| \geq \sqrt{\frac{1}{\sum_{i=1}^k \frac{N_k}{V_k}} \log \frac{1}{\delta}}} \leq \delta\,.
+}
+
+
+\subsection*{General Case}
+
+
+Let $\operatorname P_{ij}$ be the measure on $\Omega$ with $\Pij{X = x} = \P{X = x|do(X_i = j)}$.
+
+\begin{algorithm}[H]
+\caption{CheckValid}\label{alg:alloc}
+\begin{algorithmic}
+\STATE {\bf Input:} $\epsilon > 0$, $\delta > 0$, $\operatorname P_1,\ldots,\operatorname P_N$
+\STATE Compute $o_1,\ldots,o_N \in \set{1,\ldots,N}$ such that $\calP_i \subseteq \set{o_k : k < i}$ for all $i$
+\FOR{$i \in \set{o_1,\ldots,o_N}$}
+\STATE Compute variances:
+\eq{
+\forall k \in \calP_i \text{ and } l \in \set{0,1} \qquad
+V_{ijkl} = \frac{1}{N_{kl}} \EE_{\operatorname P_{ij}}\!\! \left[\frac{\Pij{x}}{\Pkl{x}}\right] 
+}
+\STATE Compute variance for learning from do nothing action:
+\eq{
+V_{ij} = \frac{2}{T} \EE_{\operatorname P_{ij}} \!\!\left[\frac{\Pij{x}}{\P{x}}\right]
+}
+\STATE Compute required budget: 
+\eq{
+N_{ij} = \max\set{0, \ceil{\frac{1}{\epsilon^2} - \sum_{k \in \calP_i} \sum_{l \in \set{0,1}} \frac{1}{V_{ijkl}} - \frac{1}{V_{ij}}}}\,.
+} 
+\ENDFOR
+\IF{$\sum_{i=1}^N \sum_{j \in \set{0,1}} N_{ij} \leq T / 2$}
+\STATE {\bf return true}
+\ELSE
+\STATE {\bf return false}
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+
+\begin{theorem}
+Let $\delta = 1/(2NT)$ and $\epsilon$ be the smallest value for which \cref{alg:alloc} returns true. 
+Let $N_{ij}$ as computed by \cref{alg:alloc} be the number of times the algorithm selects the action $do(X_i = j)$ 
+and computes estimates using the mixture estimator described in the previous section. Choosing $I_T = \argmax_{ij} \hat \mu_{ij}$ leads
+to
+\eq{
+\EE[r_T] \leq \epsilon + \frac{1}{T}\,.
+}
+\end{theorem}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

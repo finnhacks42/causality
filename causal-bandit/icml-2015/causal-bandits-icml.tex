@@ -8,7 +8,7 @@
 \usepackage{algorithmic}
 
 \usepackage{cleveref}
-\usepackage{hyperref}
+%\usepackage{hyperref}
 \newcommand{\theHalgorithm}{\arabic{algorithm}}
 \usepackage{icml2015stylefiles/icml2015} 
 \usepackage{tikz}
@@ -153,7 +153,6 @@ We propose a new algorithm that can make use of the causal feedback and prove th
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 \label{sec:intro}
-
 \input{introduction}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -161,7 +160,6 @@ We propose a new algorithm that can make use of the causal feedback and prove th
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Problem Setup}
 \label{sec:defs}
-
 \input{setup}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -170,7 +168,7 @@ We propose a new algorithm that can make use of the causal feedback and prove th
 \section{Upper Bounds on the Simple Regret}
 \label{sec:simple-regret}
 
-%\input{simple-regret}
+\input{simple-regret}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % UPPER BOUND ON SIMPLE REGRET GENERAL CASE
@@ -205,7 +203,7 @@ We propose a new algorithm that can make use of the causal feedback and prove th
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiments}
 
-%\input{experiments}
+\input{experiments}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DISCUSSION
@@ -214,6 +212,13 @@ We propose a new algorithm that can make use of the causal feedback and prove th
 
 \input{discussion}
 
-\bibliography{library,library2}
-\bibliographystyle{icml2015}
+%\bibliography{library,library2}
+%\bibliographystyle{icml2015}
+
+
+\onecolumn
+
+\input{tech}
+
+
 \end{document}
