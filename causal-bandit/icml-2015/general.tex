@@ -24,7 +24,7 @@ where $\Omega = \set{0,1}^N$. The problem of learning the optimal intervention i
 by the dependencies between the random variables. Learning from observational data is no longer straightforward
 because variables can be correlated through their parents. Consider, for example, the causual model below where $X_1$
 deterministically causes $X_2$ and $X_3$, which ensures that $X_2 = X_3$ for all observational data. Now suppose $r(X) = \ind{X_2 \neq X_3}$,
-then intervening on either $X_2$ or $X_3$ is optimal, but this positive is never observed from observational samples only. This is despite
+then intervening on either $X_2$ or $X_3$ is optimal. But the positive reward is never observed from observational samples only, despite
 the fact that $\P{X_2 = 1} = \P{X_3 = 1} = \frac{1}{2}$.
 \begin{figure}[h]
 \centering
@@ -48,13 +48,8 @@ the fact that $\P{X_2 = 1} = \P{X_3 = 1} = \frac{1}{2}$.
 }
 \end{figure} 
 
-
-
-Since estimating $\P{Y|do(X_i=j)}$ from observational data requires conditioning on the parents of $X_i$, the variance of our estimators depends on $\P{X_i=j|\calP_i}$, rather than simply being a function of the number of times we observe $X_i=j$ as in the parallel bandit case. For example consider the graph in Figure \ref{fig:causalStructure_confounded}. In this model 
-$P(Y|do(X_i = j) = \sum_z P(Y|X_i = j,Z)P(Z)$. Let $P(z=1)=.5$, $P(X_i = 1|z = 1) = 1$, and $P(X_i = 0|z = 0) = 1$ then $P(X_i = 1) = .5$ but we will be unable to estimate $P(Y|do(X_i = 1))$ as we will never get any data for the term $P(Y|X_i = 1, Z = 0)$.
-
-
-For general models, it is also insufficient to only trade off learning about multiple actions by observing against learning individual actions by explicitly playing them. We can also learn about the reward for intervening on one variable from rounds in which we actually set a different variable.
+Another difficulty is that it is no longer sufficient to learn about $\mu_{ij}$ exclusivly from observational data and when $do(X_i = j)$ is chosen.
+We can also learn about the reward for intervening on one variable from rounds in which we actually set a different variable.
 
 \eqn {
 \label{eq:estimation_transfer}
@@ -62,7 +57,11 @@ P(Y_t|do(X_{t,i} = j))= & \nonumber \\
  \sum_{j'}  P(Y_t|do(X_{t,l} & = j'),X_{t,i} = j)P(X_{t,l} = j')
 }
 
-Consider the graph in Figure \ref{fig:causalchain}, where each variable deterministically takes the value of its parent,$X_k = X_{k-1}$ for $k\in {N...2}$ and $\P{X_1} = 0$. We can learn the reward for all the arms $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$. If we only considered information transfer from one action to another for the case of the $do()$ action, we would have to explicitly play each of these arms individually to estimate their rewards. 
+Consider the graph in Figure \ref{fig:causalchain}, where each variable deterministically takes the value of its parent, $X_k = X_{k-1}$ 
+for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. 
+We can learn the reward for all the arms $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$. 
+If we only considered information transfer from one action to another for the case of the $do()$ action, we would have to 
+explicitly play each of these arms individually to estimate their rewards. 
 
 \begin{figure}[h]
 \centering
@@ -70,8 +69,6 @@ Consider the graph in Figure \ref{fig:causalchain}, where each variable determin
 \label{fig:causalchain}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={observed}, hidden/.style={empty}]
-
- %nodes
 \node[main node](1){$X_{1}$};
 \node[main node, right=of 1](2){$X_{2}$};
 \node[hidden, right=of 2](3){$...$};
@@ -79,81 +76,20 @@ Consider the graph in Figure \ref{fig:causalchain}, where each variable determin
 \node[main node, right=of 4](5){Y};
  \path[every node/.style={font=\sffamily\small}]
     (1) edge (2)
-    	(2) edge (3)
+  	(2) edge (3)
     (3) edge (4)
     (4) edge (5);
 \end{tikzpicture}
 \end{figure} 
 
-\todof{From here onwards needs to be replaced by truncated importance sampling version}
-
-Let $r(x) = \P{Y = 1|X = x}$. Then
-
-\eq {
-\mu_{ij} = P(Y = 1|do(X_i = j)) = \sum_{\x:x_i=j} \P{\boldsymbol{X}|do(X_i=j)}r(x)
-}
 
 
-We wish to devise an estimator for $\mu_{ij}$ using $X$ and $Y$ without
-intervening to set $X_i = j$. A natural choice is the importance weighted estimator
-
+Before the algorithm we introduce the truncated importance weighted estimator, which we will use to learn about the returns of 
+specific interventions from observational data, or by intervening on other variables. Let $P$ and $Q$ be distributions on $\Omega$.
+We would like to estimate
 \eq{
-Z_{ij} 
-&= \frac{Y \ind{X_i = j}}{\P{X_i = j|\calP_i(X)}}\,. 
+\mu_Q = \EE_Q r(x) = \sum_{x \in \Omega} Q(x) r(x) 
 }
-
-Checking:
-\eq{
-&\E{Z_{ij}} 
-= \sum_x \frac{\P{X = x} r(x) \P{X = x | do(X_i = j)}}{\P{X = x}} \\
-&= \P{Y = 1| do(X_i = j)} \,. 
-}
-The variance of $Z_{ij}$ may also be bounded
-\eq{
-&\Var[Z_{ij}]
-\leq \E{Z_{ij}^2} \\
-&\leq \sum_x \P{X = x} \left(\frac{\ind{X_i = j}}{\P{X_i = j|\calP_i(X) = \calP_i(x)}}\right)^2 \\
-&= \E{\frac{1}{\P{X_i = j|\calP_i(X)}}} \\
-&= V_{ij}\,.
-}
-In the general graph setting the dimension $m$ has a slightly different definition.
-\eq{
-m = \min\set{m : \sum_{ij} \ind{V_{ij} \leq 1/m} = m}\,.
-}
-
-\todof{I think the above should be}
-
-\eq {
-m = \min \set{m: \sum_{ij} \ind{V_{ij} \geq m} = m}\,.
-}
-
-That is, $m$ should be chosen such that the size of the set variances greater than $m$ is $m$. This ensures all the variances of the remaining arms are smaller than $m$. This definition would also seem equivalent to sorting the variances such that $V^{(0)} \geq V^{(1)} ... \geq V^{(2N)}$ and then defining $m = \min m: V^{(m)} \leq m$ which is in turn equivalent to the definition in terms of $q$ for parallel bandits. 
-
-\begin{algorithm}[H]
-\caption{General Algorithm}
-\begin{algorithmic}
-\STATE {\bf Input:} $N$, $\mathcal P$
-\STATE Compute $m$:
-\eq{
-m = \min\set{m : \sum_{ij} \ind{V_{ij} \leq 1/m} = m}
-}
-\STATE Collect $T/2$ observational samples and estimate $\hat \mu_{ij}$:
-\eq{
-\hat \mu_{ij} = \sum_{t=1}^{T/2} \frac{Y_t \ind{X_{t,i} = j}}{\P{X_{t,i} = j | \mathcal P_i(X_t)}}
-}
-\FOR{$i \in \set{1,\ldots,m}$}
-\STATE For each $i,j $ with $V_{ij} < 1/m$ take action $do(X_i = j)$ for $T/(2m)$ samples $Y^{(ij)}_1,\ldots,Y^{(ij)}_{T/2m}$
-\STATE Update estimate:
-\eq{
-\eta &= \frac{V_{ij}}{V_{ij} + m} \\
-\hat \mu_{ij} &= \eta \left(\frac{2m}{T} \sum_{t=1}^{T/(2m)} Y^{(ij)}_t\right) + (1 - \eta) \hat \mu_{ij}
-}
-\ENDFOR
-\STATE Choose $do(X_i = j)$ for $ij = \argmax_{ij} \hat \mu_{ij}$
-\end{algorithmic}
-\end{algorithm}
-
-
-
+using samples $X \in \Omega$ and $Y \in \set{0,1}$ where $X \sim P$ and $Y = 1$ with probability $r(X)$.
 
 
