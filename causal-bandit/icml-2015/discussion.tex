@@ -56,7 +56,9 @@ We can generalize the (simple regret) algorithm developed for the parallel bandi
 
 The key challenge here is probably in computing the variance of the estimators. This would give us an upper bound for the regret for general graphs. 
 
-It is unclear if this approach remains optimal. The $do()$ action is not the only one that can reveal information about the rewards of multiple other actions. In the example in figure \ref{fig:causalStructure_confounded}, $do(Z)$ is another obvious candidate. We would need to establish a matching lower bound - or prove that $do()$ is always the most revealing action. We are also not using the fact that the rewards are not entirely independent (They are 'almost' independent in the parallel bandit example). To what extent does this apply in general (provided there are many actions?).
+It is unclear if this approach remains optimal. The $do()$ action is not the only one that can reveal information about the rewards of multiple other actions. In the example in figure \ref{fig:causalStructure_confounded}, $do(Z)$ is another obvious candidate. We would need to establish a matching lower bound - or prove that $do()$ is always the most revealing action. 
+
+We are also not using the fact that the rewards are not entirely independent (They are 'almost' independent in the parallel bandit example). This does not apply in general. Consider a chain graph $X_1 \rightarrow X_2 \rightarrow, ..., X_N \rightarrow Y$. In this case $k > i \implies P(Y|do(X_i)) \leq P(Y|do(X_k))$.  
 
 
 \subsection{General graphs with known structure but latent variables}

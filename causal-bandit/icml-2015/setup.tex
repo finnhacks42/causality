@@ -108,33 +108,18 @@ on $X_{t,i} = j$. Formally,
 \label{eq:observe}
 \P{Y_t \leq y|do(X_{t,i} = j)} = \P{Y_t \leq y|do(),X_{t,i} = j}\,.
 }
-This follows from application of the do-calculus \cite{Pearl2000} to the causal graph for the parallel bandits problem (Fig.~\ref{fig:causalStructure}). It is not the case in general. 
-For example if there was a variable $X'$ that caused both $X_{t,i}$ and $Y$ (or $X_{t,i}$ and any other variable $X_{t,l}$), 
-that would introduce a backdoor path from $X_{t,i} \rightarrow Y_t$ and we would have to condition on $X'$ to derive the 
-interventional distribution of $Y_t$ from the observational one.
+This follows from application of the do-calculus \cite{Pearl2000} to the causal graph for the parallel bandits problem (\cref{fig:causalStructure}). It is not the case in general. 
+For example if there was a variable $X'$ that caused both $X_{t,i}$ and $Y$ (or $X_{t,i}$ and any other variable $X_{t,l}$),that would introduce a backdoor path from $X_{t,i} \rightarrow Y_t$ and we would have to condition on $X'$ to derive the interventional distribution of $Y_t$ from the observational one.
 
-\todot{Or just give a reference or hide in the appendix depending on space in the end}
-\color{red} Probably should define causal model and back-door rule to properly show this.\color{black}
+This enables us to estimate the the rewards for multiple interventions simultaneously by observing the values taken by the variables when we select the $do()$ action. Unfortunately interventions that occur with low probability ($\P{X_{t,i} = j}$ is small) suffer from a high approximation error and need to be explored separately, by explicitly making the intervention. 
 
-We can also learn about the reward for intervening on one variable from rounds in which we actually set a different variable.
-
-\eqn {
-\label{eq:estimation_transfer}
-P(Y_t|do(X_{t,i} = j))= & \nonumber \\
- \sum_{j'}  P(Y_t|do(X_{t,l} & = j'),X_{t,i} = j)P(X_{t,l} = j')
-}
-
+To exploit the causal structure we must optimally balance the collection of observational data against making interventions to learn about low probability events. The problem is more challenging because the probabilities $P(X_i=j)$ are unknown and must also be estimated.
 
 \begin{definition}
-Let $\boldsymbol{q} \in [0,1]^N$. Then define $q^{(i)}$ to be the $i$th largest value of the set $\set{\min \set{q_j, 1 - q_j} : 1 \leq j \leq N}$.
-For example
-\eq{
-\boldsymbol{q} &= (0,\, 2/3,\, 1/2,\, 1) \\
-q^{(1)} &= 0,\,\, q^{(2)} = 0,\,\, q^{(3)} = 1/3,\,\, q^{(4)} = 1/2\,.
-}
+Let $V_{ij} = \frac{1}{P(X_i = j)}$, for $i \in \set{1...N}$ and $j \in {0,1}$. 
 Define 
 \eqn{
 \label{def:m}
-m(\boldsymbol{q}) = \min\set{1 \leq i \leq N: q^{(i+1)} \geq \frac{1}{i}}\,.
+m(\boldsymbol{V}) = \min \set{m: \sum_{ij} \ind{V_{ij} \geq m} = m}\,.
 }
 \end{definition}

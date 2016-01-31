@@ -1,13 +1,6 @@
 In this section we develop and analyse an algorithm for minimising the simple regret in the
 causal bandit problem.  
 
-
-The main idea of the algorithm is that by making no intervention (doing nothing) it is possible to estimate simultaneously the returns of all interventions.
-Unfortunately interventions that occur with low probability ($\P{X_{t,i} = j}$ is small) suffer from a high approximation error and should be
-explored separately by actually making the intervention. The algorithm works by optimally balancing the collection of observational data (when
-no action is taken) and making interventions to learn about low probability events. The problem is more challenging because $\boldsymbol{q}$ is
-unknown and must also be estimated.
-
 \begin{algorithm}[h]
 \caption{Causal Best Arm Identification}\label{alg:simple}
 \begin{algorithmic}[1]
@@ -19,12 +12,10 @@ unknown and must also be estimated.
 \eq{
 (\forall i,j) \qquad \hat \mu_{i,j} = \frac{\sum_{t=1}^{T/2} \ind{X_{t,i} = j} r_t}{\sum_{t=1}^{T/2} \ind{X_{t,i} = j}}\,.
 }
-\STATE Compute $\hat q_i = \frac{2}{T} \sum_{t=1}^{T/2} X_{t,i}$
-\STATE Compute $\hat s_i = \min\set{\hat q_i, 1 - \hat q_i}$
-\STATE Compute $\hat{s'} = sorted(\hat{s}) : \hat{s'}_1 \leq \hat{s'_2} \leq ... \leq \hat{s'}_N$
-\STATE Compute $\hat m = \min\set{1 \leq i \leq N : \hat s'_{i+1} \geq \frac{1}{i}}$
+\STATE Compute $\hat V_{ij} = \frac{T}{2 \sum_{t=1}^{T/2}\ind{X_{t,i}=j}} $
+\STATE Compute $\hat m = m(\hat{\boldsymbol{V}})$
 \STATE $i'(i) = $ the index of $\hat s_i$ in $\hat s'$
-\STATE Compute $A$ as the subset of infrequently observed arms $\{(i,j):i'(i) \leq \hat m, j = \ind{\hat q_{i} \leq \frac{1}{2}} \}$ with $|A| = \hat m$
+\STATE Compute $A$ as the subset of infrequently observed arms $\set{(i,j):V_{ij} \geq m}$ with $|A| = \hat m$
 
 \FOR{$(i,j) \in A$}
 \FOR{$t \in 1,\ldots,\frac{T - 1)}{2\hat m}$}
@@ -36,8 +27,6 @@ unknown and must also be estimated.
 \STATE Choose action $do(X_{t,\hat i^*} = \hat j^*)$
 \end{algorithmic}
 \end{algorithm}
-
-
 
 \begin{theorem}\label{thm:uq-simple}
 Algorithm \ref{alg:simple} satisfies
@@ -76,8 +65,6 @@ Let $\delta >0$ and assume $T \geq 48m \log\frac{4N}{\delta}$. Then
 \P{\hat m < \frac{2}{3}m} \leq \delta\ \text{ and } \P{\hat m > 2m} \leq \delta\,.
 }
 \end{lemma}
-
-
 
 \begin{proof}
 Let $\boldsymbol{q}^b$ and $\boldsymbol{q}^{ub}$ and be the maximally balanced and unbalanced $\boldsymbol{q}$ for a given $m$ respectively.
