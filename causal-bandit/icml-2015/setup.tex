@@ -13,7 +13,7 @@ Further details can be found in Chapter 21 of~\cite{Koller2009}.
 A learner for a casual bandit problem is given the casual model's graph $\mathcal{G}$, a set of \emph{observable} variables $\mathcal{O} \subseteq \mathcal{X}$, a set of \emph{allowed interventions} $\mathcal{A}$, a \emph{reward variable} $Y$. 
 The following game is then played over $T$ rounds.
 In round $t$, the learner selects an allowed intervention $do(\vec{X}_t = \vec{x}_t)$ from $\mathcal{A}$.
-Values for all non-intervened variables $\vec{X}^c_t$ are sampled from $\P{\vec{X}^c_t | do(\vec{X}_t = \vec{x}_t)}$. Finally, the learner is shown the sampled values of all the observable variables in $\vec{X}^c_t \cap \mathcal{O}$ and receives the reward $Y_t$.
+Values for all non-intervened variables $\vec{X}^c_t$ are sampled from $\P{\vec{X}^c_t | do(\vec{X}_t = \vec{x}_t)}$. Finally, the learner is shown the sampled values of all the observable variables in $\vec{X}^c_t \cap \mathcal{O}$ and receives the reward $Y_t \in \set{0,1}$.
 
 Although we will focus on the intervene-observe-reward ordering of events within each round, others are also possible. 
 If the non-intervened variables are observed before an intervention is selected our framework reduces to stochastic contextual bandits, which are already well understood~\citep{Agarwal2014}. 
@@ -37,7 +37,8 @@ Cumulative regret is more appropriate for online agents that may continue to ada
 We analyse both cases in \S\ref{sec:simple-regret} and \S\ref{sec:cum-regret}, respectively.
 
 \todom{Mention pruning of actions?}
-We note that classical $K$-armed stochastic bandit problem can be recovered in our framework by considering a simple causal model with one edge connecting a single variable $X$ that can take on $K$ values to a reward variable $Y = r(X) + \eta$ for some arbitrary but unknown, real-valued function $r$ and a noise term $\eta$ that may depend on $X$.
+\todot{I don't understand this at all. Later we are assuming $X_1,\ldots,X_N$ are binary and there are $N$ of them}
+We note that classical $K$-armed stochastic bandit problem can be recovered in our framework by considering a simple causal model with one edge connecting a single variable $X$ that can take on $K$ values to a reward variable $Y \in \set{0,1}$ where $\P{Y = 1|X} = r(X)$ for some arbitrary but unknown, real-valued function $r$.
 The set of allowed interventions in this case is $\mathcal{A} = \{ do(X = k) \colon k \in \{1, \ldots, K\}\}$.
 Conversely, any causal bandit problem can reduced to a classical stochastic $|\mathcal{A}|$-armed bandit problem by treating each possible intervention as an arm and ignoring all sampled values for the observed variables except for the reward.
 Intuitively though, one would expect to perform better by making use of the extra observations.
