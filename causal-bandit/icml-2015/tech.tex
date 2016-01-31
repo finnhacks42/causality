@@ -204,7 +204,7 @@ as required.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TRUNCATED IMPORTANCE SAMPLING
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Truncated Importance Sampling}
+\section*{Truncated Importance Sampling}\label{sec:truncated}
 
 Let $P$ and $Q$ be distributions on $\Omega = \set{0,1}^N$ and let $Y \in \set{0,1}$ be defined in terms of its conditional expectation given $X \in \Omega$.
 \eq{
@@ -304,50 +304,11 @@ Therefore
 }
 
 
-\subsection*{General Case}
+\section*{Proof of Theorem \ref{thm:estimate}}\label{sec:thm:estimate}
 
-\iffalse
-Let $\operatorname P_{ij}$ be the measure on $\Omega$ with $\Pij{X = x} = \P{X = x|do(X_i = j)}$.
+Apply Bernstein's inequality.
 
-\begin{algorithm}[H]
-\caption{CheckValid}\label{alg:alloc}
-\begin{algorithmic}
-\STATE {\bf Input:} $\epsilon > 0$, $\delta > 0$, $\operatorname P_1,\ldots,\operatorname P_N$
-\STATE Compute $o_1,\ldots,o_N \in \set{1,\ldots,N}$ such that $\calP_i \subseteq \set{o_k : k < i}$ for all $i$
-\FOR{$i \in \set{o_1,\ldots,o_N}$}
-\STATE Compute variances:
-\eq{
-\forall k \in \calP_i \text{ and } l \in \set{0,1} \qquad
-V_{ijkl} = \frac{1}{N_{kl}} \EE_{\operatorname P_{ij}}\!\! \left[\frac{\Pij{x}}{\Pkl{x}}\right] 
-}
-\STATE Compute variance for learning from do nothing action:
-\eq{
-V_{ij} = \frac{2}{T} \EE_{\operatorname P_{ij}} \!\!\left[\frac{\Pij{x}}{\P{x}}\right]
-}
-\STATE Compute required budget: 
-\eq{
-N_{ij} = \max\set{0, \ceil{\frac{1}{\epsilon^2} - \sum_{k \in \calP_i} \sum_{l \in \set{0,1}} \frac{1}{V_{ijkl}} - \frac{1}{V_{ij}}}}\,.
-} 
-\ENDFOR
-\IF{$\sum_{i=1}^N \sum_{j \in \set{0,1}} N_{ij} \leq T / 2$}
-\STATE {\bf return true}
-\ELSE
-\STATE {\bf return false}
-\ENDIF
-\end{algorithmic}
-\end{algorithm}
-
-\fi
-\begin{theorem}
-Let $\delta = 1/(2NT)$ and $\epsilon$ be the smallest value for which Algorithm \ref{alg:alloc} returns true. 
-Let $N_{ij}$ as computed by Algorithm \ref{alg:alloc} be the number of times the algorithm selects the action $do(X_i = j)$ 
-and computes estimates using the mixture estimator described in the previous section. Choosing $I_T = \argmax_{ij} \hat \mu_{ij}$ leads
-to
-\eq{
-\EE[r_T] \leq \epsilon + \frac{1}{T}\,.
-}
-\end{theorem}
-
+\todot{Write this up}
 
 
 

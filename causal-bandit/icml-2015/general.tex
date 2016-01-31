@@ -1,5 +1,6 @@
 
 \newcommand{\calP}{\mathcal P}
+\newcommand{\calA}{\mathcal A}
 \newcommand{\x}{\boldsymbol{x}}
 
 We now consider single variable interventions on general causal graphs over binary variables $Y, X_1,\ldots,X_N$. 
@@ -28,7 +29,7 @@ then intervening on either $X_2$ or $X_3$ is optimal. But the positive reward is
 the fact that $\P{X_2 = 1} = \P{X_3 = 1} = \frac{1}{2}$.
 \begin{figure}[h]
 \centering
-\caption{Causal model for the confounded parallel bandits problem}.\label{fig:causalStructure_confounded}
+\caption{}\label{fig:causalStructure_confounded}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={observed}, hidden/.style={empty}]
 \node[main node](1){$X_1$};
@@ -118,19 +119,56 @@ The bias can be controlled in terms of $V$ via Markov's inequality.
 = \frac{V}{B}\,.
 }
 The point is that $B$ can be tuned to trade the bias against the concentration of the estimator,
-the latter of which can be controlled via Bernstein's inequality. 
+the latter of which will be controlled via Bernstein's inequality. 
 
 Let $\operatorname P_{ij}$ be the measure on $\Omega$ with $\Pij{X = x} = \P{X = x|do(X_i = j)}$.
+As in the previous section, the algorithm for learning an optimal intervention on a general graph will 
+collect $T/2$ observational samples by choosing $do()$. It then chooses $do(X_i = j)$ 
+exactly $N_{ij}$ times, where $N_{ij}$ will be chosen shortly. For each $i$ it computes an estimate $\hat \mu_{ij}$ of $\mu_{ij}$ via
+a mixture of truncated importance weighted estimators.
+\eq{
+\hat \mu_{ij} 
+= 
+\frac{
+  \eta_{ij} \sum_{t=1}^{T/2} \frac{Z_{ij}(t)}{T/2} + \sum_{kl \in \calA_i} \eta_{ijkl} \sum_{t=1}^{N_{kl}} \frac{Z_{ijkl}(t)}{N_{kl}}}
+    {\eta_{ij} + \sum_{kl \in \calA_i} \eta_{ijkl}}\,,
+}
+where $\calA_i = \set{k, l : k \text{ is a ancestor of } i \text{ and } l \in \set{0,1}}$ and
+\eq{
+\eta_{ij} &= \frac{T/2}{V_{ij}} &
+V_{ij} &= \EE_{\operatorname{P}_{ij}} \left[\frac{\Pn{ij}{X = x}}{\P{X = x}}\right] \\
+\eta_{ijkl} &= \frac{N_{kl}}{V_{ijkl}} &
+V_{ijkl} &= \EE_{\operatorname{P}_{ij}} \left[\frac{\Pn{ij}{X = x}}{\Pn{kl}{X = x}}\right]
+}
+
+The following theorem controls the concentration of $\hat \mu_{ij}$ about $\mu_{ij}$. 
+\ifsup
+The proof may be found in Appendix \ref{sec:thm:estimate}.
+\else
+The proof follows from an application of Bernstein's inequality and may be found in the supplementary material.
+\fi
+
+\begin{theorem}\label{thm:estimate}
+The estimator $\hat \mu_{ij}$ satisfies:
+\eq{
+\P{\left|\hat \mu_{ij} - \mu\right| \geq \sqrt{\frac{1}{\sum_{k \in \calA_i, l \in \set{0,1}} \frac{N_{kl}}{V_{ijkl}}} \log\frac{1}{\delta}}} \leq \delta\,.
+}
+\end{theorem}
+
+
+All that remains is to choose $N_{ij}$ to minimise the worst-case approximation error in the bound above over all $i$ and $j$.
+This is acheived by finding the smallest $\epsilon > 0$ such that {\sc CheckValid} returns true (see Algorithm \ref{alg:alloc}).
+
 
 \begin{algorithm}[H]
 \caption{CheckValid}\label{alg:alloc}
 \begin{algorithmic}
-\STATE {\bf Input:} $\epsilon > 0$, $\delta > 0$, $\operatorname P_1,\ldots,\operatorname P_N$
-\STATE Compute $o_1,\ldots,o_N \in \set{1,\ldots,N}$ such that $\calP_i \subseteq \set{o_k : k < i}$ for all $i$
+\STATE {\bf Input:} $\epsilon > 0$, $\delta > 0$, $\operatorname P_{ij}$ for all $ij$
+\STATE Compute $o_1,\ldots,o_N \in \set{1,\ldots,N}$ such that $\calA_i \subseteq \set{o_k : k < i}$ for all $i$
 \FOR{$i \in \set{o_1,\ldots,o_N}$ and $j \in \set{0,1}$}
 \STATE Compute variances:
 \eq{
-\forall k \in \calP_i,\, l \in \set{0,1} \quad
+\forall k \in \calA_i,\, l \in \set{0,1} \quad
 V_{ijkl} = \frac{1}{N_{kl}} \EE_{\operatorname P_{ij}}\!\! \left[\frac{\Pij{x}}{\Pkl{x}}\right] 
 }
 \STATE Compute variance for learning from observational data:
@@ -139,16 +177,33 @@ V_{ij} = \frac{2}{T} \EE_{\operatorname P_{ij}} \!\!\left[\frac{\Pij{x}}{\P{x}}\
 }
 \STATE Compute required budget: 
 \eq{
-N_{ij} = \max\set{0, \ceil{\frac{1}{\epsilon^2} - \sum_{k \in \calP_i} \sum_{l \in \set{0,1}} \frac{1}{V_{ijkl}} - \frac{1}{V_{ij}}}}\,.
+N_{ij} = \max\set{0, \ceil{\frac{1}{\epsilon^2} - \sum_{k \in \calA_i} \sum_{l \in \set{0,1}} \frac{1}{V_{ijkl}} - \frac{1}{V_{ij}}}}\,.
 } 
 \ENDFOR
-\IF{$\sum_{i=1}^N \sum_{j \in \set{0,1}} N_{ij} \leq T / 2$}
-\STATE {\bf return true}
-\ELSE
-\STATE {\bf return false}
-\ENDIF
+\STATE {\bf if $\sum_{ij} N_{ij} \leq T/2$} {\bf return} true {\bf else return} false
 \end{algorithmic}
 \end{algorithm}
+
+\todot{discuss role of $delta = 1/(NT)$}
+\todot{define $Z_{ijkl}(t)$ etc.}
+\todot{Define $B_{ijkl}$}
+\begin{theorem}
+Let $\epsilon > 0$ be the smallest value of $\epsilon$ such that Algorithm \ref{alg:alloc} returns true and let $IJ = \argmax_{ij} \hat \mu_{ij}$.
+Then $\mu^* - \E \mu_{IJ} \leq \epsilon + 1/T$.
+\end{theorem}
+
+
+\subsection*{Comparison to Simple Setting}
+
+In Section \ref{sec:simple-regret} we assumed a simple graph structure and unknown distributions on $X_i$, which were then learned from observational
+data. In contrast, in this section we have allow arbitrary (known) graphs, but assumed the distribution on $X$ was known. 
+Using the approach in this section on the simple graph with known distribution leads to 
+\eq{
+\EE \mu^* - \EE \mu_{IJ} \in \bigo{\sqrt{\frac{m}{T} \log \frac{N}{\delta}}}\,, 
+}
+which is the same bound as in the previous section. 
+\todot{finish this}
+
 
 
 
