@@ -214,8 +214,7 @@ where $r:\Omega \to [0,1]$ is some unknown function.
 We tackle the problem of estimating $\mu = \EE_Q r = \sum_x \Q{x} r(x)$ using
 samples of $X$ and $Y$ with $X$ sampled from $P$.
 Define random variable $R(x) = Q(x)/P(x)$ and estimator $Z$ by
-\eqn{
-\label{eq:truncated}
+\eq{
 Z = Y R \ind{R < B}\,,
 }
 which trivially satisfies $|Z| \leq B$ surely.
@@ -307,7 +306,7 @@ Therefore
 
 \subsection*{General Case}
 
-
+\iffalse
 Let $\operatorname P_{ij}$ be the measure on $\Omega$ with $\Pij{X = x} = \P{X = x|do(X_i = j)}$.
 
 \begin{algorithm}[H]
@@ -338,7 +337,7 @@ N_{ij} = \max\set{0, \ceil{\frac{1}{\epsilon^2} - \sum_{k \in \calP_i} \sum_{l \
 \end{algorithmic}
 \end{algorithm}
 
-
+\fi
 \begin{theorem}
 Let $\delta = 1/(2NT)$ and $\epsilon$ be the smallest value for which Algorithm \ref{alg:alloc} returns true. 
 Let $N_{ij}$ as computed by Algorithm \ref{alg:alloc} be the number of times the algorithm selects the action $do(X_i = j)$ 

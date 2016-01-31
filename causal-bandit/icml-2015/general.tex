@@ -50,13 +50,6 @@ the fact that $\P{X_2 = 1} = \P{X_3 = 1} = \frac{1}{2}$.
 
 Another difficulty is that it is no longer sufficient to learn about $\mu_{ij}$ exclusivly from observational data and when $do(X_i = j)$ is chosen.
 We can also learn about the reward for intervening on one variable from rounds in which we actually set a different variable.
-
-\eqn {
-\label{eq:estimation_transfer}
-P(Y_t|do(X_{t,i} = j))= & \nonumber \\
- \sum_{j'}  P(Y_t|do(X_{t,l} & = j'),X_{t,i} = j)P(X_{t,l} = j')
-}
-
 Consider the graph in Figure \ref{fig:causalchain}, where each variable deterministically takes the value of its parent, $X_k = X_{k-1}$ 
 for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. 
 We can learn the reward for all the arms $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$. 
@@ -90,6 +83,73 @@ We would like to estimate
 \eq{
 \mu_Q = \EE_Q r(x) = \sum_{x \in \Omega} Q(x) r(x) 
 }
-using samples $X \in \Omega$ and $Y \in \set{0,1}$ where $X \sim P$ and $Y = 1$ with probability $r(X)$.
+using samples $X \in \Omega$ and $Y \in \set{0,1}$ where $X \sim P$ and $Y = 1$ with probability $r(X)$. Ultimately we will be interested
+in the special case that $Q(x) = P(x|do(X_i = j))$ and where $P(x) = P(x|do())$ or $P(x|do(X_k = l))$, but for now we keep things general.
+Define random variable $R(x) = Q(x)/P(x)$ and estimator $Z$ by
+\eqn{
+\label{eq:truncated}
+Z = Y R \ind{R < B}\,,
+}
+which trivially satisfies $|Z| \leq B$ surely.
+Note that the usual importance weighted estimator would be $YR$, which if $Q$ is absolutely continuous with respect to $P$ satisfies $\EE_P YR = \mu$. Unfortunately
+this estimator may suffer from poor concentration, a problem that can be mitigated via the truncation in (\ref{eq:truncated}) at the cost of some bias.
+Computing the expectation we see
+\eq{
+\EE_P[Z] = \mu - \beta\,.
+}
+where $\beta \geq 0$ is the negative bias and satisfies
+\eq{
+\beta \leq \Q{R \geq B}\,.
+}
+Bounding the variance is also straightforward.
+\eq{
+\Var[Z] 
+&\leq \EE[Z^2] 
+=\sum_x \P{X = x} Z(x)^2 \\
+&\leq \sum_x \P{X = x} \left(\frac{\Q{X = x}}{\P{X = x}}\right)^2 \\
+&\leq \sum_x \Q{X = x} \frac{\Q{X = x}}{\P{X = x}} 
+= V\,.
+}
+The bias can be controlled in terms of $V$ via Markov's inequality.
+\eq{
+\beta 
+\leq \Q{R \geq B} 
+\leq \frac{\EE_Q[R]}{B}
+= \frac{V}{B}\,.
+}
+The point is that $B$ can be tuned to trade the bias against the concentration of the estimator,
+the latter of which can be controlled via Bernstein's inequality. 
+
+Let $\operatorname P_{ij}$ be the measure on $\Omega$ with $\Pij{X = x} = \P{X = x|do(X_i = j)}$.
+
+\begin{algorithm}[H]
+\caption{CheckValid}\label{alg:alloc}
+\begin{algorithmic}
+\STATE {\bf Input:} $\epsilon > 0$, $\delta > 0$, $\operatorname P_1,\ldots,\operatorname P_N$
+\STATE Compute $o_1,\ldots,o_N \in \set{1,\ldots,N}$ such that $\calP_i \subseteq \set{o_k : k < i}$ for all $i$
+\FOR{$i \in \set{o_1,\ldots,o_N}$ and $j \in \set{0,1}$}
+\STATE Compute variances:
+\eq{
+\forall k \in \calP_i,\, l \in \set{0,1} \quad
+V_{ijkl} = \frac{1}{N_{kl}} \EE_{\operatorname P_{ij}}\!\! \left[\frac{\Pij{x}}{\Pkl{x}}\right] 
+}
+\STATE Compute variance for learning from observational data:
+\eq{
+V_{ij} = \frac{2}{T} \EE_{\operatorname P_{ij}} \!\!\left[\frac{\Pij{x}}{\P{x}}\right]
+}
+\STATE Compute required budget: 
+\eq{
+N_{ij} = \max\set{0, \ceil{\frac{1}{\epsilon^2} - \sum_{k \in \calP_i} \sum_{l \in \set{0,1}} \frac{1}{V_{ijkl}} - \frac{1}{V_{ij}}}}\,.
+} 
+\ENDFOR
+\IF{$\sum_{i=1}^N \sum_{j \in \set{0,1}} N_{ij} \leq T / 2$}
+\STATE {\bf return true}
+\ELSE
+\STATE {\bf return false}
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+
 
 
