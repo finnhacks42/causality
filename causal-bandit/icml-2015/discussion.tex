@@ -9,57 +9,6 @@ More generally, assuming causal structure creates more complex types of side inf
 
 \section{Future Open Questions}
 
-\subsection{General graphs without latent variables}
-
-The query $P(Y|do(V)$ is identifiable for any graph with known structure and fully observable variables. This means we can create an estimator for the reward of any action in terms only of results observed when the $do()$ action was selected (although the variance of these estimators can be infinite if any node conditional probabilities are zero). For example, consider the graph in \cref{fig:causalStructure_confounded}. 
-
-\begin{figure}[h]
-\centering
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
-  thick,main node/.style={observed}, hidden/.style={empty}]
-
- %nodes
-
-\node[main node](1){$X_{1}$};
-\node[main node, right=of 1](2){$X_{2}$};
-\node[hidden, right=of 2](3){$...$};
-\node[main node, right=of 3](4){$X_{N}$};
-\node[main node, below right=of 2](5){Y};
-\node[main node, above=of 3](6){$Z$};
- \path[every node/.style={font=\sffamily\small}]
-    (1) edge (5)
-    	(2) edge (5)
-    (4) edge (5)
-    (6) edge (1) edge (2) edge(4);
-	
-\end{tikzpicture}
-\caption{Causal model for the confounded parallel bandits problem.\label{fig:causalStructure_confounded}}
-\end{figure} 
-
-\eq {
-P(Y|do(X_i = j) = \sum_z P(Y|X_i = j,Z)P(Z)
-}
-
-In this case, the variance of the estimator is no longer simply a function of the number of times we observe $X_i = j$ but instead depends on the joint probability $P(X_i,Z)$. For example, if $P(z=1) = P(z=0) = .5$, $P(X_i = 1|z = 1) = 1$, and $P(X_i = 0|z = 0) = 1$ then $P(X_i = 1) = .5$ but we will will be unable to estimate $P(Y|do(X_i = 1))$ as we will never get any data for the term $P(Y|X_i = 1, Z = 0)$.
-
-We can generalize the (simple regret) algorithm developed for the parallel bandit problem to general graphs as follows. 
-
-
-\begin{itemize}
-\item Apply the do-calculus to write an expression for the reward of each action in term of observational data: $P(Y|do(X_i=j)) = \sum_{pa_i} P(Y|X_i = j,pa_i)P(pa_i)$ \cite{Pearl2000} Theorem 3.2.2
-\item Create an estimator from this expression
-\item Observe for $T/2$ rounds.
-\item Calculate the variance in the estimators from $P(pa_i)$ and $P(X_i|pa_i)$ if they are known (corresponds to known $q$ case) or estimate the variance from the observations (as for unknown $q$ case). 
-\item Compute the set of poorly estimated actions, $A$ based on the inverses of the variances.
-\item Explicitly play actions in $A$ for the remaining $T/2$ rounds.
-\end{itemize}
-
-The key challenge here is probably in computing the variance of the estimators. This would give us an upper bound for the regret for general graphs. 
-
-It is unclear if this approach remains optimal. The $do()$ action is not the only one that can reveal information about the rewards of multiple other actions. In the example in figure \ref{fig:causalStructure_confounded}, $do(Z)$ is another obvious candidate. We would need to establish a matching lower bound - or prove that $do()$ is always the most revealing action. 
-
-We are also not using the fact that the rewards are not entirely independent (They are 'almost' independent in the parallel bandit example). This does not apply in general. Consider a chain graph $X_1 \rightarrow X_2 \rightarrow, ..., X_N \rightarrow Y$. In this case $k > i \implies P(Y|do(X_i)) \leq P(Y|do(X_k))$.  
-
 
 \subsection{General graphs with known structure but latent variables}
 In this case, some queries will be non-identifiable. The corresponding actions can be immediately added to the set $A$ prior to collecting any data. We can then use the same algorithm as in the case where there are no latent variables, except that we will have to use the more general do-calculus rather than simply adjusting for the parents to write the expression for each action in terms of observational data. 
