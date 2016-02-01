@@ -1,29 +1,85 @@
-In this section we develop and analyse an algorithm for minimising the simple regret in the
-causal bandit problem.  
+In this section we develop an algorithm for achieving the optimal simple regret in a special case of a causal bandit problem.
+
+\subsection{The Parallel Bandit Problem}
+
+We now consider a class of a causal bandit problems which we call \emph{parallel bandits}.
+It is simple enough to admit a thorough analysis but rich enough to model the type of problem discussed in \S\ref{sec:intro}, including the farming example. It also suffices to witness the regret gap between algorithms that make use of causal models and those which do not.
+
+The causal model for this class of problems has $N$ binary variables $\{ X_1, \ldots, X_N \}$ where each $X_i \in \{0,1\}$ are independent causes of a reward variable $Y \in \R$, as shown in Figure~\ref{fig:causalStructure}.
+All variables are observable (\ie, $\mathcal{O} = \{Y, X_1, \ldots, X_N\}$) and the set of allowable actions are all size 0 and size 1 interventions: 
+\[
+	\mathcal{A} = \{do()\} \cup \{ do(X_i = j) \colon i \in \{1, \ldots, N\}, j \in \{0,1\}\}.
+\]
+In the farming example from the introduction, $X_1$ might represent temperature (\eg, $X_1=0$ for low and $X_1=1$ for high). 
+In this case, the interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ might represent the use of shades or heat lamps to keep the temperature low or high, respectively.
+
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed}, hidden/.style={empty}]
+
+ %nodes
+\node[main node](1){$X_{1}$};
+\node[main node, right=of 1](2){$X_{2}$};
+\node[hidden, right=of 2](3){$...$};
+\node[main node, right=of 3](4){$X_{N}$};
+\node[main node, below right=of 2](5){Y};
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge (5)
+    	(2) edge (5)
+    (4) edge (5);
+	
+\end{tikzpicture}
+\caption{Causal model for the parallel bandits problem.\label{fig:causalStructure}}
+\end{figure}
+
+In each round of the game, the learner either purely observes by selecting $do()$ or chooses a single variable to intervene on and the value to set it to. 
+The remainder of the variables are simultaneously set by independently biased coin flips. 
+The value of all variables are then used to determine the distribution of rewards for that round.
+Formally, when not intervened upon we assume that each $X_i \sim \bernoulli(q_i)$ where $\vec{q} = (q_1, \ldots, q_N) \in [0,1]^N$ so that $q_i = \P{X_i = 1}$.
+\todom{Should $Y$ be 0-1 valued or real everywhere?}
+The value of the reward variable is distributed as $Y = r(\vec{X}) + \eta$ where $r : \{0,1\}^N \to \R$ is an arbitrary, fixed, and unknown function and $\eta$ is $1$-subgaussian noise with a distribution that may depend on $\vec{X}$.
+In the farming example, this choice of $Y$ models the fixed, noisy but unknown dependence of crop yield on the temperature, soil, and moisture.
+
+\todom{$i,j$ notation to $a \in \actions$}
+In our analysis below, we will often use the pair $(i,j)$ for $i \in \{1, \ldots, N\}$ and $j \in \{0,1\}$ as a shorthand for the intervention $do(X_i = j)$.
+We will also make use of the expansion of the expected reward for $do(X_i = j)$:
+\eq{
+\mu_{i,j} 
+&= \E{r(X)|do(X_i = j)} \\
+&= \sum_{\boldsymbol{x} \in \set{0,1}^N : x_i = j} r(\boldsymbol{x})  \prod_{k \neq i} q_k^{x_k} (1 - q_k)^{1-x_k}\,.  
+}
+The sum and product use the restrictions $x_i = j$ and $k \ne i$ because the intervention forces $X_i = j$ with probability 1.
+The optimal intervention is denoted $(i^*,j^*) = \argmax_{i,j} \mu_{i,j}$ and the corresponding optimal reward is $\mu^* = \mu_{i^*,j^*}$. 
+Note that the expected reward of the optimal intervention is at least as large as the expected reward for doing nothing.
+
+
+
+\subsection{The Parallel Bandit Algorithm}
+\label{sub:par-bandit-alg}
 
 \begin{algorithm}[h]
 \caption{Causal Best Arm Identification}\label{alg:simple}
 \begin{algorithmic}[1]
-\STATE {\bf Input:} $T, N$
+\STATE {\bf Input:} Total rounds $T$, causal graph $\mathcal{G}$, allowable interventions $\actions$. 
 \FOR{$t \in 1,\ldots,(T - 1) / 2$}
-\STATE Choose the action $do()$ and observe $\boldsymbol{X}_t$ and $r_t$
+\STATE Perform empty intervention $do()$; observe $\vec{x}_t$ and $r_t$
 \ENDFOR
-\STATE Estimate $\mu$ using observation data:
-\eq{
-(\forall i,j) \qquad \hat \mu_{i,j} = \frac{\sum_{t=1}^{T/2} \ind{X_{t,i} = j} r_t}{\sum_{t=1}^{T/2} \ind{X_{t,i} = j}}\,.
-}
-\STATE Compute $\hat V_{ij} = \frac{T}{2 \sum_{t=1}^{T/2}\ind{X_{t,i}=j}} $
-\STATE Compute $\hat m = m(\hat{\boldsymbol{V}})$
-\STATE Compute $A$ as the subset of infrequently observed arms $\set{(i,j):V_{ij} \geq m}$ with $|A| = \hat m$
-
-\FOR{$(i,j) \in A$}
-\FOR{$t \in 1,\ldots,\frac{T - 1)}{2\hat m}$}
-\STATE Choose action $do(X_{t,i} = j)$ and observe $r_t$
+\FOR{$a = do(X_i = x) \in \actions$}
+\STATE Count times $a$ was seen $T_a = \sum_{t=1}^{T/2} \ind{x_{t,i} = x}$
+\STATE Estimate reward $\hat{\mu}_a = \frac{1}{T_a} \sum_{t=1}^{T/2} \ind{x_{t,i} = x} r_t$
+\STATE Estimate probabilities $\hat{p}_a = \frac{2 T_a}{T-1}$ and $\hat{V}_a = \frac{1}{\hat{p}_a}$
 \ENDFOR
-\STATE Recompute $\hat \mu_{i,j} = \frac{2\hat m}{T} \sum_{t=1}^{ T/2\hat m} r_t(X_{t,i}=j)$ 
+\STATE Compute $\hat{m} = m(\hat{\vec{V}})$ and $A = \set{a \in \actions \colon \hat{V}_a \geq \hat{m}}$.
+\STATE Let $T_A := \frac{T-1}{2 |A|}$ be times to sample each $a\in\actions$.
+\FOR{$a = do(X_i = x) \in A$}
+\FOR{$t \in 1,\ldots,T_A$}
+\STATE Intervene with $a$ and observe $r_t$
 \ENDFOR
-\STATE Estimated optimal action is $\hat i^*, \hat j^* = \argmax_{i,j} \hat \mu_{i,j}$
-\STATE Choose action $do(X_{t,\hat i^*} = \hat j^*)$
+\STATE Re-estimate $\hat{\mu}_a = \frac{1}{T_A} \sum_{t=1}^{T_A} r_t$
+\ENDFOR
+\RETURN estimated optimal $\hat{a}^* \in \argmax_{a\in\actions} \hat{\mu}_a$
 \end{algorithmic}
 \end{algorithm}
 
