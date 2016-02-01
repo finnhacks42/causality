@@ -24,7 +24,11 @@ This paper can be seen as a first step towards formalising and solving problems 
 In \S\ref{sec:defs} we formally introduce \emph{causal bandit problems} in which interventions are treated as arms in a bandit problem but their influence on the reward --- along with any other observations --- is assumed to conform to a known causal graph. 
 We show that our causal bandit framework subsumes the classical bandits (no additional observations) and contextual stochastic bandit problems (observations are revealed before an intervention is chosen) before focusing on the case where, like the above example, observations occur \emph{after} each intervention is made.
 
-Our main results for this case are: an upper bound on the (simple) regret (Theorem~\ref{thm:}) for a general, fully observable causal model (TODO?); an upper bound on the cumulative regret (Theorem~\ref{thm:}) for a specific causal model that has a better dependence on the number of available actions then the best possible algorithm which ignores the causal model; and a matching lower bound (Theorem~\ref{thm:}) for any algorithm which does use the additional causal information.
+In \S\ref{sec:parallel} we analyse a specific family of causal bandit problems which we call \emph{parallel bandit} problems.
+We  upper bound on the (simple) regret (Theorem~\ref{thm:}) for a general, fully observable causal model (TODO?)
+\todom{Finish describing new structure}
+
+; an upper bound on the cumulative regret (Theorem~\ref{thm:}) for a specific causal model that has a better dependence on the number of available actions then the best possible algorithm which ignores the causal model; and a matching lower bound (Theorem~\ref{thm:}) for any algorithm which does use the additional causal information.
 Our analysis relies on results from causal inference that relate the distributions obtained through interventions to those based only on observations.
 Central to our new bounds is a quantity that replaces the number of possible actions with a measure of how ``informative'' the observations are for estimating the rewards for interventions.
 
