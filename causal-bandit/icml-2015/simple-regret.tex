@@ -14,7 +14,6 @@ causal bandit problem.
 }
 \STATE Compute $\hat V_{ij} = \frac{T}{2 \sum_{t=1}^{T/2}\ind{X_{t,i}=j}} $
 \STATE Compute $\hat m = m(\hat{\boldsymbol{V}})$
-\STATE $i'(i) = $ the index of $\hat s_i$ in $\hat s'$
 \STATE Compute $A$ as the subset of infrequently observed arms $\set{(i,j):V_{ij} \geq m}$ with $|A| = \hat m$
 
 \FOR{$(i,j) \in A$}
