@@ -3,9 +3,9 @@
 \newcommand{\calA}{\mathcal A}
 \newcommand{\x}{\boldsymbol{x}}
 
-We now consider single variable interventions on general causal graphs over binary variables $Y, X_1,\ldots,X_N$. 
+We now consider the more general problem where the graph structure is known, but arbitrary.
 As before $Y$ is the target variable and $\P{Y=1|X} = r(X)$ is the expected reward given $X$.
-We let $\calP_i \subseteq \set{1,\ldots,N}$ denote the parents of $i$ so the joint distribution over $X$ may be written as
+We let $\calP_i \subseteq \set{1,\ldots,N}$ denote the parents of variable $X_i$ so the joint distribution over $X$ may be written as
 \eq{
 \P{X = x} = \prod_{i=1}^N \P{X_i = x_i|X_j = x_j \text{ for all } j \in \calP_i}\,.
 }
@@ -17,7 +17,7 @@ with $x_i = j$ we have
 &\P{X = x|do(X_i = j)} \\
 &\qquad =\prod_{k \neq i} \P{X_k = x_k|X_j = x_j \text{ for all } j \in \calP_k}\,.
 }
-As before the expected reward from intervening by setting variable $X_i = j$ is
+As before the expected reward from intervening by $do(X_i = j)$.
 \eq{
 \mu_{ij} = \sum_{x \in \Omega} \P{X = x|do(X_i = j)} r(x)\,,
 }
@@ -29,7 +29,6 @@ then intervening on either $X_2$ or $X_3$ is optimal. But the positive reward is
 the fact that $\P{X_2 = 1} = \P{X_3 = 1} = \frac{1}{2}$.
 \begin{figure}[h]
 \centering
-\caption{}\label{fig:causalStructure_confounded}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={observed}, hidden/.style={empty}]
 \node[main node](1){$X_1$};
@@ -47,15 +46,14 @@ the fact that $\P{X_2 = 1} = \P{X_3 = 1} = \frac{1}{2}$.
 \P{X_2 = j|X_1 = j} &= 
 \P{X_3 = j|X_1 = j} = 1\,.
 }
+\caption{}\label{fig:causalStructure_confounded}
 \end{figure} 
 
 Another difficulty is that it is no longer sufficient to learn about $\mu_{ij}$ exclusivly from observational data and when $do(X_i = j)$ is chosen.
 We can also learn about the reward for intervening on one variable from rounds in which we actually set a different variable.
 Consider the graph in Figure \ref{fig:causalchain}, where each variable deterministically takes the value of its parent, $X_k = X_{k-1}$ 
 for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. 
-We can learn the reward for all the arms $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$. 
-If we only considered information transfer from one action to another for the case of the $do()$ action, we would have to 
-explicitly play each of these arms individually to estimate their rewards. 
+We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$. 
 
 \begin{figure}[h]
 \centering
@@ -85,7 +83,9 @@ We would like to estimate
 \mu_Q = \EE_Q r(x) = \sum_{x \in \Omega} Q(x) r(x) 
 }
 using samples $X \in \Omega$ and $Y \in \set{0,1}$ where $X \sim P$ and $Y = 1$ with probability $r(X)$. Ultimately we will be interested
-in the special case that $Q(x) = P(x|do(X_i = j))$ and where $P(x) = P(x|do())$ or $P(x|do(X_k = l))$, but for now we keep things general.
+in the case that 
+$Q(x) = P(x|do(X_i = j))$
+and where $P(x) = P(x|do())$ or $P(x|do(X_k = l))$, but for now we keep things general.
 Define random variable $R(x) = Q(x)/P(x)$ and estimator $Z$ by
 \eqn{
 \label{eq:truncated}
@@ -135,7 +135,7 @@ a mixture of truncated importance weighted estimators.
 }
 where 
 \eq{
-\calA_{ij} = \set{ij} \cup \set{kl : k \text{ is a ancestor of } i \text{ and } l \in \set{0,1}}
+\calA_{ij} = \set{ij} \cup \set{kl : k \text{ is an ancestor of } i \text{ and } l \in \set{0,1}}
 }
 and
 \eq{
