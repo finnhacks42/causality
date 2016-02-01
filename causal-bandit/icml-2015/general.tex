@@ -9,21 +9,20 @@ We let $\calP_i \subseteq \set{1,\ldots,N}$ denote the parents of $i$ so the joi
 \eq{
 \P{X = x} = \prod_{i=1}^N \P{X_i = x_i|X_j = x_j \text{ for all } j \in \calP_i}\,.
 }
-Throughout this section we are going to assume that the causal structure and conditional distributions of $X$ are known,
-which allows us to compute the above quantity for arbitrary $x$. As in the previous sections we allow interventions on
-a single variable by setting $X_i = j$ for any $i \in \set{1,\ldots,N}$ and $j \in \set{0,1}$. Then for $x \in \set{0,1}^N$ 
-with $x_i = j$ we have
+Throughout this section we assume that the causal structure and conditional distributions of $X$ are known,
+which allows us to compute the above quantity for arbitrary $x \in \Omega = \set{0,1}^N$. Given the learner intervens by $do(X_i = j)$
+leads to
 \eq{
-&\P{X = x|do(X_i = j)} \\
+&\Pn{ij}{X = x} = \P{X = x|do(X_i = j)} \\
 &\qquad =\prod_{k \neq i} \P{X_k = x_k|X_j = x_j \text{ for all } j \in \calP_k}\,.
 }
-As before the expected reward from intervening by setting variable $X_i = j$ is
+The expected reward by making the intervention $do(X_i = j)$ is
 \eq{
-\mu_{ij} = \sum_{x \in \Omega} \P{X = x|do(X_i = j)} r(x)\,,
+\mu_{ij} = \sum_{x \in \Omega} \P{X = x|do(X_i = j)} r(x)\,.
 }
-where $\Omega = \set{0,1}^N$. The problem of learning the optimal intervention is now significantly complicated
-by the dependencies between the random variables. Learning from observational data is no longer straightforward
-because variables can be correlated through their parents. Consider, for example, the causual model below where $X_1$
+The problem of learning the optimal intervention is made more complicated than the simple case because of 
+the dependencies between the random variables. Learning from observational data is no longer straightforward
+because variables can be correlated through their parents. Consider, for example, the causual graph below where $X_1$
 deterministically causes $X_2$ and $X_3$, which ensures that $X_2 = X_3$ for all observational data. Now suppose $r(X) = \ind{X_2 \neq X_3}$,
 then intervening on either $X_2$ or $X_3$ is optimal. But the positive reward is never observed from observational samples, despite
 the fact that $\P{X_2 = 1} = \P{X_3 = 1} = \frac{1}{2}$.
@@ -163,7 +162,7 @@ The estimator $\hat \mu_{ij}$ satisfies:
 All that remains is to choose $N_{ij}$ to minimise the worst-case approximation error in the bound above over all $i$ and $j$.
 This is acheived by finding the smallest $\epsilon > 0$ such that {\sc CheckValid} returns true (see Algorithm \ref{alg:alloc}).
 
-
+\todot{Topological sort}
 \begin{algorithm}[H]
 \caption{CheckValid}\label{alg:alloc}
 \begin{algorithmic}
