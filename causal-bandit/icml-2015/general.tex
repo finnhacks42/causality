@@ -108,13 +108,14 @@ Then for $C = \sqrt{2} + 4$ we have
 \end{theorem}
 
 \begin{proof}
+First note that $X_t, Y_t$ are sampled from $\operatorname{Q}$.
 We abbreviate $Z_{at} = Z_a(X_t)$ and $R_{at} = R_a(X_t)$.
-First note that $|Z_{at}| \leq B_a$ and that
+By definition we have $|Z_{at}| \leq B_a$ and 
 \eq{
 \Var_Q[Z_{at}] 
-&\leq \EE_Q[Z_{at}^2] \\
-&\leq \EE_{\Ps_a}\left[\frac{\Ps_a(\parents{Y}(X))}{\Q{\parents{Y}(X)}}\right] \\
-&\leq m(\eta)\,.
+\leq \EE_Q[Z_{at}^2] 
+\leq \EE_{\Ps_a}\left[\frac{\Ps_a(\parents{Y}(X))}{\Q{\parents{Y}(X)}}\right] 
+\leq m(\eta)\,.
 }
 Checking the expectation we have
 \eq{
@@ -123,7 +124,11 @@ Checking the expectation we have
 &= \EE_{\Ps_a} Y - \EE_{\Ps_a} \left[Y\ind{R_a > B_a}\right] \\
 &= \mu_a - \beta_a\,,
 }
-where $0 \leq \beta_a = \EE_{\Ps_a}[Y \ind{R_a > B_a}] \leq \Pn{a}{R_a(X) > B_a}$ is the negative bias. 
+where 
+\eq{
+0 \leq \beta_a = \EE_{\Ps_a}[Y \ind{R_a > B_a}] \leq \Pn{a}{R_a(X) > B_a}
+}
+is the negative bias. 
 The bias may be bounded in terms of $m(\eta)$ via an application of Markov's inequality.
 \eq{
 \beta_a \leq \Pn{a}{R_a(X) > B_a} \leq \frac{\EE_{\Ps_a}[R_a(X)]}{B_a} \leq \frac{m(\eta)}{B_a}\,.
@@ -165,7 +170,7 @@ as required.
 
 \subsection*{Choosing the Sampling Distribution}
 
-Algorithm \ref{alg:general} depends on a choice of sampling distribution $\eta$. In light of Theorem \ref{thm:general}
+Algorithm \ref{alg:general} depends on a choice of sampling distribution $\operatorname{Q}$ that is determined by $\eta$. In light of Theorem \ref{thm:general}
 a natural choice of $\eta$ is the minimiser of $m(\eta)$.
 \eq{
 \eta^* 
@@ -193,8 +198,13 @@ as required.
 \end{proof}
 
 The second observation is that in the parallel bandit setting the $m$ given in this section coincides with the $m$ given there.
+Note that in the previous section we did not assume knowledge of the conditional distributions on $X$ and instead only the graph structure.
+Thus the algorithm given in that setting has broader applicability to that particular graph than the generic algorithm given here.
 \todot{Finish this}
 
+Finally, we believe that Algorithm \ref{alg:general} with the optimal choice of $\eta$ is close to minimax optimal, but leave lower bounds
+for future work.
+\todot{Mention obvious modification to deal with large gaps}
 
 
 
