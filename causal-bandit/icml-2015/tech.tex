@@ -314,6 +314,8 @@ Apply Bernstein's inequality.
 
 \section*{Blah blah}
 
+
+
 Let $P_a$ be distribution on parents of $y$ given do action $a$.
 Let $\eta_a$ be the weight of action $a$ so $\sum_a \eta_a = 1$. 
 The algorithm then chooses action $a$ with probability $\eta_a$.
@@ -325,12 +327,12 @@ where $Q_a = \sum_{\eta_a P_a}$.
 The bound on the variance is
 \eq{
 V_a 
-&= \sum_{x \in \text{parents}(y)} \frac{P_a(x)^2}{Q_a(x)}
+&= \sum_{x \in \text{parents}(y)} \frac{P_a(x)^2}{Q_a(x)} \\
 &= \sum_{x \in \text{parents}(y)} \frac{P_a(x)^2}{\sum_b \eta_b P_b(x)}
 }
 Optimisation problem is:
 \eq{
-\argmin_{\eta} \max_x V_a\,.
+\argmin_{\eta} \max_a V_a\,.
 }
 
 

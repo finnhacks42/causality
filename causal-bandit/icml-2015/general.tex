@@ -2,8 +2,39 @@
 \newcommand{\calP}{\mathcal P}
 \newcommand{\calA}{\mathcal A}
 \newcommand{\x}{\boldsymbol{x}}
+\newcommand{\Ps}{\operatorname{P}}
 
 We now consider the more general problem where the graph structure is known, but arbitrary.
+We use the notation $\P{\parents{Y}(X)}$ to denote a random variable that is the probability that the parents of $Y$ are $X$.
+Let $\eta$ be a distribution on available interventions $\calA$ so $\eta_a \geq 0$ and $\sum_{a \in \calA} \eta_a = 1$.
+Define $Q = \sum_{a \in \calA} \eta_a \Ps_a$ be the mixture distribution.
+Let $a \in \calA$ be an intervention and define random variable
+\eq{
+Z_a(X) = R_a(X) Y \ind{R_a(X) \leq B_a}\,,
+}
+where $B_a \geq 0$ is some constant to be chosen subsequently and
+\eq{
+R_a(X) = \frac{\P{\parents{Y}(X)|a}}{\Q{\parents{Y}(X)}}\,.
+}
+\begin{algorithm}[H]
+\begin{algorithmic}
+\STATE {\bf Input:} $\eta$, $B$, $T$
+\FOR{$t \in \set{1,\ldots,T}$}
+\STATE Sample action $I_t = a$ with probability $\eta$
+\STATE Do action $I_t$ and observe $X_t$ and $Y_t$
+\ENDFOR
+\STATE For each $a \in \calA$ compute an estimate of its return:
+\eq{
+\forall a\in \calA \qquad \hat \mu_a = \frac{1}{T} \sum_{t=1}^T Z_a(X_t)
+}
+\STATE Choose $I = \argmax_a \hat \mu_a$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}
+Blah
+\end{theorem}
+
 As before $Y$ is the target variable and $\P{Y=1|X} = r(X)$ is the expected reward given $X$.
 We let $\calP_i \subseteq \set{1,\ldots,N}$ denote the parents of variable $X_i$ so the joint distribution over $X$ may be written as
 \eq{
