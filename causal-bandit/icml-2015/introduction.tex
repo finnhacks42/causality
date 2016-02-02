@@ -29,9 +29,11 @@ We propose a simple causal best arm identification algorithm (Algorithm~\ref{alg
 In contrast, the best a bandit algorithm can do if the causal model is ignored is $\Omega(\sqrt{N/T})$.
 This shows theoretically the value of our framework over the traditional bandit problem. 
 Experiments in \S\ref{sec:experiments} further demonstrate the value of causal models in bandit problems.
+\todom{Mention cumulative regret?}
 
-Interventions and observations may have a complex relationship in the general causal model. 
-However, in \S\ref{sec:simple-regret-general}, Theorem~\ref{thm:general-upper} shows how an importance-sampling based algorithm (Algorithm~\ref{alg:alloc}) can obtain non-trivial guarantees on simple regret.
+In the general casual model interventions and observations may have a complex relationship. 
+However, in \S\ref{sec:simple-regret-general}, Theorem~\ref{thm:general-upper} shows how an importance-sampling based algorithm that exploits the causal graph (Algorithm~\ref{alg:alloc}) can obtain non-trivial guarantees on simple regret.
+While this upper bound reduces to the one for parallel bandits, a matching lower bound for the general case is left as an open problem.
 
 % Our analysis relies on results from causal inference that relate the distributions obtained through interventions to those based only on observations.
 % Central to our new bounds is a quantity that replaces the number of possible actions with a measure of how ``informative'' the observations are for estimating the rewards for interventions.
