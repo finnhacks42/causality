@@ -5,52 +5,6 @@
 \newcommand{\Ps}{\operatorname{P}}
 
 We now consider the more general problem where the graph structure is known, but arbitrary.
-We use the notation $\P{\parents{Y}(X)}$ to denote a random variable that is the probability that the parents of $Y$ are $X$.
-Let $\eta$ be a distribution on available interventions $\calA$ so $\eta_a \geq 0$ and $\sum_{a \in \calA} \eta_a = 1$.
-Define $Q = \sum_{a \in \calA} \eta_a \Ps_a$ be the mixture distribution.
-Let $a \in \calA$ be an intervention and define random variable
-\eq{
-Z_a(X) = R_a(X) Y \ind{R_a(X) \leq B_a}\,,
-}
-where $B_a \geq 0$ is some constant to be chosen subsequently and
-\eq{
-R_a(X) = \frac{\P{\parents{Y}(X)|a}}{\Q{\parents{Y}(X)}}\,.
-}
-\begin{algorithm}[H]
-\begin{algorithmic}
-\STATE {\bf Input:} $\eta$, $B$, $T$
-\FOR{$t \in \set{1,\ldots,T}$}
-\STATE Sample action $I_t = a$ with probability $\eta$
-\STATE Do action $I_t$ and observe $X_t$ and $Y_t$
-\ENDFOR
-\STATE For each $a \in \calA$ compute an estimate of its return:
-\eq{
-\forall a\in \calA \qquad \hat \mu_a = \frac{1}{T} \sum_{t=1}^T Z_a(X_t)
-}
-\STATE Choose $I = \argmax_a \hat \mu_a$
-\end{algorithmic}
-\end{algorithm}
-
-\begin{theorem}
-Blah
-\end{theorem}
-
-As before $Y$ is the target variable and $\P{Y=1|X} = r(X)$ is the expected reward given $X$.
-We let $\calP_i \subseteq \set{1,\ldots,N}$ denote the parents of variable $X_i$ so the joint distribution over $X$ may be written as
-\eq{
-\P{X = x} = \prod_{i=1}^N \P{X_i = x_i|X_j = x_j \text{ for all } j \in \calP_i}\,.
-}
-Throughout this section we assume that the causal structure and conditional distributions of $X$ are known,
-which allows us to compute the above quantity for arbitrary $x \in \Omega = \set{0,1}^N$. Given the learner intervens by $do(X_i = j)$
-leads to
-\eq{
-&\Pn{ij}{X = x} = \P{X = x|do(X_i = j)} \\
-&\qquad =\prod_{k \neq i} \P{X_k = x_k|X_j = x_j \text{ for all } j \in \calP_k}\,.
-}
-The expected reward by making the intervention $do(X_i = j)$ is
-\eq{
-\mu_{ij} = \sum_{x \in \Omega} \P{X = x|do(X_i = j)} r(x)\,.
-}
 The problem of learning the optimal intervention is made more complicated than the simple case because of 
 the dependencies between the random variables. Learning from observational data is no longer straightforward
 because variables can be correlated through their parents. Consider, for example, the causual graph below where $X_1$
@@ -106,137 +60,136 @@ We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously b
 
 
 
-Before the algorithm we introduce the truncated importance weighted estimator, which we will use to learn about the returns of 
-specific interventions from observational data, or by intervening on other variables. Let $P$ and $Q$ be distributions on $\Omega$.
-We would like to estimate
-\eq{
-\mu_Q = \EE_Q r(x) = \sum_{x \in \Omega} Q(x) r(x) 
-}
-using samples $X \in \Omega$ and $Y \in \set{0,1}$ where $X \sim P$ and $Y = 1$ with probability $r(X)$. Ultimately we will be interested
-in the case that 
-$Q(x) = P(x|do(X_i = j))$
-and where $P(x) = P(x|do())$ or $P(x|do(X_k = l))$, but for now we keep things general.
-Define random variable $R(x) = Q(x)/P(x)$ and estimator $Z$ by
-\eqn{
-\label{eq:truncated}
-Z = Y R \ind{R < B}\,,
-}
-which trivially satisfies $|Z| \leq B$ surely.
-Note that the usual importance weighted estimator would be $YR$, which if $Q$ is absolutely continuous with respect to $P$ satisfies $\EE_P YR = \mu$. Unfortunately
-this estimator may suffer from poor concentration, a problem that can be mitigated via the truncation in (\ref{eq:truncated}) at the cost of some bias.
-Computing the expectation we see
-\eq{
-\EE_P[Z] = \mu - \beta\,.
-}
-where $\beta \geq 0$ is the negative bias and satisfies
-\eq{
-\beta \leq \Q{R \geq B}\,.
-}
-Bounding the variance is also straightforward.
-\eq{
-\Var[Z] 
-&\leq \EE[Z^2] 
-=\sum_x \P{X = x} Z(x)^2 \\
-&\leq \sum_x \P{X = x} \left(\frac{\Q{X = x}}{\P{X = x}}\right)^2 \\
-&= \sum_x \Q{X = x} \frac{\Q{X = x}}{\P{X = x}} 
-= V\,.
-}
-The bias can be controlled in terms of $V$ via Markov's inequality.
-\eq{
-\beta 
-\leq \Q{R \geq B} 
-\leq \frac{\EE_Q[R]}{B}
-= \frac{V}{B}\,.
-}
-The point is that $B$ can be tuned to trade the bias against the concentration of the estimator,
-the latter of which will be controlled via Bernstein's inequality. 
 
-Let $\operatorname P_{ij}$ be the measure on $\Omega$ with $\Pij{X = x} = \P{X = x|do(X_i = j)}$.
-As in the previous section, the algorithm for learning an optimal intervention on a general graph will 
-collect $T/2$ observational samples by choosing $do()$. It then chooses $do(X_i = j)$ 
-exactly $N_{ij}$ times, where $N_{ij}$ will be chosen shortly. For each $i$ it computes an estimate $\hat \mu_{ij}$ of $\mu_{ij}$ via
-a mixture of truncated importance weighted estimators.
+We use the notation $\P{\parents{Y}(X)}$ to denote a random variable that is the probability that the parents of $Y$ are $X$.
+Let $\eta$ be a distribution on available interventions $\calA$ so $\eta_a \geq 0$ and $\sum_{a \in \calA} \eta_a = 1$.
+Define $Q = \sum_{a \in \calA} \eta_a \Ps_a$ be the mixture distribution.
+Let $a \in \calA$ be an intervention and define random variable
 \eq{
-\hat \mu_{ij} 
-= 
-\frac{
-  \eta_{ij} \sum_{t=1}^{T/2} \frac{Z_{ij}(t)}{T/2} + \sum_{kl \in \calA_{ij}} \eta_{ijkl} \sum_{t=1}^{N_{kl}} \frac{Z_{ijkl}(t)}{N_{kl}}}
-    {\eta_{ij} + \sum_{kl \in \calA_{ij}} \eta_{ijkl}}\,,
+Z_a(X) = R_a(X) Y \ind{R_a(X) \leq B_a}\,,
 }
-where 
+where $B_a \geq 0$ is some constant to be chosen subsequently and
 \eq{
-\calA_{ij} = \set{ij} \cup \set{kl : k \text{ is an ancestor of } i \text{ and } l \in \set{0,1}}
+R_a(X) = \frac{\P{\parents{Y}(X)|a}}{\Q{\parents{Y}(X)}}\,.
 }
-and
+Define $m(\eta)$ by
 \eq{
-\eta_{ij} &= \frac{T/2}{V_{ij}} &
-V_{ij} &= \EE_{\operatorname{P}_{ij}} \left[\frac{\Pn{ij}{X = x}}{\P{X = x}}\right] \\
-\eta_{ijkl} &= \frac{N_{kl}}{V_{ijkl}} &
-V_{ijkl} &= \EE_{\operatorname{P}_{ij}} \left[\frac{\Pn{ij}{X = x}}{\Pn{kl}{X = x}}\right]
+m(\eta) = \max_{a \in \calA} \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right]\,.
 }
 
-The following theorem controls the concentration of $\hat \mu_{ij}$ about $\mu_{ij}$. 
-\ifsup
-The proof may be found in Appendix \ref{sec:thm:estimate}.
-\else
-The proof follows from an application of Bernstein's inequality and may be found in the supplementary material.
-\fi
-
-\begin{theorem}\label{thm:estimate}
-The estimator $\hat \mu_{ij}$ satisfies:
-\eq{
-\P{\left|\hat \mu_{ij} - \mu\right| \geq \sqrt{\frac{1}{\sum_{kl \in \calA_{ij}} \frac{N_{kl}}{V_{ijkl}}} \log\frac{1}{\delta}}} \leq \delta\,.
-}
-\end{theorem}
-
-
-All that remains is to choose $N_{ij}$ to minimise the worst-case approximation error in the bound above over all $i$ and $j$.
-This is acheived by finding the smallest $\epsilon > 0$ such that {\sc CheckValid} returns true (see Algorithm \ref{alg:alloc}).
-
-\todot{Topological sort}
 \begin{algorithm}[H]
-\caption{CheckValid}\label{alg:alloc}
+\caption{General Algorithm}\label{alg:general}
 \begin{algorithmic}
-\STATE {\bf Input:} $\epsilon > 0$, $\delta > 0$, $\operatorname P_{ij}$ for all $ij$
-\STATE Compute $o_1,\ldots,o_N \in \set{1,\ldots,N}$
-\FOR{$i \in \set{o_1,\ldots,o_N}$ and $j \in \set{0,1}$}
-\STATE Compute variances:
-\eq{
-\forall k \in \calA_i,\, l \in \set{0,1} \quad
-V_{ijkl} = \frac{1}{N_{kl}} \EE_{\operatorname P_{ij}}\!\! \left[\frac{\Pij{x}}{\Pkl{x}}\right] 
-}
-\STATE Compute variance for learning from observational data:
-\eq{
-V_{ij} = \frac{2}{T} \EE_{\operatorname P_{ij}} \!\!\left[\frac{\Pij{x}}{\P{x}}\right]
-}
-\STATE Compute required budget: 
-\eq{
-N_{ij} = \max\set{0, \ceil{\frac{1}{\epsilon^2} - \sum_{k \in \calA_i} \sum_{l \in \set{0,1}} \frac{1}{V_{ijkl}} - \frac{1}{V_{ij}}}}\,.
-} 
+\STATE {\bf Input:} $\eta$, $T$
+\FOR{$t \in \set{1,\ldots,T}$}
+\STATE Sample action $I_t = a$ with probability $\eta$
+\STATE Do action $I_t$ and observe $X_t$ and $Y_t$
 \ENDFOR
-\STATE {\bf if $\sum_{ij} N_{ij} \leq T/2$} {\bf return} true {\bf else return} false
+\STATE For each $a \in \calA$ compute an estimate of its return:
+\eq{
+\forall a\in \calA \qquad \hat \mu_a = \frac{1}{T} \sum_{t=1}^T Z_a(X_t)
+}
+\STATE Choose $I = \argmax_a \hat \mu_a$
 \end{algorithmic}
 \end{algorithm}
 
-\todot{discuss role of $delta = 1/(NT)$}
-\todot{define $Z_{ijkl}(t)$ etc.}
-\todot{Define $B_{ijkl}$}
-\begin{theorem}\label{thm:general-upper}
-Let $\epsilon > 0$ be the smallest value of $\epsilon$ such that Algorithm \ref{alg:alloc} returns true and let $IJ = \argmax_{ij} \hat \mu_{ij}$.
-Then $\mu^* - \E \mu_{IJ} \leq \epsilon + 1/T$.
+\begin{theorem}\label{thm:general}
+If Algorithm \ref{alg:general} is run with $B \in \R^{|\calA|}$ given by
+\eq{
+B_a = \sqrt{\frac{m(\eta)T}{\log\left(2T|\calA|\right)}}\,.
+}
+Then for $C = \sqrt{2} + 4$ we have
+\eq{
+\mu^* - \EE[\mu_I] \leq C\sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)} + \frac{1}{T}\,.
+}
 \end{theorem}
 
-
-\subsection*{Comparison to Simple Setting}
-
-In Section \ref{sec:simple-regret} we assumed a simple graph structure and unknown distributions on $X_i$, which were then learned from observational
-data. In contrast, in this section we have allow arbitrary (known) graphs, but assumed the distribution on $X$ was known. 
-Using the approach in this section on the simple graph with known distribution leads to 
+\begin{proof}
+First note that $|Z_a(X_t)| \leq B_a$ and that
 \eq{
-\EE \mu^* - \EE \mu_{IJ} \in \bigo{\sqrt{\frac{m}{T} \log \frac{N}{\delta}}}\,, 
+\Var_Q[Z_a(X_t)] 
+&\leq \EE_Q[Z_a(X_t)^2] \\
+&\leq \EE_{\Ps_a}\left[\frac{\Ps_a(\parents{Y}(X))}{\Q{\parents{Y}(X)}}\right] \\
+&\leq m(\eta)\,.
 }
-which is the same bound as in the previous section. 
-\todot{finish this}
+Checking the expectation we have
+\eq{
+\EE_Q[Z] 
+&= \EE_{\Ps_a}\left[Y \ind{R_a \leq B_a}\right] \\
+&= \EE_{\Ps_a} Y - \EE_{\Ps_a} \left[Y\ind{R_a > B_a}\right] \\
+&= \mu_a - \beta_a\,,
+}
+where $0 \leq \beta_a = \EE_{\Ps_a}[Y \ind{R_a > B_a}] \leq \Pn{a}{R_a > B_a}$ is the negative bias. 
+The bias may be bounded in terms of $m(\eta)$ via an application of Markov's inequality.
+\eq{
+\beta_a \leq \Pn{a}{R_a > B_a} \leq \frac{\EE_{\Ps_a}[R_a(X)]}{B_a} \leq \frac{m(\eta)}{B_a}\,.
+}
+Let $\epsilon_a > 0$ be given by
+\eq{
+\epsilon = \sqrt{\frac{2m(\eta)}{T} \log\left(2T|\calA|\right)} + \frac{3B_a}{T} \log\left(2T|\calA|\right)\,.
+}
+Then by the union bound and Bernstein's inequality we have
+\eq{
+&\P{\text{exists } a \in \calA : \left|\hat \mu_a - \EE_Q[\hat \mu_a]\right| \geq \epsilon_a} \\ 
+&\qquad\leq \sum_{a \in \calA} \P{\left|\hat \mu_a - \EE_Q[\hat \mu_a]\right| \geq \epsilon_a} \leq \frac{1}{T}\,.
+}
+Assuming this event does not occur and letting $a^* = \argmax_{a \in \calA} \mu_a$ we have
+\eq{
+\mu_I \geq \hat \mu_I - \epsilon_I  
+\geq \hat \mu_{a^*} - \epsilon_I  
+\geq \mu^* - \epsilon_{a^*} - \epsilon_I - \beta_{a^*}\,. 
+}
+By the definition of the truncation
+we have
+\eq{
+\epsilon_a \leq \left(\sqrt{2} + 3\right)\sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)}
+}
+and
+\eq{
+\beta_a \leq \sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)}\,. 
+}
+Therefore for $C = \sqrt{2} + 4$ we have
+\eq{
+\P{\mu_I \geq \mu^* - C \sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)}} \leq \frac{1}{T}\,.
+}
+Therefore
+\eq{
+\mu^* - \EE[\mu_I] \leq C \sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)} + \frac{1}{T}
+}
+as required.
+\end{proof}
+
+\subsection*{Choosing the Sampling Distribution}
+
+Algorithm \ref{alg:general} depends on a choice of sampling distribution $\eta$. In light of Theorem \ref{thm:general}
+a natural choice of $\eta$ is the minimiser of $m(\eta)$.
+\eq{
+\eta^* 
+&= \argmin_\eta m(\eta) \\
+&= \argmin_\eta \max_{a \in \calA} \EE_{\Ps_a} \left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right] \\
+&= \argmin_\eta \underbrace{\max_{a \in \calA} \EE_{\Ps_a} \left[\frac{\Pn{a}{\parents{Y}(X)}}{\sum_{b \in \calA} \eta_b \Pn{b}{\parents{Y}(X)}}\right]}_{m(\eta)}\,.
+}
+Since the mixture of convex functions is convex and the maximum of a set of convex functions is convex, we see that $m(\eta)$ is convex (in $\eta$).
+Therefore the minimisation problem may be tackled using standard techniques from convex optimisation. In the experimental section we present some special cases,
+but for now we give two simple results. The first shows that $|\calA|$ serves as an upper bound on $m(\eta^*)$.
+
+\begin{lemma}
+$m(\eta^*) \leq |\calA|$.
+\end{lemma}
+
+\begin{proof}
+By definition, $m(\eta^*) \leq m(\eta)$ for all $\eta$. Let $\eta_a = 1/|\calA|$. Then
+\eq{
+m(\eta) 
+&= \max_a \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right] \\
+&\leq \max_a \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\eta_a \Pn{a}{\parents{Y}(X)}}\right] \\
+&\leq \max_a \EE_{\Ps_a}\left[\frac{1}{\eta_a}\right] = |\calA|
+}
+as required.
+\end{proof}
+
+The second observation is that in the parallel bandit setting the $m$ given in this section coincides with the $m$ given there.
+\todot{Finish this}
 
 
 
