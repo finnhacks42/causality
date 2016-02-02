@@ -18,6 +18,7 @@ deploying shade or heat lamps will set the temperature to be low or high; the nu
 When not intervened upon, the temperature, soil, and moisture vary naturally from season to season due to weather conditions and these are all observed along with the final crop yield at the end of each season.
 How might the farmer best experiment to identify the single, highest yielding intervention without sacrificing too much crop yield (relative to always choosing the best intervention) in the process?
 
+
 \subsection{Contributions}
 
 This paper can be seen as a first step towards formalising and solving problems such as the one above. 
@@ -44,13 +45,16 @@ While this upper bound reduces to the one for parallel bandits, a matching lower
 
 \subsection{Related Work}
 
-One obvious approach would be to cast the above example as a stochastic multi-armed bandit problem (\eg, the six possible farming interventions is an arm and the crop yield is the reward) and apply an algorithm such as UCB~\cite{Auer1995} with well understood regret guarantees.
-However, as we show in \S\ref{sec:simple-regret}, this approach ignores the extra information available in the non-intervened variables and subsequently yields a worst-case regret after $T$ round of $\bigomega{\sqrt{NT}}$ with a sub-optimal dependence on $N$, the number of possible interventions.
+As alluded to above, causal bandit problems with $N$ possible interventions can be treated as a classical $N$-armed bandit problem by simply ignoring the causal model and extra observations that are revealed each round.
+In the farming example, the farmer could treat the six possible interventions are arms, ignore the observations of the non-intervened variables, and apply an algorithm such as UCB~\cite{Auer1995} with well understood regret guarantees.
+However, as we show in \S\ref{sec:simple-regret}, this approach ignores the extra information available in the non-intervened variables and subsequently yields sub-optimal performance.
 
+Bandit problems with side information are commonly referred to as ``contextual bandits'' and have been well studied in recent years~\cite{Langford2008,Agarwal2014}.
+Our framework bears a superficial similarity to contextual bandit problems since the extra observations on non-intervened variables might be viewed as context for selecting an intervention. 
+However, a crucial difference is that in our model the extra observations are only revealed \emph{after} selecting an intervention and cannot be used as context.
+We discuss the relationship between causal and contextual bandits further in \S\ref{sec:defs} and leave their combination as future work.
 
-Our framework also bears a superficial similarity to contextual bandit problems \cite{Langford2008,Agarwal2014} since the extra observations on non-intervened variables might be viewed as context for selecting an intervention. However, a crucial difference is that in our model the extra observations are only revealed \emph{after} selecting an intevention and cannot be used as context.
-
-There has been a significant amount of recent work which proposes alternative modes of feedback within the bandit setting \cite{TODO} as well as results for partial monitoring which, at first glance, may appear applicable. Indeed, we show in Section~\ref{}, that it is possible to applying these existing results to our problem, however the resulting regret is $\bigo{\sqrt{NT}}$, again with a sub-optimal dependence on $N$.
+There has been a significant amount of recent work which proposes alternative modes of feedback within the bandit setting \citep{Alon2015} which, at first glance, may appear applicable. Indeed, we show in \S~\ref{sec:discussion}, that it is possible to applying these existing results to our problem, however the resulting regret is $\bigo{\sqrt{NT}}$, again with a sub-optimal dependence on $N$.
 
 \todom{Rework rest of intro}
 
@@ -59,9 +63,7 @@ There has been a significant amount of recent work which proposes alternative mo
 % A widely used framework for sequential decision making is the multi-armed bandit. In the classic multi-armed bandit setting there is a finite set of available actions, each associated with a distribution over rewards which is unknown but stationary. At each timestep the agent selects an action and receives a reward sampled i.i.d from the corresponding reward distribution. The performance of bandit algorithms is described by the regret: the difference in the expected reward obtained by the algorithm and the reward that could be obtained if the optimal action was selected at every timestep. 
 
 
-We take a first step towards unifying these approaches by considering a variant of the stochastic multi-armed bandit problem where we have prior knowledge of the causal structure governing the available actions. 
-
-\todom{Summarise results \& give intuition for algorithm}
+% We take a first step towards unifying these approaches by considering a variant of the stochastic multi-armed bandit problem where we have prior knowledge of the causal structure governing the available actions. 
 
 % A natural way to connect the causal framework with the bandit setting is to model the problem as a causal directed acyclic graph. Each possible assignment of variables to values is an action (bandit arm). The reward could be a general function of the action selected and the final state of the graph. However for simplicity, we will consider the reward to be the value of a single specified node minus the cost of the selected action. The number of actions grows exponentially with the number of variables in the graph, making it important to use algorithms that take account of the graph structure to reduce the search space. 
 
