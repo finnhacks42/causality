@@ -1,4 +1,4 @@
-In this section we develop an algorithm for achieving the optimal simple regret in a special case of a causal bandit problem.
+In this section we propose and analyse an algorithm for achieving the optimal simple regret in a special case of a causal bandit problem.
 
 \subsection{The Parallel Bandit Problem}
 
@@ -6,7 +6,7 @@ We now consider a class of a causal bandit problems which we call \emph{parallel
 It is simple enough to admit a thorough analysis but rich enough to model the type of problem discussed in \S\ref{sec:intro}, including the farming example. It also suffices to witness the regret gap between algorithms that make use of causal models and those which do not.
 
 The causal model for this class of problems has $N$ binary variables $\{ X_1, \ldots, X_N \}$ where each $X_i \in \{0,1\}$ are independent causes of a reward variable $Y \in \R$, as shown in Figure~\ref{fig:causalStructure}.
-All variables are observable (\ie, $\mathcal{O} = \{Y, X_1, \ldots, X_N\}$) and the set of allowable actions are all size 0 and size 1 interventions: 
+All variables are observable and the set of allowable actions are all size 0 and size 1 interventions: 
 \[
 	\mathcal{A} = \{do()\} \cup \{ do(X_i = j) \colon i \in \{1, \ldots, N\}, j \in \{0,1\}\}.
 \]
@@ -67,12 +67,12 @@ Note that the expected reward of the optimal intervention is at least as large a
 \STATE Perform empty intervention $do()$; observe $\vec{x}_t$ and $r_t$
 \ENDFOR
 \FOR{$a = do(X_i = x) \in \actions$}
-\STATE Count times $a$ was seen $T_a = \sum_{t=1}^{T/2} \ind{x_{t,i} = x}$
-\STATE Estimate reward $\hat{\mu}_a = \frac{1}{T_a} \sum_{t=1}^{T/2} \ind{x_{t,i} = x} r_t$
-\STATE Estimate probabilities $\hat{p}_a = \frac{2 T_a}{T-1}$ and $\hat{V}_a = \frac{1}{\hat{p}_a}$
+\STATE Count times $X_i = x$ seen: $T_a = \sum_{t=1}^{T/2} \ind{x_{t,i} = x}$
+\STATE Estimate reward: $\hat{\mu}_a = \frac{1}{T_a} \sum_{t=1}^{T/2} \ind{x_{t,i} = x} r_t$
+\STATE Estimate probabilities: $\hat{p}_a = \frac{2 T_a}{T-1}$ and $\hat{V}_a = \frac{1}{\hat{p}_a}$
 \ENDFOR
 \STATE Compute $\hat{m} = m(\hat{\vec{V}})$ and $A = \set{a \in \actions \colon \hat{V}_a \geq \hat{m}}$.
-\STATE Let $T_A := \frac{T-1}{2 |A|}$ be times to sample each $a\in\actions$.
+\STATE Let $T_A := \frac{T-1}{2 |A|}$ be times to sample each $a\in A$.
 \FOR{$a = do(X_i = x) \in A$}
 \FOR{$t \in 1,\ldots,T_A$}
 \STATE Intervene with $a$ and observe $r_t$

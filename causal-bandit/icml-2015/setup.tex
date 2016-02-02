@@ -23,15 +23,15 @@ If the non-intervened variables are observed before an intervention is selected 
 Even if no observations are made during the rounds, the causal model may still allow offline pruning of the set of 
 allowable interventions thereby reducing the complexity.
 
-The learning goal we will consider and analyse is identifying the intervention with highest expected reward by round $T$. 
+The learning goal we will consider and analyse is identifying the intervention with highest expected reward by round $T$.
+This is sometimes refered to as a ``pure exploration''~\citep{Bubeck2009} or ``best-arm identification'' problem~\citep{Gabillon2012}.
 This objective is most appropriate when the learning agent has a fixed learning budget after which its policy will be fixed indefintely. 
-\todom{Citation}
-We denote the expected reward for the intervention $do(\vec{X} = \vec{x})$ by $\mu_{\vec{x}} := \E{Y | do(\vec{X} = \vec{x})}$ and the optimal expected reward by $\mu^* := \max_{\vec{x}} \mu_{\vec{x}}$.
-Performance for the first goal can be measured by \emph{simple regret}, \ie, the gap between the optimal expected reward and the intervention chosen by the learner on round $T$:
-\eqn{
+We denote the expected reward for the intervention $a = do(\vec{X} = \vec{x})$ by $\mu_{a} := \E{Y | do(\vec{X} = \vec{x})}$ and the optimal expected reward by $\mu^* := \max_{a\in\actions} \mu_{a}$.
+Performance for the first goal can be measured by \emph{simple regret}, \ie, the gap between the optimal expected reward and the intervention $a_T$ chosen by the learner on round $T$:
+\begin{equation}
 \label{eq:regret-simple}
-\simpleregret = \mu^* - \E{\mu_{\vec{x}_T}}\,.
-}
+	\simpleregret = \mu^* - \E{\mu_{a_T}}.
+\end{equation}
 
 Another common objective in bandit problems is maximising the \emph{cumulative regret}, the total expected reward over all $T$ rounds. 
 We have established upper bounds for cumulative regret for parallel bandits but not the general causal bandit case.
