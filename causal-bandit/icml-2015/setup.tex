@@ -35,7 +35,7 @@ Performance for the first goal can be measured by \emph{simple regret}, \ie, the
 
 Another common objective in bandit problems is maximising the \emph{cumulative regret}, the total expected reward over all $T$ rounds. 
 We have established upper bounds for cumulative regret for parallel bandits but not the general causal bandit case.
-Due to space limitations we focus on simple regret and defer these to Appendix~\ref{app:cumulatve}.
+%Due to space limitations we focus on simple regret and defer these to Appendix~\ref{app:cumulatve}.
 
 We note that classical $K$-armed stochastic bandit problem can be recovered in our framework by considering a simple causal model with one edge connecting a single variable $X$ that can take on $K$ values to a reward variable $Y \in \set{0,1}$ where $\P{Y = 1|X} = r(X)$ for some arbitrary but unknown, real-valued function $r$.
 The set of allowed interventions in this case is $\mathcal{A} = \{ do(X = k) \colon k \in \{1, \ldots, K\}\}$.
