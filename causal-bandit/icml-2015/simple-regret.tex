@@ -12,7 +12,7 @@ All variables are observable and the set of allowable actions are all size 0 and
 	\mathcal{A} = \set{do()} \cup \set{ do(X_i = j) \colon 1 \leq i \leq N \text{ and } j \in \set{0,1}}\,.
 }
 In the farming example from the introduction, $X_1$ might represent temperature (\eg, $X_1=0$ for low and $X_1=1$ for high). 
-In this case, the interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ might represent the use of shades or heat lamps to keep the temperature low or high, respectively.
+The interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ indicate the use of shades or heat lamps to keep the temperature low or high, respectively.
 
 
 \begin{figure}[h]
@@ -35,13 +35,13 @@ In this case, the interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ might represent 
 \caption{Causal model for the parallel bandits problem.\label{fig:causalStructure}}
 \end{figure}
 
-In each round of the game, the learner either purely observes by selecting $do()$ or chooses a single variable to intervene on and the value to set it to. 
+In each round the learner either purely observes by selecting $do()$ or chooses a single variable to intervene on and the value to set it to. 
 The remainder of the variables are simultaneously set by independently biased coin flips. 
 The value of all variables are then used to determine the distribution of rewards for that round.
 Formally, when not intervened upon we assume that each $X_i \sim \bernoulli(q_i)$ where $\vec{q} = (q_1, \ldots, q_N) \in [0,1]^N$ so that $q_i = \P{X_i = 1}$.
 %\todom{Should $Y$ be 0-1 valued or real everywhere?} YES!
 The value of the reward variable is distributed as $\P{Y = 1|\vec{X}} = r(\vec{X})$ where 
-$r : \{0,1\}^N \to \R$ is an arbitrary, fixed, and unknown function. 
+$r : \{0,1\}^N \to [0,1]$ is an arbitrary, fixed, and unknown function. 
 In the farming example, this choice of $Y$ models the success or failure of a seasons crop, which depends stochastically on the various environment variables.
 Note that the expected reward of the optimal intervention is at least as large as the expected reward for doing nothing.
 
@@ -67,27 +67,33 @@ actions $do(X_i = j)$ for which $\P{X_i = j}$ is large. These are the interventi
 from observational data. Those actions where $\P{X_i = j}$ is small may not be observed (often) in the first $T/2$ rounds, so
 the estimates of the returns of these actions from the first $T/2$ samples could be quite poor. For the remaining $T/2$ rounds
 the algorithm makes interventions on the actions $a = do(X_i = j)$ for which $\P{X_i = j}$ is small. The precise allocation is
-carefully chosen to minimise the worst-case simple regret.
+carefully chosen to minimise the worst-case simple regret. The difficulty of the problem depends on $\vec{q}$. 
+Define $m \in \set{1, \ldots, N}$ by
+\eq{
+m(\vec{q}) = \max \set{i : \sum_{k=1}^N \ind{\min\set{q_k, (1 - q_k)}} \leq 1/i}\,.
+}
 
 \begin{algorithm}[h]
 \caption{Parallel Bandit Algorithm}\label{alg:simple}
 \begin{algorithmic}[1]
 \STATE {\bf Input:} Total rounds $T$ and $N$.
 \FOR{$t \in 1,\ldots,T / 2$}
-\STATE Perform empty intervention $do()$; observe $\vec{X}_t$ and $Y_t$
+\STATE Perform empty intervention $do()$
+\STATE Observe $\vec{X}_t$ and $Y_t$
 \ENDFOR
 \FOR{$a = do(X_i = x) \in \actions$}
 \STATE Count times $X_i = x$ seen: $T_a = \sum_{t=1}^{T/2} \ind{X_{t,i} = x}$
 \STATE Estimate reward: $\hat{\mu}_a = \frac{1}{T_a} \sum_{t=1}^{T/2} \ind{X_{t,i} = x} Y_t$ \\[0.2cm]
-\STATE Estimate probabilities: $\hat{p}_a = \frac{2 T_a}{T}$ and $\hat{V}_a = \frac{1}{\hat{p}_a}$
+\STATE Estimate probabilities: $\hat{p}_a = \frac{2 T_a}{T}$ 
+\STATE $\hat q_i = \hat{q}_{do(X_i = 1)}$
 \ENDFOR
-\STATE Compute $\hat{m} = m(\hat{\vec{V}})$ and $A = \set{a \in \actions \colon \hat{V}_a \geq \hat{m}}$.
-\STATE Let $T_A := \frac{T-1}{2 |A|}$ be times to sample each $a\in A$.
+\STATE Compute $\hat{m} = m(\vec{\hat q})$ and $A = \set{a \in \actions \colon \hat{p}_a \leq 1/\hat m}$.
+\STATE Let $T_A := \frac{T}{2 |A|}$ be times to sample each $a\in A$.
 \FOR{$a = do(X_i = x) \in A$}
 \FOR{$t \in 1,\ldots,T_A$}
-\STATE Intervene with $a$ and observe $r_t$
+\STATE Intervene with $a$ and observe $Y_t$
 \ENDFOR
-\STATE Re-estimate $\hat{\mu}_a = \frac{1}{T_A} \sum_{t=1}^{T_A} r_t$
+\STATE Re-estimate $\hat{\mu}_a = \frac{1}{T_A} \sum_{t=1}^{T_A} Y_t$
 \ENDFOR
 \RETURN estimated optimal $\hat{a}^* \in \argmax_{a\in\actions} \hat{\mu}_a$
 \end{algorithmic}
@@ -96,7 +102,7 @@ carefully chosen to minimise the worst-case simple regret.
 \begin{theorem}\label{thm:uq-simple}
 Algorithm \ref{alg:simple} satisfies
 \eq{
-\simpleregret \in \bigo{\sqrt{\frac{m}{T}\log\left(\frac{NT}{m}\right)}}\,.
+\simpleregret \in \bigo{\sqrt{\frac{m(\vec{q})}{T}\log\left(\frac{NT}{m}\right)}}\,.
 }
 \end{theorem}
 
