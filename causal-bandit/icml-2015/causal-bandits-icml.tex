@@ -11,7 +11,7 @@
 
 
 
-%\usepackage{hyperref}
+\usepackage{hyperref}
 \newcommand{\theHalgorithm}{\arabic{algorithm}}
 \usepackage{icml2015stylefiles/icml2015} 
 \usepackage{tikz}
@@ -19,6 +19,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
+
 
 
 \setlength{\marginparwidth}{10ex}%added by Yifan so that the todos can fit in the margin
@@ -108,6 +109,7 @@
 \newcommand{\Pn}[2]{\operatorname{P}_{#1}\left\{#2\right\}}
 \newcommand{\parents}[1]{\operatorname{Pa}_{#1}}
 \newcommand{\actions}{\mathcal{A}}
+\newcommand{\calA}{\mathcal A}
 
 \newcommand{\etc}{\textit{etc}}
 \newcommand{\ie}{\textit{i.e.}}
@@ -123,6 +125,9 @@
 \newtheorem{assumption}[theorem]{Assumption}
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{example}[theorem]{Example}
+\let\temp\epsilon
+\let\epsilon\varepsilon
+
 
 % The \icmltitle you define below is probably too long as a header.
 % Therefore, a short form for the running title is supplied here:
@@ -157,7 +162,8 @@
 \begin{abstract} 
 We study the problem of using causal models to improve the rate at which good interventions can be learned online in a stochastic environment. 
 Our formalism combines multi-arm bandits and causal inference to model a novel type of bandit feedback that is not exploited by existing approaches.
-We propose a new algorithm that can make use of the causal feedback and prove that it achieves bounds on both simple and cumulative regret that are strictly better (in dependence on the number of possible interventions and number of rounds) than algorithms which do not use the additional causal information.
+We propose a new algorithm that exploits the causal feedback and prove a bound on its simple regret that is strictly better (in all quantities) 
+than algorithms that do not use the additional causal information.
 \end{abstract} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

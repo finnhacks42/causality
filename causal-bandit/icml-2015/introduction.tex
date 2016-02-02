@@ -1,14 +1,14 @@
 Medical drug testing, policy setting, and other scientific processes are commonly framed and analysed in the language of sequential experimental design and, in special cases, as bandit problems~\citep{Robbins1952,Chernoff1959}. 
-In this framework, single actions (\eg, experiments or interventions) from a pre-determined set are repeatedly performed in order to determine the most effective one via feedback from a single, real-valued reward signal. 
-We propose generalizing such sequential experiments by assuming that, in additional to the reward signal, values of other variables are drawn from a probabilistic causal model~\citep{Pearl2000} and observed.
-These causal models are common in social science, demography, and economics where explicit experimentation may be difficult. 
-For example, predicting the effect of changes to childcare subsidies on workforce participation or school choice on student grades. 
-Results from causal inference relate observational distributions to interventional ones, allowing us to predict the outcome of intervention without explicitly performing it. 
-By combining causal inference using a causal graph we show, theoretically and empirically, how non-interventional observations can be used to improve the rate at which high-reward actions can be identified.
-
-% A classical problem in economics and operations research is how to choose interventions that maximise utility. 
-% We study an idealised model of such interventions using a combination of the multi-armed bandit framework \citep{Robbins1952} and the theory/language of causal inference 
-% \citep{Pearl2000}.
+In this framework, single actions (\eg, experiments or interventions) from a pre-determined set are repeatedly performed in 
+order to evaluate their effectiveness via feedback from a single, real-valued reward signal.
+We propose a generalisation of the standard model by assuming that, in additional to the reward signal, the learner observes the values of a number of covariates 
+drawn from a probabilistic causal model~\citep{Pearl2000}.
+Causal models are commonly used in disciplines where explicit experimentation may be difficult such as social science, demography and economics.
+For example, when predicting the effect of changes to childcare subsidies on workforce participation, or school choice on grades. 
+Results from causal inference relate observational distributions to interventional ones, allowing the outcome of an intervention to be predicted without
+explicitly performing it.
+By exploiting the causal information we show, theoretically and empirically, how non-interventional observations can be used to improve the rate at 
+which high-reward actions can be identified.
 
 The type of problem we are concerned with is best illustrated with an example. 
 Consider a farmer wishing to optimise the yield of her crop. 
@@ -16,31 +16,29 @@ She knows that crop yield is only affected by temperature, a particular soil nut
 In each season the farmer has enough time and money to intervene and control at most one of these variables:
 deploying shade or heat lamps will set the temperature to be low or high; the nutrient can be added or removed a through a choice of fertilizer; and irrigation or rain-proof covers will keep the soil wet or dry.
 When not intervened upon, the temperature, soil, and moisture vary naturally from season to season due to weather conditions and these are all observed along with the final crop yield at the end of each season.
-How might the farmer best experiment to identify the single, highest yielding intervention without sacrificing too much crop yield (relative to always choosing the best intervention) in the process?
+How might the farmer best experiment to identify the single, highest yielding intervention in a limited number of seasons?
+%without sacrificing too much crop yield (relative to always choosing the best intervention) in the process?
 
 
 \subsection{Contributions}
 
-This paper can be seen as a first step towards formalising and solving problems such as the one above. 
+This paper takes the first step towards formalising and solving problems such as the one above. 
 In \S\ref{sec:defs} we formally introduce \emph{causal bandit problems} in which interventions are treated as arms in a bandit problem but their influence on the reward --- along with any other observations --- is assumed to conform to a known causal graph. 
 We show that our causal bandit framework subsumes the classical bandits (no additional observations) and contextual stochastic bandit problems (observations are revealed before an intervention is chosen) before focusing on the case where, like the above example, observations occur \emph{after} each intervention is made.
 
-In \S\ref{sec:simple-regret} we analyse a specific family of causal bandit problems that we call \emph{parallel bandit} problems in which $N$ factors affect the reward independently.
-We propose a simple causal best arm identification algorithm (Algorithm~\ref{alg:simple}) for this problem and show it is optimal up to log factors (Theorems~\ref{thm:uq-simple} \& \ref{thm:lower}) with $\tilde{\Theta}(\sqrt{m/T})$ simple regret after $T$ rounds where $m$ depends on the casual model and may be much smaller than $N$.
-In contrast, the best a bandit algorithm can do if the causal model is ignored is $\Omega(\sqrt{N/T})$.
+We focus on the simple regret, which measures the difference between the return of the optimal action and that of the action chosen by the algorithm after $T$ rounds.
+In \S\ref{sec:simple-regret} we analyse a specific family of causal bandit problems that we call \emph{parallel bandit} problems in which $N$ factors affect the reward independently and there are $2N$ possible interventions.
+We propose a simple causal best arm identification algorithm (Algorithm~\ref{alg:simple}) for this problem and show that up to logarithmic factors it enjoys minimax optimal
+simple regret guarantees of $\tilde\Theta(\sqrt{m/T})$ where $m$ depends on the causal model and may be much smaller than $N$.
+In contrast, existing best arm identification algorithms suffer $\Omega(\sqrt{N/T})$ simple regret.
 This shows theoretically the value of our framework over the traditional bandit problem. 
-Experiments in \S\ref{sec:experiments} further demonstrate the value of causal models in bandit problems.
+Experiments in \S\ref{sec:experiments} further demonstrate the value of causal models in this framework.
 \todom{Mention cumulative regret?}
 
 In the general casual model interventions and observations may have a complex relationship. 
-However, in \S\ref{sec:simple-regret-general}, Theorem~\ref{thm:general-upper} shows how an importance-sampling based algorithm that exploits the causal graph (Algorithm~\ref{alg:alloc}) can obtain non-trivial guarantees on simple regret.
-While this upper bound reduces to the one for parallel bandits, a matching lower bound for the general case is left as an open problem.
+In \S\ref{sec:simple-regret-general} we propose an algorithm (Algorithm~\ref{alg:alloc}) inspired by importance-sampling that a) enjoys sub-linear regret equivalent to the optimal rate in the parallel bandit setting and b) captures many of the intricacies of sharing information in a causal graph in the general case. 
+As in the parallel bandit case, the regret guarantee is often significantly better than $O(\sqrt{N/T})$ and never worse, where $N$ is the number of available interventions.
 
-% Our analysis relies on results from causal inference that relate the distributions obtained through interventions to those based only on observations.
-% Central to our new bounds is a quantity that replaces the number of possible actions with a measure of how ``informative'' the observations are for estimating the rewards for interventions.
-
-% Although the witness (Algorithm~\ref{alg:}) for our upper bound is very simple (\ie, observe without intervening for some initial period and then play undersampled actions in order to get good estimates) our key point is that algorithms which use causal information when available have a clear, theoretical improvement over those which do not.
-% These results are experimentally validated in \S\ref{sec}.
 
 
 \subsection{Related Work}
