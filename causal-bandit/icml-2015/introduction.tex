@@ -24,19 +24,20 @@ This paper can be seen as a first step towards formalising and solving problems 
 In \S\ref{sec:defs} we formally introduce \emph{causal bandit problems} in which interventions are treated as arms in a bandit problem but their influence on the reward --- along with any other observations --- is assumed to conform to a known causal graph. 
 We show that our causal bandit framework subsumes the classical bandits (no additional observations) and contextual stochastic bandit problems (observations are revealed before an intervention is chosen) before focusing on the case where, like the above example, observations occur \emph{after} each intervention is made.
 
-In \S\ref{sec:simple-regret} we analyse a specific family of causal bandit problems which we call \emph{parallel bandit} problems.
-We propose a causal best arm identification algorithm (Algorithm~\ref{alg:simple}) for this problem and show it is optimal (Theorems~\ref{thm:uq-simple} \& \ref{thm:lower}). 
+In \S\ref{sec:simple-regret} we analyse a specific family of causal bandit problems that we call \emph{parallel bandit} problems in which $N$ factors affect the reward independently.
+We propose a simple causal best arm identification algorithm (Algorithm~\ref{alg:simple}) for this problem and show it is optimal up to log factors (Theorems~\ref{thm:uq-simple} \& \ref{thm:lower}) with $\tilde{\Theta}(\sqrt{m/T})$ simple regret after $T$ rounds where $m$ depends on the casual model and may be much smaller than $N$.
+In contrast, the best a bandit algorithm can do if the causal model is ignored is $\Omega(\sqrt{N/T})$.
+This shows theoretically the value of our framework over the traditional bandit problem. 
+Experiments in \S\ref{sec:experiments} further demonstrate the value of causal models in bandit problems.
 
+Interventions and observations may have a complex relationship in the general causal model. 
+However, in \S\ref{sec:simple-regret-general}, Theorem~\ref{thm:general-upper} shows how an importance-sampling based algorithm (Algorithm~\ref{alg:alloc}) can obtain non-trivial guarantees on simple regret.
 
-for a general, fully observable causal model (TODO?)
-\todom{Finish describing new structure}
+% Our analysis relies on results from causal inference that relate the distributions obtained through interventions to those based only on observations.
+% Central to our new bounds is a quantity that replaces the number of possible actions with a measure of how ``informative'' the observations are for estimating the rewards for interventions.
 
-; an upper bound on the cumulative regret (Theorem~\ref{thm:}) for a specific causal model that has a better dependence on the number of available actions then the best possible algorithm which ignores the causal model; and a matching lower bound (Theorem~\ref{thm:}) for any algorithm which does use the additional causal information.
-Our analysis relies on results from causal inference that relate the distributions obtained through interventions to those based only on observations.
-Central to our new bounds is a quantity that replaces the number of possible actions with a measure of how ``informative'' the observations are for estimating the rewards for interventions.
-
-Although the witness (Algorithm~\ref{alg:}) for our upper bound is very simple (\ie, observe without intervening for some initial period and then play undersampled actions in order to get good estimates) our key point is that algorithms which use causal information when available have a clear, theoretical improvement over those which do not.
-These results are experimentally validated in \S\ref{sec}.
+% Although the witness (Algorithm~\ref{alg:}) for our upper bound is very simple (\ie, observe without intervening for some initial period and then play undersampled actions in order to get good estimates) our key point is that algorithms which use causal information when available have a clear, theoretical improvement over those which do not.
+% These results are experimentally validated in \S\ref{sec}.
 
 
 \subsection{Related Work}
