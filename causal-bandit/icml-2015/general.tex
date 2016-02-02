@@ -84,14 +84,14 @@ m(\eta) = \max_{a \in \calA} \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\
 \begin{algorithmic}
 \STATE {\bf Input:} $T$, $\eta \in [0,1]^{|\calA|}$, $B \in [0,\infty)^{|\calA|}$
 \FOR{$t \in \set{1,\ldots,T}$}
-\STATE Sample action $I_t = a$ with probability $\eta$
-\STATE Do action $I_t$ and observe $X_t$ and $Y_t$
+\STATE Sample action $a_t = a$ with probability $\eta$
+\STATE Do action $a_t$ and observe $X_t$ and $Y_t$
 \ENDFOR
 \STATE For each $a \in \calA$ compute an estimate of its return:
 \eq{
 \forall a\in \calA \qquad \hat \mu_a = \frac{1}{T} \sum_{t=1}^T Z_a(X_t)
 }
-\STATE Choose $I = \argmax_a \hat \mu_a$
+\STATE {\bf return} $\hat a^* = \argmax_a \hat \mu_a$
 \end{algorithmic}
 \end{algorithm}
 
@@ -191,19 +191,26 @@ By definition, $m(\eta^*) \leq m(\eta)$ for all $\eta$. Let $\eta_a = 1/|\calA|$
 m(\eta) 
 &= \max_a \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right] \\
 &\leq \max_a \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\eta_a \Pn{a}{\parents{Y}(X)}}\right] \\
-&\leq \max_a \EE_{\Ps_a}\left[\frac{1}{\eta_a}\right] = |\calA|
+&\leq \max_a \EE_{\Ps_a}\left[\frac{1}{\eta_a}\right] = |\calA| \qedhere
 }
-as required.
 \end{proof}
 
-The second observation is that in the parallel bandit setting the $m$ given in this section coincides with the $m$ given there.
-Note that in the previous section we did not assume knowledge of the conditional distributions on $X$ and instead only the graph structure.
-Thus the algorithm given in that setting has broader applicability to that particular graph than the generic algorithm given here.
-\todot{Finish this}
+\todo{give reference}
+The second observation is that in the parallel bandit setting the $m(\eta)$ given in this section coincides with the $m$ in Equation blah.
+Recall in that setting that 
+\eq{
+\actions = \set{do()} \cup \set{do(X_i = j) : 1 \leq i \leq N \text{ and } j \in \set{0,1}}\,.
+}
+For $a = do()$ we let $\eta_a = 1/2$. Assume without loss of generality that $\P{X_i = 1} \geq \P{X_i = 0}$ for all $i$ and
+$\P{X_i = 0}$ is monotone increasing in $i$. Then let $m = \max\set{i : \P{X_i = 0} \leq 1 / i}$, which is the same as in \S3. 
+For $i \leq m$ and $a = do(X_i = 0)$ let $\eta_a = 1/(2m)$. Then it is easy to check that $m(\eta) \leq 2m$. 
 
+\begin{remark}
+The algorithm in the previous section for the parallel bandit problem did not assume knowledge of the conditional distributions on $X$ and 
+instead only the graph structure. Thus the algorithm given in that setting has broader applicability to that particular graph than the generic algorithm given here.
 Finally, we believe that Algorithm \ref{alg:general} with the optimal choice of $\eta$ is close to minimax optimal, but leave lower bounds
 for future work.
-\todot{Mention obvious modification to deal with large gaps}
+\end{remark}
 
 
 

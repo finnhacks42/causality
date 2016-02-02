@@ -1,15 +1,16 @@
-In this section we propose and analyse an algorithm for achieving the optimal simple regret in a special case of a causal bandit problem.
 
-\subsection{The Parallel Bandit Problem}
 
-We now consider a class of a causal bandit problems which we call \emph{parallel bandits}.
-It is simple enough to admit a thorough analysis but rich enough to model the type of problem discussed in \S\ref{sec:intro}, including the farming example. It also suffices to witness the regret gap between algorithms that make use of causal models and those which do not.
+In this section we propose and analyse an algorithm for achieving the optimal regret in a natural special 
+case of the causal bandit problem which we call the {\it parallel bandit}.
+It is simple enough to admit a thorough analysis but rich enough to model the type of problem discussed in \S\ref{sec:intro}, including the farming example. 
+It also suffices to witness the regret gap between algorithms that make use of causal models and those which do not.
 
-The causal model for this class of problems has $N$ binary variables $\{ X_1, \ldots, X_N \}$ where each $X_i \in \{0,1\}$ are independent causes of a reward variable $Y \in \R$, as shown in Figure~\ref{fig:causalStructure}.
+The causal model for this class of problems has $N$ binary variables $\{ X_1, \ldots, X_N \}$ where each $X_i \in \{0,1\}$ are independent causes of a 
+reward variable $Y \in \set{0,1}$, as shown in Figure~\ref{fig:causalStructure}.
 All variables are observable and the set of allowable actions are all size 0 and size 1 interventions: 
-\[
-	\mathcal{A} = \{do()\} \cup \{ do(X_i = j) \colon i \in \{1, \ldots, N\}, j \in \{0,1\}\}.
-\]
+\eq{
+	\mathcal{A} = \set{do()} \cup \set{ do(X_i = j) \colon 1 \leq i \leq N \text{ and } j \in \set{0,1}}\,.
+}
 In the farming example from the introduction, $X_1$ might represent temperature (\eg, $X_1=0$ for low and $X_1=1$ for high). 
 In this case, the interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ might represent the use of shades or heat lamps to keep the temperature low or high, respectively.
 
@@ -38,38 +39,47 @@ In each round of the game, the learner either purely observes by selecting $do()
 The remainder of the variables are simultaneously set by independently biased coin flips. 
 The value of all variables are then used to determine the distribution of rewards for that round.
 Formally, when not intervened upon we assume that each $X_i \sim \bernoulli(q_i)$ where $\vec{q} = (q_1, \ldots, q_N) \in [0,1]^N$ so that $q_i = \P{X_i = 1}$.
-\todom{Should $Y$ be 0-1 valued or real everywhere?}
-The value of the reward variable is distributed as $Y = r(\vec{X}) + \eta$ where $r : \{0,1\}^N \to \R$ is an arbitrary, fixed, and unknown function and $\eta$ is $1$-subgaussian noise with a distribution that may depend on $\vec{X}$.
-In the farming example, this choice of $Y$ models the fixed, noisy but unknown dependence of crop yield on the temperature, soil, and moisture.
-
-\todom{$i,j$ notation to $a \in \actions$}
-In our analysis below, we will often use the pair $(i,j)$ for $i \in \{1, \ldots, N\}$ and $j \in \{0,1\}$ as a shorthand for the intervention $do(X_i = j)$.
-We will also make use of the expansion of the expected reward for $do(X_i = j)$:
-\eq{
-\mu_{i,j} 
-&= \E{r(X)|do(X_i = j)} \\
-&= \sum_{\boldsymbol{x} \in \set{0,1}^N : x_i = j} r(\boldsymbol{x})  \prod_{k \neq i} q_k^{x_k} (1 - q_k)^{1-x_k}\,.  
-}
-The sum and product use the restrictions $x_i = j$ and $k \ne i$ because the intervention forces $X_i = j$ with probability 1.
-The optimal intervention is denoted $(i^*,j^*) = \argmax_{i,j} \mu_{i,j}$ and the corresponding optimal reward is $\mu^* = \mu_{i^*,j^*}$. 
+%\todom{Should $Y$ be 0-1 valued or real everywhere?} YES!
+The value of the reward variable is distributed as $\P{Y = 1|\vec{X}} = r(\vec{X})$ where 
+$r : \{0,1\}^N \to \R$ is an arbitrary, fixed, and unknown function. 
+In the farming example, this choice of $Y$ models the success or failure of a seasons crop, which depends stochastically on the various environment variables.
 Note that the expected reward of the optimal intervention is at least as large as the expected reward for doing nothing.
+
+%\todom{$i,j$ notation to $a \in \actions$}
+%In our analysis below, we will often use the pair $(i,j)$ for $i \in \{1, \ldots, N\}$ and $j \in \{0,1\}$ as a shorthand for the intervention $do(X_i = j)$.
+%We will also make use of the expansion of the expected reward for $do(X_i = j)$:
+%\eq{
+%\mu_{i,j} 
+%&= \E{r(X)|do(X_i = j)} \\
+%&= \sum_{\boldsymbol{x} \in \set{0,1}^N : x_i = j} r(\boldsymbol{x})  \prod_{k \neq i} q_k^{x_k} (1 - q_k)^{1-x_k}\,.  
+%}
+%The sum and product use the restrictions $x_i = j$ and $k \ne i$ because the intervention forces $X_i = j$ with probability 1.
+%The optimal intervention is denoted $(i^*,j^*) = \argmax_{i,j} \mu_{i,j}$ and the corresponding optimal reward is $\mu^* = \mu_{i^*,j^*}$. 
 
 
 
 \subsection{The Parallel Bandit Algorithm}
 \label{sub:par-bandit-alg}
 
+The algorithm operates as follows. For the first $T/2$ rounds it chooses $do()$ to collect observational data.
+The fact that $X_1,\ldots,X_N$ are independent can be used to create good estimators of the returns of those
+actions $do(X_i = j)$ for which $\P{X_i = j}$ is large. These are the interventions that are essentially observed
+from observational data. Those actions where $\P{X_i = j}$ is small may not be observed (often) in the first $T/2$ rounds, so
+the estimates of the returns of these actions from the first $T/2$ samples could be quite poor. For the remaining $T/2$ rounds
+the algorithm makes interventions on the actions $a = do(X_i = j)$ for which $\P{X_i = j}$ is small. The precise allocation is
+carefully chosen to minimise the worst-case simple regret.
+
 \begin{algorithm}[h]
-\caption{Causal Best Arm Identification}\label{alg:simple}
+\caption{Parallel Bandit Algorithm}\label{alg:simple}
 \begin{algorithmic}[1]
-\STATE {\bf Input:} Total rounds $T$, causal graph $\mathcal{G}$, allowable interventions $\actions$. 
-\FOR{$t \in 1,\ldots,(T - 1) / 2$}
-\STATE Perform empty intervention $do()$; observe $\vec{x}_t$ and $r_t$
+\STATE {\bf Input:} Total rounds $T$ and $N$.
+\FOR{$t \in 1,\ldots,T / 2$}
+\STATE Perform empty intervention $do()$; observe $\vec{X}_t$ and $Y_t$
 \ENDFOR
 \FOR{$a = do(X_i = x) \in \actions$}
-\STATE Count times $X_i = x$ seen: $T_a = \sum_{t=1}^{T/2} \ind{x_{t,i} = x}$
-\STATE Estimate reward: $\hat{\mu}_a = \frac{1}{T_a} \sum_{t=1}^{T/2} \ind{x_{t,i} = x} r_t$
-\STATE Estimate probabilities: $\hat{p}_a = \frac{2 T_a}{T-1}$ and $\hat{V}_a = \frac{1}{\hat{p}_a}$
+\STATE Count times $X_i = x$ seen: $T_a = \sum_{t=1}^{T/2} \ind{X_{t,i} = x}$
+\STATE Estimate reward: $\hat{\mu}_a = \frac{1}{T_a} \sum_{t=1}^{T/2} \ind{X_{t,i} = x} Y_t$ \\[0.2cm]
+\STATE Estimate probabilities: $\hat{p}_a = \frac{2 T_a}{T}$ and $\hat{V}_a = \frac{1}{\hat{p}_a}$
 \ENDFOR
 \STATE Compute $\hat{m} = m(\hat{\vec{V}})$ and $A = \set{a \in \actions \colon \hat{V}_a \geq \hat{m}}$.
 \STATE Let $T_A := \frac{T-1}{2 |A|}$ be times to sample each $a\in A$.
