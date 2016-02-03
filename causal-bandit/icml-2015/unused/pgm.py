@@ -115,15 +115,29 @@ def confounded_graph(n):
     factorization = TableCPDFactorization(model)
     return model,factorization
     
-# could probably implement causal queries fairly easily on top of the TableCPDFactorization. 
-    
-     
-model,fn = confounded_graph(3)
-q = {'X1':'0'}
-# calculate probability distribution
-result = fn.condprobve(q,{})
-df = printdist(result,model)
-df['gibbs'] = gibbs_marginals(fn,model,q,{})['probability']
-df['rejection']=random_sample_marginals(model,q,{})['probability']
+def simple_graph(pz,px1gz,px2gz):
+    pgm = DiscretePGM()
+    pgm.addNode('Z',[0,1],None,[1-pz,pz])
+    pgm.addNode('X1',[0,1],['Z'],cpd(px1gz))
+    pgm.addNode('X2',[0,1],['Z'],cpd(px2gz))
+    model = pgm.construct()
+    factorization = TableCPDFactorization(model)
+    return factorization
 
-print df
+    
+# could probably implement causal queries fairly easily on top of the TableCPDFactorization. 
+
+graph = simple_graph(.2,[.3,.7],[.2,.9])
+q1 = graph.condprobve({'X1':''},{'X2':'0'})
+print q1.vals
+     
+
+
+#q = {'X1':'0'}
+# calculate probability distribution
+#result = fn.condprobve(q,{})
+#df = printdist(result,model)
+#df['gibbs'] = gibbs_marginals(fn,model,q,{})['probability']
+#df['rejection']=random_sample_marginals(model,q,{})['probability']
+
+

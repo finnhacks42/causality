@@ -66,3 +66,45 @@ This allows us to rapidly simulate rewards and conditional rewards for large num
 \centering
 \includegraphics[width=.5\textwidth]{exp_general_simpleregret_vs_N_T250_sims10000_20160131_080208.pdf}
 \end{figure}
+
+\subsection{Experiments on more general graphs}
+We now demonstrate the general simple regret algorithm on some graphs that display some interesting behaviour.
+ 
+\begin{figure}[h]
+\centering
+\caption{Causal model for the confounded bandits problem.}
+\label{fig:causalStructure_confounded_N}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed}, hidden/.style={empty}]
+\node[main node](1){$X_{2}$};
+\node[main node, right=of 1](2){$X_{3}$};
+\node[hidden, right=of 2](3){$...$};
+\node[main node, right=of 3](4){$X_{N}$};
+\node[main node, below right=of 2](5){Y};
+\node[main node,above right=of 2](6){$X_1$}; 
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge (5)
+    	(2) edge (5)
+    (4) edge (5)
+    (6) edge (1) edge (2) edge (4);
+\end{tikzpicture}
+\end{figure}
+
+\subsubsection{X1-dominated confounded model}
+A model under which the value of the confounding variable $X_1$ plays the central role in determining $P(Y)$.  Let:
+\eq {
+\P{Z = 1} &= q \\
+\P{X_k = 1|Z=j} &=  q_j \;\; \forall k \in \set{1...n}\\
+\P{Y|x_1 ... x_n} &= \bar{\boldsymbol{x}}
+} 
+This leads to rewards:
+\eq {
+\P{Y|do(Z = j)} = q^j(1-q)^{1-j}\\
+\P{Y|do(X_i = j)} = \begin{cases}
+\frac{1}{n} + \frac{n-1}{n}\left(q q_1 + (1-q)q_0 \right) & \text{ if } j = 1 \\
+\frac{n-1}{n}\left(q q_1 + (1-q)q_0 \right) & \text { if } j = 0
+\end{cases}
+}
+
+We can select the probabilities to create a scenario close to the worst case problem such that there is a single arm $do(Z=1)$ that is optimal with expected reward ...
+

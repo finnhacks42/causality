@@ -1,9 +1,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%% ICML 2015 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
+%%%%%%%% ICML 2016 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Use the following line _only_ if you're still using LaTeX 2.09.
-%\documentstyle[icml2015,epsf,natbib]{article}
+%\documentstyle[icml2016,epsf,natbib]{article}
 % If you rely on Latex2e packages, like most moden people use this:
 \documentclass{article}
 
@@ -23,8 +23,8 @@
 
 % As of 2011, we use the hyperref package to produce hyperlinks in the
 % resulting PDF.  If this breaks your system, please commend out the
-% following usepackage line and replace \usepackage{icml2015} with
-% \usepackage[nohyperref]{icml2015} above.
+% following usepackage line and replace \usepackage{icml2016} with
+% \usepackage[nohyperref]{icml2016} above.
 \usepackage{hyperref}
 
 % Packages hyperref and algorithmic misbehave sometimes.  We can fix
@@ -34,27 +34,27 @@
 % Employ the following version of the ``usepackage'' statement for
 % submitting the draft version of the paper for review.  This will set
 % the note in the first column to ``Under review.  Do not distribute.''
-\usepackage{icml2015} 
+\usepackage{icml2016} 
 
 % Employ this version of the ``usepackage'' statement after the paper has
 % been accepted, when creating the final version.  This will set the
 % note in the first column to ``Proceedings of the...''
-%\usepackage[accepted]{icml2015}
+%\usepackage[accepted]{icml2016}
 
 
 % The \icmltitle you define below is probably too long as a header.
 % Therefore, a short form for the running title is supplied here:
-\icmltitlerunning{Submission and Formatting Instructions for ICML 2015}
+\icmltitlerunning{Submission and Formatting Instructions for ICML 2016}
 
 \begin{document} 
 
 \twocolumn[
 \icmltitle{Submission and Formatting Instructions for \\ 
-           International Conference on Machine Learning (ICML 2015)}
+           International Conference on Machine Learning (ICML 2016)}
 
 % It is OKAY to include author information, even for blind
 % submissions: the style file will automatically remove it for you
-% unless you've provided the [accepted] option to the icml2015
+% unless you've provided the [accepted] option to the icml2016
 % package.
 \icmlauthor{Your Name}{email@yourdomain.edu}
 \icmladdress{Your Fantastic Institute,
@@ -73,28 +73,28 @@
 
 \begin{abstract} 
 The purpose of this document is to provide both the basic paper template and
-submission guidelines.
+submission guidelines. Abstracts should be a single paragraph, between 4--6 sentences long, ideally.  Gross violations will trigger corrections at the camera-ready phase.
 \end{abstract} 
 
 \section{Electronic Submission}
 \label{submission}
 
-Submission to ICML 2015 will be entirely electronic, via a web site
+Submission to ICML 2016 will be entirely electronic, via a web site
 (not email).  Information about the submission process and \LaTeX\ templates
 are available on the conference web site at:
 \begin{center}
-\textbf{\texttt{http://icml.cc/2015/}}
+\textbf{\texttt{http://icml.cc/2016/}}
 \end{center}
 Send questions about submission and electronic templates to
-\texttt{francis.bach@inria.fr, david.blei@columbia.edu}.
+\texttt{icml2016pc@gmail.com}.
 
 The guidelines below will be enforced for initial submissions and
 camera-ready copies.  Here is a brief summary:
 \begin{itemize}
 \item Submissions must be in PDF.
-\item The maximum paper length is \textbf{8 pages excluding references, and 10 pages
-  including references} (pages 9 and 10 must contain only references).
-\item Do \textbf{not include author information or acknowledgments} in your initial
+\item The maximum paper length is \textbf{8 pages excluding references and acknowledgements, and 10 pages
+  including references and acknowledgements} (pages 9 and 10 must contain only references and acknowledgements).
+\item Do \textbf{not include author information or acknowledgements} in your initial
 submission. 
 \item Your paper should be in \textbf{10 point Times font}.
 \item Make sure your PDF file only uses Type-1 fonts.
@@ -104,12 +104,17 @@ the graphic file itself).  Place table captions {\em over} the table.
 as possible.  Place multiple citations in chronological order.  
 \item Do not alter the style template; in particular, do not compress the paper
 format by reducing the vertical spaces.
+\item Keep your abstract brief and self-contained, one
+   paragraph and roughly 4--6 sentences.  Gross violations will require correction at the camera-ready phase.
+  Title should have content words capitalized.
+  
+
 \end{itemize}
 
 \subsection{Submitting Papers}
 
-{\bf Paper Deadline:} The deadline for paper submission to ICML 2015
-is at \textbf{23:59 Universal Time (3:59 Pacific Daylight Time) on February 6, 2015}.
+{\bf Paper Deadline:} The deadline for paper submission to ICML 2016
+is at \textbf{23:59 Universal Time (3:59 p.m.\ Pacific Standard Time) on February 5, 2016}.
 If your full submission does not reach us by this time, it will 
 not be considered for publication. There is no separate abstract submission.
 
@@ -167,9 +172,9 @@ not, you need to configure pdflatex to use a font map file that specifies that
 the fonts be embedded. Also you should ensure that images are not downsampled
 or otherwise compressed in a lossy way.
 
-Note that the 2015 style files use the {\tt hyperref} package to
+Note that the 2016 style files use the {\tt hyperref} package to
 make clickable links in documents.  If this causes problems for you,
-add {\tt nohyperref} as one of the options to the {\tt icml2015}
+add {\tt nohyperref} as one of the options to the {\tt icml2016}
 usepackage statement.
 
 \subsection{Reacting to Reviews}
@@ -190,14 +195,14 @@ format this.
 The footnote, ``Preliminary work.  Under review by the International
 Conference on Machine Learning (ICML).  Do not distribute.'' must be
 modified to ``\textit{Proceedings of the
-$\mathit{31}^{st}$ International Conference on Machine Learning},
-Lille, France, 2015.  JMLR: W\&CP volume 37. 
-Copyright 2015 by the author(s).''
+$\mathit{33}^{rd}$ International Conference on Machine Learning},
+New York, NY, USA, 2016.  JMLR: W\&CP volume 48. 
+Copyright 2016 by the author(s).''
 
 For those using the \textbf{\LaTeX} style file, simply change
-$\mathtt{\backslash usepackage\{icml2015\}}$ to 
+$\mathtt{\backslash usepackage\{icml2016\}}$ to 
 
-$$\mathtt{\backslash usepackage[accepted]\{icml2015\}}$$
+$$\mathtt{\backslash usepackage[accepted]\{icml2016\}}$$
 
 \noindent
 Authors using \textbf{Word} must edit the
@@ -210,7 +215,7 @@ The running head should be centered, bold and in $9$ point type.  The
 rule should be $10$ points above the main text.  For those using the
 \textbf{\LaTeX} style file, the original title is automatically set as running
 head using the {\tt fancyhdr} package which is included in the ICML
-2015 style file package.  In case that the original title exceeds the
+2016 style file package.  In case that the original title exceeds the
 size restrictions, a shorter form can be supplied by using
 
 \verb|\icmltitlerunning{...}|
@@ -227,8 +232,10 @@ the information that they desire.
 \subsection{Length and Dimensions}
 
 Papers must not exceed eight (8) pages, including all figures, tables,
-and appendices, but excluding references. When references are included,
-the paper must not exceed ten (10) pages. Any submission that exceeds 
+and appendices, but excluding references and acknowledgements. When references and acknowledgements are included,
+the paper must not exceed ten (10) pages.
+Acknowledgements should be limited to grants and people who contributed to the paper.
+Any submission that exceeds 
 this page limit or that diverges significantly from the format specified 
 herein will be rejected without review.
 
@@ -254,7 +261,7 @@ case.
 \label{author info}
 
 To facilitate blind review, author information must not appear.  If
-you are using \LaTeX\/ and the \texttt{icml2015.sty} file, you may use
+you are using \LaTeX\/ and the \texttt{icml2016.sty} file, you may use
 \verb+\icmlauthor{...}+ to specify authors.  The author information
 will simply not be printed until {\tt accepted} is an argument to the
 style file. Submissions that include the author information will not
@@ -293,7 +300,7 @@ should appear flush left on the ensuing line, on a single line if
 possible. If successive authors have the same affiliation, then give
 their physical address only once.
 
-A sample file (in PDF) with author names is included in the ICML2015 
+A sample file (in PDF) with author names is included in the ICML2016 
 style file package.
 
 \subsection{Abstract}
@@ -305,7 +312,7 @@ a vertical spacing of 11~points, and should be indented 0.25~inches
 more than normal on left-hand and right-hand margins. Insert
 0.4~inches of blank space after the body. Keep your abstract brief and 
 self-contained,
-limiting it to one paragraph and no more than six or seven sentences.
+limiting it to one paragraph and roughly 4--6 sentences.  Gross violations will require correction at the camera-ready phase.
 
 \subsection{Partitioning the Text} 
 
@@ -407,11 +414,6 @@ Algorithm~\ref{alg:example} shows an example.
    \UNTIL{$noChange$ is $true$}
 \end{algorithmic}
 \end{algorithm}
-
-
-
-
-
  
 \subsection{Tables} 
  
@@ -468,7 +470,7 @@ top or bottom of the page.
 
 Please use APA reference format regardless of your formatter
 or word processor. If you rely on the \LaTeX\/ bibliographic 
-facility, use {\tt natbib.sty} and {\tt icml2015.bst} 
+facility, use {\tt natbib.sty} and {\tt icml2016.bst} 
 included in the style-file package to obtain this format.
 
 Citations within the text should include the authors' last names and
@@ -510,9 +512,8 @@ the material as ``Supplementary Material'' into the CMT reviewing
 system.  Note that reviewers are not required to look a this material
 when writing their review.
 
-
 % Acknowledgements should only appear in the accepted version. 
-\section*{Acknowledgments} 
+\section*{Acknowledgements} 
  
 \textbf{Do not} include acknowledgements in the initial version of
 the paper submitted for blind review.
@@ -531,7 +532,7 @@ support.
 \nocite{langley00}
 
 \bibliography{example_paper}
-\bibliographystyle{icml2015}
+\bibliographystyle{icml2016}
 
 \end{document} 
 
