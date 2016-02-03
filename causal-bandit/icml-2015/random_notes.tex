@@ -1,0 +1,27 @@
+Strictly better performance is not true for the case where q is unknown (due to the hard transition between exploration and exploitation). We have performance of the same order or better than algorithms that don't use the causal structure. Maybe an algorithm that did offer strictly better performance is possible - although there could be a trade off against performance on 'easy' problems?  
+
+We can then marginalize to obtain $P(Y|do(X_i = j))$
+
+\eq {
+P(Y|do(X_i = j)) =& \sum_{\x:x_i=j} \prod_{k \neq i}\P{x_k|\calP_k(\x)}\P{Y|\calP_Y(\x)}\\
+ =& \sum_{\x:x_i=j} \prod_{k \neq i}\P{x_k|\calP_k(\x)}\P{Y|\x}\\
+ =& \sum_{\x:x_i=j} \P{\boldsymbol{X}|do(X_i=j)}\P{Y|\x}
+}
+
+The query $P(Y|do(V)$ is identifiable for any graph with known structure and fully observable variables. This means we can create an estimator for the reward of any action in terms only of results observed when the $do()$ action was selected (although the variance of these estimators can be infinite if any node conditional probabilities are zero). For example, consider the graph in \cref{fig:causalStructure_confounded}. 
+
+We can generalize the (simple regret) algorithm developed for the parallel bandit problem to general graphs as follows. 
+
+
+\begin{itemize}
+\item Apply the do-calculus to write an expression for the reward of each action in term of observational data: $P(Y|do(X_i=j)) = \sum_{pa_i} P(Y|X_i = j,pa_i)P(pa_i)$ \cite{Pearl2000} Theorem 3.2.2
+\item Create an estimator from this expression
+\item Observe for $T/2$ rounds.
+\item Calculate the variance in the estimators from $P(pa_i)$ and $P(X_i|pa_i)$ if they are known (corresponds to known $q$ case) or estimate the variance from the observations (as for unknown $q$ case). 
+\item Compute the set of poorly estimated actions, $A$ based on the inverses of the variances.
+\item Explicitly play actions in $A$ for the remaining $T/2$ rounds.
+\end{itemize}
+
+It is unclear if this approach remains optimal. The $do()$ action is not the only one that can reveal information about the rewards of multiple other actions. In the example in figure \ref{fig:causalStructure_confounded}, $do(Z)$ is another obvious candidate. We would need to establish a matching lower bound - or prove that $do()$ is always the most revealing action. 
+
+We are also not using the fact that the rewards are not entirely independent (They are 'almost' independent in the parallel bandit example). This does not apply in general. Consider a chain graph $X_1 \rightarrow X_2 \rightarrow, ..., X_N \rightarrow Y$. In this case $k > i \implies P(Y|do(X_i)) \leq P(Y|do(X_k))$.  
