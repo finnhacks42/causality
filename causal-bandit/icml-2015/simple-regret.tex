@@ -85,8 +85,7 @@ m(\vec{q}) = \max \set{i : \sum_{k=1}^N \ind{\min\set{q_k, \,1 - q_k} \leq 1/i} 
 \FOR{$a = do(X_i = x) \in \actions$}
 \STATE Count times $X_i = x$ seen: $T_a = \sum_{t=1}^{T/2} \ind{X_{t,i} = x}$
 \STATE Estimate reward: $\hat{\mu}_a = \frac{1}{T_a} \sum_{t=1}^{T/2} \ind{X_{t,i} = x} Y_t$ \\[0.2cm]
-\STATE Estimate probabilities: $\hat{p}_a = \frac{2 T_a}{T}$ 
-\STATE $\hat q_i = \hat{q}_{do(X_i = 1)}$
+\STATE Estimate probabilities: $\hat{p}_a = \frac{2 T_a}{T}$,\,\, $\hat q_i = \hat p_{do(X_i = 1)}$
 \ENDFOR
 \STATE Compute $\hat{m} = m(\vec{\hat q})$ and $A = \set{a \in \actions \colon \hat{p}_a \leq 1/\hat m}$.
 \STATE Let $T_A := \frac{T}{2 |A|}$ be times to sample each $a\in A$.
@@ -113,7 +112,7 @@ this setting.
 We prove a lower bound on the simple regret that matches up to logarithmic factors the upper bound given in Theorem \ref{thm:uq-simple}
 
 \begin{theorem}\label{thm:lower}
-Let $\vec{q}$ be fixed and satisfies $m = m(\boldsymbol{q})$. Then there exists a reward function such that
+Let $\vec{q}$ be fixed and satisfies $m = m(\boldsymbol{q})$. Then for all strategies there exists a reward function such that
 \eq{
 \simpleregret \geq \frac{\frac{m}{2e} - 1}{m} \sqrt{\frac{2m}{3T}} = \Omega\left(\sqrt{\frac{m}{T}}\right)\,.
 }
