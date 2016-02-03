@@ -33,10 +33,9 @@ simple regret guarantees of $\tilde\Theta(\sqrt{m/T})$ where $m$ depends on the 
 In contrast, existing best arm identification algorithms suffer $\Omega(\sqrt{N/T})$ simple regret.
 This shows theoretically the value of our framework over the traditional bandit problem. 
 Experiments in \S\ref{sec:experiments} further demonstrate the value of causal models in this framework.
-\todom{Mention cumulative regret?}
 
-In the general casual model interventions and observations may have a complex relationship. 
-In \S\ref{sec:simple-regret-general} we propose an novel algorithm inspired by importance-sampling that a) enjoys sub-linear regret equivalent to the optimal rate in the parallel bandit setting and b) captures many of the intricacies of sharing information in a causal graph in the general case. 
+In the general casual bandit problem interventions and observations may have a complex relationship. 
+In \S\ref{sec:simple-regret-general} we propose a novel algorithm inspired by importance-sampling that a) enjoys sub-linear regret equivalent to the optimal rate in the parallel bandit setting and b) captures many of the intricacies of sharing information in a causal graph in the general case.
 As in the parallel bandit case, the regret guarantee is often significantly better than $O(\sqrt{N/T})$ and never worse, where $N$ is the number of available interventions.
 
 
@@ -44,39 +43,29 @@ As in the parallel bandit case, the regret guarantee is often significantly bett
 \subsection{Related Work}
 
 As alluded to above, causal bandit problems with $N$ possible interventions can be treated as a classical $N$-armed bandit problem by simply ignoring the causal model and extra observations that are revealed each round.
-In the farming example, the farmer could treat the six possible interventions are arms, ignore the observations of the non-intervened variables, and apply an algorithm such as UCB~\cite{Auer1995} with well understood regret guarantees.
+In the farming example, the farmer could treat the six possible interventions are arms, ignore the observations of the non-intervened variables, and apply an existing best-arm identificaion algorithm~\citep{Jamieson2013} with well understood simple regret guarantees.
 However, as we show in \S\ref{sec:simple-regret}, this approach ignores the extra information available in the non-intervened variables and subsequently yields sub-optimal performance.
 
-Bandit problems with side information are commonly referred to as ``contextual bandits'' and have been well studied in recent years~\cite{Langford2008,Agarwal2014}.
+A well-studied class of bandit problems with side information are ``contextual bandits''~\cite{Langford2008,Agarwal2014}.
 Our framework bears a superficial similarity to contextual bandit problems since the extra observations on non-intervened variables might be viewed as context for selecting an intervention. 
-However, a crucial difference is that in our model the extra observations are only revealed \emph{after} selecting an intervention and cannot be used as context.
-We discuss the relationship between causal and contextual bandits further in \S\ref{sec:defs} and leave their combination as future work.
+However, a crucial difference is that in our model the extra observations are only revealed \emph{after} selecting an intervention and hence cannot be used as context.
+% We discuss the relationship between causal and contextual bandits further in \S\ref{sec:defs} and leave their combination as future work.
 
-There has been a significant amount of recent work which proposes alternative modes of feedback within the bandit setting \citep{Alon2015} which, at first glance, may appear applicable. Indeed, we show in \S~\ref{sec:discussion}, that it is possible to applying these existing results to our problem, however the resulting regret is $\bigo{\sqrt{NT}}$, again with a sub-optimal dependence on $N$.
+There have been several proposals for bandit problems where extra feedback is received after an action is taken.
+\citet{Alon2015} consider a very general model where rewards on unplayed actions are revealed according to a feedback graph.
+As we discuss in \S\ref{sec:discussion}, the problem they consider shares some similarity with ours however their results are for cumulative regret and thus cannot be used to guarantee low simple regret~\citep{Bubeck2009}.
+Even in the case of cumulative regret we show that an application of their results to the parallel bandit problem with $N$ variables yields a $\bigo{\sqrt{NT}}$ bound.
+\citet{Yu2009} consider bandit problems where a learner chooses an arm to play as well as set of arms to observe rewards for in a stochastic setting where the reward distributions can change infrequently and the aim is to minimize cumulative regret.
+They use extra observations to detect changes whereas we assume fixed reward distributions and use extra observations to improve arm selection.
+\citet{Avner2012} analyse bandit problems where the choice of arm to pull and arm to receive feedback on are decoupled. 
+The main difference from our present work is our focus on simple regret and exploitation of the more complex information related rewarding via the causal graph.
+To the best of our knowledge, our paper is the first to analyse simple regret in bandit problems with extra post-action feedback.
 
-\todom{Rework rest of intro}
-
-%Problems requiring choosing an action under uncertainty are rife in all areas of human endeavour. For many problems, actions may be chosen sequentially, allowing the agent to learn from the outcome of early choices to improve later ones. 
-
-% A widely used framework for sequential decision making is the multi-armed bandit. In the classic multi-armed bandit setting there is a finite set of available actions, each associated with a distribution over rewards which is unknown but stationary. At each timestep the agent selects an action and receives a reward sampled i.i.d from the corresponding reward distribution. The performance of bandit algorithms is described by the regret: the difference in the expected reward obtained by the algorithm and the reward that could be obtained if the optimal action was selected at every timestep. 
-
-
-% We take a first step towards unifying these approaches by considering a variant of the stochastic multi-armed bandit problem where we have prior knowledge of the causal structure governing the available actions. 
-
-% A natural way to connect the causal framework with the bandit setting is to model the problem as a causal directed acyclic graph. Each possible assignment of variables to values is an action (bandit arm). The reward could be a general function of the action selected and the final state of the graph. However for simplicity, we will consider the reward to be the value of a single specified node minus the cost of the selected action. The number of actions grows exponentially with the number of variables in the graph, making it important to use algorithms that take account of the graph structure to reduce the search space. 
-
-% Problems framed in this way take on characteristics of different bandit settings depending on the assumptions we make about what subset of actions can be taken, what variables are observable and whether they are observed before or after an action is selected. If feedback is received only on the reward node then the do-calculus can be applied to eliminate some actions immediately, before any experiments are performed and then a standard bandit algorithm can be run on the remaining actions. 
-
-% If we receive feedback on additional nodes the problem can be more interesting. In addition to being able to eliminate some actions prior to sampling any data as in the previous case, taking one action may give us some information on actions that were not selected. 
-
-% We consider a bandit problem where the actions and reward are represented by a specific causal graph that demonstrates this interesting structure. We develop an algorithm to leverage the information provided by this structure and demonstrate it substantially outperforms standard bandit algorithms applied to the same problem where the number of actions is large.
-
-There has been substantial recent work into extending bandit algorithms to incorporate additional assumptions and deal with more complex feedback structures. Algorithms with strong guarantees have been developed for linear bandits [], generalized linear bandits, gaussian process bandits [], etc. There is also an active line of research into bandits with feedback defined by a graph. Actions are modelled as nodes in the graph and the agent observes rewards for each action connected to the selected action []. The novelty of our work is that we assume prior knowledge of the causal structure but not the functional form of the relationship between variables.   
 
 % Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
 
 Two pieces of recent work also consider using causal models in bandit problems.
-Although \citet{Bareinboim2015} also use causal inference to improve the chance of choosing an optimal arm, their work differs from our in two key ways. Firstly, their focus is on correcting the effects of unobserved confounding variables whereas we assume all variables are observable. Secondly, they do not assume their learning algorithm has access to a causal graph and instead use a form of contextual randomization to improve reward estimates in a Thompson sampling-style algorithm. \citet{Ortega2014thompson} also present an analysis and extension of Thompson sampling assuming actions are causal interventions. Their focus, however, is on causal induction (\ie, learning an unknown causal model) instead of exploiting a known causal model. Neither work provides a regret analysis. 
+\citet{Bareinboim2015} also use causal inference to improve the chance of choosing an optimal arm. Their work differs from ours in two key ways. Firstly, their focus is on correcting the effects of unobserved confounding variables whereas we assume all variables are observable. Secondly, they do not assume their learning algorithm has access to a causal graph and instead use a form of contextual randomization to improve reward estimates in a Thompson sampling-style algorithm. \citet{Ortega2014thompson} present an analysis and extension of Thompson sampling assuming actions are causal interventions. Their focus is on causal induction (\ie, learning an unknown causal model) instead of exploiting a known causal model. Neither work provides a regret analysis. 
 Combining their handling of unobserved variables and causal induction with our analysis is left as future work.
 % Key to Elias' paper is: observing the action an agent would take if it were allowed to make its natural choice can provide some information about hidden confounders that influence both the reward and the choice of action. Therefore, incorporating an agents natural choice as context may outperform a standard bandit that does not use that context. (Note: even in the presence of hidden confounders, including the agents natural choice as context only may improve the results. It is easy to come up with a counter example in which it does not).
 
