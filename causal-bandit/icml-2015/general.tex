@@ -74,10 +74,13 @@ where $B_a \geq 0$ is some constant to be chosen subsequently and
 \eq{
 R_a(X) = \frac{\P{\parents{Y}(X)|a}}{\Q{\parents{Y}(X)}}\,.
 }
-Define $m(\eta)$ by
+Abusing notation we define $m(\eta)$ by
 \eq{
 m(\eta) = \max_{a \in \calA} \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right]\,.
 }
+We will shortly see that $m(\eta)$ is a measure of the difficulty of the problem that approximately cooincides 
+with the version given in the previous section, which justifies the name overloading.
+
 
 \begin{algorithm}[H]
 \caption{General Algorithm}\label{alg:general}
@@ -178,12 +181,14 @@ a natural choice of $\eta$ is the minimiser of $m(\eta)$.
 &= \argmin_\eta \underbrace{\max_{a \in \calA} \EE_{\Ps_a} \left[\frac{\Pn{a}{\parents{Y}(X)}}{\sum_{b \in \calA} \eta_b \Pn{b}{\parents{Y}(X)}}\right]}_{m(\eta)}\,.
 }
 Since the mixture of convex functions is convex and the maximum of a set of convex functions is convex, we see that $m(\eta)$ is convex (in $\eta$).
-Therefore the minimisation problem may be tackled using standard techniques from convex optimisation. In the experimental section we present some special cases,
+Therefore the minimisation problem may be tackled using standard techniques from convex optimisation. 
+An interpretation of $m(\eta^*)$ is the minimum achievable worst-case variance of the importance weighted estimator.
+In the experimental section we present some special cases,
 but for now we give two simple results. The first shows that $|\calA|$ serves as an upper bound on $m(\eta^*)$.
 
-\begin{lemma}
+\begin{proposition}
 $m(\eta^*) \leq |\calA|$.
-\end{lemma}
+\end{proposition}
 
 \begin{proof}
 By definition, $m(\eta^*) \leq m(\eta)$ for all $\eta$. Let $\eta_a = 1/|\calA|$. Then
@@ -195,15 +200,14 @@ m(\eta)
 }
 \end{proof}
 
-\todo{give reference}
-The second observation is that in the parallel bandit setting the $m(\eta)$ given in this section coincides with the $m$ in Equation blah.
+The second observation is that in the parallel bandit setting the $m(\eta)$ given in this section approximately coincides with the $m(\vec{q})$ in Eq.\ \ref{eq:m-simple}.
 Recall in that setting that 
 \eq{
 \actions = \set{do()} \cup \set{do(X_i = j) : 1 \leq i \leq N \text{ and } j \in \set{0,1}}\,.
 }
-For $a = do()$ we let $\eta_a = 1/2$. Assume without loss of generality that $\P{X_i = 1} \geq \P{X_i = 0}$ for all $i$ and
-$\P{X_i = 0}$ is monotone increasing in $i$. Then let $m = \max\set{i : \P{X_i = 0} \leq 1 / i}$, which is the same as in \S3. 
-For $i \leq m$ and $a = do(X_i = 0)$ let $\eta_a = 1/(2m)$. Then it is easy to check that $m(\eta) \leq 2m$. 
+For $a = do()$ choose $\eta_a = 1/2$. 
+Let $m = m(\vec{q})$ and for $a = do(X_i = j)$ let $\eta_a = \ind{\P{X_i = j} \leq 1/m} / (2m)$. 
+Then it is easy to check that $m(\eta) \leq 2m$.  
 
 \begin{remark}
 The algorithm in the previous section for the parallel bandit problem did not assume knowledge of the conditional distributions on $X$ and 

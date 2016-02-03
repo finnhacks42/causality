@@ -69,8 +69,9 @@ the estimates of the returns of these actions from the first $T/2$ samples could
 the algorithm makes interventions on the actions $a = do(X_i = j)$ for which $\P{X_i = j}$ is small. The precise allocation is
 carefully chosen to minimise the worst-case simple regret. The difficulty of the problem depends on $\vec{q}$. 
 Define $m \in \set{1, \ldots, N}$ by
-\eq{
-m(\vec{q}) = \max \set{i : \sum_{k=1}^N \ind{\min\set{q_k, (1 - q_k)}} \leq 1/i}\,.
+\eqn{
+\label{eq:m-simple}
+m(\vec{q}) = \max \set{i : \sum_{k=1}^N \ind{\min\set{q_k, \,1 - q_k} \leq 1/i} \leq i}\,.
 }
 
 \begin{algorithm}[h]
@@ -112,7 +113,7 @@ this setting.
 We prove a lower bound on the simple regret that matches up to logarithmic factors the upper bound given in Theorem \ref{thm:uq-simple}
 
 \begin{theorem}\label{thm:lower}
-Let $\vec{q}$ be fixed and satisfies $m = m(\boldsymbol{q})$.
+Let $\vec{q}$ be fixed and satisfies $m = m(\boldsymbol{q})$. Then there exists a reward function such that
 \eq{
 \simpleregret \geq \frac{\frac{m}{2e} - 1}{m} \sqrt{\frac{2m}{3T}} = \Omega\left(\sqrt{\frac{m}{T}}\right)\,.
 }
