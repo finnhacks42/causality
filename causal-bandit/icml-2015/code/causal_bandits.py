@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from time import time
 
 
+
 def random_eta(n):
     eta = np.random.random(n)
     eta = eta/eta.sum()
@@ -210,10 +211,10 @@ baseline  = SuccessiveRejects()
 
 ts = time()   
 regret = np.zeros((len(T_vals),3,simulations))
-for T_indx,T in enumerate(T_vals):
-    for s in xrange(simulations):
-        if s % 100 == 0:
+for s in xrange(simulations):
+    if s % 100 == 0:
             print s
+    for T_indx,T in enumerate(T_vals):     
         regret[T_indx,0,s] = causal.run(T,model,eta,4)
         regret[T_indx,1,s] = causal.run(T,model2,eta2,2)
         regret[T_indx,2,s] = baseline.run(T,model)
@@ -223,7 +224,12 @@ print 'took: %2.4f sec' % (te-ts)
 mean = regret.mean(axis=2)       
 plt.plot(T_vals,mean)
 
-
+error = 3*regret.std(axis=2)/sqrt(simulations)
+fig,ax = plt.subplots()
+ax.errorbar(T_vals,mean[:,0],yerr=error[:,0], label="Causal m(eta) = 4",linestyle="",marker="o")    
+ax.errorbar(T_vals,mean[:,2],yerr=error[:,2], label="Successive Rejects",linestyle="",marker="D") 
+ax.legend(loc="lower left",numpoints=1)
+   
 
 #
 ##constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0})
