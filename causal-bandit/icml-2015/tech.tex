@@ -101,11 +101,11 @@ Therefore with probability at least $1 - 6\delta$ we have
 }
 If this occurs, then 
 \eq{
-\mu_{\hat a^*} \geq \hat \mu_{\hat a^*} - \epsilon \geq \hat \mu_{a^*} - \epsilon \geq \mu_{a^*} - 2\epsilon\,.
+\mu_{\hat a^*_T} \geq \hat \mu_{\hat a^*_T} - \epsilon \geq \hat \mu_{a^*} - \epsilon \geq \mu_{a^*} - 2\epsilon\,.
 }
 Therefore
 \eq{
-\mu^* - \EE[\mu_{\hat a^*}] 
+\mu^* - \EE[\mu_{\hat a^*_T}] 
 \leq 6\delta + \epsilon 
 \leq \frac{6m}{T} + \sqrt{\frac{32m}{T} \log \frac{NT}{m}}\,, 
 }
@@ -117,7 +117,6 @@ which completes the result.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Proof of Theorem \ref{thm:lower}}\label{sec:thm:lower}
 
-\todot{Change this to Bernoulli}
 Assume without loss of generality that $q_1 \leq q_2 \leq \ldots \leq q_N \leq 1/2$.
 For each $i$ define reward function $r_i$ by
 \eq{
@@ -127,50 +126,47 @@ r_i(\boldsymbol{X}) &= \begin{cases}
 \frac{1}{2} & \text{otherwise}\,,
 \end{cases}
 }
-where $\epsilon > 0$ is some constant to be chosen later.
+where $1/4 \geq \epsilon > 0$ is some constant to be chosen later.
 We abbreviate $R_{T,i}$ to be the expected simple regret incurred when interacting with the
-environment determined by $\boldsymbol{q}$ and $r_i$. Let $P_i$ be the corresponding measure
-on all observations over all $T$ rounds and $\mathbb E_i$ the expectation with respect to $P_i$. By Lemma 2.6 by \cite{Tsy08} we have
+environment determined by $\boldsymbol{q}$ and $r_i$. Let $\operatorname{P}_i$ be the corresponding measure
+on all observations over all $T$ rounds and $\EE_i$ the expectation with respect to $\operatorname{P}_i$. By Lemma 2.6 by \cite{Tsy08} we have
 \eq{
-\Prz{I_T = i} + \Pri{I_T \neq i} \geq \exp\left(-\KL(P_0, P_i)\right)\,,
+\Prz{\hat a^*_T = a^*} + \Pri{\hat a^*_T \neq a^*} \geq \exp\left(-\KL(\operatorname{P}_0, \operatorname{P}_i)\right)\,,
 }
-where $\KL(P_0, P_i)$ is the KL divergence between measures $P_0$ and $P_i$.
-Let $T_i(T) = \sum_{t=1}^T \ind{I_t = i}$ be the total number of times the learner intervenes on variable $i$ (with any intervention). 
-Then for $i \leq m$ a computation shows that 
-\todot{Need to add at minimum some citations here}
+where $\KL(\Ps_0, \Ps_i)$ is the KL divergence between measures $\operatorname{P}_0$ and $\operatorname{P}_i$.
+Let $T_i(T) = \sum_{t=1}^T \ind{a_t = do(X_i = 1)}$ be the total number of times the learner intervenes on variable $i$ by setting it to $1$.
+Then for $i \leq m$ we have $q_i \leq 1/m$ and the KL divergence between $\Ps_0$ and $\Ps_i$ may be bounded using the telescoping property (chain rule) and
+by bounding the local KL divergence by the $\chi$-squared distance as by \cite{Auer1995}. This leads to 
 \eq{
-\KL(P_0, P_i) 
-&\leq 4\epsilon^2 \EE_0\left[\sum_{t=1}^T \ind{X_{t,i} = 1}\right] \\
-%&= \frac{\epsilon^2}{2} \mathbb E_0\left[\sum_{t=1}^T \ind{X_{t,i} = 1}\right] \\
-&\leq 4\epsilon^2 \left(\mathbb E_0 T_i(T) + q_i T\right) \\
-&\leq 4\epsilon^2 \left(\mathbb E_0 T_i(T) + \frac{T}{m}\right)\,.
+\KL(\Ps_0, \Ps_i) 
+&\leq 6\epsilon^2 \EE_0\left[\sum_{t=1}^T \ind{X_{t,i} = 1}\right] 
+\leq 6\epsilon^2 \left(\EE_0 T_i(T) + q_i T\right) 
+\leq 6\epsilon^2 \left(\EE_0 T_i(T) + \frac{T}{m}\right)\,.
 }
-Define set $A$ by
+Define set $A = \set{i \leq m : \EE_0 T_i(T) \leq 2T / m}$.
+Then for $i \in A$ and choosing $\epsilon = \min\set{1/4, \sqrt{m/(18T)}}$ we have
 \eq{
-A = \set{i \leq m : \mathbb E_0 T_i(T) \leq 2T / m}\,.
+\KL(\Ps_0, \Ps_i) \leq \frac{18T\epsilon^2}{m} = 1\,. 
 }
-Then for $i \in A$ and choosing $\epsilon = \sqrt{2m/3T}$ we have
-\eq{
-\KL(P_0, P_i) \leq \frac{3T\epsilon^2}{2m} = 1\,. 
-}
-Now $\sum_{i=1}^m \mathbb E_0 T_i(T) \leq T$, which implies that $|A| \geq m/2$.
+Now $\sum_{i=1}^m \EE_0 T_i(T) \leq T$, which implies that $|A| \geq m/2$.
 Therefore
 \eq{
-\sum_{i \in A} \Pri{I_T \neq i} 
-&\geq \sum_{i \in A} \exp\left(-\KL(P_0, P_i)\right) - 1\\
-&\geq \frac{|A|}{e} - 1 
+\sum_{i \in A} \Pri{\hat a^*_T \neq a} 
+\geq \sum_{i \in A} \exp\left(-\KL(\Ps_0, \Ps_i)\right) - 1
+\geq \frac{|A|}{e} - 1 
 \geq \frac{m}{2e} - 1\,.
 }
 Therefore there exists an $i \in A$ such that
+$\Pri{\hat a^*_T \neq a^*} \geq \frac{\frac{m}{2e} - 1}{m}$. 
+Therefore if $\epsilon < 1/4$ we have
 \eq{
-\Pri{I_T \neq i} \geq \frac{\frac{m}{2e} - 1}{m}\,.
+R_{T,i} \geq \frac{1}{2} \Pn{i}{\hat a^*_T \neq a^*} \epsilon \geq \frac{\frac{m}{2e} - 1}{2m} \sqrt{\frac{m}{18T}}\,.
 }
-Therefore
+Otherwise $m \geq 18T$ so $\sqrt{m/T} = \Omega(1)$ and
 \eq{
-R_{T,i} \geq \frac{1}{2} P_i(I_T \neq i) \epsilon \geq \frac{\frac{m}{2e} - 1}{2m} \sqrt{\frac{2m}{3T}}
+R_{T,i} \geq \frac{1}{2} \Pn{i}{\hat a^*_T \neq a^*} \epsilon \geq \frac{1}{4} \frac{\frac{m}{2e} - 1}{2m} \in \Omega(1) 
 }
 as required.
-
 
 
 

@@ -13,6 +13,10 @@ import matplotlib.pyplot as plt
 from time import time
 from datetime import datetime as dt
 
+
+REGRET_LABEL = "Regret"
+HORIZON_LABEL = "T"
+
 def now_string():
     return dt.now().strftime('%Y%m%d_%H%M')
 
@@ -31,8 +35,7 @@ def part_balanced_q(N,m):
     q = np.full(N,.5,dtype=float)
     q[0:m] = 0
     return q
-    
-    
+        
 def argmax_rand(x):
     """ return the index of the maximum element in the array, ignoring nans. 
     If there are multiple max valued elements return 1 at random"""
@@ -46,6 +49,104 @@ def calculate_m(qij_sorted):
             return indx
     return len(qij_sorted)/2      
     
+class VeryConfounded(object):
+    def __init__(self,a,b,n,q1,q2,pYgivenW):
+        #self.pV = np.vstack((1.0-q,q)) TODO fix this.
+        self.n = n # number of V variables
+        self.N = self.n + 2 # number of variables total
+        self.K = 2*self.N + 1 #v_1...v_n = 0,v_1...v_n=1,w0=0,w1=0,w0=1,w1=1,do()
+        self.pYgivenW = pYgivenW # 2*2 matrix p(y|0,0),p(y|0,1),p(y|1,0),p(y|1,1)
+        
+        self.pW0givenA = np.full(self.K,(1-q1)*a + q1*q2*(n-2)/(n-1.0))
+        self.pW0givenA[n:] = (1-q1)*a + q1*(q2*(n-2)/(n-1.0)+1/(n-1.0))
+        self.pW0givenA[0] = a
+        self.pW0givenA[n] = q2
+        self.pW0givenA[[-4,-2,-1]] = (1-q1)*a + q1*q2 # for do(w1=0),do(w1=1),do()
+        self.pW0givenA[-3] = 1 # for do(w0 = 1)
+        self.pW0givenA[-5] = 0 # for do(w0 = 0)
+        
+        self.pW1givenA = np.full(self.K,(1-q1)*b)
+        self.pW1givenA[n:] = (1-q1)*b+q1*q2**(n-2)
+        self.pW1givenA[0] = b
+        self.pW1givenA[n] = q2**(n-1)
+        self.pW1givenA[[-5,-3,-1]] = (1-q1)*b # for do(w0=0),do(w0=1),do()
+        self.pW1givenA[-2] = 1 # for do(w1 = 1)
+        self.pW1givenA[-4] = 0 # for do(w1 = 0)
+        
+        self.pW0givenA = np.vstack((1-self.pW0givenA,self.pW0givenA))
+        self.pW1givenA = np.vstack((1-self.pW1givenA,self.pW1givenA))
+        self.wCombinations = np.asarray([(0, 0), (0, 1), (1, 0), (1, 1)])
+        self.expected_rewards = self.estimate_rewards(100000)
+        self.optimal = np.max(self.expected_rewards)
+        
+    def estimate_rewards(self,samples_per_action):
+        total = np.zeros(self.K)
+        for s in xrange(samples_per_action):
+            for a in range(self.K):
+                x,y = self.sample(a)
+                total[a] += y
+        return total/float(samples_per_action)
+    
+    def P(self,w):
+        return self.pW0givenA[w[0],:]*self.pW1givenA[w[1],:] 
+        
+    def R(self,x,eta):
+        pa = self.P(x)
+        Q = (eta*pa).sum()
+        ratio = np.true_divide(pa,Q)
+        ratio[np.isnan(ratio)] = 0 # we get nan when 0/0 but should just be 0 in this case
+        return ratio
+        
+    def V(self,eta):
+        va = np.zeros(self.K)  
+        for x in self.wCombinations:
+            pa = self.P(x)
+            Q = (eta*pa).sum()
+            ratio = np.true_divide(pa**2,Q)
+            ratio[np.isnan(ratio)] = 0 # we get nan when 0/0 but should just be 0 in this case
+            va += ratio         
+        return va 
+        
+    def pW0(self,v):
+        return v.mean()
+    
+    def pW1(self,v):
+        return v.prod()
+    
+    def sample(self,action):
+        v = binomial(1,q2,size=self.n)
+        v[0] = binomial(1,q1)
+        if action < 2*self.n: # setting one of the V's
+            i,j = action % self.n, action/self.N
+            v[i] = j
+        w0 = binomial(1,self.pW0(v))
+        w1 = binomial(1,self.pW1(v))
+        if not action < 2*self.n:     
+            if action == self.K - 2:
+                w1 = 1
+            elif action == self.K - 3:
+                w0 = 1
+            elif action == self.K - 4:
+                w1 = 0
+            elif action == self.K - 5:
+                w0 = 0
+        x = np.zeros(self.N)  
+        x[0:self.n] = v
+        x[self.n] = w0
+        x[self.n+1]= w1
+        y = binomial(1,self.pYgivenW[w0,w1])
+        return x,y
+    
+    def sample_multiple(self,actions,n):
+        """ sample the specified actions, n times each """
+        return binomial(n,self.expected_rewards[actions])
+    
+    def m(self,eta):
+        maxV = self.V(eta).max()
+        assert not np.isnan(maxV), "m should not be nan"
+        return maxV
+        
+
 
 class Parallel(object):
     def __init__(self,q,epsilon):
@@ -231,7 +332,7 @@ def find_eta(model):
     return res.x,res.fun
     
 def experiment1(N,simulations,a):
-    q = part_balanced_q(N,2) #TODO fix most unbalanced (N,1)
+    q = part_balanced_q(N,2) 
     model = Parallel(q,.5)
     eta,mq = model.analytic_eta()
     Tmin = int(ceil(4*model.K/a)) 
@@ -271,28 +372,55 @@ def experiment1(N,simulations,a):
     fig.savefig(fig_name, bbox_inches='tight') 
     return regret,mean,error                               
 
-REGRET_LABEL = "Regret"
-HORIZON_LABEL = "T"
+ts = time()
+a,b,n,q1,q2, = 1,1,20,.1,.5
+pYgivenW = np.asarray([[.5,.5],[.5,.6]])
 
-regret,mean,error = experiment1(50,10000,4.0)   
+model = VeryConfounded(a,b,n,q1,q2,pYgivenW) 
+print model.expected_rewards
+
+eta,m = find_eta(model)
+te = time()
+print 'took: %2.4f sec' % (te-ts)
 
 
+T_vals = range(model.K,10*model.K,model.K)
+simulations = 100
+causal = GeneralCausal()
+baseline  = SuccessiveRejects()
 
-#model2 = Parallel(np.full(N,.5),epsilon) #balanced q
-#eta2 = np.zeros(model2.K)
-#eta2[-1] = 1.0 # just observe strategy 
+ts = time()   
+regret = np.zeros((len(T_vals),2,simulations))
+for s in xrange(simulations):
+    if s % 100 == 0:
+            print s
+    for T_indx,T in enumerate(T_vals): 
+        regret[T_indx,0,s] = causal.run(T,model,eta,m)
+        regret[T_indx,1,s] = baseline.run(T,model)
+        
+te = time()
+print 'took: %2.4f sec' % (te-ts)
 
-#print model.m(eta)
-#print model2.m(eta2)
-#
-##constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0})
+mean = regret.mean(axis=2)       
+error = 3*regret.std(axis=2)/sqrt(simulations)
+
+fig,ax = plt.subplots()
+ax.errorbar(T_vals,mean[:,0],yerr=error[:,0], label="Algorithm 2",linestyle="",marker="s",markersize=4)    
+ax.errorbar(T_vals,mean[:,1],yerr=error[:,1], label="Successive Rejects",linestyle="",marker="D",markersize=4) 
+ax.set_xlabel(HORIZON_LABEL)
+ax.set_ylabel(REGRET_LABEL)
+ax.legend(loc="upper right",numpoints=1)
+fig_name = "exp_regret_cnfd_vs_T_N{0}_s{1}_{2}.pdf".format(model.N,simulations,now_string())
+fig.savefig(fig_name, bbox_inches='tight') 
+
+
 #results = []
-##'ftol' : 10 * np.finfo(float).eps
+#
 #o = open("converge3.txt","w")
 #for t in range(30):
-#    eta0 = random_eta(n)
-#    res = minimize(maxV,eta0,bounds = [(0.0,1.0)]*n, constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0}),options={'disp': True},method='SLSQP')#, method='L-BFGS-B',
-#    #res = minimize(maxV,eta0, options={'disp': True})
+#    eta0 = random_eta(model.K)
+#    res = minimize(model.m,eta0,bounds = [(0.0,1.0)]*model.K, constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0}),options={'disp': True},method='SLSQP')#, method='L-BFGS-B',
+#    
 #    results.append(res)
 #    if res.success:
 #        result =["%.4f"%float(x) for x in res.x]
@@ -308,34 +436,4 @@ regret,mean,error = experiment1(50,10000,4.0)
 #for r in results:
 #    print ["%.3f" % float(v) for v in r.jac]
 
-#print sum(res.x)
-# need do and doZ in there as actions too...
-    
- 
-#    def V(self,eta):
-#        xvals = map(np.asarray,product([0,1],repeat = self.N-1)) # all possible assignments to our N-1 variables that are parents of Y
-#        va = np.zeros(2*self.N + 1)        
-#        for x in xvals:
-#            pa = self.P(x)
-#            Q = (eta*pa).sum()
-#            va += np.true_divide(pa**2,Q)
-#        return va 
-
-   
-#    def P(self,x):
-#        assert len(x) == self.pX.shape[1]
-#        indices = np.arange(len(x))
-#        ps = self.pX[x,indices] # probability of xi for each i
-#        pi = np.asarray([np.prod(ps[indices != i]) for i in indices])
-#        pij = np.vstack((pi,pi))
-#        pij[1-x,indices] = 0 # these are the probability of observing the given x for each action do(Xi=j) 2*(N-1) array
-#        
-#        pij = pij.reshape((len(x)*2,)) #flatten first N-1 will be px=0,2nd px=1
-#        pobserve = np.prod(ps) # the probability of x given do()
-#        pxz0 = np.prod(self.pxz[0,indices,x]) # the probabilities of x given do(z = 0)
-#        pxz1 = np.prod(self.pxz[1,indices,x]) # the probabilities of x given do(z = 1)
-#        pa = np.hstack((pij,pxz0,pxz1,pobserve))
-#        
-#        return pa
-#    
 
