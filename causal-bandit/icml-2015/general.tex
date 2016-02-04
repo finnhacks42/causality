@@ -71,6 +71,7 @@ Let $a \in \calA$ be an intervention and define random variable
 Z_a(X) = R_a(X) Y \ind{R_a(X) \leq B_a}\,,
 }
 where $B_a \geq 0$ is some constant to be chosen subsequently and
+\todom{Symbol clash with regret}
 \eq{
 R_a(X) = \frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\,.
 }
@@ -81,7 +82,7 @@ m(\eta) = \max_{a \in \calA} \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\
 We will shortly see that $m(\eta)$ is a measure of the difficulty of the problem that approximately cooincides 
 with the version given in the previous section, which justifies the name overloading.
 
-
+\todom{Change to $[0,1]^{\calA}$}
 \begin{algorithm}[H]
 \caption{General Algorithm}\label{alg:general}
 \begin{algorithmic}

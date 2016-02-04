@@ -17,8 +17,7 @@ A learner for a casual bandit problem is given the casual model's graph $\mathca
 One variable $Y \in \mathcal{X}$ is designated as the \emph{reward variable} and takes on values in $\{0, 1\}$.
 We denote the expected reward for the intervention $a = do(\vec{X} = \vec{x})$ by $\mu_{a} := \E{Y | do(\vec{X} = \vec{x})}$ and 
 the optimal expected reward by $\mu^* := \max_{a\in\actions} \mu_{a}$. 
-
-The game proceeds over $T$ rounds.
+The causal bandit game proceeds over $T$ rounds.
 In round $t$, the learner \emph{intervenes} by choosing $a_t = do(\vec{X}_t = \vec{x}_t) \in \mathcal{A}$ based on previous observations. 
 It then \emph{observes} sampled values for all non-intervened variables $\vec{X}^c_t$ drawn from $\P{\vec{X}^c_t | do(\vec{X}_t = \vec{x}_t)}$, 
 including the \emph{reward} $Y_t \in \{0,1\}$. 

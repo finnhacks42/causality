@@ -1,9 +1,13 @@
-Both our general causal model algorithm and algorithm for parallel bandits adaptively estimate the reward for allowable actions over $T$ rounds.
-For general causal bandit problem with $N$ allowable interventions we have shown that Algorithm~\ref{alg:general} has simple regret that is never worse than $\bigo{\sqrt{N/T}}$.
+Our general causal bandit algorithm adaptively estimates the reward for all allowable interventions $a \in \calA$ over $T$ rounds by sampling and applying interventions from a distribution $\eta$.
+For general causal bandit problem we have shown that Algorithm~\ref{alg:general} has simple regret that is $\bigo{\sqrt{m(\eta)/T}}$ up to log factors and that the parameter $m(\eta)$ is always less than $N$.
+The value of $m(\eta)$ is a uniform bound on the variance of the reward estimators $\hat{\mu}_a$.
+Intuitively, problems where variables' values in the causal model all ``occur naturally'' will have 
+
+The main practical drawback of Algorithm~\ref{alg:general} is that both the estimator terms $Z_a$ and the optimal sampling distribution $\eta^*$ require knowledge of the distributions $P_a$ for all $a \in \calA$.
+In contrast, in the special case of parallel bandits, we were able to remove the assumption that the conditional model ...  matching lower bound (up to log factors).
+Finding a version that estimates $\eta$ in general case ... and lower bounds is left as future work.
 
 \paragraph{Cumulative Regret}
-In the special case of parallel bandits, we were able to remove the assumption that the conditional model
-
 Cumulative regret... use \citep{wu2015online} to get optimal cumulative regret bound (should be $\Omega(T^{2/3})$?)
 
 General discussion of how to map parallel bandit problem to graph feedback.
