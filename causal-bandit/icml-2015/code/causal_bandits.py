@@ -7,13 +7,14 @@ Created on Wed Feb  3 09:51:47 2016
 import numpy as np
 from itertools import product
 from scipy.optimize import minimize
-from math import sqrt
-from math import log
+from math import sqrt,log,ceil
 from numpy.random import binomial
 import matplotlib.pyplot as plt
 from time import time
+from datetime import datetime as dt
 
-
+def now_string():
+    return dt.now().strftime('%Y%m%d_%H%M')
 
 def random_eta(n):
     eta = np.random.random(n)
@@ -25,28 +26,46 @@ def most_unbalanced_q(N,m):
     q[0:m] = 0
     return q
     
+def part_balanced_q(N,m):
+    """ all but m of the variables have probability .5"""
+    q = np.full(N,.5,dtype=float)
+    q[0:m] = 0
+    return q
+    
+    
+def argmax_rand(x):
+    """ return the index of the maximum element in the array, ignoring nans. 
+    If there are multiple max valued elements return 1 at random"""
+    max_val = np.nanmax(x)
+    indicies = np.where(x == max_val)[0]
+    return np.random.choice(indicies) 
 
-def maxV(eta):
-    maxV = model.V(eta).max()
-    if not np.isfinite(maxV):
-        return np.inf
-    return maxV#+penalty # consider penalizing eta going beyond bounds 
+def calculate_m(qij_sorted):
+    for indx,value in enumerate(qij_sorted):
+        if value >= 1.0/(indx+1):
+            return indx
+    return len(qij_sorted)/2      
+    
 
 class Parallel(object):
     def __init__(self,q,epsilon):
         """ actions are do(x_1 = 0)...do(x_N = 0),do(x_1=1)...do(N_1=1), do() """
         assert q[0] <= .5, "P(x_1 = 1) should be <= .5 to ensure worst case reward distribution can be created"
-        self.epsilon = epsilon
-        self.epsilon_minus = self.epsilon*q[0]/(1.0-q[0]) 
+        self.q = q
         self.N = len(q) # number of variables
         self.K = 2*self.N+1 #number of actions
         self.pX = np.vstack((1.0-q,q))
+        self.set_epsilon(epsilon)
         
+    def set_epsilon(self,epsilon):
+        assert epsilon <= .5 ,"epsilon cannot exceed .5"
+        self.epsilon = epsilon
+        self.epsilon_minus = self.epsilon*self.q[0]/(1.0-self.q[0]) 
         self.expected_rewards = np.full(self.K,.5)
         self.expected_rewards[0] = .5 - self.epsilon_minus
         self.expected_rewards[self.N] = .5+self.epsilon
         self.optimal = .5+self.epsilon
-         
+    
     def sample(self,action):
         x = binomial(1,self.pX[1,:])
         if action != self.K - 1: # everything except the do() action
@@ -107,20 +126,41 @@ class Parallel(object):
         probs = self.pX[:,:].reshape((self.N*2,)) # reshape such that first N are do(Xi=0)
         sort_order = np.argsort(probs)
         ordered = probs[sort_order]
-        mq = self.N
-        for indx,value in enumerate(ordered):
-            if value >= 1.0/(indx+1):
-                mq = indx
-                break
+        mq = calculate_m(ordered)
         unbalanced = sort_order[0:mq]
         eta[unbalanced] = 1.0/(2*mq)
         return eta,mq
     
 
-        
-        
     
- 
+class ParallelCausal(object):
+    
+    def run(self,T,model):
+        self.trials = np.zeros(model.K)
+        self.success = np.zeros(model.K)
+        h = T/2
+        for t in range(h):
+            x,y = model.sample(model.K) # do nothing
+            xij = np.hstack((1-x,x,1)) # first N actions represent x_i = 0,2nd N x_i=1, last do()
+            self.trials += xij
+            self.success += y*xij
+            
+        infrequent = self.estimate_infrequent(h)
+        n = int(float(h)/len(infrequent))
+        self.trials[infrequent] = n # note could be improved by adding to rather than reseting observation results - does not change worst case. 
+        self.success[infrequent] = model.sample_multiple(infrequent,n)
+        u = np.true_divide(self.success,self.trials)
+        best_action = argmax_rand(u)
+        return model.optimal - model.expected_rewards[best_action]
+   
+            
+    def estimate_infrequent(self,h):
+        qij_hat = np.true_divide(self.trials,h)
+        s_indx = np.argsort(qij_hat) #indexes of elements from s in sorted(s)
+        m_hat = calculate_m(qij_hat[s_indx])
+        infrequent = s_indx[0:m_hat]
+        return infrequent
+       
 
 class GeneralCausal(object):
     
@@ -138,6 +178,7 @@ class GeneralCausal(object):
         self.u = u/float(T)
         best_action = np.argmax(u)
         return model.optimal - model.expected_rewards[best_action]
+        
         
  
 class SuccessiveRejects(object):
@@ -188,49 +229,61 @@ def find_eta(model):
     res = minimize(model.m, eta0,bounds = [(0.0,1.0)]*model.K, constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0}),options={'disp': True},method='SLSQP')
     assert res.success, " optimization failed to converge"+res.message
     return res.x,res.fun
-                                
-N = 30
-q = most_unbalanced_q(N,2) #TODO fix most unbalanced (N,1)
-epsilon = .1
-model = Parallel(q,epsilon)
-eta,mq = model.analytic_eta()
+    
+def experiment1(N,simulations,a):
+    q = part_balanced_q(N,2) #TODO fix most unbalanced (N,1)
+    model = Parallel(q,.5)
+    eta,mq = model.analytic_eta()
+    Tmin = int(ceil(4*model.K/a)) 
+    T_vals = range(Tmin,10*model.K,model.K)
+    
+    causal = GeneralCausal()
+    causal_parallel = ParallelCausal()
+    baseline  = SuccessiveRejects()
+    
+    ts = time()   
+    regret = np.zeros((len(T_vals),4,simulations))
+    for s in xrange(simulations):
+        if s % 100 == 0:
+                print s
+        for T_indx,T in enumerate(T_vals): 
+            epsilon = sqrt(model.K/(a*T))
+            model.set_epsilon(epsilon)
+            regret[T_indx,0,s] = causal.run(T,model,eta,4)
+            regret[T_indx,1,s] = causal_parallel.run(T,model)
+            regret[T_indx,2,s] = baseline.run(T,model)
+            regret[T_indx,3,s] = epsilon
+            
+    te = time()
+    print 'took: %2.4f sec' % (te-ts)
+    
+    mean = regret.mean(axis=2)       
+    error = 3*regret.std(axis=2)/sqrt(simulations)
+    
+    fig,ax = plt.subplots()
+    ax.errorbar(T_vals,mean[:,0],yerr=error[:,0], label="Algorithm 2",linestyle="",marker="s",markersize=4) 
+    ax.errorbar(T_vals,mean[:,1],yerr=error[:,1], label="Algorithm 1",linestyle="",marker="o",markersize=5)    
+    ax.errorbar(T_vals,mean[:,2],yerr=error[:,2], label="Successive Rejects",linestyle="",marker="D",markersize=4) 
+    ax.set_xlabel(HORIZON_LABEL)
+    ax.set_ylabel(REGRET_LABEL)
+    ax.legend(loc="upper right",numpoints=1)
+    fig_name = "exp_regret_vs_T_N{0}_a{1}_s{2}_{3}.pdf".format(N,a,simulations,now_string())
+    fig.savefig(fig_name, bbox_inches='tight') 
+    return regret,mean,error                               
 
-model2 = Parallel(np.full(N,.5),epsilon) #balanced q
-eta2 = np.zeros(model2.K)
-eta2[-1] = 1.0 # just observe strategy 
+REGRET_LABEL = "Regret"
+HORIZON_LABEL = "T"
+
+regret,mean,error = experiment1(50,10000,4.0)   
+
+
+
+#model2 = Parallel(np.full(N,.5),epsilon) #balanced q
+#eta2 = np.zeros(model2.K)
+#eta2[-1] = 1.0 # just observe strategy 
 
 #print model.m(eta)
 #print model2.m(eta2)
-
-
-
-T_vals = range(10,500,10)
-simulations = 5000
-causal = GeneralCausal()
-baseline  = SuccessiveRejects()
-
-ts = time()   
-regret = np.zeros((len(T_vals),3,simulations))
-for s in xrange(simulations):
-    if s % 100 == 0:
-            print s
-    for T_indx,T in enumerate(T_vals):     
-        regret[T_indx,0,s] = causal.run(T,model,eta,4)
-        regret[T_indx,1,s] = causal.run(T,model2,eta2,2)
-        regret[T_indx,2,s] = baseline.run(T,model)
-        
-te = time()
-print 'took: %2.4f sec' % (te-ts)
-mean = regret.mean(axis=2)       
-plt.plot(T_vals,mean)
-
-error = 3*regret.std(axis=2)/sqrt(simulations)
-fig,ax = plt.subplots()
-ax.errorbar(T_vals,mean[:,0],yerr=error[:,0], label="Causal m(eta) = 4",linestyle="",marker="o")    
-ax.errorbar(T_vals,mean[:,2],yerr=error[:,2], label="Successive Rejects",linestyle="",marker="D") 
-ax.legend(loc="lower left",numpoints=1)
-   
-
 #
 ##constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0})
 #results = []
