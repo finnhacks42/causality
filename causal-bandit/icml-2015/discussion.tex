@@ -1,4 +1,12 @@
-Both our general causal model algorithm and algorithm for parallel bandits are adaptive reward estimators. 
+Both our general causal model algorithm and algorithm for parallel bandits adaptively estimate the reward for allowable actions over $T$ rounds.
+For general causal bandit problem with $N$ allowable interventions we have shown that Algorithm~\ref{alg:general} has simple regret that is never worse than $\bigo{\sqrt{N/T}}$.
+
+\paragraph{Cumulative Regret}
+In the special case of parallel bandits, we were able to remove the assumption that the conditional model
+
+Cumulative regret... use \citep{wu2015online} to get optimal cumulative regret bound (should be $\Omega(T^{2/3})$?)
+
+General discussion of how to map parallel bandit problem to graph feedback.
 
 In our algorithm, we have only used the side information provided by the $do()$ action about other actions. Since the $do()$ action fully reveals the value of alternate actions we could have incorporated this information via the graph feedback model \cite{Mannor2011}, where at each timestep the feedback graph $G_t$ is selected stochastically, dependent on $\boldsymbol{q}$, and revealed after an action has been chosen. The feedback graph is distinct from the causal graph. A link $A \rightarrow B$ in $G_t$ indicates that selecting the action $A$ reveals the reward for action $B$. For this specific problem, $G_t$ will always be a star graph with the action $do()$ connected to half the remaining actions. The Exp3-IX algorithm \cite{Kocak2014} was developed for the adversarial version of this problem and has regret $\bigo{\sqrt{\bar{\alpha}T}}$, where $\bar{\alpha}$ is the average independence number of $G_t$. In our case $\bar{\alpha} = \frac{N}{2}$ so we again obtain the regret of the standard bandit algorithm. The issue here is that a malicious adversary can select the same graph each time, such that the rewards for half the arms are never revealed by the informative action. This is equivalent to a, nominally, stochastic selection of feedback graph where $\boldsymbol{q} = \boldsymbol{0}$
 
@@ -7,34 +15,27 @@ In our algorithm, we have only used the side information provided by the $do()$ 
 %   - do calculus' identifability
 %   - non-ident variables into infinite variance case.
 
+\paragraph{Causal Models with Non-Observable Variables}
+In this case, some queries will be non-identifiable. The corresponding actions can be immediately added to the set $A$ prior to collecting any data. We can then use the same algorithm as in the case where there are no latent variables, except that we will have to use the more general do-calculus rather than simply adjusting for the parents to write the expression for each action in terms of observational data. 
 % 
 
 \cite{Lelarge2012} consider a stochastic version of the graph feedback problem, but with a fixed graph available to the algorithm before it must select an action. In addition, their algorithm is not optimal for all graph structures and fails, in particular, to provide improvements for star like graphs as in our case. \cite{Buccapatnam2014} improve the dependence of the algorithm on the graph structure but still assume the graph is fixed and available to the algorithm before the action is selected. 
 
 More generally, assuming causal structure creates more complex types of side information, such as that shown in equation \ref{eq:estimation_transfer}. In this case, selecting one action does not fully reveal an alternate action but provides some information towards an estimate. The quality of the estimate notably depends not only on the number of times that action was selected. For example, to get a good estimate for $X_1 = 1$ by intervening on $X_2$ requires us to sample both $X_2=0$ and $X_2=1$, in proportions dependent on $q_2$. This more complex side information does not fit within the graph feedback framework.
 
-\cite{wu2015online} consider a relevant feedback model. 
 
 
-\subsection{Open Questions}
+\paragraph{Partially or Completely Unknown Causal Graph}
 
 
-\paragraph{General graphs with known structure but latent variables}
-In this case, some queries will be non-identifiable. The corresponding actions can be immediately added to the set $A$ prior to collecting any data. We can then use the same algorithm as in the case where there are no latent variables, except that we will have to use the more general do-calculus rather than simply adjusting for the parents to write the expression for each action in terms of observational data. 
+Unknown in general case - e.g., like algorithm 1
 
-\paragraph{Graphs with partially or unknown structure}
-
-\begin{itemize}
-
-\item Unknown in general case - e.g., like algorithm 1
-
-\item Partially known structure
+(Partially known structure)
 There has been substantial work on the problem of selecting experiments to discover the correct causal graph from within a Markov equivalence class \cite{Eberhardt2005,eberhardt2010causal,hauser2014two,Hu2014}. This problem arises naturally if we assume free access to a large observational dataset, from which the Markov equivalence class can be found via causal discovery techniques. Key results $bigo(n)$ singleton or $bigo(log log n)$ multi-variate experiments are required.
 - Focus on minimizing the number of experiments that must be performed. Examples of active versus online learning. The cost of experiments constant or at least known. 
 
-\item Unknown Structure
+(Unknown Structure)
 If we need to learn the structure, in an online environment. 
 Experiment is much, much more revealing than inference from observational data. We would expect it to dominate. 
 
-\end{itemize}
 
