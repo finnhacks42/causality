@@ -151,13 +151,13 @@ Then for $i \in A$ and choosing $\epsilon = \min\set{1/4, \sqrt{m/(18T)}}$ we ha
 Now $\sum_{i=1}^m \EE_0 T_i(T) \leq T$, which implies that $|A| \geq m/2$.
 Therefore
 \eq{
-\sum_{i \in A} \Pri{I_T \neq i} 
+\sum_{i \in A} \Pri{\hat a^*_T \neq a} 
 \geq \sum_{i \in A} \exp\left(-\KL(\Ps_0, \Ps_i)\right) - 1
 \geq \frac{|A|}{e} - 1 
 \geq \frac{m}{2e} - 1\,.
 }
 Therefore there exists an $i \in A$ such that
-$\Pri{I_T \neq i} \geq \frac{\frac{m}{2e} - 1}{m}$. 
+$\Pri{\hat a^*_T \neq a^*} \geq \frac{\frac{m}{2e} - 1}{m}$. 
 Therefore if $\epsilon < 1/4$ we have
 \eq{
 R_{T,i} \geq \frac{1}{2} \Pn{i}{\hat a^*_T \neq a^*} \epsilon \geq \frac{\frac{m}{2e} - 1}{2m} \sqrt{\frac{m}{18T}}\,.
