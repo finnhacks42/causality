@@ -235,7 +235,7 @@ def experiment1(N,simulations,a):
     model = Parallel(q,.5)
     eta,mq = model.analytic_eta()
     Tmin = int(ceil(4*model.K/a)) 
-    T_vals = range(Tmin,10*model.K,model.K/2)
+    T_vals = range(Tmin,10*model.K,model.K)
     
     causal = GeneralCausal()
     causal_parallel = ParallelCausal()
@@ -261,16 +261,21 @@ def experiment1(N,simulations,a):
     error = 3*regret.std(axis=2)/sqrt(simulations)
     
     fig,ax = plt.subplots()
-    ax.errorbar(T_vals,mean[:,0],yerr=error[:,0], label="Algorithm 2",linestyle="",marker="o") 
-    ax.errorbar(T_vals,mean[:,1],yerr=error[:,1], label="Algorithm 1",linestyle="",marker="o")    
-    ax.errorbar(T_vals,mean[:,2],yerr=error[:,2], label="Successive Rejects",linestyle="",marker="D") 
-    ax.plot(T_vals,mean[:,3],label="Epsilon")
+    ax.errorbar(T_vals,mean[:,0],yerr=error[:,0], label="Algorithm 2",linestyle="",marker="s",markersize=4) 
+    ax.errorbar(T_vals,mean[:,1],yerr=error[:,1], label="Algorithm 1",linestyle="",marker="o",markersize=5)    
+    ax.errorbar(T_vals,mean[:,2],yerr=error[:,2], label="Successive Rejects",linestyle="",marker="D",markersize=4) 
+    ax.set_xlabel(HORIZON_LABEL)
+    ax.set_ylabel(REGRET_LABEL)
     ax.legend(loc="upper right",numpoints=1)
     fig_name = "exp_regret_vs_T_N{0}_a{1}_s{2}_{3}.pdf".format(N,a,simulations,now_string())
     fig.savefig(fig_name, bbox_inches='tight') 
-    return regret                               
+    return regret,mean,error                               
 
-regret = experiment1(50,10000,4.0)   
+REGRET_LABEL = "Regret"
+HORIZON_LABEL = "T"
+
+regret,mean,error = experiment1(50,10000,4.0)   
+
 
 
 #model2 = Parallel(np.full(N,.5),epsilon) #balanced q
