@@ -1,18 +1,22 @@
-Our general causal bandit algorithm adaptively estimates the reward for all allowable interventions $a \in \calA$ over $T$ rounds by sampling and applying interventions from a distribution $\eta$.
-For general causal bandit problem we have shown that Algorithm~\ref{alg:general} has simple regret that is $\bigo{\sqrt{m(\eta)/T}}$ up to log factors and that the parameter $m(\eta)$ is always less than $N$.
-The value of $m(\eta)$ is a uniform bound on the variance of the reward estimators $\hat{\mu}_a$.
-Intuitively, problems where variables' values in the causal model all ``occur naturally'' will have 
+Algorithm~\ref{alg:general} for general causal bandit problems adaptively estimates the reward for all allowable interventions $a \in \calA$ over $T$ rounds by sampling and applying interventions from a distribution $\eta$.
+Theorem~\ref{thm:general} shows that this algorithm has (up to log factors) simple regret that is $\bigo{\sqrt{m(\eta)/T}}$ and that the parameter $m(\eta)$ is always less than $N$.
+The value of $m(\eta)$ is a uniform bound on the variance of the reward estimators $\hat{\mu}_a$ and, intuitively, problems where all variables' values in the causal model ``occur naturally'' when interventions are sampled from $\eta$ will have low values of $m(\eta)$.
 
-The main practical drawback of Algorithm~\ref{alg:general} is that both the estimator terms $Z_a$ and the optimal sampling distribution $\eta^*$ require knowledge of the distributions $P_a$ for all $a \in \calA$.
-In contrast, in the special case of parallel bandits, we were able to remove the assumption that the conditional model ...  matching lower bound (up to log factors).
-Finding a version that estimates $\eta$ in general case ... and lower bounds is left as future work.
+The main practical drawback of Algorithm~\ref{alg:general} is that both the estimator terms $Z_a$ and the optimal sampling distribution $\eta^*$ (\ie, the one that minimises $m(\eta)$) require knowledge of the conditional distributions $P_a$ for all $a \in \calA$.
+In contrast, in the special case of parallel bandits, Algorithm~\ref{alg:simple} uses the $do()$ action to effectively estimate $m(\eta)$ and the rewards then re-samples the interventions with variances that are not bound by $\hat{m}(\eta)$.
+Despite these extra estimates, Theorem~\ref{thm:lower} shows that this approach is optimal (up to log factors).
+Finding an algorithm that only requires the causal graph and lower bounds for its simple regret in the general case is left as future work.
 
+\todom{Still cleaning up below}
 \paragraph{Cumulative Regret}
+
 Cumulative regret... use \citep{wu2015online} to get optimal cumulative regret bound (should be $\Omega(T^{2/3})$?)
 
 General discussion of how to map parallel bandit problem to graph feedback.
 
 In our algorithm, we have only used the side information provided by the $do()$ action about other actions. Since the $do()$ action fully reveals the value of alternate actions we could have incorporated this information via the graph feedback model \cite{Mannor2011}, where at each timestep the feedback graph $G_t$ is selected stochastically, dependent on $\boldsymbol{q}$, and revealed after an action has been chosen. The feedback graph is distinct from the causal graph. A link $A \rightarrow B$ in $G_t$ indicates that selecting the action $A$ reveals the reward for action $B$. For this specific problem, $G_t$ will always be a star graph with the action $do()$ connected to half the remaining actions. The Exp3-IX algorithm \cite{Kocak2014} was developed for the adversarial version of this problem and has regret $\bigo{\sqrt{\bar{\alpha}T}}$, where $\bar{\alpha}$ is the average independence number of $G_t$. In our case $\bar{\alpha} = \frac{N}{2}$ so we again obtain the regret of the standard bandit algorithm. The issue here is that a malicious adversary can select the same graph each time, such that the rewards for half the arms are never revealed by the informative action. This is equivalent to a, nominally, stochastic selection of feedback graph where $\boldsymbol{q} = \boldsymbol{0}$
+
+% \cite{Lelarge2012} consider a stochastic version of the graph feedback problem, but with a fixed graph available to the algorithm before it must select an action. In addition, their algorithm is not optimal for all graph structures and fails, in particular, to provide improvements for star like graphs as in our case. \cite{Buccapatnam2014} improve the dependence of the algorithm on the graph structure but still assume the graph is fixed and available to the algorithm before the action is selected. 
 
 % Non-observable variables? 
 % Currently assume all P_a are available (implied by observablity)
@@ -23,9 +27,8 @@ In our algorithm, we have only used the side information provided by the $do()$ 
 In this case, some queries will be non-identifiable. The corresponding actions can be immediately added to the set $A$ prior to collecting any data. We can then use the same algorithm as in the case where there are no latent variables, except that we will have to use the more general do-calculus rather than simply adjusting for the parents to write the expression for each action in terms of observational data. 
 % 
 
-\cite{Lelarge2012} consider a stochastic version of the graph feedback problem, but with a fixed graph available to the algorithm before it must select an action. In addition, their algorithm is not optimal for all graph structures and fails, in particular, to provide improvements for star like graphs as in our case. \cite{Buccapatnam2014} improve the dependence of the algorithm on the graph structure but still assume the graph is fixed and available to the algorithm before the action is selected. 
 
-More generally, assuming causal structure creates more complex types of side information, such as that shown in equation \ref{eq:estimation_transfer}. In this case, selecting one action does not fully reveal an alternate action but provides some information towards an estimate. The quality of the estimate notably depends not only on the number of times that action was selected. For example, to get a good estimate for $X_1 = 1$ by intervening on $X_2$ requires us to sample both $X_2=0$ and $X_2=1$, in proportions dependent on $q_2$. This more complex side information does not fit within the graph feedback framework.
+% More generally, assuming causal structure creates more complex types of side information, such as that shown in equation \ref{eq:estimation_transfer}. In this case, selecting one action does not fully reveal an alternate action but provides some information towards an estimate. The quality of the estimate notably depends not only on the number of times that action was selected. For example, to get a good estimate for $X_1 = 1$ by intervening on $X_2$ requires us to sample both $X_2=0$ and $X_2=1$, in proportions dependent on $q_2$. This more complex side information does not fit within the graph feedback framework.
 
 
 
