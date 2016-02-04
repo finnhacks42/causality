@@ -17,12 +17,14 @@ With $\epsilon \in (0,.5)$. This ensures that
 
 This allows us to rapidly simulate rewards and conditional rewards for large numbers of variables and to change the value of $\boldsymbol{q}$ with minimal impact on the reward function \footnote{$\boldsymbol{q}$ only effects the reward of a single, non-optimal arm, which becomes insignificant with large numbers of variables.}. 
 
+\iffalse
 \begin{figure}
 \caption{Final regret versus number of variables $N$ for UCB with $\alpha = 2$, Causal-Explore-Exploit with $m=2$ and with $m=N$ and horizon $T = 10,000$ . Error bars show standard deviation over 100 simulations. The regret for UCB grows linearly with the number of variables, whist for Causal-Explore-Exploit with fixed $m$, the growth is sub-logarthmic.  }
 \label{fig:known_q_r_vs_N}
 \centering
 \includegraphics[width=.5\textwidth]{exp_regret_vs_N_T10000_sims100_20151229_113550.pdf}
 \end{figure}
+\fi
 
 \iffalse
 \begin{figure}
