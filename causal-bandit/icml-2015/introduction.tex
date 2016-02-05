@@ -52,9 +52,9 @@ However, a crucial difference is that in our model the extra observations are on
 % We discuss the relationship between causal and contextual bandits further in \S\ref{sec:defs} and leave their combination as future work.
 
 There have been several proposals for bandit problems where extra feedback is received after an action is taken.
-\citet{Alon2015} and \citet{Kocak2014} consider very general models where rewards on unplayed actions are revealed according to a feedback graph.
+\citet{Alon2015}, \citet{Kocak2014} and \citet{wu2015online} consider very general models where rewards on unplayed actions are revealed according to a feedback graph.
 As we discuss in \S\ref{sec:discussion}, the problem they consider shares some similarity with ours however their results are for cumulative regret and thus cannot be used to guarantee low simple regret~\citep{Bubeck2009}.
-Even in the case of cumulative regret we show that an application of their results to the parallel bandit problem with $N$ variables yields a $\bigo{\sqrt{NT}}$ bound.
+% Even in the case of cumulative regret we show that an application of their results to the parallel bandit problem with $N$ variables yields a $\bigo{\sqrt{NT}}$ bound.
 \citet{Yu2009} consider bandit problems where a learner chooses an arm to play as well as set of arms to observe rewards for in a stochastic setting where the reward distributions can change infrequently and the aim is to minimize cumulative regret.
 They use extra observations to detect changes whereas we assume fixed reward distributions and use extra observations to improve arm selection.
 \citet{Avner2012} analyse bandit problems where the choice of arm to pull and arm to receive feedback on are decoupled. 
