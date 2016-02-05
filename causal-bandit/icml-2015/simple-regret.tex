@@ -62,13 +62,9 @@ Note that the expected reward of the optimal intervention is at least as large a
 \label{sub:par-bandit-alg}
 
 The algorithm operates as follows. For the first $T/2$ rounds it chooses $do()$ to collect observational data.
-The fact that only link from each $X_1,\ldots,X_N$ to $Y$ is a direct, causal one means that $\P{Y|do(X_i=j)}=\P{Y|X_i=j}$. Thus we can create good estimators of the returns of those actions $do(X_i = j)$ for which $\P{X_i = j}$ is large. 
-These are the interventions that are easily estimated ``passively'' (\ie, without playing them explicitly). 
-Those actions where $\P{X_i = j}$ is small may not be observed (often) in the first $T/2$ rounds, so
-the estimates of the returns of these actions from the first $T/2$ samples could be quite poor. For the remaining $T/2$ rounds
-the algorithm makes interventions on the actions $a = do(X_i = j)$ for which $\P{X_i = j}$ is small. The precise allocation is
-carefully chosen to minimise the worst-case simple regret. 
-The difficulty of the problem depends on $\vec{q}$ and, in particular, how many of the variables have an infrequently occurring value (\ie, small $q_i$ or $1-q_i$). 
+As the only link from each $X_1,\ldots,X_N$ to $Y$ is a direct, causal one, $\P{Y|do(X_i=j)}=\P{Y|X_i=j}$. We use this to get good estimates for the actions $do(X_i=j)$ for which $\P{X_i = j}$ is large, without playing them explicitly. 
+
+Those actions where $\P{X_i = j}$ is small may not be observed (often) in the first $T/2$ rounds, so the estimates of the returns of these actions from the first $T/2$ samples could be quite poor. For the remaining $T/2$ rounds the algorithm makes interventions on the actions $a = do(X_i = j)$ for which $\P{X_i = j}$ is small. The precise allocation is carefully chosen to minimise the worst-case simple regret. The difficulty of the problem depends on $\vec{q}$ and, in particular, how many of the variables have an infrequently occurring value (\ie, small $q_i$ or $1-q_i$). 
 Let $I_1 = \emptyset$ and for $\tau \in [0,1)$ let $I_\tau = \set{ i : \min\set{q_i, 1-q_i} \leq \tau}$.
 Define
 \eqn{
@@ -100,7 +96,7 @@ When $\vec{q} = (\frac{1}{2}, \ldots, \frac{1}{2})$ we have $m(\vec{q}) = 1$ and
 \ENDFOR
 \STATE Re-estimate $\hat{\mu}_a = \frac{1}{T_A} \sum_{t=1}^{T_A} Y_t$
 \ENDFOR
-\RETURN estimated optimal $\hat{a}^*_T \in \argmax_{a\in\actions} \hat{\mu}_a$
+\RETURN estimated optimal $\hat{a}^* \in \argmax_{a\in\actions} \hat{\mu}_a$
 \end{algorithmic}
 \end{algorithm}
 
@@ -120,21 +116,21 @@ Algorithm \ref{alg:simple} satisfies
 Note that algorithms designed for finite-armed bandits would explore interventions more uniformly and achieve a regret of $\Omega(\sqrt{N/T})$.
 Since $m$ is typically much smaller than $N$ we anticipate that the new algorithm will significantly outperform classical bandit algorithms in
 this setting.
-We prove a lower bound on the simple regret that matches up to logarithmic factors the upper bound given in Theorem \ref{thm:uq-simple}.
+We prove a lower bound on the simple regret that matches up to logarithmic factors the upper bound given in Theorem \ref{thm:uq-simple}
 
 \begin{theorem}\label{thm:lower}
-For all $T$, $\vec{q}$ and all strategies there exists a reward function such that
+Let $\vec{q}$ be fixed and satisfies $m = m(\boldsymbol{q})$. Then for all strategies there exists a reward function such that
 \eq{
 \simpleregret 
-\in \Omega\left(\sqrt{\frac{m(\vec{q})}{T}}\right)\,.
+%\geq \frac{\frac{m}{2e} - 1}{m} \sqrt{\frac{2m}{3T}} 
+\in \Omega\left(\sqrt{\frac{m}{T}}\right)\,.
 }
 \end{theorem}
 
 \ifsup
-The proofs of Theorems \ref{thm:uq-simple} and \ref{thm:lower} may be found in Sections \ref{sec:thm:uq-simple} and \ref{sec:thm:lower} respectively.
+The proof of Theorems \ref{thm:uq-simple} and \ref{thm:lower} may be found in Sections \ref{sec:thm:uq-simple} and \ref{sec:thm:lower}.
 \else
-The proofs of Theorems \ref{thm:uq-simple} and \ref{thm:lower} follow by carefully analysing the concentration
-of $\hat p_a$ and $\hat m$ about their true values and may be found in the supplementary material.
+The proof of Theorems \ref{thm:uq-simple} and \ref{thm:lower} may be found in the supplementary material.
 \fi
 
 
