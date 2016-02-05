@@ -40,8 +40,6 @@ We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously b
 
 \begin{figure}[h]
 \centering
-\caption{A causal chain graph}.
-\label{fig:causalchain}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={observed}, hidden/.style={empty}]
 \node[main node](1){$X_{1}$};
@@ -55,6 +53,8 @@ We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously b
     (3) edge (4)
     (4) edge (5);
 \end{tikzpicture}
+\caption{A causal chain graph}.
+\label{fig:causalchain}
 \end{figure} 
 
 
