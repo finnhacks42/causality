@@ -81,11 +81,10 @@ m(\eta) = \max_{a \in \calA} \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\
 }
 We will shortly see that $m(\eta)$ is a measure of the difficulty of the problem that approximately coincides with the version for parallel bandits, justifying the name overloading.
 
-\todom{Change to $[0,1]^{\calA}$}
 \begin{algorithm}[H]
 \caption{General Algorithm}\label{alg:general}
 \begin{algorithmic}
-\STATE {\bf Input:} $T$, $\eta \in [0,1]^{|\calA|}$, $B \in [0,\infty)^{|\calA|}$
+\STATE {\bf Input:} $T$, $\eta \in [0,1]^{\calA}$, $B \in [0,\infty)^{\calA}$
 \FOR{$t \in \set{1,\ldots,T}$}
 \STATE Sample action $a_t = a$ with probability $\eta$
 \STATE Do action $a_t$ and observe $X_t$ and $Y_t$
@@ -99,7 +98,7 @@ We will shortly see that $m(\eta)$ is a measure of the difficulty of the problem
 \end{algorithm}
 
 \begin{theorem}\label{thm:general}
-If Algorithm \ref{alg:general} is run with $B \in \R^{|\calA|}$ given by
+If Algorithm \ref{alg:general} is run with $B \in \R^{\calA}$ given by
 \eq{
 B_a = \sqrt{\frac{m(\eta)T}{\log\left(2T|\calA|\right)}}\,.
 }
@@ -186,7 +185,7 @@ An interpretation of $m(\eta^*)$ is the minimum achievable worst-case variance o
 In the experimental section we present some special cases,
 but for now we give two simple results. The first shows that $|\calA|$ serves as an upper bound on $m(\eta^*)$.
 
-\begin{proposition}
+\begin{proposition}\label{pro:m-bound}
 $m(\eta^*) \leq |\calA|$.
 \end{proposition}
 
@@ -206,8 +205,10 @@ Recall in that setting that
 \actions = \set{do()} \cup \set{do(X_i = j) : 1 \leq i \leq N \text{ and } j \in \set{0,1}}\,.
 }
 For $a = do()$ choose $\eta_a = 1/2$. 
-Let $m = m(\vec{q})$ and for $a = do(X_i = j)$ let $\eta_a = \ind{\P{X_i = j} \leq 1/m} / (2m)$. 
-Then it is easy to check that $m(\eta) \leq 2m$.  
+\todom{Check please!}
+Let $m = m(\vec{q})$ and note that there are at most $m$ pairs $(i,j)$ such that $\P{X_i = j} \leq 1/m$.
+Thus, for $a = do(X_i = j)$ letting $\eta_a \propto \ind{\P{X_i = j} \leq 1/m} / (2m)$ guarantees $\eta_a \ge \frac{1}{2m}$ when $\eta_a \ne 0$.
+It is then easy to check that $m(\eta) \leq 2m$ using an argument like that for Proposition~\ref{pro:m-bound}.
 
 \begin{remark}
 The algorithm in the previous section for the parallel bandit problem did not assume knowledge of the conditional distributions on $X$ and 
