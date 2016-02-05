@@ -28,10 +28,9 @@ We show that our causal bandit framework subsumes the classical bandits (no addi
 
 Our focus is on the simple regret, which measures the difference between the return of the optimal action and that of the action chosen by the algorithm after $T$ rounds.
 In \S\ref{sec:simple-regret} we analyse a specific family of causal bandit problems that we call \emph{parallel bandit} problems in which $N$ factors affect the reward independently and there are $2N$ possible interventions.
-We propose a simple causal best arm identification algorithm (Algorithm~\ref{alg:simple}) for this problem and show that up to logarithmic factors it enjoys minimax optimal
+We propose a simple causal best arm identification algorithm for this problem and show that up to logarithmic factors it enjoys minimax optimal
 simple regret guarantees of $\tilde\Theta(\sqrt{m/T})$ where $m$ depends on the causal model and may be much smaller than $N$.
-\todom{Need ref or proof?}
-In contrast, existing best arm identification algorithms suffer $\Omega(\sqrt{N/T})$ simple regret.
+In contrast, existing best arm identification algorithms suffer $\Omega(\sqrt{N/T})$ simple regret (Thm. 4 by \citet{audibert2010best}).
 This shows theoretically the value of our framework over the traditional bandit problem. 
 Experiments in \S\ref{sec:experiments} further demonstrate the value of causal models in this framework.
 
@@ -66,9 +65,19 @@ To the best of our knowledge, our paper is the first to analyse simple regret in
 % Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
 
 Two pieces of recent work also consider applying ideas from causal inference to bandit problems.
-\citet{Bareinboim2015} demonstrate that in the presence of confounding variables the value that a variable would have taken had it not been intervened on can provide important contextual information. \todof{write one sentence to explain how their work is different to ours}
+\citet{Bareinboim2015} demonstrate that in the presence of confounding variables the value that a variable would have taken had it not been 
+intervened on can provide important contextual information. Their work differs in many ways. For example, the focus is on the cumulative regret and
+the context is observed before the action is taken and cannot be controlled by the learning agent.  
+
+%\todof{write one sentence to explain how their work is different to ours}
 
  \citet{Ortega2014thompson} present an analysis and extension of Thompson sampling assuming actions are causal interventions. Their focus is on causal induction (\ie, learning an unknown causal model) instead of exploiting a known causal model. Combining their handling of  causal induction with our analysis is left as future work.
 % Key to Elias' paper is: observing the action an agent would take if it were allowed to make its natural choice can provide some information about hidden confounders that influence both the reward and the choice of action. Therefore, incorporating an agents natural choice as context may outperform a standard bandit that does not use that context. (Note: even in the presence of hidden confounders, including the agents natural choice as context only may improve the results. It is easy to come up with a counter example in which it does not).
+
+The truncated importance weighted estimators used in \S\ref{sec:simple-regret-general} have been studied before in a causal framework by \citet{BJQ13}, 
+where the focus is on learning from observational data, but not controlling the sampling process. They also briefly discusses some of the issues 
+encountered in sequential design, but do not give an algorithm or theoretical results for this case.
+
+
 
 

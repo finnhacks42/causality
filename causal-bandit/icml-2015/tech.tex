@@ -5,6 +5,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Proof of Theorem \ref{thm:uq-simple}}\label{sec:thm:uq-simple}
 
+
 Assume without loss of generality that $q_1 \leq q_2 \leq \ldots \leq q_N \leq 1/2$. The assumption is non-restrictive since all variables
 are independent and permutations of the variables can be pushed to the reward function.
 The proof of Theorem \ref{thm:uq-simple} requires some lemmas, the first of which is an immediate consequence of the Chernoff bound.
@@ -52,9 +53,7 @@ Let $F$ be the event that there exists and $1 \leq i \leq N$ for which
 }
 Then by the union bound and Lemma \ref{lem:conc1} we have $\P{F} \leq \delta$. The result will be completed by showing that
 when $F$ does not hold we have $2m(\vec{q})/3 \leq m(\vec{\hat q}) \leq 2m(\vec{q})$.
-\todom{Reconcile with new def. of m}
-Towards this end recall that $m(\vec{q}) = \min\set{i : q_i \geq 1 / i}$.
-Therefore for $i > m$ we have $q_i \geq q_m \geq 1/m$ and so by Lemma \ref{lem:conc1} we have
+From the definition of $m(\vec{q})$ and our assumption on $\vec{q}$ we have for $i > m$ that $q_i \geq q_m \geq 1/m$ and so by Lemma \ref{lem:conc1} we have
 \eq{
 \frac{3}{4} 
 &\geq \frac{1}{2} + \sqrt{\frac{3}{T} \log \frac{2N}{\delta}} 
@@ -118,6 +117,8 @@ which completes the result.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Proof of Theorem \ref{thm:lower}}\label{sec:thm:lower}
 
+We follow a relatively standard path by choosing multiple environments that have different optimal arms, but which cannot all be statistically
+separated in $T$ rounds.
 Assume without loss of generality that $q_1 \leq q_2 \leq \ldots \leq q_N \leq 1/2$.
 For each $i$ define reward function $r_i$ by
 \eq{
@@ -130,14 +131,14 @@ r_i(\boldsymbol{X}) &= \begin{cases}
 where $1/4 \geq \epsilon > 0$ is some constant to be chosen later.
 We abbreviate $R_{T,i}$ to be the expected simple regret incurred when interacting with the
 environment determined by $\boldsymbol{q}$ and $r_i$. Let $\operatorname{P}_i$ be the corresponding measure
-on all observations over all $T$ rounds and $\EE_i$ the expectation with respect to $\operatorname{P}_i$. By Lemma 2.6 by \cite{Tsy08} we have
+on all observations over all $T$ rounds and $\EE_i$ the expectation with respect to $\operatorname{P}_i$. By Lemma 2.6 by \citet{Tsy08} we have
 \eq{
 \Prz{\hat a^*_T = a^*} + \Pri{\hat a^*_T \neq a^*} \geq \exp\left(-\KL(\operatorname{P}_0, \operatorname{P}_i)\right)\,,
 }
 where $\KL(\Ps_0, \Ps_i)$ is the KL divergence between measures $\operatorname{P}_0$ and $\operatorname{P}_i$.
 Let $T_i(T) = \sum_{t=1}^T \ind{a_t = do(X_i = 1)}$ be the total number of times the learner intervenes on variable $i$ by setting it to $1$.
 Then for $i \leq m$ we have $q_i \leq 1/m$ and the KL divergence between $\Ps_0$ and $\Ps_i$ may be bounded using the telescoping property (chain rule) and
-by bounding the local KL divergence by the $\chi$-squared distance as by \cite{Auer1995}. This leads to 
+by bounding the local KL divergence by the $\chi$-squared distance as by \citet{Auer1995}. This leads to 
 \eq{
 \KL(\Ps_0, \Ps_i) 
 &\leq 6\epsilon^2 \EE_0\left[\sum_{t=1}^T \ind{X_{t,i} = 1}\right] 

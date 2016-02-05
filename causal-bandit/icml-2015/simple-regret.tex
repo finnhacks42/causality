@@ -100,7 +100,7 @@ When $\vec{q} = (\frac{1}{2}, \ldots, \frac{1}{2})$ we have $m(\vec{q}) = 1$ and
 \ENDFOR
 \STATE Re-estimate $\hat{\mu}_a = \frac{1}{T_A} \sum_{t=1}^{T_A} Y_t$
 \ENDFOR
-\RETURN estimated optimal $\hat{a}^* \in \argmax_{a\in\actions} \hat{\mu}_a$
+\RETURN estimated optimal $\hat{a}^*_T \in \argmax_{a\in\actions} \hat{\mu}_a$
 \end{algorithmic}
 \end{algorithm}
 
@@ -120,21 +120,21 @@ Algorithm \ref{alg:simple} satisfies
 Note that algorithms designed for finite-armed bandits would explore interventions more uniformly and achieve a regret of $\Omega(\sqrt{N/T})$.
 Since $m$ is typically much smaller than $N$ we anticipate that the new algorithm will significantly outperform classical bandit algorithms in
 this setting.
-We prove a lower bound on the simple regret that matches up to logarithmic factors the upper bound given in Theorem \ref{thm:uq-simple}
+We prove a lower bound on the simple regret that matches up to logarithmic factors the upper bound given in Theorem \ref{thm:uq-simple}.
 
 \begin{theorem}\label{thm:lower}
-Let $\vec{q}$ be fixed and satisfies $m = m(\boldsymbol{q})$. Then for all strategies there exists a reward function such that
+For all $T$, $\vec{q}$ and all strategies there exists a reward function such that
 \eq{
 \simpleregret 
-%\geq \frac{\frac{m}{2e} - 1}{m} \sqrt{\frac{2m}{3T}} 
-\in \Omega\left(\sqrt{\frac{m}{T}}\right)\,.
+\in \Omega\left(\sqrt{\frac{m(\vec{q})}{T}}\right)\,.
 }
 \end{theorem}
 
 \ifsup
-The proof of Theorems \ref{thm:uq-simple} and \ref{thm:lower} may be found in Sections \ref{sec:thm:uq-simple} and \ref{sec:thm:lower}.
+The proofs of Theorems \ref{thm:uq-simple} and \ref{thm:lower} may be found in Sections \ref{sec:thm:uq-simple} and \ref{sec:thm:lower} respectively.
 \else
-The proof of Theorems \ref{thm:uq-simple} and \ref{thm:lower} may be found in the supplementary material.
+The proofs of Theorems \ref{thm:uq-simple} and \ref{thm:lower} follow by carefully analysing the concentration
+of $\hat p_a$ and $\hat m$ about their true values and may be found in the supplementary material.
 \fi
 
 
