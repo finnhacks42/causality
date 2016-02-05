@@ -3,13 +3,13 @@
 \newcommand{\x}{\boldsymbol{x}}
 \newcommand{\Ps}{\operatorname{P}}
 
-We now consider the more general problem where the graph structure is known, but arbitrary.
-The problem of learning the optimal intervention is made more complicated than the simple case because of 
-the dependencies between the random variables. Learning from observational data is no longer straightforward
-because variables can be correlated through their parents. Consider, for example, the causual graph in Figure \ref{fig:causalStructure_confounded} where $X_1$
-deterministically causes $X_2$ and $X_3$, which ensures that $X_2 = X_3$ for all observational data. Now suppose $r(X) = \ind{X_2 \neq X_3}$,
-then intervening on either $X_2$ or $X_3$ is optimal. But the positive reward is never observed from observational samples, despite
-the fact that $\P{X_2 = 1} = \P{X_3 = 1} = \frac{1}{2}$.
+We now consider the more general problem where the graph structure is known, but arbitrary. For general graphs, $\P{Y|X_i=j} \neq \P{Y|do(X_i=j)}$ (correlation is not causation). However if all the variables are observable, any causal distribution $\P{X_1...X_N|do(X_i=j)}$ can be expressed in terms of observational distributions via the truncated factorization formula \cite{Pearl2000}. 
+\eq{
+\P{X_1...X_N|do(X_i=j)} = 
+\prod_{k \neq i}\P{X_k|\parents{X_k}}\delta(X_i - j)  
+} 
+Where $\parents{X_k}$ denotes the parents of $X_k$ and $\delta$ is the dirac delta function. For example, given the causual graph in Figure \ref{fig:causalStructure_confounded}, by applying the truncated factorization and marginalizing, we obtain $\P{Y|do(X_2= j)} = \sum_{X_1}\P{X_1}\P{Y|X_1}$.  Note that the quality of any estimator we build for $P{Y|do(X_2= j)}$ is not just a function of the number of times we observe $X_2 = j$.
+
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
@@ -24,16 +24,10 @@ the fact that $\P{X_2 = 1} = \P{X_3 = 1} = \frac{1}{2}$.
     (3) edge (4)
     (2) edge (4);
 \end{tikzpicture}
-\eq{
-\P{X_1 = 1} &= \frac{1}{2} \\
-\P{X_2 = j|X_1 = j} &= 
-\P{X_3 = j|X_1 = j} = 1\,.
-}
 \caption{}\label{fig:causalStructure_confounded}
 \end{figure} 
 
-Another difficulty is that it is no longer sufficient to learn about $\mu_{a}$ exclusively from observational data and when $a = do(X_i = j)$ is chosen.
-We can also learn about the reward for intervening on one variable from rounds in which we actually set a different variable.
+It is no longer optimal to divide our samples between observing to learn about multiple actions and explicit intervention to learn single ones. We need to incorporate the information we can learn about the reward for intervening on one variable from rounds in which we actually set a different variable.
 Consider the graph in Figure \ref{fig:causalchain}, where each variable deterministically takes the value of its parent, $X_k = X_{k-1}$ 
 for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. 
 We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$. 
@@ -58,10 +52,7 @@ We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously b
 \end{figure} 
 
 
-
-
-We use the notation $\P{\parents{Y}(X)}$ to denote a random variable that is the probability that the parents of $Y$ are $X$.
-Let $\eta$ be a distribution on available interventions $\calA$ so $\eta_a \geq 0$ and $\sum_{a \in \calA} \eta_a = 1$.
+Let $P_a$ be a shorthand for $\P{.|a}$ and let $\eta$ be a distribution on available interventions $\calA$ so $\eta_a \geq 0$ and $\sum_{a \in \calA} \eta_a = 1$.
 Define $Q = \sum_{a \in \calA} \eta_a \Ps_a$ to be the mixture distribution over the interventions with respect to $\eta$.
 Our algorithm will choose $T$ samples from $Q$ and use them to estimate the returns $\mu_a$ for all $a \in \calA$ simultaneously via
 a truncated importance weighted estimator.
