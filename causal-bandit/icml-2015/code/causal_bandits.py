@@ -12,6 +12,7 @@ from numpy.random import binomial
 import matplotlib.pyplot as plt
 from time import time
 from datetime import datetime as dt
+import pickle
 
 
 REGRET_LABEL = "Regret"
@@ -442,7 +443,7 @@ def worst_case_constant():
     mean = regret.mean(axis=1)
     plt.plot(a_vals,mean)
 
-worst_case_constant()
+
         
 
 def regret_vs_m(N,epsilon,simulations,T):
@@ -532,18 +533,20 @@ def experiment2():
 #simulations = 100
 #T = 400
 #regret,mean,error = regret_vs_m(N,epsilon,simulations,T)
+#pickle.dump(regret, open("experiment1_{0}.pickle".format(now_string()),"wb"))
 
 # Experiment 2
 #N= 50
 #simulations = 100
 #regret2,mean2,error2 = regret_vs_T(N,simulations,epsilon=None,Tstep=None,TperK=10)
+#pickle.dump(regret2, open("experiment2_{0}.pickle".format(now_string()),"wb"))
 
 ## Experiment 3
 simulations = 10000
 N = 50
 epsilon = .3
 regret3,mean3,error3 = regret_vs_T(N,simulations,epsilon=epsilon,Tstep=25,TperK=6)
-
+pickle.dump(regret3, open("experiment3_{0}.pickle".format(now_string()),"wb"))
 
 
 
