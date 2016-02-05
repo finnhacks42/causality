@@ -1,6 +1,6 @@
-\subsection{Parallel bandits problem}
-
-For the parallel bandit problem, we use a model in which, unknown to the algorithms, $Y$ depends only on a single variable.
+We compare Algorithms \ref{alg:simple} and \ref{alg:general} with Successive Elimination on the parallel bandit problem
+under a variety of conditions, including where the importance weighted estimator used by Algorithm \ref{alg:general} is not truncated,
+which is justified in this setting by Remark \ref{rem:truncate}. Throughout we use a model in which $Y$ depends only on a single variable (this is unknown to the algorithms). 
 \eq{
 Y_t \sim \begin{cases}
 \bernoulli(\frac{1}{2}+\epsilon) & \text{if } X_1 = 1 \\
