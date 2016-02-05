@@ -8,7 +8,7 @@ We now consider the more general problem where the graph structure is known, but
 \P{X_1...X_N|do(X_i=j)} = 
 \prod_{k \neq i}\P{X_k|\parents{X_k}}\delta(X_i - j)  
 } 
-Where $\parents{X_k}$ denotes the parents of $X_k$ and $\delta$ is the dirac delta function. For example, given the causual graph in Figure \ref{fig:causalStructure_confounded}, by applying the truncated factorization and marginalizing, we obtain $\P{Y|do(X_2= j)} = \sum_{X_1}\P{X_1}\P{Y|X_1}$.  Note that the quality of any estimator we build for $P{Y|do(X_2= j)}$ is not just a function of the number of times we observe $X_2 = j$.
+Where $\parents{X_k}$ denotes the parents of $X_k$ and $\delta$ is the dirac delta function. For example, given the causual graph in Figure \ref{fig:causalStructure_confounded}, by applying the truncated factorization and marginalizing, we obtain $\P{Y|do(X_2= j)} = \sum_{X_1}\P{X_1}\P{Y|X_1}$.  Note that the quality of any estimator we build for $\P{Y|do(X_2= j)}$ is not just a function of the number of times we observe $X_2 = j$.
 
 \begin{figure}[h]
 \centering
