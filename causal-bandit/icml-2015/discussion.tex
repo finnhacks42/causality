@@ -33,7 +33,7 @@ Unfortunately, in this case the resulting star graphs have an $\bar{\alpha} = N$
 \paragraph{Causal Models with Non-Observable Variables}
 We have assumed through this paper that all variables in the causal model were observable after an intervention is made.
 A natural generalisation of our model would be for some variables to be unobservable.
-\todom{More to say here?}
+\todom{FIX ME!}
 If the conditional models are known then the $Z_a$ terms in Algorithm~\ref{alg:general} could still be obtained via marginalising.
 However, if this is not the case the estimation problem becomes more difficult.
 % In this case, some conditional distributions may be non-identifiable. 
@@ -51,7 +51,7 @@ The latter case arises naturally if we assume free access to a large observation
 Work on the problem of selecting experiments to discover the correct causal graph from within a Markov equivalence class~\cite{Eberhardt2005,eberhardt2010causal,hauser2014two,Hu2014b} could potentially be incorporated into a causal bandit algorithm.
 In particular, \citet{Hu2014b} show that only $\bigo{\log \log n}$ multi-variable interventions are required on average to recover a causal graph over $n$ variables once purely observational data is used to recover the ``essential graph''.
 Simultaneously learning a completely unknown causal model while estimating the rewards of interventions without a large observational dataset would be much more challenging.
-	
+
 % (Partially known structure)
 % Key results $bigo(n)$ singleton or $bigo(log log n)$ multi-variate experiments are required.
 % - Focus on minimizing the number of experiments that must be performed. Examples of active versus online learning. The cost of experiments constant or at least known. 
