@@ -30,6 +30,7 @@ Our focus is on the simple regret, which measures the difference between the ret
 In \S\ref{sec:simple-regret} we analyse a specific family of causal bandit problems that we call \emph{parallel bandit} problems in which $N$ factors affect the reward independently and there are $2N$ possible interventions.
 We propose a simple causal best arm identification algorithm (Algorithm~\ref{alg:simple}) for this problem and show that up to logarithmic factors it enjoys minimax optimal
 simple regret guarantees of $\tilde\Theta(\sqrt{m/T})$ where $m$ depends on the causal model and may be much smaller than $N$.
+\todom{Need ref or proof?}
 In contrast, existing best arm identification algorithms suffer $\Omega(\sqrt{N/T})$ simple regret.
 This shows theoretically the value of our framework over the traditional bandit problem. 
 Experiments in \S\ref{sec:experiments} further demonstrate the value of causal models in this framework.
