@@ -15,13 +15,20 @@ We compare the performance of the Algorithm 1, which is specific to the parallel
 In figure \ref{fig:simple_vs_m} we fix the number of variables $N$ and the horizon $T$ and compare the performance of the algorithms as $m$ increases. The regret for the Successive Reject algorithm is constant as it depends only on the reward distribution and has no knowledge of the causal structure. For the causal algorithms it increases approximately with $\sqrt{m}$. As $m$ approaches $N$, the gain the causal algorithms obtain from knowledge of the structure is outweighed by fact they do not take into account the observed rewards to focus sampling effort on actions with likely high pay-offs.
 
 \begin{figure}[h]
-\caption{Simple regret vs $m(\boldsymbol{q})$ for fixed horizon $T=300$ and number of variables $N = 50$}
+\caption{Simple regret vs $m(\boldsymbol{q})$ for fixed horizon $T=400$ and number of variables $N = 50$}
 \label{fig:simple_vs_m}
 \centering
 \includegraphics[width=.5\textwidth]{exp_regret_vs_m_N50_T400_s100_20160205_1637.pdf}
 \end{figure}
 
-If figures \ref{fig:simple_vs_T_vary_epsilon} and \ref{fig:simple_vs_T} we compare the performance as a function of $T$. \todof{finish this}
+\begin{figure}[h]
+\caption{Simple regret vs $m(\boldsymbol{q})$ for fixed horizon $T=400$ and number of variables $N = 50$, without truncation}
+\label{fig:simple_vs_m2}
+\centering
+\includegraphics[width=.5\textwidth]{exp_regret_vs_m_N50_T400_s100_20160205_1701.pdf}
+\end{figure}
+
+If figures \ref{fig:simple_vs_T_vary_epsilon} and \ref{fig:simple_vs_T} we compare the performance as a function of $T$. 
 
 For the parallel bandit problem, the regression estimator used in the specific algorithm outperforms the truncated importance weighted estimator in the more 
 general algorithm, despite the fact the specific algorithm must estimate $\boldsymbol{q}$ from the data. 
