@@ -104,6 +104,12 @@ When $\vec{q} = (\frac{1}{2}, \ldots, \frac{1}{2})$ we have $m(\vec{q}) = 1$ and
 \end{algorithmic}
 \end{algorithm}
 
+To identify a high-reward intervention, Algorithm~\ref{alg:simple} break $T$ rounds into halves. 
+In the first half, the non-interventional action $do()$ is played and the rewards observed.
+These are used to estimate the occurrance probabilities $\vec{q}$ and the value of $m(\vec{q})$.
+The remainder of the rounds are then evenly split to estimate the infrequently observed interventions, as determined by the estimate for $m(\vec{q})$.
+Although very simple, the following two theorems show that this algorithm is effectively optimal.
+
 \begin{theorem}\label{thm:uq-simple}
 Algorithm \ref{alg:simple} satisfies
 \eq{
