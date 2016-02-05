@@ -16,6 +16,7 @@ from datetime import datetime as dt
 
 REGRET_LABEL = "Regret"
 HORIZON_LABEL = "T"
+M_LABEL = "m(q)"
 
 def now_string():
     return dt.now().strftime('%Y%m%d_%H%M')
@@ -75,7 +76,7 @@ class VeryConfounded(object):
         
         self.pW0givenA = np.vstack((1-self.pW0givenA,self.pW0givenA))
         self.pW1givenA = np.vstack((1-self.pW1givenA,self.pW1givenA))
-        self.wCombinations = np.asarray([(0, 0), (0, 1), (1, 0), (1, 1)])
+        self.parent_vals = np.asarray([(0, 0), (0, 1), (1, 0), (1, 1)])
         self.expected_rewards = self.estimate_rewards(100000)
         self.optimal = np.max(self.expected_rewards)
         
@@ -99,7 +100,7 @@ class VeryConfounded(object):
         
     def V(self,eta):
         va = np.zeros(self.K)  
-        for x in self.wCombinations:
+        for x in self.parent_vals:
             pa = self.P(x)
             Q = (eta*pa).sum()
             ratio = np.true_divide(pa**2,Q)
@@ -148,6 +149,11 @@ class VeryConfounded(object):
         
 
 
+        
+        
+        
+    
+
 class Parallel(object):
     def __init__(self,q,epsilon):
         """ actions are do(x_1 = 0)...do(x_N = 0),do(x_1=1)...do(N_1=1), do() """
@@ -157,6 +163,8 @@ class Parallel(object):
         self.K = 2*self.N+1 #number of actions
         self.pX = np.vstack((1.0-q,q))
         self.set_epsilon(epsilon)
+        self.parent_vals = None
+
         
     def set_epsilon(self,epsilon):
         assert epsilon <= .5 ,"epsilon cannot exceed .5"
@@ -196,7 +204,8 @@ class Parallel(object):
         pij[1-x,indx] = 0
         pij = pij.reshape((len(x)*2,)) #flatten first N-1 will be px=0,2nd px=1
         pobserve = joint# the probability of x given do()
-        return np.hstack((pij,pobserve))
+        result = np.hstack((pij,pobserve))
+        return result
         
     def R(self,x,eta):
         pa = self.P(x)
@@ -206,9 +215,10 @@ class Parallel(object):
         return ratio
         
     def V(self,eta):
-        xvals = map(np.asarray,product([0,1],repeat = self.N)) # all possible assignments to our N variables that are parents of Y
+        if not self.parent_vals:
+            self.parent_vals = map(np.asarray,product([0,1],repeat = self.N)) # all possible assignments to our N variables that are parents of Y
         va = np.zeros(self.K)  
-        for x in xvals:
+        for x in self.parent_vals:
             pa = self.P(x)
             Q = (eta*pa).sum()
             ratio = np.true_divide(pa**2,Q)
@@ -337,9 +347,34 @@ def find_eta(model):
     return res.x,res.fun
    
    
-
+def sample_pa(model,p_indx,sims):
+    result = []
+    for action in range(model.K):
+        d = {}
+        result.append(d)
+        for s in xrange(sims):
+            x,y = model.sample(action)
+            p = tuple(x[p_indx])
+            if p in d:
+                d[p] += 1
+            else:
+                d[p] = 1
+        for key,value in d.iteritems():
+            d[key] = value/float(sims)
     
-def experiment1(N,simulations,epsilon=None,Tstep=None,TperK=10):
+    for x in model.parent_vals:
+        px = model.P(x)
+        spx = [dic.get(tuple(x),0.0) for dic in result]
+        print x,px,spx
+        
+            
+    
+          
+
+
+#regret,mean,error = experiment1(50,1000,.3,TperK = 6,Tstep = 25)
+    
+def regret_vs_T(N,simulations,epsilon=None,Tstep=None,TperK=10):
     
     a = 4.0
     q = part_balanced_q(N,2) 
@@ -387,10 +422,47 @@ def experiment1(N,simulations,epsilon=None,Tstep=None,TperK=10):
     ax.set_ylabel(REGRET_LABEL)
     ax.legend(loc="upper right",numpoints=1)
     fig_name = "exp_regret_vs_T_N{0}_a{1}_s{2}_{3}.pdf".format(N,a,simulations,now_string())
-    #fig.savefig(fig_name, bbox_inches='tight') 
+    fig.savefig(fig_name, bbox_inches='tight') 
     return regret,mean,error  
 
-experiment1(50,1000,.3,TperK = 6,Tstep = 25)
+
+def regret_vs_m(N,epsilon,simulations,T):
+    m_vals = range(2,N,2)
+    causal = GeneralCausal()
+    causal_parallel = ParallelCausal()
+    baseline  = SuccessiveRejects()
+    
+    ts = time()   
+    regret = np.zeros((len(m_vals),3,simulations))
+    for s in xrange(simulations):
+        if s % 100 == 0:
+                print s
+        for m_indx,m in enumerate(m_vals): 
+            q = part_balanced_q(N,m)
+            model = Parallel(q,epsilon)
+            eta,mq = model.analytic_eta()
+            regret[m_indx,0,s] = causal.run(T,model,eta,mq)
+            regret[m_indx,1,s] = causal_parallel.run(T,model)
+            regret[m_indx,2,s] = baseline.run(T,model)
+            
+    te = time()
+    print 'took: %2.4f sec' % (te-ts)
+    
+    mean = regret.mean(axis=2)       
+    error = 3*regret.std(axis=2)/sqrt(simulations)
+    
+    fig,ax = plt.subplots()
+    ax.errorbar(m_vals,mean[:,0],yerr=error[:,0], label="Algorithm 2",linestyle="",marker="s",markersize=4) 
+    ax.errorbar(m_vals,mean[:,1],yerr=error[:,1], label="Algorithm 1",linestyle="",marker="o",markersize=5)    
+    ax.errorbar(m_vals,mean[:,2],yerr=error[:,2], label="Successive Rejects",linestyle="",marker="D",markersize=4) 
+    ax.set_xlabel(M_LABEL)
+    ax.set_ylabel(REGRET_LABEL)
+    ax.legend(loc="lower right",numpoints=1)
+    fig_name = "exp_regret_vs_m_N{0}_T{1}_s{2}_{3}.pdf".format(N,T,simulations,now_string())
+    fig.savefig(fig_name, bbox_inches='tight') 
+    return regret,mean,error
+
+
 
 def experiment2():                          
     ts = time()
@@ -434,6 +506,33 @@ def experiment2():
     return regret,mean,error
 
 
+N = 50
+epsilon = .3
+simulations = 100
+T = 400
+regret,mean,error = regret_vs_m(N,epsilon,simulations,T)
+
+
+#q = part_balanced_q(10,2) 
+#print q       
+#model = Parallel(q,.2)
+#eta,m = model.analytic_eta()
+#bandit = GeneralCausal()
+##T_vals = range(55,70,1)
+##sims = 1000
+##regret = np.zeros((len(T_vals),sims))
+##for tindx,t in enumerate(T_vals):
+##    for s in xrange(sims):
+##        regret[tindx,s] = bandit.run(t,model,eta,m)
+##means = regret.mean(axis=1)
+##
+##
+##plt.plot(T_vals,means)
+#
+##high at 63, low at 64
+#print "eta",eta,m
+#bandit.run(63,model,eta,m)
+#bandit.run(64,model,eta,m)
 
 #fig_name = "exp_regret_vs_T_N{0}_a{1}_s{2}_{3}.pdf".format(N,a,simulations,now_string())
 #fig.savefig(fig_name, bbox_inches='tight') 
