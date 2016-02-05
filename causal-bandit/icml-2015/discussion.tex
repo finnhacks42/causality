@@ -7,14 +7,21 @@ In contrast, in the special case of parallel bandits, Algorithm~\ref{alg:simple}
 Despite these extra estimates, Theorem~\ref{thm:lower} shows that this approach is optimal (up to log factors).
 Finding an algorithm that only requires the causal graph and lower bounds for its simple regret in the general case is left as future work.
 
+\paragraph{Using the Reward Signal}
+
+
 \paragraph{Cumulative Regret}
-Although we have focused on simple regret in our analysis, a natural question is whether cumulative regret bounds can be obtained for the general causal bandit problem we have proposed.
-% In the case of the parallel bandit problem however, we can make use of existing work on bandits with graph feedback to achieve this.
+Although we have focused on simple regret in our analysis, a natural but open question is whether cumulative regret bounds can be obtained for the general causal bandit problem we have proposed.
+In the case of the parallel bandit problem we can slightly modify the analysis from \citep{wu2015online} on bandits with graph feedback to get optimal cumulative regret guarantees.
+Their model assumes the rewards for all arms $a$ are Gaussian with mean $\mu_a$ and variance $\sigma^2_{ab}$ and that playing an arm $a$ will reveal a side observation $Y_{ab}$ of the reward for all arms $b$ distributed with mean $\mu_b$ and variance $\sigma^2_{ab}$.
+We can build a similar dependence structure with variances for a Bernoulli reward variable that is derived from the $\vec{q}$ vector of probabilities.
+Even though the original results are for Gaussian rewards we believe the analysis will go through largely unchanged.
 
-\todom{Not sure about reduction here}
-Cumulative regret... use \citep{wu2015online} to get optimal cumulative regret bound (should be $\Omega(T^{2/3})$?)
-
-General discussion of how to map parallel bandit problem to graph feedback?
+Exploiting the variance structure in this way seems necessary even in the parallel bandit case.
+If instead we choose to use other graph feedback models for cumulative regret we would require those with time varying graphs~\citep{Alon2015,Kocak2014}.
+Results for these models give a cumulative regret of $\bigo{\sqrt{\bar{\alpha} T}}$ where $\bar{\alpha}$ is the average independence number of the time varying graphs.
+On each round, the feedback graph over the $2N$ possible interventions over $N$ binary variables would connect the chosen intervention to the corresponding intervention for each of the other $N-1$ observed variables.
+Unfortunately, in this case the resulting star graphs have an $\bar{\alpha} = N$ and so the cumulative regret bounds would improve over those obtained by ignoring the causal graph structure.
 
 % In our algorithm, we have only used the side information provided by the $do()$ action about other actions. Since the $do()$ action fully reveals the value of alternate actions we could have incorporated this information via the graph feedback model \cite{Mannor2011}, where at each timestep the feedback graph $G_t$ is selected stochastically, dependent on $\boldsymbol{q}$, and revealed after an action has been chosen. The feedback graph is distinct from the causal graph. A link $A \rightarrow B$ in $G_t$ indicates that selecting the action $A$ reveals the reward for action $B$. For this specific problem, $G_t$ will always be a star graph with the action $do()$ connected to half the remaining actions. The Exp3-IX algorithm \cite{Kocak2014} was developed for the adversarial version of this problem and has regret $\bigo{\sqrt{\bar{\alpha}T}}$, where $\bar{\alpha}$ is the average independence number of $G_t$. In our case $\bar{\alpha} = \frac{N}{2}$ so we again obtain the regret of the standard bandit algorithm. The issue here is that a malicious adversary can select the same graph each time, such that the rewards for half the arms are never revealed by the informative action. This is equivalent to a, nominally, stochastic selection of feedback graph where $\boldsymbol{q} = \boldsymbol{0}$
 
