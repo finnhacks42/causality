@@ -7,7 +7,7 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 
-\newif\ifsup\suptrue
+\newif\ifsup\supfalse
 
 
 
@@ -23,8 +23,8 @@
 
 
 \setlength{\marginparwidth}{10ex}%added by Yifan so that the todos can fit in the margin
-\usepackage[obeyFinal]{todonotes}
-%\usepackage[disable]{todonotes}
+%\usepackage[obeyFinal]{todonotes}
+\usepackage[disable]{todonotes}
 
 \newcommand{\tinytodo}[2][]{\todo[size=\tiny]{#2}}
 %\newcommand{\tinytodo}[2][]{\todo[size=\tiny, #1]{\begin{spacing}{1.0}#2\end{spacing}}}
