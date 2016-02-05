@@ -376,18 +376,19 @@ def sample_pa(model,p_indx,sims):
     
 def regret_vs_T(N,simulations,epsilon=None,Tstep=None,TperK=10):
     
-    a = 4.0
+    a = 9.0
     q = part_balanced_q(N,2) 
     if epsilon:
         model = Parallel(q,epsilon)
         Tmin = 10
+        vary_epsilon = False
     else:
         model =  Parallel(q,.5)
         Tmin = int(ceil(4*model.K/a))
+        vary_epsilon = True
     
     Tstep = model.K if not Tstep else Tstep
     eta,mq = model.analytic_eta()
-    print mq
      
     T_vals = range(Tmin,TperK*model.K,Tstep)
     
@@ -396,17 +397,18 @@ def regret_vs_T(N,simulations,epsilon=None,Tstep=None,TperK=10):
     baseline  = SuccessiveRejects()
     
     ts = time()   
-    regret = np.zeros((len(T_vals),3,simulations))
+    regret = np.zeros((len(T_vals),4,simulations))
     for s in xrange(simulations):
         if s % 100 == 0:
                 print s
         for T_indx,T in enumerate(T_vals): 
-            if not epsilon: #variable epsilon
+            if vary_epsilon: #variable epsilon
                 epsilon = sqrt(model.K/(a*T))
                 model.set_epsilon(epsilon)
             regret[T_indx,0,s] = causal.run(T,model,eta,mq)
             regret[T_indx,1,s] = causal_parallel.run(T,model)
             regret[T_indx,2,s] = baseline.run(T,model)
+            regret[T_indx,3,s] = epsilon
             
     te = time()
     print 'took: %2.4f sec' % (te-ts)
@@ -418,6 +420,7 @@ def regret_vs_T(N,simulations,epsilon=None,Tstep=None,TperK=10):
     ax.errorbar(T_vals,mean[:,0],yerr=error[:,0], label="Algorithm 2",linestyle="",marker="s",markersize=4) 
     ax.errorbar(T_vals,mean[:,1],yerr=error[:,1], label="Algorithm 1",linestyle="",marker="o",markersize=5)    
     ax.errorbar(T_vals,mean[:,2],yerr=error[:,2], label="Successive Rejects",linestyle="",marker="D",markersize=4) 
+    #ax.plot(T_vals,mean[:,3],label="epsilon")
     ax.set_xlabel(HORIZON_LABEL)
     ax.set_ylabel(REGRET_LABEL)
     ax.legend(loc="upper right",numpoints=1)
@@ -425,6 +428,26 @@ def regret_vs_T(N,simulations,epsilon=None,Tstep=None,TperK=10):
     fig.savefig(fig_name, bbox_inches='tight') 
     return regret,mean,error  
 
+def worst_case_constant():
+    bandit = ParallelCausal()
+    T = 400
+    N = 50
+    sims = 1000
+    q = part_balanced_q(N,2)
+    model =  Parallel(q,.5)
+    a_vals = np.linspace(.1,2,20)
+    regret = np.zeros((len(a_vals),sims))
+    for indx,a in enumerate(a_vals):
+        epsilon = sqrt(2.0/float(a*T))
+        model.set_epsilon(epsilon)
+        for s in range(sims):
+            regret[indx,s] = bandit.run(T,model)
+    
+    mean = regret.mean(axis=1)
+    plt.plot(a_vals,mean)
+
+worst_case_constant()
+        
 
 def regret_vs_m(N,epsilon,simulations,T):
     m_vals = range(2,N,2)
@@ -506,11 +529,27 @@ def experiment2():
     return regret,mean,error
 
 
-N = 50
-epsilon = .3
-simulations = 10000
-T = 400
-regret,mean,error = regret_vs_m(N,epsilon,simulations,T)
+
+## Experiment 1
+#N = 50
+#epsilon = .3
+#simulations = 100
+#T = 400
+#regret,mean,error = regret_vs_m(N,epsilon,simulations,T)
+
+# Experiment 2
+#N= 50
+#simulations = 100
+#regret2,mean2,error2 = regret_vs_T(N,simulations,epsilon=None,Tstep=None,TperK=10)
+
+## Experiment 3
+#simulations = 1000
+#N = 50
+#epsilon = .3
+#regret3,mean3,error3 = regret_vs_T(N,simulations,epsilon=epsilon,Tstep=25,TperK=6)
+
+
+
 
 
 #q = part_balanced_q(10,2) 
