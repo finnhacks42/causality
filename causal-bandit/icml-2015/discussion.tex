@@ -8,15 +8,15 @@ Despite these extra estimates, Theorem~\ref{thm:lower} shows that this approach 
 Finding an algorithm that only requires the causal graph and lower bounds for its simple regret in the general case is left as future work.
 
 \paragraph{Cumulative Regret}
-Another open question is whether cumulative regret bounds can be obtained for the general causal bandit problem we have proposed.
-In the case of the parallel bandit problem however, we can make use of existing work on bandits with graph feedback to achieve this.
-Each time an action $do(X_i = j) \in \calA$ is chosen 
+Although we have focused on simple regret in our analysis, a natural question is whether cumulative regret bounds can be obtained for the general causal bandit problem we have proposed.
+% In the case of the parallel bandit problem however, we can make use of existing work on bandits with graph feedback to achieve this.
 
+\todom{Not sure about reduction here}
 Cumulative regret... use \citep{wu2015online} to get optimal cumulative regret bound (should be $\Omega(T^{2/3})$?)
 
-General discussion of how to map parallel bandit problem to graph feedback.
+General discussion of how to map parallel bandit problem to graph feedback?
 
-In our algorithm, we have only used the side information provided by the $do()$ action about other actions. Since the $do()$ action fully reveals the value of alternate actions we could have incorporated this information via the graph feedback model \cite{Mannor2011}, where at each timestep the feedback graph $G_t$ is selected stochastically, dependent on $\boldsymbol{q}$, and revealed after an action has been chosen. The feedback graph is distinct from the causal graph. A link $A \rightarrow B$ in $G_t$ indicates that selecting the action $A$ reveals the reward for action $B$. For this specific problem, $G_t$ will always be a star graph with the action $do()$ connected to half the remaining actions. The Exp3-IX algorithm \cite{Kocak2014} was developed for the adversarial version of this problem and has regret $\bigo{\sqrt{\bar{\alpha}T}}$, where $\bar{\alpha}$ is the average independence number of $G_t$. In our case $\bar{\alpha} = \frac{N}{2}$ so we again obtain the regret of the standard bandit algorithm. The issue here is that a malicious adversary can select the same graph each time, such that the rewards for half the arms are never revealed by the informative action. This is equivalent to a, nominally, stochastic selection of feedback graph where $\boldsymbol{q} = \boldsymbol{0}$
+% In our algorithm, we have only used the side information provided by the $do()$ action about other actions. Since the $do()$ action fully reveals the value of alternate actions we could have incorporated this information via the graph feedback model \cite{Mannor2011}, where at each timestep the feedback graph $G_t$ is selected stochastically, dependent on $\boldsymbol{q}$, and revealed after an action has been chosen. The feedback graph is distinct from the causal graph. A link $A \rightarrow B$ in $G_t$ indicates that selecting the action $A$ reveals the reward for action $B$. For this specific problem, $G_t$ will always be a star graph with the action $do()$ connected to half the remaining actions. The Exp3-IX algorithm \cite{Kocak2014} was developed for the adversarial version of this problem and has regret $\bigo{\sqrt{\bar{\alpha}T}}$, where $\bar{\alpha}$ is the average independence number of $G_t$. In our case $\bar{\alpha} = \frac{N}{2}$ so we again obtain the regret of the standard bandit algorithm. The issue here is that a malicious adversary can select the same graph each time, such that the rewards for half the arms are never revealed by the informative action. This is equivalent to a, nominally, stochastic selection of feedback graph where $\boldsymbol{q} = \boldsymbol{0}$
 
 % \cite{Lelarge2012} consider a stochastic version of the graph feedback problem, but with a fixed graph available to the algorithm before it must select an action. In addition, their algorithm is not optimal for all graph structures and fails, in particular, to provide improvements for star like graphs as in our case. \cite{Buccapatnam2014} improve the dependence of the algorithm on the graph structure but still assume the graph is fixed and available to the algorithm before the action is selected. 
 
@@ -28,10 +28,13 @@ In our algorithm, we have only used the side information provided by the $do()$ 
 \paragraph{Causal Models with Non-Observable Variables}
 We have assumed through this paper that all variables in the causal model were observable after an intervention is made.
 A natural generalisation of our model would be for some variables to be unobservable.
-In this case, some conditional distributions may be non-identifiable. 
-The corresponding actions can be immediately added to the set $A$ prior to collecting any data. 
-We can then use the same algorithm as in the case where there are no latent variables, except that we will have to use the more general do-calculus rather than simply adjusting for the parents to write the expression for each action in terms of observational data. 
-% 
+\todom{More to say here?}
+If the conditional models are known then the $Z_a$ terms in Algorithm~\ref{alg:general} could still be obtained via marginalising.
+However, if this is not the case the estimation problem becomes more difficult.
+% In this case, some conditional distributions may be non-identifiable. 
+% The corresponding actions can be immediately added to the set $A$ prior to collecting any data. 
+% We can then use the same algorithm as in the case where there are no latent variables, except that we will have to use the more general do-calculus rather than simply adjusting for the parents to write the expression for each action in terms of observational data.
+Combining our estimation techniques with insights from \citet{Bareinboim2015} for handling unobserved confounders would be worth investigation.
 
 
 % More generally, assuming causal structure creates more complex types of side information, such as that shown in equation \ref{eq:estimation_transfer}. In this case, selecting one action does not fully reveal an alternate action but provides some information towards an estimate. The quality of the estimate notably depends not only on the number of times that action was selected. For example, to get a good estimate for $X_1 = 1$ by intervening on $X_2$ requires us to sample both $X_2=0$ and $X_2=1$, in proportions dependent on $q_2$. This more complex side information does not fit within the graph feedback framework.
@@ -42,7 +45,7 @@ We can then use the same algorithm as in the case where there are no latent vari
 A much more difficult generalisation would be to consider causal bandit problems where the causal graph is completely unknown or known to be a member of class of models.
 The latter case arises naturally if we assume free access to a large observational dataset, from which the Markov equivalence class can be found via causal discovery techniques. 
 Work on the problem of selecting experiments to discover the correct causal graph from within a Markov equivalence class~\cite{Eberhardt2005,eberhardt2010causal,hauser2014two,Hu2014} could potentially be incorporated into a causal bandit algorithm as part of a pre-processing step.
-Simultaneously learning a completely unknown causal model while estimating the rewards of interventions would be much more challenging.
+Simultaneously learning a completely unknown causal model while estimating the rewards of interventions would be much more challenging but there is 
 \todom{Ideas? Relevant refs?}
 	
 % (Partially known structure)
