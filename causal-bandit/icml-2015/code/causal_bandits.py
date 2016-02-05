@@ -297,17 +297,13 @@ class SuccessiveRejects(object):
     label = "Successive Reject"
     
     def run(self,T,model):
-        self.trials = np.zeros(model.K)
-        self.success = np.zeros(model.K)
-        self.actions = range(0,model.K)
+        
         if T <= model.K:
-            to_sample = np.random.choice(self.actions,size=T,replace=False)
-            self.trials[to_sample] +=1
-            self.success[to_sample] += model.sample_multiple(to_sample,1)
-            u = np.true_divide(self.success,self.trials)
-            best_action = argmax_rand(u)
-            #return np.nan
+            return np.nan
         else:
+            self.trials = np.zeros(model.K)
+            self.success = np.zeros(model.K)
+            self.actions = range(0,model.K)
             allocations = self.allocate(T,model.K)
             self.rejected = np.zeros((model.K),dtype=bool)
             for k in range(0,model.K-1):
@@ -543,10 +539,10 @@ def experiment2():
 #regret2,mean2,error2 = regret_vs_T(N,simulations,epsilon=None,Tstep=None,TperK=10)
 
 ## Experiment 3
-#simulations = 1000
-#N = 50
-#epsilon = .3
-#regret3,mean3,error3 = regret_vs_T(N,simulations,epsilon=epsilon,Tstep=25,TperK=6)
+simulations = 10000
+N = 50
+epsilon = .3
+regret3,mean3,error3 = regret_vs_T(N,simulations,epsilon=epsilon,Tstep=25,TperK=6)
 
 
 
