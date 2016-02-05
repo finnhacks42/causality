@@ -284,7 +284,7 @@ class GeneralCausal(object):
             a = np.random.choice(actions,p=eta)
             x,y = model.sample(a) #x is an array containing values for each variable
             r = model.R(x,eta)
-            z = (r <= self.B)*r*y
+            z = r*y #(r <= self.B)*r*y #Truncation turned off to run parallel bandit experiments
             u += z
         self.u = u/float(T)
         best_action = np.argmax(u)
@@ -508,7 +508,7 @@ def experiment2():
 
 N = 50
 epsilon = .3
-simulations = 100
+simulations = 10000
 T = 400
 regret,mean,error = regret_vs_m(N,epsilon,simulations,T)
 
