@@ -21,6 +21,7 @@ We can build a similar dependence structure with variances for a Bernoulli rewar
 \todom{Check this!}
 Even though the original results are for Gaussian rewards we believe the analysis will go through largely unchanged.
 
+\todof {This paragraph could be be clearer. These results are sub-optimal as they apply to adversarial case such that opponent can effectively choose m = N}
 Exploiting the variance structure in this way seems necessary even in the parallel bandit case.
 If instead we choose to use other graph feedback models we would require those with time varying graphs~\citep{Alon2015,Kocak2014}.
 Results for these models give a cumulative regret of $\bigo{\sqrt{\bar{\alpha} T}}$ where $\bar{\alpha}$ is the average independence number of the time varying graphs.
@@ -31,11 +32,9 @@ Unfortunately, in this case the resulting star graphs have an $\bar{\alpha} = N$
 
 
 \paragraph{Causal Models with Non-Observable Variables}
-We have assumed through this paper that all variables in the causal model were observable after an intervention is made.
-A natural generalisation of our model would be for some variables to be unobservable.
-\todom{FIX ME!}
-If the conditional models are known then the $Z_a$ terms in Algorithm~\ref{alg:general} could still be obtained via marginalising.
-However, if this is not the case the estimation problem becomes more difficult.
+If we assume knowledge of the conditional \textit{interventional} distributions $P_a$ our analysis applies unchanged to the case of causal models with non-observable variables. For example, if we had access to a data set of \textit{experiments} in which the reward variable $Y$ was not available from which to build estimates of $P_a$. Some of the interventional distributions $P_a$ may be non-identifiable meaning we can not obtain prior estimates for $P_a$ from even an infinite amount of observational data. \todof{tie in to brief discussion of approach if had to estimate $P_a$ terms within algorithm.
+
+
 % In this case, some conditional distributions may be non-identifiable. 
 % The corresponding actions can be immediately added to the set $A$ prior to collecting any data. 
 % We can then use the same algorithm as in the case where there are no latent variables, except that we will have to use the more general do-calculus rather than simply adjusting for the parents to write the expression for each action in terms of observational data.
