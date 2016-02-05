@@ -8,19 +8,33 @@ Despite these extra estimates, Theorem~\ref{thm:lower} shows that this approach 
 Finding an algorithm that only requires the causal graph and lower bounds for its simple regret in the general case is left as future work.
 
 \paragraph{Making Better Use of the Reward Signal}
-Several existing algorithms for best arm identification are based on ``successive rejection'' (SR) of arms based on UCB-like bounds on their rewards~\citep{Even-Dar2002}.
+Existing algorithms for best arm identification are based on ``successive rejection'' (SR) of arms based on UCB-like bounds on their rewards~\citep{Even-Dar2002}.
 In contrast, our algorithms completely ignore the reward signal when developing their arm sampling policies and only use the rewards when estimating $\hat{\mu}_a$.
 Incorporating the reward signal into our sampling techniques or designing more adaptive reward estimators that focus on high reward interventions is an obvious next step.
 This would likely improve the poor performance of our causal algorithm relative to the sucessive rejects algorithm for large $m$, as seen in Figure~\ref{fig:simple_vs_m}.
+For the parallel bandit the required modifications should be quite straightforward. The idea would be to adapt the algorithm to essentially use successive elimination in
+the second phase so arms are eliminated as soon as they are provably no longer optimal with high probability. In the general case a similar modification is also possible
+by dividing the budget $T$ into phases and optimising the sampling distribution $\eta$, eliminating arms when their confidence intervals are no longer overlapping. Note
+that these modifications will not improve the minimax regret, which at least for the parallel bandit is already optimal. For this reason we prefer to emphasize 
+the main point that causal structure should be exploited when available. Another observation is that Algorithm \ref{alg:general} is actually using a fixed design, which
+in some cases may be preferred to a sequential design for logistical reasons. This is not possible for Algorithm \ref{alg:simple}, since the $\vec{q}$ vector is unknown.
 
 \paragraph{Cumulative Regret}
-Although we have focused on simple regret in our analysis, a natural but open question is whether cumulative regret bounds can be obtained for the general causal bandit problem we have proposed.
-In the case of the parallel bandit problem we can slightly modify the analysis from \citep{wu2015online} on bandits with graph feedback to get optimal cumulative regret guarantees.
-Their model assumes the rewards for all arms $a$ are Gaussian with mean $\mu_a$ and variance $\sigma^2_{ab}$ and that playing an arm $a$ will reveal a side observation $Y_{ab}$ of the reward for all arms $b$ distributed with mean $\mu_b$ and variance $\sigma^2_{ab}$.
-We can build a similar dependence structure with variances for a Bernoulli reward variable that is derived from the $\vec{q}$ vector of probabilities.
-\todom{Check this!}
-Even though the original results are for Gaussian rewards we believe the analysis will go through largely unchanged.
+Although we have focused on simple regret in our analysis, it would also be natural to consider the cumulative regret.
+In the case of the parallel bandit problem we can slightly modify the analysis from \citep{wu2015online} on bandits with side information 
+to get near-optimal cumulative regret guarantees. They consider a finite-armed bandit model with side information where in reach round
+the learner chooses an action and receives a Gaussian reward signal for all actions, but with a known variance that depends on the chosen action.
+In this way the learner can gain information about actions it does not take with varying levels of accuracy. The reduction follows by substituting
+the importance weighted estimators in place of the Gaussian reward. In the case that $\vec{q}$ is known this would lead to a known variance
+and the only (insignificant) difference is the Bernoulli noise model. In the parallel bandit case we believe this would lead to near-optimal cumulative regret,
+at least asymptotically. 
 
+%Their model assumes the rewards for all arms $a$ are Gaussian with mean $\mu_a$ and variance $\sigma^2_{ab}$ and that playing an arm $a$ will reveal a side observation $Y_{ab}$ of the reward for all arms $b$ distributed with mean $\mu_b$ and variance $\sigma^2_{ab}$.
+%We can build a similar dependence structure with variances for a Bernoulli reward variable that is derived from the $\vec{q}$ vector of probabilities.
+%\todom{Check this!}
+%Even though the original results are for Gaussian rewards we believe the analysis will go through largely unchanged.
+
+\todof {This paragraph could be be clearer. These results are sub-optimal as they apply to adversarial case such that opponent can effectively choose m = N}
 Exploiting the variance structure in this way seems necessary even in the parallel bandit case.
 If instead we choose to use other graph feedback models we would require those with time varying graphs~\citep{Alon2015,Kocak2014}.
 Results for these models give a cumulative regret of $\bigo{\sqrt{\bar{\alpha} T}}$ where $\bar{\alpha}$ is the average independence number of the time varying graphs.
@@ -31,11 +45,9 @@ Unfortunately, in this case the resulting star graphs have an $\bar{\alpha} = N$
 
 
 \paragraph{Causal Models with Non-Observable Variables}
-We have assumed through this paper that all variables in the causal model were observable after an intervention is made.
-A natural generalisation of our model would be for some variables to be unobservable.
-\todom{FIX ME!}
-If the conditional models are known then the $Z_a$ terms in Algorithm~\ref{alg:general} could still be obtained via marginalising.
-However, if this is not the case the estimation problem becomes more difficult.
+If we assume knowledge of the conditional \textit{interventional} distributions $P_a$ our analysis applies unchanged to the case of causal models with non-observable variables. For example, if we had access to a data set of \textit{experiments} in which the reward variable $Y$ was not available from which to build estimates of $P_a$. Some of the interventional distributions $P_a$ may be non-identifiable meaning we can not obtain prior estimates for $P_a$ from even an infinite amount of observational data. \todof{tie in to brief discussion of approach if had to estimate $P_a$ terms within algorithm.}
+
+
 % In this case, some conditional distributions may be non-identifiable. 
 % The corresponding actions can be immediately added to the set $A$ prior to collecting any data. 
 % We can then use the same algorithm as in the case where there are no latent variables, except that we will have to use the more general do-calculus rather than simply adjusting for the parents to write the expression for each action in terms of observational data.
