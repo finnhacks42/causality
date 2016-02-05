@@ -9,7 +9,7 @@ We will assume each variable only takes on a finite number of distinct values.
 An edge from variable $X_i$ to $X_j$ is interpreted to mean that a change in the value of $X_i$ may directly cause a change to the value of $X_j$.
 The \emph{parents} of a variable $X_i$, denoted $\parents{X_i}$ or just $\parents{i}$, is the set of all variables $X_j$ such that there is an edge from $X_j$ to $X_i$ in $\mathcal{G}$.
 An \emph{intervention (of size $n$)}, denoted $do(\vec{X}=\vec{x})$, assigns the values $\vec{x}=\{x_1, \ldots, x_n\}$ to the corresponding variables $\vec{X}=\{X_1, \ldots, X_n\} \subset \mathcal{X}$ with the empty intervention (where no variable is set) denoted $do()$.
-The intervention also ``mutilates'' the graph $\mathcal{G}$ by removing all edges from the parents of $X_i$ to $X_i$ for each $X_i \in \vec{X}$. 
+The intervention also ``mutilates'' the graph $\mathcal{G}$ by removing all edges from $\parents{i}$ to $X_i$ for each $X_i \in \vec{X}$. 
 The resulting graph defines a probability distribution $\P{\vec{X}^c | do(\vec{X}=\vec{x})}$ over $\vec{X}^c := \mathcal{X} - \vec{X}$. 
 Details can be found in Chapter 21 of~\cite{Koller2009}.
 
@@ -21,7 +21,7 @@ The causal bandit game proceeds over $T$ rounds.
 In round $t$, the learner \emph{intervenes} by choosing $a_t = do(\vec{X}_t = \vec{x}_t) \in \mathcal{A}$ based on previous observations. 
 It then \emph{observes} sampled values for all non-intervened variables $\vec{X}^c_t$ drawn from $\P{\vec{X}^c_t | do(\vec{X}_t = \vec{x}_t)}$, 
 including the \emph{reward} $Y_t \in \{0,1\}$. 
-After $T$ observations the learner outputs an estimate of the optimal action $\hat a^*_T$.
+After $T$ observations the learner outputs an estimate of the optimal action $\hat a^*_T \in \actions$ based on its prior observations.
 
 The objective of the learner is to minimise the simple regret
 \begin{equation}

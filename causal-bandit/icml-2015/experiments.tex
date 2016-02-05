@@ -23,7 +23,10 @@ In figure \ref{fig:simple_vs_m} we fix the number of variables $N$ and the horiz
 
 If figures \ref{fig:simple_vs_T_vary_epsilon} and \ref{fig:simple_vs_T} we compare the performance as a function of $T$. \todof{finish this}
 
-For the parallel bandit problem, the regression estimator used in the specific algorithm outperforms the truncated importance weighted estimator in the more general algorithm, despite the fact the specific algorithm must estimate $\boldsymbol{q}$ from the data. 
+For the parallel bandit problem, the regression estimator used in the specific algorithm outperforms the truncated importance weighted estimator in the more 
+general algorithm, despite the fact the specific algorithm must estimate $\boldsymbol{q}$ from the data. 
+This is an interesting phenomenon that has been noted before in off-policy evaluation where the regression (and not the importance weighted) estimator
+is known to be minimax optimal asymptotically \citep{LMS14}.
 
 \begin{figure}
 \caption{Simple regret vs horizon, $T$, with $N = 50$ and $\epsilon = \sqrt{K/4T}$}

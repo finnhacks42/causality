@@ -22,11 +22,11 @@ How might the farmer best experiment to identify the single, highest yielding in
 
 \subsection{Contributions}
 
-This paper takes the first step towards formalising and solving problems such as the one above. 
+We take the first step towards formalising and solving problems such as the one above. 
 In \S\ref{sec:defs} we formally introduce \emph{causal bandit problems} in which interventions are treated as arms in a bandit problem but their influence on the reward --- along with any other observations --- is assumed to conform to a known causal graph. 
 We show that our causal bandit framework subsumes the classical bandits (no additional observations) and contextual stochastic bandit problems (observations are revealed before an intervention is chosen) before focusing on the case where, like the above example, observations occur \emph{after} each intervention is made.
 
-We focus on the simple regret, which measures the difference between the return of the optimal action and that of the action chosen by the algorithm after $T$ rounds.
+Our focus is on the simple regret, which measures the difference between the return of the optimal action and that of the action chosen by the algorithm after $T$ rounds.
 In \S\ref{sec:simple-regret} we analyse a specific family of causal bandit problems that we call \emph{parallel bandit} problems in which $N$ factors affect the reward independently and there are $2N$ possible interventions.
 We propose a simple causal best arm identification algorithm (Algorithm~\ref{alg:simple}) for this problem and show that up to logarithmic factors it enjoys minimax optimal
 simple regret guarantees of $\tilde\Theta(\sqrt{m/T})$ where $m$ depends on the causal model and may be much smaller than $N$.
@@ -35,7 +35,7 @@ This shows theoretically the value of our framework over the traditional bandit 
 Experiments in \S\ref{sec:experiments} further demonstrate the value of causal models in this framework.
 
 In the general casual bandit problem interventions and observations may have a complex relationship. 
-In \S\ref{sec:simple-regret-general} we propose a novel algorithm inspired by importance-sampling that a) enjoys sub-linear regret equivalent to the optimal rate in the parallel bandit setting and b) captures many of the intricacies of sharing information in a causal graph in the general case.
+In \S\ref{sec:simple-regret-general} we propose a new algorithm inspired by importance-sampling that a) enjoys sub-linear regret equivalent to the optimal rate in the parallel bandit setting and b) captures many of the intricacies of sharing information in a causal graph in the general case.
 As in the parallel bandit case, the regret guarantee is often significantly better than $O(\sqrt{N/T})$ and never worse, where $N$ is the number of available interventions.
 
 
@@ -43,7 +43,7 @@ As in the parallel bandit case, the regret guarantee is often significantly bett
 \subsection{Related Work}
 
 As alluded to above, causal bandit problems with $N$ possible interventions can be treated as a classical $N$-armed bandit problem by simply ignoring the causal model and extra observations that are revealed each round.
-In the farming example, the farmer could treat the six possible interventions are arms, ignore the observations of the non-intervened variables, and apply an existing best-arm identificaion algorithm~\citep{Jamieson2013} with well understood simple regret guarantees.
+In the farming example, the farmer could treat the six possible interventions as arms, ignore the observations of the non-intervened variables, and apply an existing best-arm identificaion algorithm with well understood simple regret guarantees \citep{Jamieson2013}.
 However, as we show in \S\ref{sec:simple-regret}, this approach ignores the extra information available in the non-intervened variables and subsequently yields sub-optimal performance.
 
 A well-studied class of bandit problems with side information are ``contextual bandits''~\cite{Langford2008,Agarwal2014}.
@@ -65,7 +65,7 @@ To the best of our knowledge, our paper is the first to analyse simple regret in
 % Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
 
 Two pieces of recent work also consider using causal models in bandit problems.
-\citet{Bareinboim2015} also use causal inference to improve the chance of choosing an optimal arm. Their work differs from ours in two key ways. Firstly, their focus is on correcting the effects of unobserved confounding variables whereas we assume all variables are observable. Secondly, they do not assume their learning algorithm has access to a causal graph and instead use a form of contextual randomization to improve reward estimates in a Thompson sampling-style algorithm. \citet{Ortega2014thompson} present an analysis and extension of Thompson sampling assuming actions are causal interventions. Their focus is on causal induction (\ie, learning an unknown causal model) instead of exploiting a known causal model. Neither work provides a regret analysis. 
+\citet{Bareinboim2015} use causal inference to improve the chance of choosing an optimal arm. Their work differs from ours in two key ways. Firstly, their focus is on correcting the effects of unobserved confounding variables whereas we assume all variables are observable. Secondly, they do not assume their learning algorithm has access to a causal graph and instead use a form of contextual randomization to improve reward estimates in a Thompson sampling-style algorithm. \citet{Ortega2014thompson} present an analysis and extension of Thompson sampling assuming actions are causal interventions. Their focus is on causal induction (\ie, learning an unknown causal model) instead of exploiting a known causal model. Neither work provides a regret analysis. 
 Combining their handling of unobserved variables and causal induction with our analysis is left as future work.
 % Key to Elias' paper is: observing the action an agent would take if it were allowed to make its natural choice can provide some information about hidden confounders that influence both the reward and the choice of action. Therefore, incorporating an agents natural choice as context may outperform a standard bandit that does not use that context. (Note: even in the presence of hidden confounders, including the agents natural choice as context only may improve the results. It is easy to come up with a counter example in which it does not).
 
