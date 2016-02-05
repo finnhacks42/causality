@@ -287,21 +287,27 @@ class SuccessiveRejects(object):
     label = "Successive Reject"
     
     def run(self,T,model):
-        if T <= model.K:
-            return np.nan
-        allocations = self.allocate(T,model.K)
         self.trials = np.zeros(model.K)
         self.success = np.zeros(model.K)
         self.actions = range(0,model.K)
-        self.rejected = np.zeros((model.K),dtype=bool)
-        for k in range(0,model.K-1):
-            nk = allocations[k]
-            self.success[self.actions] += model.sample_multiple(self.actions,nk)
-            self.trials[self.actions] += nk
-            self.reject()
-        assert len(self.actions == 1), "number of arms remaining is: {0}, not 1.".format(len(self.actions))
-        assert sum(self.trials <= T),"number of pulls = {0}, exceeds T = {1}".format(sum(self.trials),T)
-        best_action = self.actions[0]
+        if T <= model.K:
+            to_sample = np.random.choice(self.actions,size=T,replace=False)
+            self.trials[to_sample] +=1
+            self.success[to_sample] += model.sample_multiple(to_sample,1)
+            u = np.true_divide(self.success,self.trials)
+            best_action = argmax_rand(u)
+            #return np.nan
+        else:
+            allocations = self.allocate(T,model.K)
+            self.rejected = np.zeros((model.K),dtype=bool)
+            for k in range(0,model.K-1):
+                nk = allocations[k]
+                self.success[self.actions] += model.sample_multiple(self.actions,nk)
+                self.trials[self.actions] += nk
+                self.reject()
+            assert len(self.actions == 1), "number of arms remaining is: {0}, not 1.".format(len(self.actions))
+            assert sum(self.trials <= T),"number of pulls = {0}, exceeds T = {1}".format(sum(self.trials),T)
+            best_action = self.actions[0]
         return model.optimal - model.expected_rewards[best_action]
     
     def allocate(self,T,K):
@@ -324,36 +330,48 @@ class SuccessiveRejects(object):
         return np.random.choice(indicies) # select one at random
 
 
-
 def find_eta(model):
     eta0 = random_eta(model.K)
     res = minimize(model.m, eta0,bounds = [(0.0,1.0)]*model.K, constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0}),options={'disp': True},method='SLSQP')
     assert res.success, " optimization failed to converge"+res.message
     return res.x,res.fun
+   
+   
+
     
-def experiment1(N,simulations,a):
+def experiment1(N,simulations,epsilon=None,Tstep=None,TperK=10):
+    
+    a = 4.0
     q = part_balanced_q(N,2) 
-    model = Parallel(q,.5)
+    if epsilon:
+        model = Parallel(q,epsilon)
+        Tmin = 10
+    else:
+        model =  Parallel(q,.5)
+        Tmin = int(ceil(4*model.K/a))
+    
+    Tstep = model.K if not Tstep else Tstep
     eta,mq = model.analytic_eta()
-    Tmin = int(ceil(4*model.K/a)) 
-    T_vals = range(Tmin,10*model.K,model.K)
+    print mq
+     
+    T_vals = range(Tmin,TperK*model.K,Tstep)
     
     causal = GeneralCausal()
     causal_parallel = ParallelCausal()
     baseline  = SuccessiveRejects()
     
     ts = time()   
-    regret = np.zeros((len(T_vals),4,simulations))
+    regret = np.zeros((len(T_vals),3,simulations))
     for s in xrange(simulations):
         if s % 100 == 0:
                 print s
         for T_indx,T in enumerate(T_vals): 
-            epsilon = sqrt(model.K/(a*T))
-            model.set_epsilon(epsilon)
-            regret[T_indx,0,s] = causal.run(T,model,eta,4)
+            if not epsilon: #variable epsilon
+                epsilon = sqrt(model.K/(a*T))
+                model.set_epsilon(epsilon)
+            regret[T_indx,0,s] = causal.run(T,model,eta,mq)
             regret[T_indx,1,s] = causal_parallel.run(T,model)
             regret[T_indx,2,s] = baseline.run(T,model)
-            regret[T_indx,3,s] = epsilon
             
     te = time()
     print 'took: %2.4f sec' % (te-ts)
@@ -369,50 +387,57 @@ def experiment1(N,simulations,a):
     ax.set_ylabel(REGRET_LABEL)
     ax.legend(loc="upper right",numpoints=1)
     fig_name = "exp_regret_vs_T_N{0}_a{1}_s{2}_{3}.pdf".format(N,a,simulations,now_string())
-    fig.savefig(fig_name, bbox_inches='tight') 
-    return regret,mean,error                               
+    #fig.savefig(fig_name, bbox_inches='tight') 
+    return regret,mean,error  
 
-ts = time()
-a,b,n,q1,q2, = 1,1,20,.1,.5
-pYgivenW = np.asarray([[.5,.5],[.5,.6]])
+experiment1(50,1000,.3,TperK = 6,Tstep = 25)
 
-model = VeryConfounded(a,b,n,q1,q2,pYgivenW) 
-print model.expected_rewards
-
-eta,m = find_eta(model)
-te = time()
-print 'took: %2.4f sec' % (te-ts)
-
-
-T_vals = range(model.K,10*model.K,model.K)
-simulations = 100
-causal = GeneralCausal()
-baseline  = SuccessiveRejects()
-
-ts = time()   
-regret = np.zeros((len(T_vals),2,simulations))
-for s in xrange(simulations):
-    if s % 100 == 0:
-            print s
-    for T_indx,T in enumerate(T_vals): 
-        regret[T_indx,0,s] = causal.run(T,model,eta,m)
-        regret[T_indx,1,s] = baseline.run(T,model)
+def experiment2():                          
+    ts = time()
+    a,b,n,q1,q2, = 1,1,20,.1,.5
+    pYgivenW = np.asarray([[.5,.5],[.5,.6]])   
+    model = VeryConfounded(a,b,n,q1,q2,pYgivenW) 
+    print model.expected_rewards
+    
+    eta,m = find_eta(model)
+    te = time()
+    print 'took: %2.4f sec' % (te-ts)
         
-te = time()
-print 'took: %2.4f sec' % (te-ts)
+    T_vals = range(model.K,10*model.K,model.K)
+    simulations = 100
+    causal = GeneralCausal()
+    baseline  = SuccessiveRejects()
+    
+    ts = time()   
+    regret = np.zeros((len(T_vals),2,simulations))
+    for s in xrange(simulations):
+        if s % 100 == 0:
+                print s
+        for T_indx,T in enumerate(T_vals): 
+            regret[T_indx,0,s] = causal.run(T,model,eta,m)
+            regret[T_indx,1,s] = baseline.run(T,model)
+            
+    te = time()
+    print 'took: %2.4f sec' % (te-ts)
+    
+    mean = regret.mean(axis=2)       
+    error = 3*regret.std(axis=2)/sqrt(simulations)
+    
+    fig,ax = plt.subplots()
+    ax.errorbar(T_vals,mean[:,0],yerr=error[:,0], label="Algorithm 2",linestyle="",marker="s",markersize=4)    
+    ax.errorbar(T_vals,mean[:,1],yerr=error[:,1], label="Successive Rejects",linestyle="",marker="D",markersize=4) 
+    ax.set_xlabel(HORIZON_LABEL)
+    ax.set_ylabel(REGRET_LABEL)
+    ax.legend(loc="upper right",numpoints=1)
+    fig_name = "exp_regret_cnfd_vs_T_N{0}_s{1}_{2}.pdf".format(model.N,simulations,now_string())
+    fig.savefig(fig_name, bbox_inches='tight') 
+    return regret,mean,error
 
-mean = regret.mean(axis=2)       
-error = 3*regret.std(axis=2)/sqrt(simulations)
 
-fig,ax = plt.subplots()
-ax.errorbar(T_vals,mean[:,0],yerr=error[:,0], label="Algorithm 2",linestyle="",marker="s",markersize=4)    
-ax.errorbar(T_vals,mean[:,1],yerr=error[:,1], label="Successive Rejects",linestyle="",marker="D",markersize=4) 
-ax.set_xlabel(HORIZON_LABEL)
-ax.set_ylabel(REGRET_LABEL)
-ax.legend(loc="upper right",numpoints=1)
-fig_name = "exp_regret_cnfd_vs_T_N{0}_s{1}_{2}.pdf".format(model.N,simulations,now_string())
-fig.savefig(fig_name, bbox_inches='tight') 
 
+#fig_name = "exp_regret_vs_T_N{0}_a{1}_s{2}_{3}.pdf".format(N,a,simulations,now_string())
+#fig.savefig(fig_name, bbox_inches='tight') 
+    
 
 #results = []
 #
