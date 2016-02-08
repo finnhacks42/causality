@@ -7,6 +7,7 @@ In contrast, in the special case of parallel bandits, Algorithm~\ref{alg:simple}
 Despite these extra estimates, Theorem~\ref{thm:lower} shows that this approach is optimal (up to log factors).
 Finding an algorithm that only requires the causal graph and lower bounds for its simple regret in the general case is left as future work.
 
+\vspace{-0.4cm} 
 \paragraph{Making Better Use of the Reward Signal}
 Existing algorithms for best arm identification are based on ``successive rejection'' (SR) of arms based on UCB-like bounds on their rewards~\citep{Even-Dar2002}.
 In contrast, our algorithms completely ignore the reward signal when developing their arm sampling policies and only use the rewards when estimating $\hat{\mu}_a$.
@@ -19,6 +20,7 @@ that these modifications will not improve the minimax regret, which at least for
 the main point that causal structure should be exploited when available. Another observation is that Algorithm \ref{alg:general} is actually using a fixed design, which
 in some cases may be preferred to a sequential design for logistical reasons. This is not possible for Algorithm \ref{alg:simple}, since the $\vec{q}$ vector is unknown.
 
+\vspace{-0.4cm} 
 \paragraph{Cumulative Regret}
 Although we have focused on simple regret in our analysis, it would also be natural to consider the cumulative regret.
 In the case of the parallel bandit problem we can slightly modify the analysis from \citep{wu2015online} on bandits with side information 
@@ -39,6 +41,7 @@ The parallel bandit problem can also be viewed as an instance of a time varying 
 % \cite{Lelarge2012} consider a stochastic version of the graph feedback problem, but with a fixed graph available to the algorithm before it must select an action. In addition, their algorithm is not optimal for all graph structures and fails, in particular, to provide improvements for star like graphs as in our case. \cite{Buccapatnam2014} improve the dependence of the algorithm on the graph structure but still assume the graph is fixed and available to the algorithm before the action is selected. 
 
 
+\vspace{-0.4cm} 
 \paragraph{Causal Models with Non-Observable Variables}
 If we assume knowledge of the conditional \textit{interventional} distributions $P_a$ our analysis applies unchanged to the case of causal models with 
 non-observable variables. For example, if we had access to a data set of \textit{experiments} in which the reward variable $Y$ was not 
@@ -56,6 +59,7 @@ even an infinite amount of observational data. Even if all variables are observa
 % More generally, assuming causal structure creates more complex types of side information, such as that shown in equation \ref{eq:estimation_transfer}. In this case, selecting one action does not fully reveal an alternate action but provides some information towards an estimate. The quality of the estimate notably depends not only on the number of times that action was selected. For example, to get a good estimate for $X_1 = 1$ by intervening on $X_2$ requires us to sample both $X_2=0$ and $X_2=1$, in proportions dependent on $q_2$. This more complex side information does not fit within the graph feedback framework.
 
 
+\vspace{-0.4cm} 
 \paragraph{Partially or Completely Unknown Causal Graph}
 A much more difficult generalisation would be to consider causal bandit problems where the causal graph is completely unknown or known to be a member of class of models.
 The latter case arises naturally if we assume free access to a large observational dataset, from which the Markov equivalence class can be found via causal discovery techniques. 
