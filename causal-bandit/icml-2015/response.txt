@@ -9,7 +9,7 @@ Pa_Y(X) is the realization of the variables in X that are (direct) parents of Y.
 
 P_a{Pa_Y(X)} is the probability of Pa_Y(X) given we select action a
 
-The definition of R_a on L483 should now make mathematical sense. It is used in the definition of Z_a, which is the truncated
+The definition of R_a on L483 should now make mathematical sense. It is used in the definition of Z_a (L476), which is the truncated
 importance weighted estimator of the payoff for action $a$ with respect to sampling distribution Q.
 
 R_a will be large if we get an assignment to the parents of Y that is likely given action $a$ but unlikely given we sample from Q. 
