@@ -1,7 +1,6 @@
 ﻿Thank you to all reviewers for your detailed and thoughtful comments
 
-We apologise for the confusing/missing definitions and lack of intuition for Alg2. We will take care to clarify these issues.
-We address question on Sec. 4 here as all reviewers had similar questions. Specific comments follow.
+We apologise for the confusing/missing definitions and lack of intuition for Alg2. We will take care to clarify these issues. We address comments on Sec. 4 here as all reviewers had similar questions. Specific comments follow.
 
 mu_I should be \mu_{\hat a^*_T}, which is the true expected payoff for the intervention chosen by the algorithm.
   
@@ -9,62 +8,40 @@ Pa_Y(X) is the realization of the variables in X that are (direct) parents of Y.
 
 P_a{Pa_Y(X)} is the probability of Pa_Y(X) given we select action a
 
-The definition of R_a on L483 should now make mathematical sense. It is used in the definition of Z_a (L476), which is the truncated
-importance weighted estimator of the payoff for action $a$ with respect to sampling distribution Q.
+The definition of R_a on L483 should now make mathematical sense. It is used in the definition of Z_a (L476), which is the truncated importance weighted estimator of the payoff for action $a$ with respect to sampling distribution Q.
 
-R_a will be large if we get an assignment to the parents of Y that is likely given action $a$ but unlikely given we sample from Q. 
-The vector eta determines the likelihood of using each intervention (including the trivial "do nothing").  
-Then m(eta) can be interpreted as an upper bound on the worst-case (over the actions) variance of the estimators Z_a, which
-is justified by the calculations in L523 and is the reason that eta is chosen to minimise m(eta). A nice outcome is that
-for the parallel bandit case the value of m(eta) coincides with the value of m(q) given in Section 3 (argument in L631). 
-At a high-level eta is chosen to maximise the information gained about all actions simultaneously.
+R_a will be large if we get an assignment to the parents of Y that is likely given action $a$ but unlikely given we sample from Q. The vector eta determines the likelihood of using each intervention (including the trivial "do nothing"). Then m(eta) can be interpreted as an upper bound on the worst-case (over the actions) variance of the estimators Z_a, which is justified by the calculations in L523 and is the reason that eta is chosen to minimise m(eta). A nice outcome is that for the parallel bandit case the value of m(eta) coincides with the value of m(q) given in Section 3 (argument in L631). At a high-level, eta is chosen to maximise the information gained about all actions simultaneously.
 
-The generalisation of Alg.1 to arbitrary graphs is not straightforward because in order to optimise eta the values of P_a on the parents
-of all variables should be estimated and bounded. Evaluating the propagation of the errors is then very challenging and seems
-worthy of a more lengthy article.
+We don't directly generalize alg1 as it's no longer optimal to trade off observing against selecting hard to learn actions. Instead we must optimize the assignment of samples to actions so as to leverage all the information a general causal graph provides about the reward for one action given another.
 
 Rev. 1
 
-Exploiting the causal structure allows us to learn the payoffs of multiple actions at each timestep, which
-greatly speeds the learning as demonstrated in Fig.5. Estimating P(Y|X1...XN) and P(X1...XN) would require 
-exponentially (in N) many estimators, which is the issue our approach addresses. We will make this key point clearer.  
+Exploiting the causal structure allows us to learn the payoffs of multiple actions at each timestep, which greatly speeds the learning as demonstrated in Fig5. Estimating P(Y|X1...XN) and P(X1...XN) would require exponentially (in N) many estimators, which is the issue our approach addresses. We will make this key point clearer.  
 
-Simple regret is a standard measure in the bandit community that captures the key aspects of the problem. An alternative would be the cumulative regret,
-which is equally interesting and sometimes more/less suitable depending on the setting. In both cases it would be possible to study the asymptotics as an
-alternative theoretical approach. This is often easier, but less informative from a practical perspective. We would be curious to know about alternative theoretical
-frameworks you might suggest.
+Simple regret is a standard measure in the bandit community that captures the key aspects of the problem. An alternative would be the cumulative regret, which is equally interesting and sometimes more/less suitable depending on the setting. In both cases it would be possible to study the asymptotics as an alternative theoretical approach. This is often easier, but less informative from a practical perspective. We would be curious to know about alternative theoretical frameworks you might suggest.
 
-For Alg1, in practice we would combine the data from both phases in the estimates for the actions with low natural probability. 
-This slightly complicates the proofs and does not improve the regret bounds. We will add a remark to clarify this. 
+Although the idea of combining causality with bandit algorithms has been considered before, our approach is (to our knowledge) novel and quite general. We agree that in most real applications there will be some uncertainty in the causal model and this is a very interesting (and challenging) topic for future research. However we believe our article is a good first step.
 
-Re. contextual bandits, we want to emphasise that those algorithms cannot be applied in our framework because they rely on 
-the context being available at decision time, while in our setting the X vector is not observed until after
-an intervention is made.
+Re. Sec2, an action selects a variable and sets its value. We will clarify this.
 
-Although the idea of combining causality with bandit algorithms has been considered before, our approach is (to our knowledge) novel and quite general.
-We agree that in most real applications there will be some uncertainty in the causal model and this is a very interesting (and challenging) topic for 
-future research. However we believe our article is a good first step.
+Re. Alg1, in practice we would combine the data from both phases in the estimates for the actions with low natural probability. This slightly complicates the proofs and does not improve the regret bounds. We will add a remark to clarify this. 
 
-Re. the proofs. We will include more steps and references in the supplementary material.
-We will include an exact ref. for the Chernoff bound in L1162. Intuitively the q_i appears because the
-variance for a Bernoulli with parameter q is q(1-q) \leq q and so it is not surprising to see this inside the square root by the central
-limit theorem. 
+Re. contextual bandits, we want to emphasise that those algorithms cannot be applied in our framework because they rely on the context being available at decision time, while in our setting the X vector is not observed until after the intervention.
+
+Re. proofs. We will include more steps in the supplementary material and an exact ref. for the Chernoff bound in L1162. Intuitively q_i appears because the variance for a Bernoulli with parameter q is q(1-q) \leq q and so it is not surprising to see this inside the square root by the central limit theorem. 
 
 Rev. 2
-Thank you for spotting the typos in eq.(2) and the do() expression in Sec. 4. 
+Thank you for spotting the errors in eq.(2) and the do() expression in Sec.4. 
 
-You are correct with regard to estimating P(Y|do(X2)) via X3. We should let X1==X2==X3 or replace fig.2 with the simpler graph X1 -> X2 -> Y, X1 -> Y.
+You are correct with regard to estimating P(Y|do(X2)) via X3. We should let X1==X2==X3 or replace fig2 with the simpler graph X1->X2->Y, X1->Y.
 
 Rev. 4
 Thank you for the detailed notes on typos. These will be fixed. 
 
-We don't know of any algorithms comparable to Alg.1 and the measure of problem difficulty $m$ is also novel.
+We don't know of any algorithms comparable to Alg1 and the measure of problem difficulty $m$ is also novel.
 
-Although trivial, it is causal theory that tells us the interventional and conditional probabilities are equal in the parallel bandit setting. 
-Alg.1/2 exploit this causal structure to beat the standard algorithms. We presented this setting so as to allow comparison between Alg.1/Alg.2. 
-We will add additional experiments for the general setting to the supplementary material. 
+Although trivial, it is causal theory that tells us the interventional and conditional probabilities are equal in the parallel bandit setting. Alg1&2 exploit this causal structure to beat the standard algorithms. We presented this setting so as to allow comparison between Alg1&Alg2. We will add additional experiments for the general setting to the supplementary material. 
 
-The experiments demonstrate the causal algorithms exploit the additional assumptions to escape the lower bounds that apply to standard simple regret algorithms. 
-All other algorithms will be subject to these bounds and thus perform similarly, however we are willing to add additional curves.
+The experiments demonstrate the causal algorithms exploit the additional assumptions to escape the lower bounds that apply to standard simple regret algorithms. All other algorithms will be subject to these bounds and thus perform similarly, however we are willing to add additional curves.
 
 
