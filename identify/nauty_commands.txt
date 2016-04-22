@@ -1,0 +1,4 @@
+./geng -c 3 graphs/c3
+./directg -o -T graphs/c3 graphs/d3 
+./listg -t graphs/c3 
+
