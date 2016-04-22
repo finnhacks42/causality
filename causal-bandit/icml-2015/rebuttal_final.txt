@@ -1,0 +1,31 @@
+﻿Thank you to all reviewers for your detailed and thoughtful reviews
+
+We apologise for the confusing/missing definitions and lack of intuition for algorithm 2. We will certainly clarify this section. As you had very similar questions regarding this section, we will address them together here and then provide specific feedback on the remainder of the paper.
+
+We cannot directly generalise algorithm1 as it is no longer trivial to determine the expected variance of the estimators for each action given observational data and the optimal way to learn about multiple actions may no longer be to observe. We must come up with a way to optimally assign our limited budget of samples, T, to actions, a, so as to get a good estimate for all actions. This assignment must take advantage of the complex ways a general causal graph provides information about the reward for one action given we take a different one. 
+
+As a first step to addressing this difficult problem we make the simplifying assumption that the conditional interventional distributions, P{X| a} are known for all variables except the outcome Y.  Let Pa_Y(X) denote a realization of the variables in X that are (direct) parents of Y. Note that P{Y|do(Pa_Y), other variables} = P{Y|do(Pa_Y)}. We can then construct an importance weighted estimate for the reward Y given each action, a, where the target distribution is P{Pa_Y(X)| a} and the sampling distribution Q is a fixed average over all the target distributions for all the allowable actions, weighted by eta. 
+
+R_a is the ratio of the probability of observing some realization of the parents of Y given we take action a to observing that realization given we are sampling actions from Q. R_a will be large if we get an assignment to the parents of Y that is likely given action a but unlikely given we sample from Q.  m(eta) is the largest (over a) expected value of R_a. A large expected value of R_a implies it will be difficult to get a good estimate for that action as we expect only a few (highly weighted) samples will contribute.  We therefore select eta* to minimise m(eta) such that our estimates are not too uncertain for any action.  m(eta*) can then be interpreted as a measure of the underlying difficulty of the problem, which we can connect back to m in algorithm 1.
+
+mu_I is the true expected reward for the action the algorithm estimates to be optimal at time T. It should have been denoted mu_a^*_T, consistent with the remainder of the paper. 
+
+Reviewer 1
+
+The advantages provided by incorporating causal structure into a bandit algorithm are that it allows us to constrain the initial search space (offline pruning only briefly mentioned) and extract information about the results of multiple actions at each timestep. Both these things allow an agent to agent to hone in on optimal actions more quickly.  Estimating P(Y|X1...XN) and P(X1...XN) would require (without assumptions assumptions on the reward function) a number of estimators that grows exponentially with the number of variables. It is essentially this issue that techniques that assume additional structure (causal or otherwise) attempt to resolve. We will try to make this key point clearer.  
+
+We focus on the simple regret as it was simplest to analyse, whilst still being relevant to practical problems, demonstrating interesting characteristics and allowing comparisons with the wider bandit literature. Simple regret is only interesting for finite time-scales as asymptotically any unbiased estimator will, by definition, suffer no regret. 
+
+Although the idea of combining causality with bandit algorithms has been considered before, the way in which we connect causal graphs to bandit problems is (to our knowledge) novel and quite general. Certainly in most real applications there will be some uncertainty in the causal model and this is a very interesting (and challenging) topic for future research. However we believe this work to be an important first step and worthy of publication. We are sorry for the difficulty in following the proofs in the supplementary material. We will include more steps and references.
+
+Reviewer 2
+Thank you for spotting the typos in eqn. (2) and the do() expression in section 4. 
+
+You are also correct with regard to estimating P(Y|do(X2)) via X3. We should let X1==X2==X3 or replace figure 2 with the simpler graph X1 -> X2 -> Y, X1 -> Y.
+
+Reviewer 4
+Thank you for the detailed notes on typos. These will be fixed. 
+
+Although trivial, it is causal theory that tells us the interventional and conditional probabilities are equal in the parallel bandit setting and algorithms 1 & 2 both use this causal structure to beat the standard algorithms. We presented this setting so as to allow comparison between alg1 and alg2. We will endeavour to add additional experiments for the general setting to the supplementary material. 
+
+The experiments aim to demonstrate the causal algorithms escape the lower bounds that apply to standard simple regret algorithms. All other algorithms will be subject to these bounds and thus perform similarly, however we can add additional curves.

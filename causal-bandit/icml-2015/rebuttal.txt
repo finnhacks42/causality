@@ -1,0 +1,66 @@
+﻿Algorithm 2
+R 1
+ Where is R_a (l477) defined? l483
+ What does Pa_Y(X) and in particular P_a{Pa_Y(X)} mean? (l483)
+ Where is \mu_I (l516) defined?
+R2
+What is Pa_Y(X) notation, the subrealization for parents of Pa_Y given a realization X of all variables?Did not understand algorithm2. If we are following what happened with algorithm 1, what we want to do is run the system observationally for a while, and learn which combinations of treatments occur frequently via an estimate of P(X1, ..., Xk) (marginal over all treatment variables if there are k of them in the DAG). Then use estimate of P(X1, ..., Xk) to construct a version of m(q) for a distribution that does not marginally factorize, as we expect to be the case for P(X1,..., Xk) in an arbitrary DAG. Finally, use that version of m(q) to drive what interventions to perform.
+Where does eta come from, and what relationship does it have to observed treatment occurrence frequencies? It sort of seems like algorithm 2 is really trying to be optimal with respect to this eta distribution, which has no relationship to actually observed frequencies of treatment occurrence, as happens with algorithm 1. Can the authors explain this? I thought the point was to try to solve “a bandit like problem” for causal relationships given observational data.
+R3
+Two central notations --Pa_Y(X) and mu_I-- are not defined, making it difficult both to understand the meaning of the quantity R_a and to check the subsequent proofs. 
+Need intuition for second algorithm. Explanation of R_a
+
+We cannot directly generalise algorithm1 as it is no longer trivial to determine the expected variance of the estimators for each action given observational data and the optimal way to learn about multiple actions may no longer be to observe. We must come up with a way to optimally assign our limited budget of samples, T, to actions, a, so as to get a good estimate for all actions. This assignment must take advantage of the complex ways a general causal graph provides information about the reward for one action given we take a different one. 
+
+As a first step to addressing this difficult problem we make the simplifying assumption that the conditional interventional distributions, P{X| a} are known for all variables except the outcome Y.  Let Pa_Y(X) denote a realization of the variables in X that are (direct) parents of Y. Note that P{Y|do(Pa_Y), other variables} = P{Y|do(Pa_Y)}. We can then construct an importance weighted estimate for the reward Y given each action, a, where the target distribution is P{Pa_Y(X)| a} and the sampling distribution Q is a fixed average over all the target distributions for all the allowable actions, weighted by eta. 
+
+R_a is the ratio of the probability of observing some realization of the parents of Y given we take action a to observing that realization given we are sampling actions from Q. R_a will be large if we get an assignment to the parents of Y that is likely given action a but unlikely given we sample from Q.  m(eta) is the largest (over a) expected value of R_a. A large expected value of R_a implies it will be difficult to get a good estimate for that action as we expect only a few (highly weighted) samples will contribute.  We therefore select eta* to minimise m(eta) such that our estimates are not too uncertain for any action.  m(eta*) can then be interpreted as a measure of the underlying difficulty of the problem, which we can connect back to m in algorithm 1.
+
+mu_I is the true expected reward for the action the algorithm estimates to be optimal at time T. It should have been denoted mu_a^*_T, consistent with the remainder of the paper. 
+
+
+
+
+Reviewer 1 (causality side)
+
+make clear which mathematical terms in section 3 & 4 are central
+many concepts, such as causal models (population-level), regret analysis (sample-level), interventions, actions, etc. are mixed in a way that is sometimes hard to follow.
+there should be more instructive but still theoretical ways than finite-sample regrets to argue why knowledge of the causal DAG helps. Great to not only have the hard-to-read finite-sample regret analysis, but also some more instructive considerations of when/how the causal approach helps. 
+
+obvious that one can construct theoretical scenarios where causal knowledge or modeling helps for bandit-like scenarios
+this direction has already been investigated e.g. by Bottou and Bareinboim - although the scenarios differ.
+Motivate with real world problem. (+ how can farmer know DAG in advance)
+ You make an interesting point in 453-455.
+From Sec. 2 it is not quite clear: does an action consists of (1) a decision on which variable to intervene as well as (2) what value to set the chosen variable to? (It gets clear later that its both.) This seems pretty clear, line 210, not sure how we can improve it.
+Why don't you use the initial T/2 data points for the final estimation of expected rewards (Alg1)
+We do use it for those actions that can be sufficiently estimated from the observational data. We could combine the estimates for the remaining actions with those obtained via intervention, but this would slightly complicate the proof of the regret bound and only change the bound by a constant factor of at most 2. 
+
+ Wouldn't it make sense to also try to estimate the form of the mechanism p(Y|X_1, ..., X_N) because this together with the estimated distributions on X_i should give additional information on the expected rewards.
+The number of estimates this requires (without some form of assumption on the function) grows exponentially with the number of variables. It also does not provide any further information on the expected rewards if we accept the stated structural assumptions and set of allowed interventions.
+Unclear if the problem they address couldn't also be addressed by some adapted version of contextual bandits (which abstract away from the difference between (1) on which variable one intervenes and (2) to which value one sets this variable).
+I don't understand the 2nd half of this comment... Contextual bandits extend standard bandits by allowing there to be additional contextual information, C, available prior to an agent selecting an action, a,. The agent must then build estimates P(Y|a, C). In our setting the additional information is received after the agent selects their action.
+
+Why does the q_i appear on the r.h.s. of the greater-or-equal sing in l1162? I couldn't see that from Chernoff. (2) 
+This probably just needs a reference. 
+Can you write down more steps that show the last inequality in l1176? It's somehow clear that you can bound it by the integral, but it would be much nicer for the reader if he/she could just go through it and not spend so much time for reconstructing steps.
+Yes we will add more steps
+
+Reviewer 2
+Section 4: The formula for p(Y | do(x2)) is incorrect, should be \sum_x1 p(x1) p(y| x1, x2). The functional better depend on x2!
+Yep, this is a typo. Reviewer is correct.
+
+“however we will never observe (X2 = 1, X1 = 0) so we cannot get a good estimate for P {Y |do(X2 = 1)}.” Not obvious, since \sum_x3 p(x3) p(y | x3, x2) is also equal to p(y |do(x2)).
+True. We could let X1=X2=X3 deterministically or just use the simpler graph X1 → X2 → Y, X1 → Y
+
+(2) should bound d from above by N, right? 
+Yep, something not quite right about (2)
+
+
+Reviewer 4
+It is a pity that the second algorithm was only tested in a setting, where all interventional probabilities actually equal conditional probabilities (P(Y|X=x) = P(Y|do(X=x)) ). Thus, there is de facto no experiment in the paper that actually uses techniques specific to causal theory.
+Although trivial, it is causal theory that tells us the interventional and conditional probabilities are equal in the parallel bandit setting and algorithms 1 & 2 both use this causal structure to beat the standard algorithms. We presented this setting so as to allow comparison between alg1 and alg2. We will endeavour to add additional experiments for the general setting to the supplementary material. 
+
+Why do you compare your algorithms to only 1 single competitor algorithm? If no valid/strong reason is given, then please add curves for at least one or two other competitors.
+The experiments aim to demonstrate the causal algorithms escape the lower bounds that apply to standard simple regret algorithms. All other algorithms will be subject to these bounds and thus perform with similarly, however we can add additional curves.
+
+
