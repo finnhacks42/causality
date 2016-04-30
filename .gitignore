@@ -35,3 +35,6 @@ graph2
 causal-bandit/icml-2015/*.pdf
 causal-bandit/icml-2015/code/*.pdf
 causal-bandit/icml-2015/unused/*.pdf
+causal-bandit/nips_2016/*.pdf
+causal-bandit/nips_2016/code/*.pdf
+causal-bandit/nips_2016/unused/*.pdf
