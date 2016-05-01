@@ -1,7 +1,7 @@
 Medical drug testing, policy setting, and other scientific processes are commonly framed and analysed in the language of sequential experimental design and, in special cases, as bandit problems~\citep{Robbins1952,Chernoff1959}. 
 In this framework, single actions (\eg, experiments or interventions) from a pre-determined set are repeatedly performed in 
 order to evaluate their effectiveness via feedback from a single, real-valued reward signal.
-We propose a generalisation of the standard model by assuming that, in additional to the reward signal, the learner observes the values of a number of covariates 
+We propose a generalisation of the standard model by assuming that, in addition to the reward signal, the learner observes the values of a number of covariates 
 drawn from a probabilistic causal model~\citep{Pearl2000}.
 Causal models are commonly used in disciplines where explicit experimentation may be difficult such as social science, demography and economics.
 For example, when predicting the effect of changes to childcare subsidies on workforce participation, or school choice on grades. 
@@ -14,7 +14,7 @@ The type of problem we are concerned with is best illustrated with an example.
 Consider a farmer wishing to optimise the yield of her crop. 
 She knows that crop yield is only affected by temperature, a particular soil nutrient, and moisture level but the precise effect of their combination is unknown.
 In each season the farmer has enough time and money to intervene and control at most one of these variables:
-deploying shade or heat lamps will set the temperature to be low or high; the nutrient can be added or removed a through a choice of fertilizer; and irrigation or rain-proof covers will keep the soil wet or dry.
+deploying shade or heat lamps will set the temperature to be low or high; the nutrient can be added or removed through a choice of fertilizer; and irrigation or rain-proof covers will keep the soil wet or dry.
 When not intervened upon, the temperature, soil, and moisture vary naturally from season to season due to weather conditions and these are all observed along with the final crop yield at the end of each season.
 How might the farmer best experiment to identify the single, highest yielding intervention in a limited number of seasons?
 %without sacrificing too much crop yield (relative to always choosing the best intervention) in the process?
@@ -43,7 +43,7 @@ As in the parallel bandit case, the regret guarantee is often significantly bett
 \subsection{Related Work}
 
 As alluded to above, causal bandit problems with $N$ possible interventions can be treated as a classical $N$-armed bandit problem by simply ignoring the causal model and extra observations that are revealed each round.
-In the farming example, the farmer could treat the six possible interventions as arms, ignore the observations of the non-intervened variables, and apply an existing best-arm identificaion algorithm with well understood simple regret guarantees \citep{Jamieson2013}.
+In the farming example, the farmer could treat the six possible interventions as arms, ignore the observations of the non-intervened variables and apply an existing best-arm identificaion algorithm with well understood simple regret guarantees \citep{Jamieson2013}.
 However, as we show in \S\ref{sec:simple-regret}, this approach ignores the extra information available in the non-intervened variables and subsequently yields sub-optimal performance.
 
 A well-studied class of bandit problems with side information are ``contextual bandits''~\cite{Langford2008,Agarwal2014}.

@@ -41,7 +41,7 @@ allowable interventions thereby reducing the complexity.
 We note that classical $K$-armed stochastic bandit problem can be recovered in our framework by considering a simple causal model with one 
 edge connecting a single variable $X$ that can take on $K$ values to a reward variable $Y \in \set{0,1}$ where $\P{Y = 1|X} = r(X)$ for some 
 arbitrary but unknown, real-valued function $r$. The set of allowed interventions in this case is $\mathcal{A} = \{ do(X = k) \colon k \in \{1, \ldots, K\}\}$.
-Conversely, any causal bandit problem can reduced to a classical stochastic $|\mathcal{A}|$-armed bandit problem by 
+Conversely, any causal bandit problem can be reduced to a classical stochastic $|\mathcal{A}|$-armed bandit problem by 
 treating each possible intervention as an arm and ignoring all sampled values for the observed variables except for the reward.
 Intuitively though, one would expect to perform better by making use of the extra observations.
 

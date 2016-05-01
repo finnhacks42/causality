@@ -62,7 +62,7 @@ Note that the expected reward of the optimal intervention is at least as large a
 \label{sub:par-bandit-alg}
 
 The algorithm operates as follows. For the first $T/2$ rounds it chooses $do()$ to collect observational data.
-The fact that only link from each $X_1,\ldots,X_N$ to $Y$ is a direct, causal one means that $\P{Y|do(X_i=j)}=\P{Y|X_i=j}$. Thus we can create good estimators of the returns of those actions $do(X_i = j)$ for which $\P{X_i = j}$ is large. 
+The fact that the only link from each $X_1,\ldots,X_N$ to $Y$ is a direct, causal one means that $\P{Y|do(X_i=j)}=\P{Y|X_i=j}$. Thus we can create good estimators of the returns of those actions $do(X_i = j)$ for which $\P{X_i = j}$ is large. 
 These are the interventions that are easily estimated ``passively'' (\ie, without playing them explicitly). 
 Those actions where $\P{X_i = j}$ is small may not be observed (often) in the first $T/2$ rounds, so
 the estimates of the returns of these actions from the first $T/2$ samples could be quite poor. For the remaining $T/2$ rounds
@@ -123,7 +123,7 @@ this setting.
 We prove a lower bound on the simple regret that matches up to logarithmic factors the upper bound given in Theorem \ref{thm:uq-simple}.
 
 \begin{theorem}\label{thm:lower}
-For all $T$, $\vec{q}$ and all strategies there exists a reward function such that
+For all $T$, $\vec{q}$ and all strategies, there exists a reward function such that
 \eq{
 \simpleregret 
 \in \Omega\left(\sqrt{\frac{m(\vec{q})}{T}}\right)\,.
