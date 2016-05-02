@@ -23,6 +23,8 @@
 
 % additional packages
 \usepackage{graphicx} % more modern 
+\usepackage{caption}
+\usepackage{subcaption}
 \usepackage{tikz}
 \usepackage{dsfont}
 \usepackage{amsmath}
@@ -32,12 +34,13 @@
 \usepackage{natbib}
 \usepackage{algorithm}
 \usepackage{algorithmic}
+\usepackage{wrapfig}
 %
 
 \newif\ifsup\supfalse
 
 \graphicspath{ {figures/} }
-\usetikzlibrary{arrows,positioning} 
+\usetikzlibrary{arrows,positioning,backgrounds} 
 \tikzset{
     %Define standard arrow tip
     >=stealth',
@@ -156,6 +159,9 @@ Our formalism combines multi-arm bandits and causal inference to model a novel t
 We propose a new algorithm that exploits the causal feedback and prove a bound on its simple regret that is strictly better (in all quantities) 
 than algorithms that do not use the additional causal information.
 \end{abstract} 
+%\begin{tikzpicture}[background rectangle/.style={fill=olive!45}, show background rectangle]
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % INTRODUCTION
@@ -204,7 +210,7 @@ than algorithms that do not use the additional causal information.
 
 \input{discussion}
 
-\bibliography{libraryicml}
+{\footnotesize\bibliography{libraryicml}}
 \bibliographystyle{icml2016}
 
 

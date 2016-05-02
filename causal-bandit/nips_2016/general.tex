@@ -3,20 +3,28 @@
 \newcommand{\x}{\boldsymbol{x}}
 \newcommand{\Ps}{\operatorname{P}}
 
-We now consider the more general problem where the graph structure is known, but arbitrary. For general graphs, $\P{Y|X_i=j} \neq \P{Y|do(X_i=j)}$ (correlation is not causation). However if all the variables are observable, any causal distribution $\P{X_1...X_N|do(X_i=j)}$ can be expressed in terms of observational distributions via the truncated factorization formula \cite{Pearl2000}. 
+We now consider the more general problem where the graph structure is known, but arbitrary. For general graphs, $\P{Y|X_i=j} \neq \P{Y|do(X_i=j)}$ (correlation is not causation). However, if all the variables are observable, any causal distribution $\P{X_1...X_N|do(X_i=j)}$ can be expressed in terms of observational distributions via the truncated factorization formula \cite{Pearl2000}. 
 \eq{
 \P{X_1...X_N|do(X_i=j)} = 
 \prod_{k \neq i}\P{X_k|\parents{X_k}}\delta(X_i - j)  
 } 
 Where $\parents{X_k}$ denotes the parents of $X_k$ and $\delta$ is the dirac delta function. 
 
-We could naively generalize our approach for parallel bandits by observing for $T/2$ rounds, applying the truncated product factorization to write an expression for each $\P{Y|a}$ in terms of observational quantities and explicitly playing the actions $a$ for which the observational estimates were poor. However, the variance of the observational estimator for $a = do(X_i = j)$ can be high even if $\P{X_i = j}$ is large. For example, given the causal graph in Figure \ref{fig:causalStructure_confounded}, $\P{Y|do(X_2= j)} = \sum_{X_1}\P{X_1}\P{Y|X_1, X_2 = j}$. Suppose $X_2 = X_1$ deterministically. No matter how large $\P{X_2 = 1}$ is, we will never observe $(X_2=1,X_1 = 0)$ and so cannot get a good estimate for $\P{Y|do(X_2=1)}$.
+We could naively generalize our approach for parallel bandits by observing for $T/2$ rounds, applying the truncated product factorization to write an expression for each $\P{Y|a}$ in terms of observational quantities and explicitly playing the actions $a$ for which the observational estimates were poor. However, it is no longer optimal to ignore the information we can learn about the reward for intervening on one variable from rounds in which we act on a different variable. Consider the graph in Figure \ref{fig:causalchain}, where each variable deterministically takes the value of its parent, $X_k = X_{k-1}$ 
+for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. 
+We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$, (but not from $do()$). 
+
+To solve the general problem we need an estimator for each action that incorporates information obtained from every other action and a way to optimally allocate samples to actions. NEED TO EXPLAIN WHY THIS PROBLEM IS HARD. 
+
+To address this difficult problem, we firstly note that the causal effect of an action $a$ on $Y$ can be factored into the causal effect of $a$ on the parents of $Y$ and the effect of the parents of $Y$ on $Y$. $\P{Y|a} = \P{Y|\parents{Y}}\P{\parents{Y}|a}$ We then assume the conditional interventional distributions $\P{\parents{Y}|a}$ are known. ADD MORE JUSTIFICATION FOR THIS ASSUMPTION. IE COULD HAPPEN IF WE HAD EXPERIMENTAL DATA COLLECTED WITH A DIFFERENT OBJECTIVE AND IS A NESSESSARY FIRST STEP TO SOLVING THE MORE GENERAL PROBLEM. 
+
+
+%Firstly, the variance of the observational estimator for $a = do(X_i = j)$ can be high even if $\P{X_i = j}$ is large. For example, given the causal graph in Figure \ref{fig:causalStructure_confounded}, $\P{Y|do(X_2= j)} = \sum_{X_1}\P{X_1}\P{Y|X_1, X_2 = j}$. Suppose $X_2 = X_1$ deterministically, no matter how large $\P{X_2 = 1}$ is we will never observe $(X_2=1,X_1 = 0)$ and so cannot get a good estimate for $\P{Y|do(X_2=1)}$. Secondly it is no longer optimal 
 
 \begin{figure}
-  \centering
-  \begin{minipage}[b]{0.4\textwidth}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
-  thick,main node/.style={observed}, hidden/.style={empty}]
+    \begin{subfigure}[b]{0.3\textwidth}
+        \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed}, hidden/.style={empty},background rectangle/.style={fill=olive!45}]
 \node[main node](1){$X_1$};
 \node[main node, below left=of 1](2){$X_2$};
 \node[main node, below right=of 1](4){Y};
@@ -25,12 +33,12 @@ We could naively generalize our approach for parallel bandits by observing for $
     (1) edge (4)
     (2) edge (4);
 \end{tikzpicture}
-\caption{}\label{fig:causalStructure_confounded}
-  \end{minipage}
-  \hfill
-  \begin{minipage}[b]{0.4\textwidth}
-    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
-  thick,main node/.style={observed}, hidden/.style={empty}]
+        \caption{}
+        \label{fig:causalStructure_confounded}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.69\textwidth}
+         \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed}, hidden/.style={empty},background rectangle/.style={fill=olive!45}]
 \node[main node](1){$X_{1}$};
 \node[main node, right=of 1](2){$X_{2}$};
 \node[hidden, right=of 2](3){$...$};
@@ -42,31 +50,18 @@ We could naively generalize our approach for parallel bandits by observing for $
     (3) edge (4)
     (4) edge (5);
 \end{tikzpicture}
-\caption{A causal chain graph}.
-\label{fig:causalchain}
-  \end{minipage}
+        \caption{}
+        \label{fig:causalchain}
+    \end{subfigure}
+    \caption{Example causal graphs}\label{fig:animals}
 \end{figure}
 
+Let $\eta$ be a distribution on available interventions $a \in \calA$ so $\eta_a \geq 0$ and $\sum_{a \in \calA} \eta_a = 1$.
+Define $Q = \sum_{a \in \calA} \eta_a \P{\parents{Y}|a}$ to be the mixture distribution over the interventions with respect to $\eta$.
 
+Our algorithm will choose $T$ samples from $Q$ IS THIS LANGUAGE CORRECT. CAN WE SAY IT LIKE THIS? and use them to estimate the returns $\mu_a$ for all $a \in \calA$ simultaneously via a truncated importance weighted estimator. The truncation introduces a bias in the estimator, but simultaneously chops the potentially heavy tail that is so detrimental to its concentration guarantees. 
 
-Additionally, it is no longer optimal to ignore the information we can learn about the reward for intervening on one variable from rounds in which we act on a different variable. Consider the graph in Figure \ref{fig:causalchain}, where each variable deterministically takes the value of its parent, $X_k = X_{k-1}$ 
-for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. 
-We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$, (but not from $do()$). 
-
-
-%It is no longer optimal to divide our samples between observing to learn about multiple actions and explicit intervention to learn single ones. We need to incorporate the information we can learn about the reward for intervening on one variable from rounds in which we actually set a different variable.
-%Consider the graph in Figure \ref{fig:causalchain}, where each variable deterministically takes the value of its parent, $X_k = X_{k-1}$ 
-%for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. 
-%We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$. 
- 
-
-Let $P_a$ be a shorthand for $\P{.|a}$ and let $\eta$ be a distribution on available interventions $\calA$ so $\eta_a \geq 0$ and $\sum_{a \in \calA} \eta_a = 1$.
-Define $Q = \sum_{a \in \calA} \eta_a \Ps_a$ to be the mixture distribution over the interventions with respect to $\eta$.
-Our algorithm will choose $T$ samples from $Q$ and use them to estimate the returns $\mu_a$ for all $a \in \calA$ simultaneously via
-a truncated importance weighted estimator. The truncation introduces a bias in the estimator, but simultaneously chops the potentially heavy tail
-that is so detrimental to its concentration guarantees. 
-
-Let $a \in \calA$ be an intervention and define random variable
+Define the random variable
 \eq{
 Z_a(X) = R_a(X) Y \ind{R_a(X) \leq B_a}\,,
 }
@@ -122,9 +117,9 @@ By definition we have $|Z_{at}| \leq B_a$ and
 Checking the expectation we have
 \eq{
 \EE_Q[Z_{at}] 
-&= \EE_{\Ps_a}\left[Y \ind{R_{at} \leq B_a}\right] \\
-&= \EE_{\Ps_a} Y - \EE_{\Ps_a} \left[Y\ind{R_a > B_a}\right] \\
-&= \mu_a - \beta_a\,,
+= \EE_{\Ps_a}\left[Y \ind{R_{at} \leq B_a}\right] 
+= \EE_{\Ps_a} Y - \EE_{\Ps_a} \left[Y\ind{R_a > B_a}\right] 
+= \mu_a - \beta_a\,,
 }
 where 
 \eq{
@@ -141,8 +136,8 @@ Let $\epsilon_a > 0$ be given by
 }
 Then by the union bound and Bernstein's inequality 
 \eq{
-&\P{\text{exists } a \in \calA : \left|\hat \mu_a - \EE_Q[\hat \mu_a]\right| \geq \epsilon_a} \\ 
-&\qquad\leq \sum_{a \in \calA} \P{\left|\hat \mu_a - \EE_Q[\hat \mu_a]\right| \geq \epsilon_a} \leq \frac{1}{T}\,.
+\P{\text{exists } a \in \calA : \left|\hat \mu_a - \EE_Q[\hat \mu_a]\right| \geq \epsilon_a} 
+\leq \sum_{a \in \calA} \P{\left|\hat \mu_a - \EE_Q[\hat \mu_a]\right| \geq \epsilon_a} \leq \frac{1}{T}\,.
 }
 Assuming this event does not occur and letting $a^* = \argmax_{a \in \calA} \mu_a$ we have
 \eq{
@@ -184,7 +179,7 @@ Algorithm \ref{alg:general} depends on a choice of sampling distribution $\opera
 a natural choice of $\eta$ is the minimiser of $m(\eta)$.
 \eq{
 \eta^* 
-&= \argmin_\eta m(\eta) \\
+= \argmin_\eta m(\eta) 
 &= \argmin_\eta \max_{a \in \calA} \EE_{\Ps_a} \left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right] \\
 &= \argmin_\eta \underbrace{\max_{a \in \calA} \EE_{\Ps_a} \left[\frac{\Pn{a}{\parents{Y}(X)}}{\sum_{b \in \calA} \eta_b \Pn{b}{\parents{Y}(X)}}\right]}_{m(\eta)}\,.
 }
@@ -202,9 +197,9 @@ $m(\eta^*) \leq |\calA|$.
 By definition, $m(\eta^*) \leq m(\eta)$ for all $\eta$. Let $\eta_a = 1/|\calA|$. Then
 \eq{
 m(\eta) 
-&= \max_a \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right] \\
-&\leq \max_a \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\eta_a \Pn{a}{\parents{Y}(X)}}\right] \\
-&\leq \max_a \EE_{\Ps_a}\left[\frac{1}{\eta_a}\right] = |\calA| \qedhere
+= \max_a \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right] 
+\leq \max_a \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\eta_a \Pn{a}{\parents{Y}(X)}}\right] 
+\leq \max_a \EE_{\Ps_a}\left[\frac{1}{\eta_a}\right] = |\calA| \qedhere
 }
 \end{proof}
 

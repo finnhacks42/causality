@@ -14,10 +14,9 @@ All variables are observable and the set of allowable actions are all size 0 and
 In the farming example from the introduction, $X_1$ might represent temperature (\eg, $X_1=0$ for low and $X_1=1$ for high). 
 The interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ indicate the use of shades or heat lamps to keep the temperature low or high, respectively.
 
-
-\begin{figure}[h]
-\centering
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+\begin{wrapfigure}[11]{r}{0.5\textwidth}
+  \begin{center}
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={observed}, hidden/.style={empty}]
 
  %nodes
@@ -32,8 +31,9 @@ The interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ indicate the use of shades or 
     (4) edge (5);
 	
 \end{tikzpicture}
-\caption{Causal model for the parallel bandits problem.\label{fig:causalStructure}}
-\end{figure}
+  \end{center}
+  \caption{Causal model for the parallel bandits problem.\label{fig:causalStructure}}
+\end{wrapfigure}
 
 In each round the learner either purely observes by selecting $do()$ or chooses a single variable to intervene on and the value to set it to. 
 The remainder of the variables are simultaneously set by independently biased coin flips. 
@@ -79,7 +79,16 @@ m(\vec{q}) = \max \set{ d : |I_{\frac{1}{d}}| \leq d}\,.
 This captures a trade off between identifying the low probability variables and not having too many of them.
 When $\vec{q} = (\frac{1}{2}, \ldots, \frac{1}{2})$ we have $m(\vec{q}) = 1$ and when $\vec{q} = (0, \ldots, 0)$ we have $m(\vec{q}) = N$, the number of variables.
 
-\begin{algorithm}[h]
+To identify a high-reward intervention, Algorithm~\ref{alg:simple} break $T$ rounds into halves. 
+In the first half, the non-interventional action $do()$ is played and the rewards observed.
+These are used to estimate the occurrance probabilities $\vec{q}$ and the value of $m(\vec{q})$.
+The remainder of the rounds are then evenly split to estimate the infrequently observed interventions, as determined by the estimate for $m(\vec{q})$.
+Although very simple, the following two theorems show that this algorithm is effectively optimal.
+
+\begin{wrapfigure}[22]{r}{0.6\textwidth}
+\vspace{-10pt}
+\begin{minipage}{.6\textwidth}
+\begin{algorithm}[H]
 \caption{Parallel Bandit Algorithm}\label{alg:simple}
 \begin{algorithmic}[1]
 \STATE {\bf Input:} Total rounds $T$ and $N$.
@@ -103,12 +112,8 @@ When $\vec{q} = (\frac{1}{2}, \ldots, \frac{1}{2})$ we have $m(\vec{q}) = 1$ and
 \RETURN estimated optimal $\hat{a}^*_T \in \argmax_{a\in\actions} \hat{\mu}_a$
 \end{algorithmic}
 \end{algorithm}
-
-To identify a high-reward intervention, Algorithm~\ref{alg:simple} break $T$ rounds into halves. 
-In the first half, the non-interventional action $do()$ is played and the rewards observed.
-These are used to estimate the occurrance probabilities $\vec{q}$ and the value of $m(\vec{q})$.
-The remainder of the rounds are then evenly split to estimate the infrequently observed interventions, as determined by the estimate for $m(\vec{q})$.
-Although very simple, the following two theorems show that this algorithm is effectively optimal.
+\end{minipage}
+\end{wrapfigure}
 
 \begin{theorem}\label{thm:uq-simple}
 Algorithm \ref{alg:simple} satisfies
