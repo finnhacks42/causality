@@ -104,66 +104,7 @@ Then for $C = \sqrt{2} + 4$ we have
 \end{theorem}
 
 
-\begin{proof}
-First note that $X_t, Y_t$ are sampled from $\operatorname{Q}$.
-We abbreviate $Z_{at} = Z_a(X_t)$ and $R_{at} = R_a(X_t)$.
-By definition we have $|Z_{at}| \leq B_a$ and 
-\eq{
-\Var_Q[Z_{at}] 
-\leq \EE_Q[Z_{at}^2] 
-\leq \EE_{\Ps_a}\left[\frac{\Ps_a(\parents{Y}(X))}{\Q{\parents{Y}(X)}}\right] 
-\leq m(\eta)\,.
-}
-Checking the expectation we have
-\eq{
-\EE_Q[Z_{at}] 
-= \EE_{\Ps_a}\left[Y \ind{R_{at} \leq B_a}\right] 
-= \EE_{\Ps_a} Y - \EE_{\Ps_a} \left[Y\ind{R_a > B_a}\right] 
-= \mu_a - \beta_a\,,
-}
-where 
-\eq{
-0 \leq \beta_a = \EE_{\Ps_a}[Y \ind{R_a > B_a}] \leq \Pn{a}{R_a(X) > B_a}
-}
-is the negative bias. 
-The bias may be bounded in terms of $m(\eta)$ via an application of Markov's inequality.
-\eq{
-\beta_a \leq \Pn{a}{R_a(X) > B_a} \leq \frac{\EE_{\Ps_a}[R_a(X)]}{B_a} \leq \frac{m(\eta)}{B_a}\,.
-}
-Let $\epsilon_a > 0$ be given by
-\eq{
-\epsilon = \sqrt{\frac{2m(\eta)}{T} \log\left(2T|\calA|\right)} + \frac{3B_a}{T} \log\left(2T|\calA|\right)\,.
-}
-Then by the union bound and Bernstein's inequality 
-\eq{
-\P{\text{exists } a \in \calA : \left|\hat \mu_a - \EE_Q[\hat \mu_a]\right| \geq \epsilon_a} 
-\leq \sum_{a \in \calA} \P{\left|\hat \mu_a - \EE_Q[\hat \mu_a]\right| \geq \epsilon_a} \leq \frac{1}{T}\,.
-}
-Assuming this event does not occur and letting $a^* = \argmax_{a \in \calA} \mu_a$ we have
-\eq{
-\mu_I \geq \hat \mu_I - \epsilon_I  
-\geq \hat \mu_{a^*} - \epsilon_I  
-\geq \mu^* - \epsilon_{a^*} - \epsilon_I - \beta_{a^*}\,. 
-}
-By the definition of the truncation
-we have
-\eq{
-\epsilon_a \leq \left(\sqrt{2} + 3\right)\sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)}
-}
-and
-\eq{
-\beta_a \leq \sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)}\,. 
-}
-Therefore for $C = \sqrt{2} + 4$ we have
-\eq{
-\P{\mu_I \geq \mu^* - C \sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)}} \leq \frac{1}{T}\,.
-}
-Therefore
-\eq{
-\mu^* - \EE[\mu_I] \leq C \sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)} + \frac{1}{T}
-}
-as required.
-\end{proof}
+
 
 \begin{remark}\label{rem:truncate}
 The choice of $B_a$ given in Theorem \ref{thm:general} is not the only possibility. As we shall see in the experiments, it is 
