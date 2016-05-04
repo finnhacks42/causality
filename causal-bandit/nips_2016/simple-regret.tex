@@ -78,7 +78,9 @@ m(\vec{q}) = \min \set{ d : |I_{d}| \leq d}\,.
 % m(\vec{q}) = \max \set{i : \sum_{k=1}^N \ind{\min\set{q_k, \,1 - q_k} \leq 1/i} \leq i}\,.
 }
 
-This captures a trade off between identifying the low probability variables and not having too many of them.
+$I_\tau$ represents the set of actions defined as low probability given a threshold $\tau$. As $\tau$ is increased, 
+
+This captures a trade off between identifying the low probability actions and not having too many of them. $I_\tau$ represents the actions defined as 'low p
 When $\vec{q} = (\frac{1}{2}, \ldots, \frac{1}{2})$ we have $m(\vec{q}) = 1$ and when $\vec{q} = (0, \ldots, 0)$ we have $m(\vec{q}) = N$, the number of variables.
 
 To identify a high-reward intervention, Algorithm~\ref{alg:simple} break $T$ rounds into halves. 

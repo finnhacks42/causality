@@ -7,7 +7,7 @@ In these problems, rewards are given for repeated interventions on a fixed causa
 Following the terminology and notation in~\cite{Koller2009}, a \emph{causal model} is given by a directed acyclic graph $\mathcal{G}$ over a set of random variables $\mathcal{X} = \{ X_1, \ldots, X_N \}$ and a joint distribution $\mathrm{P}$ over $\mathcal{X}$ that factorises over $\mathcal{G}$.
 We will assume each variable only takes on a finite number of distinct values.
 An edge from variable $X_i$ to $X_j$ is interpreted to mean that a change in the value of $X_i$ may directly cause a change to the value of $X_j$.
-The \emph{parents} of a variable $X_i$, denoted $\parents{X_i}$ or just $\parents{i}$, is the set of all variables $X_j$ such that there is an edge from $X_j$ to $X_i$ in $\mathcal{G}$.
+The \emph{parents} of a variable $X_i$, denoted $\parents{X_i}$, is the set of all variables $X_j$ such that there is an edge from $X_j$ to $X_i$ in $\mathcal{G}$.
 An \emph{intervention (of size $n$)}, denoted $do(\vec{X}=\vec{x})$, assigns the values $\vec{x}=\{x_1, \ldots, x_n\}$ to the corresponding variables $\vec{X}=\{X_1, \ldots, X_n\} \subset \mathcal{X}$ with the empty intervention (where no variable is set) denoted $do()$.
 The intervention also ``mutilates'' the graph $\mathcal{G}$ by removing all edges from $\parents{i}$ to $X_i$ for each $X_i \in \vec{X}$. 
 The resulting graph defines a probability distribution $\P{\vec{X}^c | do(\vec{X}=\vec{x})}$ over $\vec{X}^c := \mathcal{X} - \vec{X}$. 

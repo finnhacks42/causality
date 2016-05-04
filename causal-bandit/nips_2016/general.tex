@@ -3,21 +3,24 @@
 \newcommand{\x}{\boldsymbol{x}}
 \newcommand{\Ps}{\operatorname{P}}
 
-We now consider the more general problem where the graph structure is known, but arbitrary. For general graphs, $\P{Y|X_i=j} \neq \P{Y|do(X_i=j)}$ (correlation is not causation). However, if all the variables are observable, any causal distribution $\P{X_1...X_N|do(X_i=j)}$ can be expressed in terms of observational distributions via the truncated factorization formula \cite{Pearl2000}. 
+We now consider the more general problem where the graph structure is known, but arbitrary. 
+
+% How do actions map to interventions (we need not only consider singleton interventions).
+% 
+
+
+For general graphs, $\P{Y|X_i=j} \neq \P{Y|do(X_i=j)}$ (correlation is not causation). However, if all the variables are observable, any causal distribution $\P{X_1...X_N|do(X_i=j)}$ can be expressed in terms of observational distributions via the truncated factorization formula \cite{Pearl2000}. 
 \eq{
 \P{X_1...X_N|do(X_i=j)} = 
 \prod_{k \neq i}\P{X_k|\parents{X_k}}\delta(X_i - j)  
 } 
 Where $\parents{X_k}$ denotes the parents of $X_k$ and $\delta$ is the dirac delta function. 
 
-We could naively generalize our approach for parallel bandits by observing for $T/2$ rounds, applying the truncated product factorization to write an expression for each $\P{Y|a}$ in terms of observational quantities and explicitly playing the actions $a$ for which the observational estimates were poor. However, it is no longer optimal to ignore the information we can learn about the reward for intervening on one variable from rounds in which we act on a different variable. Consider the graph in Figure \ref{fig:causalchain}, where each variable deterministically takes the value of its parent, $X_k = X_{k-1}$ 
-for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. 
-We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$, (but not from $do()$). 
+We could naively generalize our approach for parallel bandits by observing for $T/2$ rounds, applying the truncated product factorization to write an expression for each $\P{Y|a}$ in terms of observational quantities and explicitly playing the actions $a$ for which the observational estimates were poor. However, it is no longer optimal to ignore the information we can learn about the reward for intervening on one variable from rounds in which we act on a different variable. Consider the graph in Figure \ref{fig:causalchain}, where each variable deterministically takes the value of its parent, $X_k = X_{k-1}$ for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$, (but not from $do()$). 
 
 To solve the general problem we need an estimator for each action that incorporates information obtained from every other action and a way to optimally allocate samples to actions. NEED TO EXPLAIN WHY THIS PROBLEM IS HARD. 
 
-To address this difficult problem, we firstly note that the causal effect of an action $a$ on $Y$ can be factored into the causal effect of $a$ on the parents of $Y$ and the effect of the parents of $Y$ on $Y$. $\P{Y|a} = \P{Y|\parents{Y}}\P{\parents{Y}|a}$ We then assume the conditional interventional distributions $\P{\parents{Y}|a}$ are known. ADD MORE JUSTIFICATION FOR THIS ASSUMPTION. IE COULD HAPPEN IF WE HAD EXPERIMENTAL DATA COLLECTED WITH A DIFFERENT OBJECTIVE AND IS A NESSESSARY FIRST STEP TO SOLVING THE MORE GENERAL PROBLEM. 
-
+To address this difficult problem, we firstly note that the causal effect of an action $a$ on $Y$ can be factored into the causal effect of $a$ on the parents of $Y$ and the effect of the parents of $Y$ on $Y$. $\P{Y|a} = \P{Y|\parents{Y}}\P{\parents{Y}|a}$. We then assume the conditional interventional distributions $\P{\parents{Y}|a}$ (but not $\P{Y|a}$) are known. These could be estimated from experimental data on the same covariates $\boldsymbol{X}$, but where the outcome of interest differed such that $Y$ was not included, or similarly from observational data subject to identifiability constraints.
 
 %Firstly, the variance of the observational estimator for $a = do(X_i = j)$ can be high even if $\P{X_i = j}$ is large. For example, given the causal graph in Figure \ref{fig:causalStructure_confounded}, $\P{Y|do(X_2= j)} = \sum_{X_1}\P{X_1}\P{Y|X_1, X_2 = j}$. Suppose $X_2 = X_1$ deterministically, no matter how large $\P{X_2 = 1}$ is we will never observe $(X_2=1,X_1 = 0)$ and so cannot get a good estimate for $\P{Y|do(X_2=1)}$. Secondly it is no longer optimal 
 
@@ -59,23 +62,9 @@ To address this difficult problem, we firstly note that the causal effect of an 
 Let $\eta$ be a distribution on available interventions $a \in \calA$ so $\eta_a \geq 0$ and $\sum_{a \in \calA} \eta_a = 1$.
 Define $Q = \sum_{a \in \calA} \eta_a \P{\parents{Y}|a}$ to be the mixture distribution over the interventions with respect to $\eta$.
 
-Our algorithm will choose $T$ samples from $Q$ IS THIS LANGUAGE CORRECT. CAN WE SAY IT LIKE THIS? and use them to estimate the returns $\mu_a$ for all $a \in \calA$ simultaneously via a truncated importance weighted estimator. The truncation introduces a bias in the estimator, but simultaneously chops the potentially heavy tail that is so detrimental to its concentration guarantees. 
-
-Define the random variable
-\eq{
-Z_a(X) = R_a(X) Y \ind{R_a(X) \leq B_a}\,,
-}
-where $B_a \geq 0$ is some constant to be chosen subsequently and
-\eq{
-R_a(X) = \frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\,.
-}
-Abusing notation we define $m(\eta)$ by
-\eq{
-m(\eta) = \max_{a \in \calA} \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right]\,.
-}
-We will shortly see that $m(\eta)$ is a measure of the difficulty of the problem that approximately 
-coincides with the version for parallel bandits, justifying the name overloading.
-
+\begin{wrapfigure}[14]{r}{0.5\textwidth}
+\vspace{-12pt}
+\begin{minipage}{.5\textwidth}
 \begin{algorithm}[H]
 \caption{General Algorithm}\label{alg:general}
 \begin{algorithmic}
@@ -86,11 +75,28 @@ coincides with the version for parallel bandits, justifying the name overloading
 \ENDFOR
 \STATE For each $a \in \calA$ compute an estimate of its return:
 \eq{
-\forall a\in \calA \qquad \hat \mu_a = \frac{1}{T} \sum_{t=1}^T Z_a(X_t)
+\hat \mu_a =  \frac{1}{T} \sum_{t=1}^T Y_t R_a(X_t)  \ind{R_a(X_t) \leq B_a}
 }
 \STATE {\bf return} $\hat a^*_T = \argmax_a \hat \mu_a$
 \end{algorithmic}
 \end{algorithm}
+\end{minipage}
+\end{wrapfigure}
+
+Our algorithm samples $T$ actions from $\eta$ and uses them to estimate the returns $\mu_a$ for all $a \in \calA$ simultaneously via a truncated importance weighted estimator. Let $\parents{Y}(X)$ denote the realization of the variables in $X$ that are parents of Y and define $R_a(X) = \frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}$
+
+\eq {
+\hat{\mu_a} = \frac{1}{T} \sum_{t=1}^T R_a(X) Y \ind{R_a(X) \leq B_a}\,, 
+} 
+
+where $ B_a \geq 0$  is a constant that tunes the level of truncation to be chosen subsequently. The truncation introduces a bias in the estimator, but simultaneously chops the potentially heavy tail that is so detrimental to its concentration guarantees. 
+
+The distribution over actions, $\eta$ plays the role of allocating samples to actions and is optimized to minimize the worst-case simple regret. Abusing notation we define $m(\eta)$ by
+\eq{
+m(\eta) = \max_{a \in \calA} \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right]\,.
+}
+We will shortly see that $m(\eta)$ is a measure of the difficulty of the problem that approximately coincides with the version for parallel bandits, justifying the name overloading.
+
 
 \begin{theorem}\label{thm:general}
 If Algorithm \ref{alg:general} is run with $B \in \R^{\calA}$ given by
@@ -106,15 +112,8 @@ Then for $C = \sqrt{2} + 4$ we have
 
 
 
-\begin{remark}\label{rem:truncate}
-The choice of $B_a$ given in Theorem \ref{thm:general} is not the only possibility. As we shall see in the experiments, it is 
-often possible to choose $B_a$ significantly
-larger when there is no heavy tail and this can drastically improve performance by eliminating the bias. This is especially true when the ratio $R_a$ is never too large
-and Bernstein's inequality could be used directly without the truncation. For another discussion see the article by \citet{BJQ13} who also use importance weighted estimators
-to learn from observational data.
-\end{remark}
-
 \subsection*{Choosing the Sampling Distribution}
+
 
 Algorithm \ref{alg:general} depends on a choice of sampling distribution $\operatorname{Q}$ that is determined by $\eta$. In light of Theorem \ref{thm:general}
 a natural choice of $\eta$ is the minimiser of $m(\eta)$.
@@ -153,6 +152,14 @@ For $a = do()$ choose $\eta_a = 1/2$.
 Let $m = m(\vec{q})$ and note that, by definition, there are at most $m$ pairs $(i,j)$ such that $\P{X_i = j} \leq 1/m$.
 Thus, for $a = do(X_i = j)$ letting $\eta_a \propto \ind{\P{X_i = j} \leq 1/m} / (2m)$ guarantees $\eta_a \ge \frac{1}{2m}$ when $\eta_a \ne 0$.
 It is then easy to check that $m(\eta) \leq 2m$ using an argument like that for Proposition~\ref{pro:m-bound}.
+
+\begin{remark}\label{rem:truncate}
+The choice of $B_a$ given in Theorem \ref{thm:general} is not the only possibility. As we shall see in the experiments, it is 
+often possible to choose $B_a$ significantly
+larger when there is no heavy tail and this can drastically improve performance by eliminating the bias. This is especially true when the ratio $R_a$ is never too large
+and Bernstein's inequality could be used directly without the truncation. For another discussion see the article by \citet{BJQ13} who also use importance weighted estimators
+to learn from observational data.
+\end{remark}
 
 \begin{remark}
 The algorithm in the previous section for the parallel bandit problem did not assume knowledge of the conditional distributions on $X$ and 
