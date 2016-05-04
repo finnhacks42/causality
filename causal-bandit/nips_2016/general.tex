@@ -99,13 +99,10 @@ We will shortly see that $m(\eta)$ is a measure of the difficulty of the problem
 
 
 \begin{theorem}\label{thm:general}
-If Algorithm \ref{alg:general} is run with $B \in \R^{\calA}$ given by
+If Algorithm \ref{alg:general} is run with $B \in \R^{\calA}$ given by $B_a = \sqrt{\frac{m(\eta)T}{\log\left(2T|\calA|\right)}}\,.$
+
 \eq{
-B_a = \sqrt{\frac{m(\eta)T}{\log\left(2T|\calA|\right)}}\,.
-}
-Then for $C = \sqrt{2} + 4$ we have
-\eq{
-\mu^* - \EE[\mu_I] \leq C\sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)} + \frac{1}{T}\,.
+\simpleregret \in \bigo{\sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)}}\,.
 }
 \end{theorem}
 
