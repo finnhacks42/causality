@@ -1,5 +1,3 @@
-
-
 In this section we propose and analyse an algorithm for achieving the optimal regret in a natural special 
 case of the causal bandit problem which we call the {\it parallel bandit}.
 It is simple enough to admit a thorough analysis but rich enough to model the type of problem discussed in \S\ref{sec:intro}, including the farming example. 
@@ -14,26 +12,62 @@ All variables are observable and the set of allowable actions are all size 0 and
 In the farming example from the introduction, $X_1$ might represent temperature (\eg, $X_1=0$ for low and $X_1=1$ for high). 
 The interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ indicate the use of shades or heat lamps to keep the temperature low or high, respectively.
 
-\begin{wrapfigure}[11]{r}{0.5\textwidth}
-  \begin{center}
-    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
-  thick,main node/.style={observed}, hidden/.style={empty}]
-
+\begin{figure}
+    \begin{subfigure}[b]{0.34\textwidth}
+	\centering    
+          \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.45cm,
+  thick,main node/.style={observed}, hidden/.style={empty},background rectangle/.style={fill=olive!45}]
+%every node/.style={scale=0.6}
  %nodes
 \node[main node](1){$X_{1}$};
 \node[main node, right=of 1](2){$X_{2}$};
 \node[hidden, right=of 2](3){$...$};
 \node[main node, right=of 3](4){$X_{N}$};
-\node[main node, below right=of 2](5){Y};
- \path[every node/.style={font=\sffamily\small}]
+\node[main node, below right=of 2](5){$Y$};
+ \path[every node/.style={font=\tiny}]
     (1) edge (5)
     	(2) edge (5)
     (4) edge (5);
-	
 \end{tikzpicture}
-  \end{center}
-  \caption{Causal model for the parallel bandits problem.\label{fig:causalStructure}}
-\end{wrapfigure}
+        \caption{Parallel graph}
+        \label{fig:causalStructure_confounded}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}
+    \centering
+        \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.45cm,
+  thick,main node/.style={observed}, hidden/.style={empty},background rectangle/.style={fill=olive!45}]
+\node[main node](1){$X_1$};
+\node[main node, below left=of 1](2){$X_2$};
+\node[main node, below right=of 1](4){$Y$};
+ \path[every node/.style={font=\tiny}]
+    (1) edge (2)
+    (1) edge (4)
+    (2) edge (4);
+\end{tikzpicture}
+        \caption{Confounded graph}
+        \label{fig:causalStructure_confounded}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+    \centering
+         \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.45cm,
+  thick,main node/.style={observed}, hidden/.style={empty},background rectangle/.style={fill=olive!45}]
+\node[main node](1){$X_{1}$};
+\node[main node, right=of 1](2){$X_{2}$};
+\node[hidden, right=of 2](3){$...$};
+\node[main node, right=of 3](4){$X_{N}$};
+\node[main node, right=of 4](5){$Y$};
+ \path[every node/.style={font=\tiny}]
+    (1) edge (2)
+  	(2) edge (3)
+    (3) edge (4)
+    (4) edge (5);
+\end{tikzpicture}
+        \caption{Chain graph}
+        \label{fig:causalchain}
+    \end{subfigure}
+    \caption{Causal Models}\label{fig:animals}
+\end{figure}
+
 
 In each round the learner either purely observes by selecting $do()$ or chooses a single variable to intervene on and the value to set it to. 
 The remainder of the variables are simultaneously set by independently biased coin flips. 
@@ -43,7 +77,7 @@ Formally, when not intervened upon we assume that each $X_i \sim \bernoulli(q_i)
 The value of the reward variable is distributed as $\P{Y = 1|\vec{X}} = r(\vec{X})$ where 
 $r : \{0,1\}^N \to [0,1]$ is an arbitrary, fixed, and unknown function. 
 In the farming example, this choice of $Y$ models the success or failure of a seasons crop, which depends stochastically on the various environment variables.
-Note that the expected reward of the optimal intervention is at least as large as the expected reward for doing nothing.
+%Note that the expected reward of the optimal intervention is at least as large as the expected reward for doing nothing.
 
 %\todom{$i,j$ notation to $a \in \actions$}
 %In our analysis below, we will often use the pair $(i,j)$ for $i \in \{1, \ldots, N\}$ and $j \in \{0,1\}$ as a shorthand for the intervention $do(X_i = j)$.
@@ -56,41 +90,19 @@ Note that the expected reward of the optimal intervention is at least as large a
 %The sum and product use the restrictions $x_i = j$ and $k \ne i$ because the intervention forces $X_i = j$ with probability 1.
 %The optimal intervention is denoted $(i^*,j^*) = \argmax_{i,j} \mu_{i,j}$ and the corresponding optimal reward is $\mu^* = \mu_{i^*,j^*}$. 
 
+\paragraph{The Parallel Bandit Algorithm}
+%\label{sub:par-bandit-alg}
 
-
-\subsection{The Parallel Bandit Algorithm}
-\label{sub:par-bandit-alg}
-
-The algorithm operates as follows. For the first $T/2$ rounds it chooses $do()$ to collect observational data. As the only link from each $X_1,\ldots,X_N$ to $Y$ is a direct, causal one, $\P{Y|do(X_i=j)}=\P{Y|X_i=j}$. Thus we can create good estimators of the returns of those actions $do(X_i = j)$ for which $\P{X_i = j}$ is large. 
-These are the interventions that are easily estimated ``passively'' (\ie, without playing them explicitly). 
-Those actions where $\P{X_i = j}$ is small may not be observed (often) in the first $T/2$ rounds, so
-the estimates of the returns of these actions from the first $T/2$ samples could be quite poor. For the remaining $T/2$ rounds
-the algorithm makes interventions on the actions $a = do(X_i = j)$ for which $\P{X_i = j}$ is small. The precise allocation is
-carefully chosen to minimise the worst-case simple regret. 
-The difficulty of the problem depends on $\vec{q}$ and, in particular, how many of the variables have an infrequently occurring value (\ie, small $q_i$ or $1-q_i$). 
-
-%Let $I_1 = \emptyset$ and for $\tau \in [0,1)$ let $I_\tau = \set{ i : \min\set{q_i, 1-q_i} \leq \tau}$.
-For $\tau \in [1...N]$ let $I_\tau = \set{ i : \min\set{q_i, 1-q_i} \leq \frac{1}{\tau - 1}}$.
-Define
-\eqn{
+The algorithm operates as follows. For the first $T/2$ rounds it chooses $do()$ to collect observational data. As the only link from each $X_1,\ldots,X_N$ to $Y$ is a direct, causal one, $\P{Y|do(X_i=j)}=\P{Y|X_i=j}$. Thus we can create good estimators for the returns of the actions $do(X_i = j)$ for which $\P{X_i = j}$ is large. The actions for which $\P{X_i = j}$ is small may not be observed (often) so  estimates their returns could be poor. To address this, the remaining $T/2$ rounds are evenly split to estimate the rewards for these infrequently observed actions. The difficulty of the problem depends on $\vec{q}$ and, in particular, how many of the variables are unbalanced (\ie, small $q_i$ or $(1-q_i)$). For $\tau \in [1...N]$ let $I_\tau = \set{ i : \min\set{q_i, 1-q_i} \leq \frac{1}{\tau - 1}}$. Define
+\eq{
 \label{eq:m-simple}
 m(\vec{q}) = \min \set{ d : |I_{d}| \leq d}\,.
 % m(\vec{q}) = \max \set{i : \sum_{k=1}^N \ind{\min\set{q_k, \,1 - q_k} \leq 1/i} \leq i}\,.
 }
+%Let $I_1 = \emptyset$ and for $\tau \in [0,1)$ let $I_\tau = \set{ i : \min\set{q_i, 1-q_i} \leq \tau}$.
 
-$I_\tau$ represents the set of actions defined as low probability given a threshold $\tau$. As $\tau$ is increased, 
-
-This captures a trade off between identifying the low probability actions and not having too many of them. $I_\tau$ represents the actions defined as 'low p
-When $\vec{q} = (\frac{1}{2}, \ldots, \frac{1}{2})$ we have $m(\vec{q}) = 1$ and when $\vec{q} = (0, \ldots, 0)$ we have $m(\vec{q}) = N$, the number of variables.
-
-To identify a high-reward intervention, Algorithm~\ref{alg:simple} break $T$ rounds into halves. 
-In the first half, the non-interventional action $do()$ is played and the rewards observed.
-These are used to estimate the occurrance probabilities $\vec{q}$ and the value of $m(\vec{q})$.
-The remainder of the rounds are then evenly split to estimate the infrequently observed interventions, as determined by the estimate for $m(\vec{q})$.
-Although very simple, the following two theorems show that this algorithm is effectively optimal.
-
-\begin{wrapfigure}[22]{r}{0.6\textwidth}
-\vspace{-10pt}
+\begin{wrapfigure}[18]{r}{0.6\textwidth}
+\vspace{-18pt}
 \begin{minipage}{.6\textwidth}
 \begin{algorithm}[H]
 \caption{Parallel Bandit Algorithm}\label{alg:simple}
@@ -119,6 +131,10 @@ Although very simple, the following two theorems show that this algorithm is eff
 \end{minipage}
 \end{wrapfigure}
 
+$I_\tau$ is the set of variables considered unbalanced and we tune $\tau$ to trade off identifying the low probability actions against not having too many of them, so as to minimize the worst-case simple regret. When $\vec{q} = (\frac{1}{2}, \ldots, \frac{1}{2})$ we have $m(\vec{q}) = 1$ and when $\vec{q} = (0, \ldots, 0)$ we have $m(\vec{q}) = N$. We do not assume that $\vec{q}$ is known, thus Algorithm \ref{alg:simple} also utilizes the samples captured during the observational phase to estimate $m(\vec{q})$. Although very simple, the following two theorems show that this algorithm is effectively optimal.
+
+
+
 \begin{theorem}\label{thm:uq-simple}
 Algorithm \ref{alg:simple} satisfies
 \eq{
@@ -126,10 +142,6 @@ Algorithm \ref{alg:simple} satisfies
 }
 \end{theorem}
 
-Note that algorithms designed for finite-armed bandits would explore interventions more uniformly and achieve a regret of $\Omega(\sqrt{N/T})$.
-Since $m$ is typically much smaller than $N$ we anticipate that the new algorithm will significantly outperform classical bandit algorithms in
-this setting.
-We prove a lower bound on the simple regret that matches up to logarithmic factors the upper bound given in Theorem \ref{thm:uq-simple}.
 
 \begin{theorem}\label{thm:lower}
 For all $T$, $\vec{q}$ and all strategies, there exists a reward function such that
@@ -145,6 +157,6 @@ The proofs of Theorems \ref{thm:uq-simple} and \ref{thm:lower} may be found in S
 The proofs of Theorems \ref{thm:uq-simple} and \ref{thm:lower} follow by carefully analysing the concentration
 of $\hat p_a$ and $\hat m$ about their true values and may be found in the supplementary material.
 \fi
-
-
+%We prove a lower bound on the simple regret that matches up to logarithmic factors the upper bound given in Theorem \ref{thm:uq-simple}. 
+By utilizing knowledge of the causal structure, Algorithm \ref{alg:simple} effectively only has to explore the $m(\vec{q})$ 'difficult' actions. Standard multi-armed bandit algorithms must explore all $2N$ actions and thus achieve regret  $\Omega(\sqrt{N/T})$. Since $m$ is typically much smaller than $N$, the new algorithm can significantly outperform classical bandit algorithms in this setting. In practice, you would combine the data from both phases to estimate rewards for the low probability actions. We do not do so here as it slightly complicates the proofs and does not improve the worst case regret.
 

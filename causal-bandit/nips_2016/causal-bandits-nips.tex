@@ -33,7 +33,7 @@
 \usepackage{times}
 \usepackage{natbib}
 \usepackage{algorithm}
-\usepackage{algorithmic}
+\usepackage[noend]{algorithmic}
 \usepackage{wrapfig}
 %
 
@@ -49,10 +49,11 @@
            circle,
            rounded corners,
            draw=black, thick,
-           minimum width=2.5em,
-           minimum height=2.5em,
-           font=\footnotesize,
+           minimum width=2.2em,
+           minimum height=2.2em,
+           font=\tiny,
            text centered,
+           scale=.8,
            fill=blue!20!white},
      latent/.style={
            circle,
@@ -162,6 +163,7 @@ We propose a new algorithm that exploits the causal feedback and prove a bound o
 than algorithms that do not use the additional causal information.
 \end{abstract} 
 %\begin{tikzpicture}[background rectangle/.style={fill=olive!45}, show background rectangle]
+
 
 
 

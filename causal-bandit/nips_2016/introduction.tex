@@ -18,11 +18,7 @@ deploying shade or heat lamps will set the temperature to be low or high; the nu
 When not intervened upon, the temperature, soil, and moisture vary naturally from season to season due to weather conditions and these are all observed along with the final crop yield at the end of each season.
 How might the farmer best experiment to identify the single, highest yielding intervention in a limited number of seasons?
 %without sacrificing too much crop yield (relative to always choosing the best intervention) in the process?
-
-
-\subsection{Contributions}
-
-We take the first step towards formalising and solving problems such as the one above. 
+\paragraph{Contributions} We take the first step towards formalising and solving problems such as the one above. 
 In \S\ref{sec:defs} we formally introduce \emph{causal bandit problems} in which interventions are treated as arms in a bandit problem but their influence on the reward --- along with any other observations --- is assumed to conform to a known causal graph. 
 We show that our causal bandit framework subsumes the classical bandits (no additional observations) and contextual stochastic bandit problems (observations are revealed before an intervention is chosen) before focusing on the case where, like the above example, observations occur \emph{after} each intervention is made.
 
@@ -36,24 +32,15 @@ Experiments in \S\ref{sec:experiments} further demonstrate the value of causal m
 
 In the general casual bandit problem interventions and observations may have a complex relationship. 
 In \S\ref{sec:simple-regret-general} we propose a new algorithm inspired by importance-sampling that a) enjoys sub-linear regret equivalent to the optimal rate in the parallel bandit setting and b) captures many of the intricacies of sharing information in a causal graph in the general case.
-As in the parallel bandit case, the regret guarantee is often significantly better than $O(\sqrt{N/T})$ and never worse, where $N$ is the number of available interventions.
+As in the parallel bandit case, the regret guarantee is often significantly better than $O(\sqrt{N/T})$ and never worse, where $N$ is the number of available interventions. 
 
+\paragraph{Related Work} As alluded to above, causal bandit problems with $N$ possible interventions can be treated as a classical $N$-armed bandit problem by simply ignoring the causal model and extra observations that are revealed each round. In the farming example, the farmer could treat the six possible interventions as arms, ignore the observations of the non-intervened variables and apply an existing best-arm identificaion algorithm with well understood simple regret guarantees \citep{Jamieson2013}. However, as we show in \S\ref{sec:simple-regret}, this approach ignores the extra information available in the non-intervened variables and subsequently yields sub-optimal performance.
 
-
-\subsection{Related Work}
-
-As alluded to above, causal bandit problems with $N$ possible interventions can be treated as a classical $N$-armed bandit problem by simply ignoring the causal model and extra observations that are revealed each round.
-In the farming example, the farmer could treat the six possible interventions as arms, ignore the observations of the non-intervened variables and apply an existing best-arm identificaion algorithm with well understood simple regret guarantees \citep{Jamieson2013}.
-However, as we show in \S\ref{sec:simple-regret}, this approach ignores the extra information available in the non-intervened variables and subsequently yields sub-optimal performance.
-
-A well-studied class of bandit problems with side information are ``contextual bandits''~\cite{Langford2008,Agarwal2014}.
-Our framework bears a superficial similarity to contextual bandit problems since the extra observations on non-intervened variables might be viewed as context for selecting an intervention. 
-However, a crucial difference is that in our model the extra observations are only revealed \emph{after} selecting an intervention and hence cannot be used as context.
-% We discuss the relationship between causal and contextual bandits further in \S\ref{sec:defs} and leave their combination as future work.
+A well-studied class of bandit problems with side information are ``contextual bandits''~\cite{Langford2008,Agarwal2014}. Our framework bears a superficial similarity to contextual bandit problems since the extra observations on non-intervened variables might be viewed as context for selecting an intervention. 
+However, a crucial difference is that in our model the extra observations are only revealed \emph{after} selecting an intervention and hence cannot be used as context. % We discuss the relationship between causal and contextual bandits further in \S\ref{sec:defs} and leave their combination as future work.
 
 There have been several proposals for bandit problems where extra feedback is received after an action is taken.
-Most recently, \citet{Alon2015}, \citet{Kocak2014} and \citet{wu2015online} have considered very general models related to partial monitoring games~\citep{Bartok2014} where rewards on unplayed actions are revealed according to a feedback graph.
-As we discuss in \S\ref{sec:discussion}, the problem they consider shares some similarity with ours however their results are for cumulative regret and thus cannot be used to guarantee low simple regret~\citep{Bubeck2009a}.
+Most recently, \citet{Alon2015}, \citet{Kocak2014} and \citet{wu2015online} have considered very general models related to partial monitoring games~\citep{Bartok2014} where rewards on unplayed actions are revealed according to a feedback graph. As we discuss in \S\ref{sec:discussion}, the problem they consider shares some similarity with ours however their results are for cumulative regret and thus cannot be used to guarantee low simple regret~\citep{Bubeck2009a}.
 % Even in the case of cumulative regret we show that an application of their results to the parallel bandit problem with $N$ variables yields a $\bigo{\sqrt{NT}}$ bound.
 \citet{Yu2009} consider bandit problems where a learner chooses an arm to play as well as set of arms to observe rewards for in a stochastic setting where the reward distributions can change infrequently and the aim is to minimize cumulative regret.
 They use extra observations to detect changes whereas we assume fixed reward distributions and use extra observations to improve arm selection.

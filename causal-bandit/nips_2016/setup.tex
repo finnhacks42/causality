@@ -8,7 +8,7 @@ Following the terminology and notation in~\cite{Koller2009}, a \emph{causal mode
 We will assume each variable only takes on a finite number of distinct values.
 An edge from variable $X_i$ to $X_j$ is interpreted to mean that a change in the value of $X_i$ may directly cause a change to the value of $X_j$.
 The \emph{parents} of a variable $X_i$, denoted $\parents{X_i}$, is the set of all variables $X_j$ such that there is an edge from $X_j$ to $X_i$ in $\mathcal{G}$.
-An \emph{intervention (of size $n$)}, denoted $do(\vec{X}=\vec{x})$, assigns the values $\vec{x}=\{x_1, \ldots, x_n\}$ to the corresponding variables $\vec{X}=\{X_1, \ldots, X_n\} \subset \mathcal{X}$ with the empty intervention (where no variable is set) denoted $do()$.
+An \emph{intervention or action (of size $n$)}, denoted $do(\vec{X}=\vec{x})$, assigns the values $\vec{x}=\{x_1, \ldots, x_n\}$ to the corresponding variables $\vec{X}=\{X_1, \ldots, X_n\} \subset \mathcal{X}$ with the empty intervention (where no variable is set) denoted $do()$.
 The intervention also ``mutilates'' the graph $\mathcal{G}$ by removing all edges from $\parents{i}$ to $X_i$ for each $X_i \in \vec{X}$. 
 The resulting graph defines a probability distribution $\P{\vec{X}^c | do(\vec{X}=\vec{x})}$ over $\vec{X}^c := \mathcal{X} - \vec{X}$. 
 Details can be found in Chapter 21 of~\cite{Koller2009}.
@@ -23,28 +23,11 @@ It then \emph{observes} sampled values for all non-intervened variables $\vec{X}
 including the \emph{reward} $Y_t \in \{0,1\}$. 
 After $T$ observations the learner outputs an estimate of the optimal action $\hat a^*_T \in \actions$ based on its prior observations.
 
-The objective of the learner is to minimise the simple regret
-\begin{equation}
-\label{eq:regret-simple}
-	\simpleregret = \mu^* - \E{\mu_{\hat a^*_T}}.
-\end{equation}
-This is sometimes refered to as a ``pure exploration''~\citep{Bubeck2009a} or ``best-arm identification'' problem~\citep{Gabillon2012a} and
-is most appropriate when, as in drug and policy testing, the learner has a fixed experimental budget after which its policy will be fixed indefintely. 
+The objective of the learner is to minimise the simple regret $\simpleregret = \mu^* - \E{\mu_{\hat a^*_T}}.$ This is sometimes refered to as a ``pure exploration''~\citep{Bubeck2009a} or ``best-arm identification'' problem~\citep{Gabillon2012a} and is most appropriate when, as in drug and policy testing, the learner has a fixed experimental budget after which its policy will be fixed indefinitely. 
 
-Although we will focus on the intervene-then-observe ordering of events within each round, other scenarios are possible. 
-If the non-intervened variables are observed before an intervention is selected our framework 
-reduces to stochastic contextual bandits, which are already reasonably well understood~\citep{Agarwal2014}. 
-Even if no observations are made during the rounds, the causal model may still allow offline pruning of the set of 
-allowable interventions thereby reducing the complexity.
+Although we will focus on the intervene-then-observe ordering of events within each round, other scenarios are possible. If the non-intervened variables are observed before an intervention is selected our framework reduces to stochastic contextual bandits, which are already reasonably well understood~\citep{Agarwal2014}. Even if no observations are made during the rounds, the causal model may still allow offline pruning of the set of allowable interventions thereby reducing the complexity.
 
-
-We note that classical $K$-armed stochastic bandit problem can be recovered in our framework by considering a simple causal model with one 
-edge connecting a single variable $X$ that can take on $K$ values to a reward variable $Y \in \set{0,1}$ where $\P{Y = 1|X} = r(X)$ for some 
-arbitrary but unknown, real-valued function $r$. The set of allowed interventions in this case is $\mathcal{A} = \{ do(X = k) \colon k \in \{1, \ldots, K\}\}$.
-Conversely, any causal bandit problem can be reduced to a classical stochastic $|\mathcal{A}|$-armed bandit problem by 
-treating each possible intervention as an arm and ignoring all sampled values for the observed variables except for the reward.
-Intuitively though, one would expect to perform better by making use of the extra observations.
-
+We note that classical $K$-armed stochastic bandit problem can be recovered in our framework by considering a simple causal model with one edge connecting a single variable $X$ that can take on $K$ values to a reward variable $Y \in \set{0,1}$ where $\P{Y = 1|X} = r(X)$ for some arbitrary but unknown, real-valued function $r$. The set of allowed interventions in this case is $\mathcal{A} = \{ do(X = k) \colon k \in \{1, \ldots, K\}\}$. Conversely, any causal bandit problem can be reduced to a classical stochastic $|\mathcal{A}|$-armed bandit problem by treating each possible intervention as an independent arm and ignoring all sampled values for the observed variables except for the reward. Intuitively though, one would expect to perform better by making use of the extra structure and observations.
 
 
 \iffalse
