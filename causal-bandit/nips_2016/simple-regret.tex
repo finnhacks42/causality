@@ -5,10 +5,7 @@ It also suffices to witness the regret gap between algorithms that make use of c
 
 The causal model for this class of problems has $N$ binary variables $\{ X_1, \ldots, X_N \}$ where each $X_i \in \{0,1\}$ are independent causes of a 
 reward variable $Y \in \set{0,1}$, as shown in Figure~\ref{fig:causalStructure}.
-All variables are observable and the set of allowable actions are all size 0 and size 1 interventions: 
-\eq{
-	\mathcal{A} = \set{do()} \cup \set{ do(X_i = j) \colon 1 \leq i \leq N \text{ and } j \in \set{0,1}}\,.
-}
+All variables are observable and the set of allowable actions are all size 0 and size 1 interventions: $\mathcal{A} = \set{do()} \cup \set{ do(X_i = j) \colon 1 \leq i \leq N \text{ and } j \in \set{0,1}}$
 In the farming example from the introduction, $X_1$ might represent temperature (\eg, $X_1=0$ for low and $X_1=1$ for high). 
 The interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ indicate the use of shades or heat lamps to keep the temperature low or high, respectively.
 
@@ -69,8 +66,7 @@ The interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ indicate the use of shades or 
 \end{figure}
 
 
-In each round the learner either purely observes by selecting $do()$ or chooses a single variable to intervene on and the value to set it to. 
-The remainder of the variables are simultaneously set by independently biased coin flips. 
+In each round the learner either purely observes by selecting $do()$ or sets the value of a single variable. The remaining variables are simultaneously set by independently biased coin flips. 
 The value of all variables are then used to determine the distribution of rewards for that round.
 Formally, when not intervened upon we assume that each $X_i \sim \bernoulli(q_i)$ where $\vec{q} = (q_1, \ldots, q_N) \in [0,1]^N$ so that $q_i = \P{X_i = 1}$.
 %\todom{Should $Y$ be 0-1 valued or real everywhere?} YES!
@@ -102,7 +98,7 @@ m(\vec{q}) = \min \set{ d : |I_{d}| \leq d}\,.
 %Let $I_1 = \emptyset$ and for $\tau \in [0,1)$ let $I_\tau = \set{ i : \min\set{q_i, 1-q_i} \leq \tau}$.
 
 \begin{wrapfigure}[18]{r}{0.6\textwidth}
-\vspace{-18pt}
+\vspace{-25pt}
 \begin{minipage}{.6\textwidth}
 \begin{algorithm}[H]
 \caption{Parallel Bandit Algorithm}\label{alg:simple}

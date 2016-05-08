@@ -28,8 +28,8 @@ To address this difficult problem, we assume the conditional interventional dist
 
 
 
-\begin{wrapfigure}[14]{r}{0.5\textwidth}
-\vspace{-12pt}
+\begin{wrapfigure}[12]{r}{0.5\textwidth}
+\vspace{-25pt}
 \begin{minipage}{.5\textwidth}
 \begin{algorithm}[H]
 \caption{General Algorithm}\label{alg:general}
@@ -54,7 +54,7 @@ To address this difficult problem, we assume the conditional interventional dist
 Our algorithm samples $T$ actions from $\eta$ and uses them to estimate the returns $\mu_a$ for all $a \in \calA$ simultaneously via a truncated importance weighted estimator. Let $\parents{Y}(X)$ denote the realization of the variables in $X$ that are parents of Y and define $R_a(X) = \frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}$
 
 \eq {
-\hat{\mu_a} = \frac{1}{T} \sum_{t=1}^T R_a(X) Y \ind{R_a(X) \leq B_a}\,, 
+\hat \mu_a =  \frac{1}{T} \sum_{t=1}^T Y_t R_a(X_t)  \ind{R_a(X_t) \leq B_a}\,, 
 } 
 
 where $ B_a \geq 0$  is a constant that tunes the level of truncation to be chosen subsequently. The truncation introduces a bias in the estimator, but simultaneously chops the potentially heavy tail that is so detrimental to its concentration guarantees. 
