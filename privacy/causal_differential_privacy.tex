@@ -42,6 +42,51 @@
 \usepackage[capitalize]{cleveref}
 \usepackage{graphicx}
 \usepackage{parskip}
+
+
+\usetikzlibrary{arrows,positioning,backgrounds} 
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=2.2em,
+           minimum height=2.2em,
+           font=\tiny,
+           text centered,
+           scale=.8,
+           fill=blue!20!white},
+     latent/.style={
+           circle,
+           rounded corners,
+           draw=black, thick, dashed,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           fill=black!10!white
+           },
+     empty/.style={
+           circle,
+           rounded corners,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 }  
+}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MACROS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -61,6 +106,7 @@
 \newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
 \newcommand{\Ber}{\operatorname{Bernoulli}}
 \renewcommand{\P}[1]{\operatorname{P}\left\{#1\right\}}
+\newcommand{\pt}{\mathcal P}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -88,19 +134,108 @@ Differential privacy has primarily focused on protecting individuals but there i
 
 Consider a scenario under which the causal graph generating a dataset is considered known - but may contain unmeasured variables. 
 
-Assume we add noise to the dataset via a single point crossover process (see paper). The goal is to prevent reliable estimation of causal effects without effecting our ability to predict a particular target variable. Some specific questions:
+Assume we add noise to the dataset via a single point crossover process (see paper). The goal is to prevent reliable estimation of causal effects without effecting our ability to predict a particular target variable. Some example questions:
 
 \begin{itemize}
-\item Under what circumstances (graph structures) it is possible to disrupt inference of a particular causal effect
-\item How can we maxiumully disrupt this inference (ie is there a cut that adds more noise for a given amount of shuffling of the data)
+\item Under what circumstances (graph structures) it is possible to disrupt inference of a particular causal effect \textcolor{red}{always provided there is a direct causal relationship between the exposure variable $X$ and outcome variable $Y$, ie $P(Y|do(X))\neq P(Y)$} 
+\item How can we maxiumully disrupt this inference (ie is there a cut that adds more noise for a given amount of shuffling of the data) \textcolor{red}{data dependent}
 \item What about if we want to disrupt a specific set of causal inference questions
 \item What about if we want to disrupt as many causal queries as possible.
 \end{itemize}
 
-The single point crossover process divides the variables into two groups and makes estimates of the form $P(X_1|X_2)$ unreliable if $X_1$ and $X_2$ are in different partitions. We can think of the process as drawing a cut through the graph.  
+\section{Problem Statement and Definitions}
+
+\begin{itemize}
+\item Let $G$ be a causal directed acyclic graph over vertices $V$ and edges $E$.
+\item Let $S = \set{(X_1,Y_1),(X_2,Y_2),...,(X_m,Y_m): X_i,Y_i \in V,X_i \neq Y_i}$ be a set of pairs of vertices in $G$.
+\item Each pair of vertices $(X_i,Y_i)$ in $S$ represents the causal query $P(Y_i|do(X_i))$
+\item A set of variables $Z \subset V$ is an adjustment for a query $(X,Y)$ if $X, Y \notin Z$ and $P(Y|do(X)) = \sum_Z P(Y|X,Z)P(Z)$
+\item An adjustment for a query is minimal if it does not contain another adjustment as a proper subset.
+\item The Single Point Crossover Process partitions the variables $V$ into two disjoint sets, $\pt_1$ and $\pt_2$ such that $\pt_1 \cup \pt_2 = V$. Let $\pt_X$ denote the partition containing the variable $X$.
+\end{itemize}
+
+\subsection{Discouraging inference of a set of causal queries via adjustment}
+
+\begin{lemma}
+One of the following holds.
+\begin{enumerate}
+\item $P(Y|do(X)) = P(Y)$
+\item There is no set of variables that satisfy the back-door criterion for identifying $P(Y|do(X))$ 
+\item There is at least one set of variables $Z$ that are a minimal adjustment for $P(Y|do(X))$, $Z$ may be the empty set. 
+\end{enumerate}
+\end{lemma}
+
+For the remainder we assume that all queries we wish to jam are of case 3, because in case 1, there is no causal effect of $X$ on $Y$ to discover and in case 2, the causal effect of $X$ on $Y$ can already not be inferred from the data and no way in which we partition the data will render it identifiable. 
+
+
+\begin{lemma}Let $Z$ be a set of variables that is a minimal adjustment for the causal query $(X,Y)$. Inferring $P(Y|do(X))$ via adjusting for $Z$ is jammed if $Y \cup Z \not\subset \pt_X$. In other words, if at least one of the variables in $X \cup Y \cup Z$ is in a different a different partition to the others. 
+
+\color{red} This stems from the fact that the expression for calculating $P(Y|do(X))$ via adjusting for $Z$ contains the factor $P(Y|X,Z)$.  I'm assuming the single point crossover process gives us this result. We need to a clear definition of 'jammed' in terms of the crossover-process.
+\end{lemma}
+
+\begin{lemma} Let $\boldsymbol{Z}$ be the set of minimal adjustments for $(X,Y)$. The causal query $(X,Y)$ is jammed if inferring $P(Y|do(X))$ via $Z$ is jammed for $\forall Z \in \boldsymbol{Z}$ 
+\end{lemma}
+
+
+\subsubsection{An algorithm for finding a cut that renders jams a set of causal queries $S$}
+\begin{enumerate}
+\item For each query $(X_i,Y_i)\in S$, find the set of minimal adjustments $\boldsymbol{Z}_i$  
+\item Construct the set of sets $Q = \set{X_i \cup Y_i \cup Z_{ik} : 1 \leq i \leq m, 0 \leq k \leq |\boldsymbol{Z}_i|}$
+\item Find a partition such that $(Q_i \nsubseteq \pt_1)\land (Q_i \nsubseteq \pt_2)\qquad \forall Q_i \in Q$
+\end{enumerate}
+
+For example in figure \ref{fig:minimal_sets_example}, with $S = \set{(A,B),(E,B),(C,B),(E,A)}$
+
+\eq{
+&S_1 = (A,B),\, \boldsymbol{Z}_1 = \set{\set{C, E},\set{D,E} \set{D,F}} \\
+&S_2 = (E,B),\, \boldsymbol{Z}_2 = \set{\set{C,D}} \\
+&S_3 = (C,B),\, \boldsymbol{Z}_3 = \set{} \\
+&S_4 = (E,A),\, \boldsymbol{Z}_4 = \set{C} \\
+&Q = \set{\set{A,B,C,E},\set{A,B,D,E},\set{A,B,D,F},\set{E,B,C,D},\set{C,B},\set{E,A,C}}
+}
+
+
+We could jam $S$ with any partition of the form $\set{A,B,...},\set{C,E,F,...}$.$S_2,S_3$ and $S_4$ are jammed because their $X$ and $Y$ variables are in different partitions. $S_1$ is jammed because, although $A$ and $B$ are in the same partition, for each of the three minimal adjustment sets, at least one variable is not in $\pt_A$. $D$ could be placed in either partition. This is not the only solution, $\set{A,C,...},\set{B,E,...}$ is another. Note than in any solution $B$ and $C$ must be in different partitions as this is the only way to jam $S_3$.
+
+The number of minimal adjustments for a given query can grow exponentially with the number of nodes in the graph. There is an algorithm to enumerate them that requires $O(n^3)$ per adjustment \cite{textor2012adjustment} .
+
+
+\begin{figure}
+\caption{}
+\label{fig:minimal_sets_example}
+\centering
+   \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.45cm,
+  thick,main node/.style={observed}, hidden/.style={empty},background rectangle/.style={fill=olive!45}]
+%every node/.style={scale=0.6}
+ %nodes
+\node[main node](1){C};
+\node[main node, below right=of 1](3){E};
+\node[main node, above right=of 3](2){D};
+\node[main node, below right=of 3](4){F};
+\node[main node, below right=of 4](5){B};
+\node[hidden, below left=of 1](7){};
+\node[main node, below left=of 7](6){A};
+ \path[every node/.style={font=\tiny}]
+    (1) edge (2) edge (3) edge (6)
+    (6) edge (5)
+    (2) edge (3) edge (5)
+    (3) edge (4) edge (6)
+    (4) edge (5);
+\end{tikzpicture}
+\end{figure}
 
 
 
+\subsubsection{Some things we can say}
+
+\begin{itemize}
+\item If $\boldsymbol{X} = \set{X_1 ... X_m}$ and $\boldsymbol{Y} = \set{Y_1...Y_m}$ are disjoint sets, then any partition with $\boldsymbol{X} \subseteq \pt_1$ and $\boldsymbol{Y} \subseteq \pt_2$ will jam $S$. This holds trivially if $|S|$ = 1.
+\item The hardest case to jam is when $\boldsymbol{Z}_i = {} \forall i$
+\item If $|S| = 2$ we can always jam $S$ as either $\boldsymbol{X}$ and $\boldsymbol{Y}$ will be disjoint or a variable $A$ will appear in both $S_1$ and $S_2$, in which case we can let $\pt_1 = \set{A}$.
+\end{itemize}
+
+\bibliographystyle{apalike}
+\bibliography{/home/finn/phd/Causality-Identify}
 
 \end{document}
 
