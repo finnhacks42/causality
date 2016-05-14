@@ -237,6 +237,14 @@ as required.
 \end{proof}
 
 
-
+%in the parallel bandit setting the $m(\eta)$ given in this section approximately coincides with the $m(\vec{q})$ in Eq.\ \ref{eq:m-simple}.
+%Recall in that setting that 
+%\eq{
+%\actions = \set{do()} \cup \set{do(X_i = j) : 1 \leq i \leq N \text{ and } j \in \set{0,1}}\,.
+%}
+%For $a = do()$ choose $\eta_a = 1/2$. 
+%Let $m = m(\vec{q})$ and note that, by definition, there are at most $m$ pairs $(i,j)$ such that $\P{X_i = j} \leq 1/m$.
+%Thus, for $a = do(X_i = j)$ letting $\eta_a \propto \ind{\P{X_i = j} \leq 1/m} / (2m)$ guarantees $\eta_a \ge \frac{1}{2m}$ when $\eta_a \ne 0$.
+%It is then easy to check that $m(\eta) \leq 2m$ using an argument like that for Proposition~\ref{pro:m-bound}.
 
 

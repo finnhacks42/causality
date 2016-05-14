@@ -43,13 +43,12 @@ The parallel bandit problem can also be viewed as an instance of a time varying 
 
 \vspace{-0.4cm} 
 \paragraph{Causal Models with Non-Observable Variables}
-If we assume knowledge of the conditional \textit{interventional} distributions $P_a$ our analysis applies unchanged to the case of causal models with 
-non-observable variables. For example, if we had access to a data set of \textit{experiments} in which the reward variable $Y$ was not 
-available from which to build estimates of $P_a$. Some of the interventional distributions $P_a$ may be non-identifiable meaning we can not obtain prior estimates for $P_a$ from 
+If we assume knowledge of the conditional \textit{interventional} distributions $\Pn{a}{\parents{Y}}$ our analysis applies unchanged to the case of causal models with 
+non-observable variables. Some of the interventional distributions may be non-identifiable meaning we can not obtain prior estimates for $\Pn{a}{\parents{Y}}$ from 
 even an infinite amount of observational data. Even if all variables are observable and the graph is known, if the conditional distributions are unknown, then Algorithm
 \ref{alg:general} cannot be used. Estimating these quantities while simultaneously minimising the simple regret is an interesting and challenging open problem.
 
-
+% For example, if we had access to a data set of \textit{experiments} in which the reward variable $Y$ was not available from which to build estimates of $P_a$.
 % In this case, some conditional distributions may be non-identifiable. 
 % The corresponding actions can be immediately added to the set $A$ prior to collecting any data. 
 % We can then use the same algorithm as in the case where there are no latent variables, except that we will have to use the more general do-calculus rather than simply adjusting for the parents to write the expression for each action in terms of observational data.

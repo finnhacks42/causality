@@ -4,7 +4,7 @@ It is simple enough to admit a thorough analysis but rich enough to model the ty
 It also suffices to witness the regret gap between algorithms that make use of causal models and those which do not.
 
 The causal model for this class of problems has $N$ binary variables $\{ X_1, \ldots, X_N \}$ where each $X_i \in \{0,1\}$ are independent causes of a 
-reward variable $Y \in \set{0,1}$, as shown in Figure~\ref{fig:causalStructure}.
+reward variable $Y \in \set{0,1}$, as shown in Figure~\ref{fig:parallel}.
 All variables are observable and the set of allowable actions are all size 0 and size 1 interventions: $\mathcal{A} = \set{do()} \cup \set{ do(X_i = j) \colon 1 \leq i \leq N \text{ and } j \in \set{0,1}}$
 In the farming example from the introduction, $X_1$ might represent temperature (\eg, $X_1=0$ for low and $X_1=1$ for high). 
 The interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ indicate the use of shades or heat lamps to keep the temperature low or high, respectively.
@@ -27,7 +27,7 @@ The interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ indicate the use of shades or 
     (4) edge (5);
 \end{tikzpicture}
         \caption{Parallel graph}
-        \label{fig:causalStructure_confounded}
+        \label{fig:parallel}
     \end{subfigure}
     \begin{subfigure}[b]{0.2\textwidth}
     \centering
@@ -62,7 +62,7 @@ The interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ indicate the use of shades or 
         \caption{Chain graph}
         \label{fig:causalchain}
     \end{subfigure}
-    \caption{Causal Models}\label{fig:animals}
+    \caption{Causal Models}\label{fig:causalmodels}
 \end{figure}
 
 

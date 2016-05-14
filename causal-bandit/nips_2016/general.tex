@@ -1,7 +1,5 @@
 
-\newcommand{\calP}{\mathcal P}
-\newcommand{\x}{\boldsymbol{x}}
-\newcommand{\Ps}{\operatorname{P}}
+
 
 We now consider the more general problem where the graph structure is known, but arbitrary. 
 
@@ -16,15 +14,13 @@ For general graphs, $\P{Y|X_i=j} \neq \P{Y|do(X_i=j)}$ (correlation is not causa
 } 
 where $\parents{X_k}$ denotes the parents of $X_k$ and $\delta$ is the dirac delta function. 
 
-We could naively generalize our approach for parallel bandits by observing for $T/2$ rounds, applying the truncated product factorization to write an expression for each $\P{Y|a}$ in terms of observational quantities and explicitly playing the actions for which the observational estimates were poor. However, it is no longer optimal to ignore the information we can learn about the reward for intervening on one variable from rounds in which we act on a different variable. Consider the graph in Figure \ref{fig:causalchain} and suppose each variable deterministically takes the value of its parent, $X_k = X_{k-1}$ for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$, but not from $do()$.  
+We could naively generalize our approach for parallel bandits by observing for $T/2$ rounds, applying the truncated product factorization to write an expression for each $\P{Y|a}$ in terms of observational quantities and explicitly playing the actions for which the observational estimates were poor. However, it is no longer optimal to ignore the information we can learn about the reward for intervening on one variable from rounds in which we act on a different variable. Consider the graph in Figure \ref{fig:causalchain} and suppose each variable deterministically takes the value of its parent, $X_k = X_{k-1}$ for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$, but not from $do()$. In addition, variance of the observational estimator for $a = do(X_i = j)$ can be high even if $\P{X_i = j}$ is large. Given the causal graph in Figure \ref{fig:causalStructure_confounded}, $\P{Y|do(X_2= j)} = \sum_{X_1}\P{X_1}\P{Y|X_1, X_2 = j}$. Suppose $X_2 = X_1$ deterministically, no matter how large $\P{X_2 = 1}$ is we will never observe $(X_2=1,X_1 = 0)$ and so cannot get a good estimate for $\P{Y|do(X_2=1)}$. 
 
-To solve the general problem we need an estimator for each action that incorporates information obtained from every other action and a way to optimally allocate samples to actions. NEED TO EXPLAIN WHY THIS PROBLEM IS HARD. 
-
-To address this difficult problem, we assume the conditional interventional distributions $\P{\parents{Y}|a}$ (but not $\P{Y|a}$) are known. These could be estimated from experimental data on the same covariates but where the outcome of interest differed, such that $Y$ was not included, or similarly from observational data subject to identifiability constraints. Let $\eta$ be a distribution on available interventions $a \in \calA$ so $\eta_a \geq 0$ and $\sum_{a \in \calA} \eta_a = 1$. Define $Q = \sum_{a \in \calA} \eta_a \P{\parents{Y}|a}$ to be the mixture distribution over the interventions with respect to $\eta$.
+To solve the general problem we need an estimator for each action that incorporates information obtained from every other action and a way to optimally allocate samples to actions. To address this difficult problem, we assume the conditional interventional distributions $\P{\parents{Y}|a}$ (but not $\P{Y|a}$) are known. These could be estimated from experimental data on the same covariates but where the outcome of interest differed, such that $Y$ was not included, or similarly from observational data subject to identifiability constraints. Let $\eta$ be a distribution on available interventions $a \in \calA$ so $\eta_a \geq 0$ and $\sum_{a \in \calA} \eta_a = 1$. Define $Q = \sum_{a \in \calA} \eta_a \P{\parents{Y}|a}$ to be the mixture distribution over the interventions with respect to $\eta$.
 
 %we firstly note that the causal effect of an action $a$ on $Y$ can be factored into the causal effect of $a$ on the parents of $Y$ and the effect of the parents of $Y$ on $Y$. $\P{Y|a} = \P{Y|\parents{Y}}\P{\parents{Y}|a}$. We then
 
-%Firstly, the variance of the observational estimator for $a = do(X_i = j)$ can be high even if $\P{X_i = j}$ is large. For example, given the causal graph in Figure \ref{fig:causalStructure_confounded}, $\P{Y|do(X_2= j)} = \sum_{X_1}\P{X_1}\P{Y|X_1, X_2 = j}$. Suppose $X_2 = X_1$ deterministically, no matter how large $\P{X_2 = 1}$ is we will never observe $(X_2=1,X_1 = 0)$ and so cannot get a good estimate for $\P{Y|do(X_2=1)}$. Secondly it is no longer optimal 
+
 
 
 
@@ -61,7 +57,7 @@ where $ B_a \geq 0$  is a constant that tunes the level of truncation to be chos
 
 The distribution over actions, $\eta$ plays the role of allocating samples to actions and is optimized to minimize the worst-case simple regret. Abusing notation we define $m(\eta)$ by
 \eq{
-m(\eta) = \max_{a \in \calA} \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right]\,.
+m(\eta) = \max_{a \in \calA} \EEa\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right]\,,\text{ where } \EEa \text{ is the expectation with respect to } \Pn{a}.
 }
 
 We will show shortly that $m(\eta)$ is a measure of the difficulty of the problem that approximately coincides with the version for parallel bandits, justifying the name overloading.
@@ -82,34 +78,23 @@ for future work.
 a natural choice of $\eta$ is the minimiser of $m(\eta)$.
 \eq{
 \eta^* 
-= \argmin_\eta m(\eta) = \argmin_\eta \underbrace{\max_{a \in \calA} \EE_{\Ps_a} \left[\frac{\Pn{a}{\parents{Y}(X)}}{\sum_{b \in \calA} \eta_b \Pn{b}{\parents{Y}(X)}}\right]}_{m(\eta)}\,.
+= \argmin_\eta m(\eta) = \argmin_\eta \underbrace{\max_{a \in \calA} \EEa \left[\frac{\Pn{a}{\parents{Y}(X)}}{\sum_{b \in \calA} \eta_b \Pn{b}{\parents{Y}(X)}}\right]}_{m(\eta)}\,.
 }
 Since the mixture of convex functions is convex and the maximum of a set of convex functions is convex, we see that $m(\eta)$ is convex (in $\eta$).
 Therefore the minimisation problem may be tackled using standard techniques from convex optimisation. An interpretation of $m(\eta^*)$ is the minimum achievable worst-case variance of the importance weighted estimator. In the experimental section we present some special cases, but for now we give two simple results. The first shows that $|\calA|$ serves as an upper bound on $m(\eta^*)$.
 
 \begin{proposition}\label{pro:m-bound}
-$m(\eta^*) \leq |\calA|$.
-\end{proposition}
-
-\begin{proof}
-By definition, $m(\eta^*) \leq m(\eta)$ for all $\eta$. Let $\eta_a = 1/|\calA|$. Then
+$m(\eta^*) \leq |\calA|$. \textit{Proof.} 
+\textup{By definition, $m(\eta^*) \leq m(\eta)$ for all $\eta$. Let $\eta_a = 1/|\calA|\,\forall a$.}
 \eq{
 m(\eta) 
-= \max_a \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right] 
-\leq \max_a \EE_{\Ps_a}\left[\frac{\Pn{a}{\parents{Y}(X)}}{\eta_a \Pn{a}{\parents{Y}(X)}}\right] 
-\leq \max_a \EE_{\Ps_a}\left[\frac{1}{\eta_a}\right] = |\calA| \qedhere
+= \max_a \EEa\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right] 
+\leq \max_a \EEa\left[\frac{\Pn{a}{\parents{Y}(X)}}{\eta_a \Pn{a}{\parents{Y}(X)}}\right] 
+= \max_a \EEa\left[\frac{1}{\eta_a}\right] = |\calA| %\qedhere
 }
-\end{proof}
+\end{proposition} 
 
-The second observation is that in the parallel bandit setting the $m(\eta)$ given in this section approximately coincides with the $m(\vec{q})$ in Eq.\ \ref{eq:m-simple}.
-Recall in that setting that 
-\eq{
-\actions = \set{do()} \cup \set{do(X_i = j) : 1 \leq i \leq N \text{ and } j \in \set{0,1}}\,.
-}
-For $a = do()$ choose $\eta_a = 1/2$. 
-Let $m = m(\vec{q})$ and note that, by definition, there are at most $m$ pairs $(i,j)$ such that $\P{X_i = j} \leq 1/m$.
-Thus, for $a = do(X_i = j)$ letting $\eta_a \propto \ind{\P{X_i = j} \leq 1/m} / (2m)$ guarantees $\eta_a \ge \frac{1}{2m}$ when $\eta_a \ne 0$.
-It is then easy to check that $m(\eta) \leq 2m$ using an argument like that for Proposition~\ref{pro:m-bound}.
+The second observation is that, in the parallel bandit setting, $m(\eta) \leq 2m(\boldsymbol{q})$. This is easy to see by letting $\eta_a = 1/2$ for $a = do()$ and $\eta_a = \ind{\P{X_i = j} \leq 1/m(\boldsymbol{q}} / (2m(\boldsymbol{q}))$ for the actions corresponding to $do(X_i=j)$, and applying an argument like Proposition~\ref{pro:m-bound}. The proof is in section \ref{} of the supplementary materials.
 
 \begin{remark}\label{rem:truncate}
 The choice of $B_a$ given in Theorem \ref{thm:general} is not the only possibility. As we shall see in the experiments, it is 
