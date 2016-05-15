@@ -32,7 +32,7 @@ To solve the general problem we need an estimator for each action that incorpora
 \begin{algorithmic}
 \STATE {\bf Input:} $T$, $\eta \in [0,1]^{\calA}$, $B \in [0,\infty)^{\calA}$
 \FOR{$t \in \set{1,\ldots,T}$}
-\STATE Sample action $a_t = a$ with probability $\eta$
+\STATE Sample action $a_t$ from $\eta$
 \STATE Do action $a_t$ and observe $X_t$ and $Y_t$
 \ENDFOR
 \FOR{$a \in \calA$}
