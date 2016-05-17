@@ -13,9 +13,9 @@ The intervention also ``mutilates'' the graph $\mathcal{G}$ by removing all edge
 The resulting graph defines a probability distribution $\P{\vec{X}^c | do(\vec{X}=\vec{x})}$ over $\vec{X}^c := \mathcal{X} - \vec{X}$. 
 Details can be found in Chapter 21 of~\cite{Koller2009}.
 
-A learner for a casual bandit problem is given the casual model's graph $\mathcal{G}$ and a set of \emph{allowed interventions} $\mathcal{A}$.
+A learner for a casual bandit problem is given the casual model's graph $\mathcal{G}$ and a set of \emph{allowed actions} $\mathcal{A}$.
 One variable $Y \in \mathcal{X}$ is designated as the \emph{reward variable} and takes on values in $\{0, 1\}$.
-We denote the expected reward for the intervention $a = do(\vec{X} = \vec{x})$ by $\mu_{a} := \E{Y | do(\vec{X} = \vec{x})}$ and 
+We denote the expected reward for the action $a = do(\vec{X} = \vec{x})$ by $\mu_{a} := \E{Y | do(\vec{X} = \vec{x})}$ and 
 the optimal expected reward by $\mu^* := \max_{a\in\actions} \mu_{a}$. 
 The causal bandit game proceeds over $T$ rounds.
 In round $t$, the learner \emph{intervenes} by choosing $a_t = do(\vec{X}_t = \vec{x}_t) \in \mathcal{A}$ based on previous observations. 
@@ -27,7 +27,7 @@ The objective of the learner is to minimise the simple regret $\simpleregret = \
 
 Although we will focus on the intervene-then-observe ordering of events within each round, other scenarios are possible. If the non-intervened variables are observed before an intervention is selected our framework reduces to stochastic contextual bandits, which are already reasonably well understood~\citep{Agarwal2014}. Even if no observations are made during the rounds, the causal model may still allow offline pruning of the set of allowable interventions thereby reducing the complexity.
 
-We note that classical $K$-armed stochastic bandit problem can be recovered in our framework by considering a simple causal model with one edge connecting a single variable $X$ that can take on $K$ values to a reward variable $Y \in \set{0,1}$ where $\P{Y = 1|X} = r(X)$ for some arbitrary but unknown, real-valued function $r$. The set of allowed interventions in this case is $\mathcal{A} = \{ do(X = k) \colon k \in \{1, \ldots, K\}\}$. Conversely, any causal bandit problem can be reduced to a classical stochastic $|\mathcal{A}|$-armed bandit problem by treating each possible intervention as an independent arm and ignoring all sampled values for the observed variables except for the reward. Intuitively though, one would expect to perform better by making use of the extra structure and observations.
+We note that classical $K$-armed stochastic bandit problem can be recovered in our framework by considering a simple causal model with one edge connecting a single variable $X$ that can take on $K$ values to a reward variable $Y \in \set{0,1}$ where $\P{Y = 1|X} = r(X)$ for some arbitrary but unknown, real-valued function $r$. The set of allowed actions in this case is $\mathcal{A} = \{ do(X = k) \colon k \in \{1, \ldots, K\}\}$. Conversely, any causal bandit problem can be reduced to a classical stochastic $|\mathcal{A}|$-armed bandit problem by treating each possible intervention as an independent arm and ignoring all sampled values for the observed variables except for the reward. Intuitively though, one would expect to perform better by making use of the extra structure and observations.
 
 
 \iffalse
