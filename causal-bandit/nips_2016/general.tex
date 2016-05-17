@@ -1,13 +1,4 @@
-
-
-
-We now consider the more general problem where the graph structure is known, but arbitrary. 
-
-% How do actions map to interventions (we need not only consider singleton interventions).
-% 
-
-
-For general graphs, $\P{Y|X_i=j} \neq \P{Y|do(X_i=j)}$ (correlation is not causation). However, if all the variables are observable, any causal distribution $\P{X_1...X_N|do(X_i=j)}$ can be expressed in terms of observational distributions via the truncated factorization formula \cite{Pearl2000}. 
+We now consider the more general problem where the graph structure is known, but arbitrary. For general graphs, $\P{Y|X_i=j} \neq \P{Y|do(X_i=j)}$ (correlation is not causation). However, if all the variables are observable, any causal distribution $\P{X_1...X_N|do(X_i=j)}$ can be expressed in terms of observational distributions via the truncated factorization formula \cite{Pearl2000}. 
 \eq{
 \P{X_1...X_N|do(X_i=j)} = 
 \prod_{k \neq i}\P{X_k|\parents{X_k}}\delta(X_i - j)\,, 
@@ -69,8 +60,11 @@ If Algorithm \ref{alg:general} is run with $B \in \R^{\calA}$ given by $B_a = \s
 \simpleregret \in \bigo{\sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)}}\,.
 }
 \end{theorem}
-
-The proof is in the supplementary materials. Note the regret has the same form as that obtained for Algorithm \ref{alg:simple}, with $m(\eta)$ replacing $m(q)$. Algorithm \ref{alg:simple} assumes only the graph structure and not knowledge of the conditional distributions on $X$. Thus it has broader applicability to the parallel graph than the generic algorithm given here. We believe that Algorithm \ref{alg:general} with the optimal choice of $\eta$ is close to minimax optimal, but leave lower bounds
+\ifsup 
+The proof is in Section \ref{sec:thm:general}.
+\else
+The proof is in the supplementary materials.
+\fi Note the regret has the same form as that obtained for Algorithm \ref{alg:simple}, with $m(\eta)$ replacing $m(q)$. Algorithm \ref{alg:simple} assumes only the graph structure and not knowledge of the conditional distributions on $X$. Thus it has broader applicability to the parallel graph than the generic algorithm given here. We believe that Algorithm \ref{alg:general} with the optimal choice of $\eta$ is close to minimax optimal, but leave lower bounds
 for future work.
 
 

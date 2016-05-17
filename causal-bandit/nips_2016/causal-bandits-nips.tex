@@ -37,7 +37,7 @@
 \usepackage{wrapfig}
 %
 
-\newif\ifsup\supfalse
+\newif\ifsup\suptrue
 
 \graphicspath{ {figures/} }
 \usetikzlibrary{arrows,positioning,backgrounds} 
@@ -218,9 +218,12 @@ than algorithms that do not use the additional causal information.
 \label{sec:discussion}
 
 \input{discussion}
-
+\pagebreak
 {\small\bibliography{libraryicml}}
 \bibliographystyle{apalike}
 
+\ifsup
 \input{tech}
+\fi
+
 \end{document}
