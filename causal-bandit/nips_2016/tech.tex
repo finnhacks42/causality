@@ -236,7 +236,31 @@ Therefore
 as required.
 \end{proof}
 
+\subsection{Relationship between $m(\eta)$ and $m(\boldsymbol{q})$}
 
+\begin{proposition}\label{pro:m-equivelence} In the parallel bandit setting,
+$m(\eta^*) \leq 2m(\boldsymbol{q})$.
+\end{proposition} 
+
+\begin{proof}
+
+Let:
+
+\eq{
+\eta_a = \begin{cases}
+\frac{1}{2} & \text{ for }a=do()\\
+\frac{1}{2m(\boldsymbol{q})}\ind{\P{X_i = j} \leq \frac{1}{m(\boldsymbol{q})}} & \text{ for all other }a \in \calA
+\end{cases}
+}
+
+\eq{
+\sum_{a \in \calA}\eta_a = \frac{1}{2}+\sum\ind{\P{X_i = j} \leq \frac{1}{m(\boldsymbol{q})}}
+}
+
+
+
+\end{proof}
+\
 %in the parallel bandit setting the $m(\eta)$ given in this section approximately coincides with the $m(\vec{q})$ in Eq.\ \ref{eq:m-simple}.
 %Recall in that setting that 
 %\eq{
