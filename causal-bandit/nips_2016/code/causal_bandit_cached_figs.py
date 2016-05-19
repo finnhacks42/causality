@@ -285,6 +285,7 @@ def plot_regret(regret,xvals):
     ax.errorbar(xvals,mean[:,1],yerr=error[:,1], label="Algorithm 1",linestyle="",marker="o",markersize=6)  
     ax.errorbar(xvals,mean[:,0],yerr=error[:,0], label="Algorithm 2",linestyle="",marker="s",markersize=5) 
     ax.errorbar(xvals,mean[:,2],yerr=error[:,2], label="Successive Rejects",linestyle="",marker="D",markersize=5) 
+    ax.set_ylabel(REGRET_LABEL)
     for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] + ax.get_xticklabels() + ax.get_yticklabels()):
         item.set_fontsize(14)
     return fig,ax
@@ -352,7 +353,7 @@ T = 400
 #with open("experiment1_{0}.pickle".format(now_string()),"wb") as out:
 #    pickle.dump(regret,out)
 
-with open('data/experiment1_20160518_1339.pickle','rb') as f:
+with open('../data/experiment1_20160518_1339.pickle','rb') as f:
     regret1 = pickle.load(f)
     m_vals = range(2,N,2)
     plot_regret_versus_m(regret1,m_vals,T)
@@ -366,7 +367,7 @@ N= 50
 #with open("experiment2_{0}.pickle".format(now_string()),"wb") as out:
 #    pickle.dump(regret2,out)
 
-with open('data/experiment2_20160518_1206.pickle',"rb") as f:
+with open('../data/experiment2_20160518_1206.pickle',"rb") as f:
     regret2 = pickle.load(f)
     model,eta,mq,T_vals,vary_epsilon,a = setup_regret_vs_T(N,epsilon=None,Tstep=None,TperK=10)
     plot_regret_versus_T(regret2,T_vals,N,a,2)
@@ -380,7 +381,7 @@ epsilon = .3
 #with open("experiment3_{0}.pickle".format(now_string()),"wb") as out:
 #    pickle.dump(regret3, out)
 
-with open('data/experiment3_20160518_0117.pickle',"rb") as f:
+with open('../data/experiment3_20160518_0117.pickle',"rb") as f:
     regret3 = pickle.load(f)
     model,eta,mq,T_vals,vary_epsilon,a = setup_regret_vs_T(N,epsilon=epsilon,Tstep=25,TperK=6)
     plot_regret_versus_T(regret3,T_vals,N,a,3)

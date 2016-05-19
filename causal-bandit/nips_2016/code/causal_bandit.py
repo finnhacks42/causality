@@ -283,6 +283,7 @@ def plot_regret(regret,xvals):
     ax.errorbar(xvals,mean[:,1],yerr=error[:,1], label="Algorithm 1",linestyle="",marker="o",markersize=6)  
     ax.errorbar(xvals,mean[:,0],yerr=error[:,0], label="Algorithm 2",linestyle="",marker="s",markersize=5) 
     ax.errorbar(xvals,mean[:,2],yerr=error[:,2], label="Successive Rejects",linestyle="",marker="D",markersize=5) 
+    ax.set_ylabel(REGRET_LABEL)
     for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] + ax.get_xticklabels() + ax.get_yticklabels()):
         item.set_fontsize(14)
     return fig,ax
@@ -347,7 +348,7 @@ s = time()
 ## Experiment 1
 N = 50
 epsilon = .3
-simulations = 1000
+simulations = 100
 T = 400
 regret,m_vals,T = regret_vs_m(N,epsilon,simulations,T)
 filename = "experiment1_{0}.pickle".format(now_string())
@@ -361,7 +362,7 @@ plot_regret_versus_m(*plot_params)
 
 ## Experiment 2
 N= 50
-simulations = 1000
+simulations = 100
 regret2,T_vals,N,a = regret_vs_T(N,simulations,epsilon=None,Tstep=None,TperK=10)
 filename = "experiment2_{0}.pickle".format(now_string())
 plot_params = (regret2,T_vals,N,a,2)
@@ -374,7 +375,7 @@ plot_regret_versus_T(*plot_params)
 ### Experiment 3
 N = 50
 epsilon = .3
-simulations = 1000
+simulations = 100
 regret3,T_vals,N,a = regret_vs_T(N,simulations,epsilon=epsilon,Tstep=25,TperK=6)
 plot_params = (regret3,T_vals,N,a,3)
 filename = "experiment3_{0}.pickle".format(now_string())
