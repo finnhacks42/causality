@@ -5,11 +5,24 @@ We now consider the more general problem where the graph structure is known, but
 } 
 where $\parents{X_k}$ denotes the parents of $X_k$ and $\delta$ is the dirac delta function. 
 
-We could naively generalize our approach for parallel bandits by observing for $T/2$ rounds, applying the truncated product factorization to write an expression for each $\P{Y|a}$ in terms of observational quantities and explicitly playing the actions for which the observational estimates were poor. However, it is no longer optimal to ignore the information we can learn about the reward for intervening on one variable from rounds in which we act on a different variable. Consider the graph in Figure \ref{fig:causalchain} and suppose each variable deterministically takes the value of its parent, $X_k = X_{k-1}$ for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. We can learn the reward for all the interventions $do(X_i = 1)$ simultaneously by selecting $do(X_1 = 1)$, but not from $do()$. In addition, variance of the observational estimator for $a = do(X_i = j)$ can be high even if $\P{X_i = j}$ is large. Given the causal graph in Figure \ref{fig:causalStructure_confounded}, $\P{Y|do(X_2= j)} = \sum_{X_1}\P{X_1}\P{Y|X_1, X_2 = j}$. Suppose $X_2 = X_1$ deterministically, no matter how large $\P{X_2 = 1}$ is we will never observe $(X_2=1,X_1 = 0)$ and so cannot get a good estimate for $\P{Y|do(X_2=1)}$. 
+We could naively generalize our approach for parallel bandits by observing for $T/2$ rounds, applying the truncated product factorization to 
+write an expression for each $\P{Y|a}$ in terms of observational quantities and explicitly playing the actions for which the observational 
+estimates were poor. However, it is no longer optimal to ignore the information we can learn about the reward for intervening on one variable 
+from rounds in which we act on a different variable. Consider the graph in Figure \ref{fig:causalchain} and suppose each variable deterministically 
+takes the value of its parent, $X_k = X_{k-1}$ for $k\in {2,\ldots,N}$ and $\P{X_1} = 0$. We can learn the reward for all the interventions $do(X_i = 1)$ 
+simultaneously by selecting $do(X_1 = 1)$, but not from $do()$. In addition, variance of the observational estimator for $a = do(X_i = j)$ can be 
+high even if $\P{X_i = j}$ is large. Given the causal graph in Figure \ref{fig:causalStructure_confounded}, $\P{Y|do(X_2= j)} = \sum_{X_1}\P{X_1}\P{Y|X_1, X_2 = j}$. 
+Suppose $X_2 = X_1$ deterministically, no matter how large $\P{X_2 = 1}$ is we will never observe $(X_2=1,X_1 = 0)$ and so cannot 
+get a good estimate for $\P{Y|do(X_2=1)}$. 
 
-To solve the general problem we need an estimator for each action that incorporates information obtained from every other action and a way to optimally allocate samples to actions. To address this difficult problem, we assume the conditional interventional distributions $\P{\parents{Y}|a}$ (but not $\P{Y|a}$) are known. These could be estimated from experimental data on the same covariates but where the outcome of interest differed, such that $Y$ was not included, or similarly from observational data subject to identifiability constraints. Let $\eta$ be a distribution on available interventions $a \in \calA$ so $\eta_a \geq 0$ and $\sum_{a \in \calA} \eta_a = 1$. Define $Q = \sum_{a \in \calA} \eta_a \P{\parents{Y}|a}$ to be the mixture distribution over the interventions with respect to $\eta$.
+To solve the general problem we need an estimator for each action that incorporates information obtained from every other action and a way to optimally 
+allocate samples to actions. To address this difficult problem, we assume the conditional interventional distributions $\P{\parents{Y}|a}$ (but not $\P{Y|a}$) 
+are known. These could be estimated from experimental data on the same covariates but where the outcome of interest differed, such that $Y$ was not included, 
+or similarly from observational data subject to identifiability constraints. Of course this is a somewhat limiting assumption, but seems like a natural place to
+start. The challenge of estimating the conditional distributions for all variables in an optimal way is left as an interesting future direction.
+Let $\eta$ be a distribution on available interventions $a \in \calA$ so $\eta_a \geq 0$ and $\sum_{a \in \calA} \eta_a = 1$. 
+Define $Q = \sum_{a \in \calA} \eta_a \P{\parents{Y}|a}$ to be the mixture distribution over the interventions with respect to $\eta$.
 
-%we firstly note that the causal effect of an action $a$ on $Y$ can be factored into the causal effect of $a$ on the parents of $Y$ and the effect of the parents of $Y$ on $Y$. $\P{Y|a} = \P{Y|\parents{Y}}\P{\parents{Y}|a}$. We then
 
 
 

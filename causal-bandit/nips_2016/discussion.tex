@@ -1,5 +1,5 @@
 Algorithm~\ref{alg:general} for general causal bandit problems adaptively estimates the reward for all allowable interventions $a \in \calA$ over $T$ rounds by sampling and applying interventions from a distribution $\eta$.
-Theorem~\ref{thm:general} shows that this algorithm has (up to log factors) simple regret that is $\bigo{\sqrt{m(\eta)/T}}$ and that the parameter $m(\eta)$ is always less than $N$.
+Theorem~\ref{thm:general} shows that this algorithm has (up to log factors) simple regret that is $\smash{\mathcal O(\sqrt{m(\eta)/T)}}$ and that the parameter $m(\eta)$ is always less than $N$.
 The value of $m(\eta)$ is a uniform bound on the variance of the reward estimators $\hat{\mu}_a$ and, intuitively, problems where all variables' values in the causal model ``occur naturally'' when interventions are sampled from $\eta$ will have low values of $m(\eta)$.
 
 The main practical drawback of Algorithm~\ref{alg:general} is that both the estimator $\hat{\mu}_a$ and the optimal sampling distribution $\eta^*$ (\ie, the one that minimises $m(\eta)$) require knowledge of the conditional distributions $\Pn{a}{\parents{Y}}$ for all $a \in \calA$.
