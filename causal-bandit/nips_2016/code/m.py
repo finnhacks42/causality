@@ -23,12 +23,13 @@ def m2(q):
             return t
 
     
-qs = [np.zeros(10),np.ones(10),np.full(10,.5),np.full(10,.1),np.asarray([0,0,0,0,0,0,0,0,0,.2])]
-for q in qs:
-    print(m1(q),m2(q))
+#qs = [np.zeros(10),np.ones(10),np.full(10,.5),np.full(10,.1),np.asarray([0,0,0,0,0,0,0,0,0,.2])]
+#for q in qs:
+#    print(m1(q),m2(q))
+#
+#for i in range(10000):
+#    q = np.random.uniform(size=20)
+#    if m1(q) != m2(q):
+#        print("Difference",q)
 
-for i in range(10000):
-    q = np.random.uniform(size=20)
-    if m1(q) != m2(q):
-        print("Difference",q)
-
+print m2(np.asarray([0,0,0,.5,.5]))

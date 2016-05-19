@@ -8,7 +8,7 @@
 
 Assume without loss of generality that $q_1 \leq q_2 \leq \ldots \leq q_N \leq 1/2$. The assumption is non-restrictive since all variables
 are independent and permutations of the variables can be pushed to the reward function.
-The proof of Theorem \ref{thm:uq-simple} requires some lemmas, the first of which is an immediate consequence of the Chernoff bound.
+The proof of Theorem \ref{thm:uq-simple} requires some lemmas, the first of which is an immediate consequence of the Chernoff bound (see Exercise 2.10 in \cite{boucheron2013concentration} for this form of the Chernoff bound).
 
 
 \begin{lemma}\label{lem:conc1}
@@ -236,9 +236,9 @@ Therefore
 as required.
 \end{proof}
 
-\subsection{Relationship between $m(\eta)$ and $m(\boldsymbol{q})$}
+\subsection{Relationship between $m(\eta)$ and $m(\boldsymbol{q})$}\label{sec:m-equivelence}
 
-\begin{proposition}\label{pro:m-equivelence} In the parallel bandit setting,
+\begin{proposition} In the parallel bandit setting,
 $m(\eta^*) \leq 2m(\boldsymbol{q})$.
 \end{proposition} 
 
