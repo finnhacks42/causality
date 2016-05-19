@@ -25,14 +25,17 @@ We show that our causal bandit framework subsumes the classical bandits (no addi
 Our focus is on the simple regret, which measures the difference between the return of the optimal action and that of the action chosen by the algorithm after $T$ rounds.
 In \S\ref{sec:simple-regret} we analyse a specific family of causal bandit problems that we call \emph{parallel bandit} problems in which $N$ factors affect the reward independently and there are $2N$ possible interventions.
 We propose a simple causal best arm identification algorithm for this problem and show that up to logarithmic factors it enjoys minimax optimal
-simple regret guarantees of $\tilde\Theta(\sqrt{m/T})$ where $m$ depends on the causal model and may be much smaller than $N$.
-In contrast, existing best arm identification algorithms suffer $\Omega(\sqrt{N/T})$ simple regret (Thm. 4 by \citet{audibert2010best}).
+simple regret guarantees of $\smash{\tilde\Theta(\sqrt{m/T})}$ where $m$ depends on the causal model and may be much smaller than $N$.
+In contrast, existing best arm identification algorithms suffer $\smash{\Omega(\sqrt{N/T})}$ simple regret (Thm. 4 by \citet{audibert2010best}).
 This shows theoretically the value of our framework over the traditional bandit problem. 
 Experiments in \S\ref{sec:experiments} further demonstrate the value of causal models in this framework.
 
 In the general casual bandit problem interventions and observations may have a complex relationship. 
-In \S\ref{sec:simple-regret-general} we propose a new algorithm inspired by importance-sampling that a) enjoys sub-linear regret equivalent to the optimal rate in the parallel bandit setting and b) captures many of the intricacies of sharing information in a causal graph in the general case.
-As in the parallel bandit case, the regret guarantee is often significantly better than $O(\sqrt{N/T})$ and never worse, where $N$ is the number of available interventions. 
+In \S\ref{sec:simple-regret-general} we propose a new algorithm inspired by importance-sampling that a) enjoys sub-linear regret equivalent 
+to the optimal rate in the parallel bandit setting and b) captures many of the intricacies of sharing information in a causal graph in the general case.
+As in the parallel bandit case, the regret guarantee scales like $\smash{O(\sqrt{m/T})}$ where $m$ depends on the underlying causal structure, with 
+smaller values corresponding to structures that are easier to learn. The value of $m$ is always less than the number of interventions $N$ and in the special
+case of the parallel bandit (where we have lower bounds) the notions are equivalent.
 
 \paragraph{Related Work} As alluded to above, causal bandit problems with $N$ possible interventions can be treated as a classical $N$-armed bandit problem by simply ignoring the causal model and extra observations that are revealed each round. In the farming example, the farmer could treat the six possible interventions as arms, ignore the observations of the non-intervened variables and apply an existing best-arm identificaion algorithm with well understood simple regret guarantees \citep{Jamieson2013}. However, as we show in \S\ref{sec:simple-regret}, this approach ignores the extra information available in the non-intervened variables and subsequently yields sub-optimal performance.
 
