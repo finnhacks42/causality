@@ -8,8 +8,7 @@
 
 Assume without loss of generality that $q_1 \leq q_2 \leq \ldots \leq q_N \leq 1/2$. The assumption is non-restrictive since all variables
 are independent and permutations of the variables can be pushed to the reward function.
-The proof of Theorem \ref{thm:uq-simple} requires some lemmas, the first of which is an immediate consequence of the Chernoff bound (see Exercise 2.10 in \cite{boucheron2013concentration} for this form of the Chernoff bound).
-
+The proof of Theorem \ref{thm:uq-simple} requires some lemmas. \
 
 \begin{lemma}\label{lem:conc1}
 Let $i \in \set{1,\ldots, N}$ and $\delta > 0$. Then
@@ -18,8 +17,19 @@ Let $i \in \set{1,\ldots, N}$ and $\delta > 0$. Then
 }
 \end{lemma}
 
+\begin{proof}
+By definition, $\hat{q}_i = \frac{2}{T}\sum_{t=1}^{T/2}X_{t,i}$, where $X_{t,i} \sim Bernoulli(q_i)$. Therefore from the Chernoff bound (see equation 6 in \cite{hagerup1990guided}),
+
+\eq{
+\P{\left|\hat q_i - q_i\right| \geq \epsilon} \leq 2e^{-\frac{T\epsilon^2}{6q_i}}
+}
+
+Letting $\delta = 2e^{-\frac{T\epsilon^2}{6q_i}}$ and solving for $\epsilon$ completes the proof.
+
+\end{proof}
+
 \begin{lemma}\label{lem:conc2}
-Let $X_1,X_2\ldots,$ be a sequence of random variables with $X_i \in [0,1]$ and $\EE X_i = p$ and $\delta \in [0,1]$.
+Let $X_1,X_2\ldots,$ be a sequence of random variables with $X_i \in [0,1]$ and $\EE[X_i] = p$ and $\delta \in [0,1]$.
 Then 
 \eq{
 \P{\exists t \geq n_0 : \left|\frac{1}{t} \sum_{s=1}^t X_s - p\right| \geq \sqrt{\frac{2}{n_0} \log \frac{2}{\delta}}} \leq 4\delta\,.
