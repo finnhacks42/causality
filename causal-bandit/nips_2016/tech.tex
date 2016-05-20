@@ -187,29 +187,31 @@ as required.
 
 \begin{proof}
 First note that $X_t, Y_t$ are sampled from $\operatorname{Q}$.
-W define $Z_a(X_t) = Y_t R_a(X_t)\ind{R_a(X_t)\leq B_a}$ and abbreviate $Z_{at} = Z_a(X_t)$ and $R_{at} = R_a(X_t)$.
+W define $Z_a(X_t) = Y_t R_a(X_t)\ind{R_a(X_t)\leq B_a}$ and abbreviate $Z_{at} = Z_a(X_t)$, $R_{at} = R_a(X_t)$ and $\Pn{a}{.} = \Pns{a}{.}$.
 By definition we have $|Z_{at}| \leq B_a$ and 
 \eq{
 \Var_Q[Z_{at}] 
 \leq \EE_Q[Z_{at}^2] 
-\leq \EEa\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right] 
+\leq \EE_Q[R_{at}^2]
+= \EEa[R_{at}]
+= \EEa\left[\frac{\Pns{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right] 
 \leq m(\eta)\,.
 }
 Checking the expectation we have
 \eq{
 \EE_Q[Z_{at}] 
 = \EEa \left[Y \ind{R_{at} \leq B_a}\right] 
-= \EEa Y - \EEa \left[Y\ind{R_a > B_a}\right] 
+= \EEa Y - \EEa \left[Y\ind{R_{at} > B_a}\right] 
 = \mu_a - \beta_a\,,
 }
 where 
 \eq{
-0 \leq \beta_a = \EEa[Y \ind{R_a > B_a}] \leq \Pn{a}{R_a(X) > B_a}
+0 \leq \beta_a = \EEa[Y \ind{R_{at} > B_a}] \leq \Pns{a}{R_{at} > B_a}
 }
 is the negative bias. 
 The bias may be bounded in terms of $m(\eta)$ via an application of Markov's inequality.
 \eq{
-\beta_a \leq \Pn{a}{R_a(X) > B_a} \leq \frac{\EEa[R_a(X)]}{B_a} \leq \frac{m(\eta)}{B_a}\,.
+\beta_a \leq \Pns{a}{R_{at} > B_a} \leq \frac{\EEa[R_{at}]}{B_a} \leq \frac{m(\eta)}{B_a}\,.
 }
 Let $\epsilon_a > 0$ be given by
 \eq{
