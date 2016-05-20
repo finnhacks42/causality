@@ -187,7 +187,7 @@ as required.
 
 \begin{proof}
 First note that $X_t, Y_t$ are sampled from $\operatorname{Q}$.
-W define $Z_a(X_t) = Y_t R_a(X_t)\ind{R_a(X_t)\leq B_a}$ and abbreviate $Z_{at} = Z_a(X_t)$, $R_{at} = R_a(X_t)$ and $\Pn{a}{.} = \Pns{a}{.}$.
+We define $Z_a(X_t) = Y_t R_a(X_t)\ind{R_a(X_t)\leq B_a}$ and abbreviate $Z_{at} = Z_a(X_t)$, $R_{at} = R_a(X_t)$ and $\Pn{a}{.} = \Pns{a}{.}$.
 By definition we have $|Z_{at}| \leq B_a$ and 
 \eq{
 \Var_Q[Z_{at}] 
@@ -215,14 +215,16 @@ The bias may be bounded in terms of $m(\eta)$ via an application of Markov's ine
 }
 Let $\epsilon_a > 0$ be given by
 \eq{
-\epsilon = \sqrt{\frac{2m(\eta)}{T} \log\left(2T|\calA|\right)} + \frac{3B_a}{T} \log\left(2T|\calA|\right)\,.
+\epsilon_a = \sqrt{\frac{2m(\eta)}{T} \log\left(2T|\calA|\right)} + \frac{3B_a}{T} \log\left(2T|\calA|\right)\,.
 }
 Then by the union bound and Bernstein's inequality 
 \eq{
-\P{\text{exists } a \in \calA : \left|\hat \mu_a - \EE_Q[\hat \mu_a]\right| \geq \epsilon_a} 
-\leq \sum_{a \in \calA} \P{\left|\hat \mu_a - \EE_Q[\hat \mu_a]\right| \geq \epsilon_a} \leq \frac{1}{T}\,.
+\P{\text{exists } a \in \calA : \left|\hat \mu_a - \EE_Q[Z_{at}]\right| \geq \epsilon_a} 
+\leq \sum_{a \in \calA} \P{\left|\hat \mu_a - \EE_Q[Z_{at}]\right| \geq \epsilon_a} \leq \frac{1}{T}\,.
 }
-Assuming this event does not occur and letting $a^* = \argmax_{a \in \calA} \mu_a$ we have
+
+Let $I = \hat{a}^*_T$ be the action selected by the algorithm, $a^* = \argmax_{a \in \calA} \mu_a$ be the true optimal action and recall that $\EE_Q[Z_{at}] = \mu_a - \beta_a$. Assuming the above event does not occur we have,
+
 \eq{
 \mu_I \geq \hat \mu_I - \epsilon_I  
 \geq \hat \mu_{a^*} - \epsilon_I  
