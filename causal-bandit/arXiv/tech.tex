@@ -1,0 +1,314 @@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PROOF OF SIMPLE REGRET UPPER BOUND
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Proof of Theorem \ref{thm:uq-simple}}\label{sec:thm:uq-simple}
+
+
+Assume without loss of generality that $q_1 \leq q_2 \leq \ldots \leq q_N \leq 1/2$. The assumption is non-restrictive since all variables
+are independent and permutations of the variables can be pushed to the reward function.
+The proof of Theorem \ref{thm:uq-simple} requires some lemmas. \
+
+\begin{lemma}\label{lem:conc1}
+Let $i \in \set{1,\ldots, N}$ and $\delta > 0$. Then
+\eq{
+\P{\left|\hat q_i - q_i\right| \geq \sqrt{\frac{6q_i}{T} \log \frac{2}{\delta}}} \leq \delta\,.
+}
+\end{lemma}
+
+\begin{proof}
+By definition, $\hat{q}_i = \frac{2}{T}\sum_{t=1}^{T/2}X_{t,i}$, where $X_{t,i} \sim Bernoulli(q_i)$. Therefore from the Chernoff bound (see equation 6 in \cite{hagerup1990guided}),
+
+\eq{
+\P{\left|\hat q_i - q_i\right| \geq \epsilon} \leq 2e^{-\frac{T\epsilon^2}{6q_i}}
+}
+
+Letting $\delta = 2e^{-\frac{T\epsilon^2}{6q_i}}$ and solving for $\epsilon$ completes the proof.
+
+\end{proof}
+
+\begin{lemma}\label{lem:conc2}
+Let $X_1,X_2\ldots,$ be a sequence of random variables with $X_i \in [0,1]$ and $\EE[X_i] = p$ and $\delta \in [0,1]$.
+Then 
+\eq{
+\P{\exists t \geq n_0 : \left|\frac{1}{t} \sum_{s=1}^t X_s - p\right| \geq \sqrt{\frac{2}{n_0} \log \frac{2}{\delta}}} \leq 4\delta\,.
+}
+\end{lemma}
+
+\begin{proof}
+For $\delta \geq 1/4$ the result is trivial. Otherwise 
+by Hoeffding's bound and the union bound:
+\eq{
+\P{\exists t \geq n_0 : \left|\frac{1}{t} \sum_{s=1}^t X_s - p\right| \geq \sqrt{\frac{2}{n_0} \log \frac{2}{\delta}}} 
+&\leq \sum_{t = n_0}^\infty \P{\left|\frac{1}{t} \sum_{s=1}^t X_s - p\right| \geq \sqrt{\frac{2}{n_0} \log \frac{2}{\delta}}} \\
+&\leq 2\sum_{t=n_0}^\infty \exp\left(-\frac{t}{n_0} \log \frac{2}{\delta}\right) 
+\leq 4\delta\,. \qedhere
+}
+\end{proof}
+
+
+
+\begin{lemma}\label{lem:m_est}
+Let $\delta \in (0,1)$ and assume $T \geq 48m \log\frac{2N}{\delta}$. Then
+\eq{
+\P{2m(\vec{q}) / 3 \leq m(\vec{\hat q}) \leq 2m(\vec{q})} \geq 1 - \delta\,.
+}
+\end{lemma}
+
+\begin{proof}
+Let $F$ be the event that there exists and $1 \leq i \leq N$ for which
+\eq{
+\left|\hat q_i - q_i\right| \geq \sqrt{\frac{6q_i}{T} \log \frac{2N}{\delta}}\,.
+}
+Then by the union bound and Lemma \ref{lem:conc1} we have $\P{F} \leq \delta$. The result will be completed by showing that
+when $F$ does not hold we have $2m(\vec{q})/3 \leq m(\vec{\hat q}) \leq 2m(\vec{q})$.
+From the definition of $m(\vec{q})$ and our assumption on $\vec{q}$ we have for $i > m$ that $q_i \geq q_m \geq 1/m$ and so by Lemma \ref{lem:conc1} we have
+\eq{
+\frac{3}{4} 
+&\geq \frac{1}{2} + \sqrt{\frac{3}{T} \log \frac{2N}{\delta}} 
+\geq q_i + \sqrt{\frac{6q_i}{T} \log \frac{2N}{\delta}} 
+\geq \hat q_i \\
+&\geq q_i - \sqrt{\frac{6q_i}{T} \log \frac{2N}{\delta}}
+\geq q_i - \sqrt{\frac{q_i}{8m}}
+\geq \frac{1}{2m}\,.
+}
+Therefore by the pigeonhole principle we have $m(\vec{\hat q}) \leq 2m$.
+For the other direction we proceed in a similar fashion. Since the failure event $F$ does not hold we have for $i \leq m$ that
+\eq{
+\hat q_i 
+\leq q_i + \sqrt{\frac{6q_i}{T} \log\frac{2N}{\delta}} 
+\leq \frac{1}{m} \left(1 + \sqrt{\frac{1}{8}}\right)
+\leq \frac{3}{2m}\,.
+}
+Therefore $m(\vec{\hat q}) \geq 2m(\vec{q}) / 3$ as required. 
+\end{proof}
+
+\begin{proof}[Proof of Theorem \ref{thm:uq-simple}]
+Let $\delta = m = m(\vec{q}) / N$. Then by Lemma \ref{lem:m_est} we have 
+\eq{
+\P{2m/3 \leq m(\vec{\hat q}) \leq 2m} \geq 1 - \delta\,.
+}
+Recall that $A = \set{a \in \actions : \hat p_a \leq 1/m(\vec{\hat q})}$. Then
+for $a \in A$ the algorithm estimates $\mu_a$ from $T/(2m(\vec{\hat q})) \geq T/(4m)$ samples.
+Therefore by Hoeffding's inequality and the union bound we have
+\eq{
+\P{\exists a \in A : |\mu_a - \hat \mu_a| \geq \sqrt{\frac{8m}{T} \log\frac{2N}{\delta}}} \leq \delta\,.
+}
+For arms not in $a$ we have $\hat p_a \geq 1/m(\vec{\hat q}) \geq 1/(2m)$.
+Therefore if $a = do(X_i = j)$, then 
+\eq{
+\hat p_a = \frac{2}{T} \sum_{t=1}^{T/2} \ind{X_i = j} \geq \frac{1}{2m}\,. 
+}
+Therefore $\sum_{t=1}^{T/2} \ind{X_{t,i} = j} \geq T/4m$
+and by Lemma \ref{lem:conc2} we have
+\eq{
+\P{\sum_{t=1}^{T/2} \ind{X_i = j} \geq \frac{T}{4m} \text{ and } \left|\hat \mu_a - \mu_a\right| \geq \sqrt{\frac{8m}{T} \log \frac{2N}{\delta}}} \leq 4\delta / N\,.
+}
+Therefore with probability at least $1 - 6\delta$ we have
+\eq{
+(\forall a \in \actions) \qquad |\hat \mu_a - \mu_a| \leq \sqrt{\frac{8m}{T} \log \frac{N}{\delta}} = \epsilon\,.
+}
+If this occurs, then 
+\eq{
+\mu_{\hat a^*_T} \geq \hat \mu_{\hat a^*_T} - \epsilon \geq \hat \mu_{a^*} - \epsilon \geq \mu_{a^*} - 2\epsilon\,.
+}
+Therefore
+\eq{
+\mu^* - \EE[\mu_{\hat a^*_T}] 
+\leq 6\delta + \epsilon 
+\leq \frac{6m}{T} + \sqrt{\frac{32m}{T} \log \frac{NT}{m}}\,, 
+}
+which completes the result.
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LOWER BOUND
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Proof of Theorem \ref{thm:lower}}\label{sec:thm:lower}
+
+We follow a relatively standard path by choosing multiple environments that have different optimal arms, but which cannot all be statistically
+separated in $T$ rounds.
+Assume without loss of generality that $q_1 \leq q_2 \leq \ldots \leq q_N \leq 1/2$.
+For each $i$ define reward function $r_i$ by
+\eq{
+r_0(\boldsymbol{X}) &= \frac{1}{2} &
+r_i(\boldsymbol{X}) &= \begin{cases}
+\frac{1}{2} + \epsilon & \text{if } X_i = 1 \\
+\frac{1}{2} & \text{otherwise}\,,
+\end{cases}
+}
+where $1/4 \geq \epsilon > 0$ is some constant to be chosen later.
+We abbreviate $R_{T,i}$ to be the expected simple regret incurred when interacting with the
+environment determined by $\boldsymbol{q}$ and $r_i$. Let $\operatorname{P}_i$ be the corresponding measure
+on all observations over all $T$ rounds and $\EE_i$ the expectation with respect to $\operatorname{P}_i$. By Lemma 2.6 by \citet{Tsy08} we have
+\eq{
+\Prz{\hat a^*_T = a^*} + \Pri{\hat a^*_T \neq a^*} \geq \exp\left(-\KL(\operatorname{P}_0, \operatorname{P}_i)\right)\,,
+}
+where $\KL(\Ps_0, \Ps_i)$ is the KL divergence between measures $\operatorname{P}_0$ and $\operatorname{P}_i$.
+Let $T_i(T) = \sum_{t=1}^T \ind{a_t = do(X_i = 1)}$ be the total number of times the learner intervenes on variable $i$ by setting it to $1$.
+Then for $i \leq m$ we have $q_i \leq 1/m$ and the KL divergence between $\Ps_0$ and $\Ps_i$ may be bounded using the telescoping property (chain rule) and
+by bounding the local KL divergence by the $\chi$-squared distance as by \citet{Auer1995}. This leads to 
+\eq{
+\KL(\Ps_0, \Ps_i) 
+&\leq 6\epsilon^2 \EE_0\left[\sum_{t=1}^T \ind{X_{t,i} = 1}\right] 
+\leq 6\epsilon^2 \left(\EE_0 T_i(T) + q_i T\right) 
+\leq 6\epsilon^2 \left(\EE_0 T_i(T) + \frac{T}{m}\right)\,.
+}
+Define set $A = \set{i \leq m : \EE_0 T_i(T) \leq 2T / m}$.
+Then for $i \in A$ and choosing $\epsilon = \min\set{1/4, \sqrt{m/(18T)}}$ we have
+\eq{
+\KL(\Ps_0, \Ps_i) \leq \frac{18T\epsilon^2}{m} = 1\,. 
+}
+Now $\sum_{i=1}^m \EE_0 T_i(T) \leq T$, which implies that $|A| \geq m/2$.
+Therefore
+\eq{
+\sum_{i \in A} \Pri{\hat a^*_T \neq a} 
+\geq \sum_{i \in A} \exp\left(-\KL(\Ps_0, \Ps_i)\right) - 1
+\geq \frac{|A|}{e} - 1 
+\geq \frac{m}{2e} - 1\,.
+}
+Therefore there exists an $i \in A$ such that
+$\Pri{\hat a^*_T \neq a^*} \geq \frac{\frac{m}{2e} - 1}{m}$. 
+Therefore if $\epsilon < 1/4$ we have
+\eq{
+R_{T,i} \geq \frac{1}{2} \Pn{i}{\hat a^*_T \neq a^*} \epsilon \geq \frac{\frac{m}{2e} - 1}{2m} \sqrt{\frac{m}{18T}}\,.
+}
+Otherwise $m \geq 18T$ so $\sqrt{m/T} = \Omega(1)$ and
+\eq{
+R_{T,i} \geq \frac{1}{2} \Pn{i}{\hat a^*_T \neq a^*} \epsilon \geq \frac{1}{4} \frac{\frac{m}{2e} - 1}{2m} \in \Omega(1) 
+}
+as required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% GENERAL-GRAPH UPPER BOUND
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Proof of Theorem \ref{thm:general}}\label{sec:thm:general}
+
+\begin{proof}
+First note that $X_t, Y_t$ are sampled from $\operatorname{Q}$.
+We define $Z_a(X_t) = Y_t R_a(X_t)\ind{R_a(X_t)\leq B_a}$ and abbreviate $Z_{at} = Z_a(X_t)$, $R_{at} = R_a(X_t)$ and $\Pn{a}{.} = \Pns{a}{.}$.
+By definition we have $|Z_{at}| \leq B_a$ and 
+\eq{
+\Var_Q[Z_{at}] 
+\leq \EE_Q[Z_{at}^2] 
+\leq \EE_Q[R_{at}^2]
+= \EEa[R_{at}]
+= \EEa\left[\frac{\Pns{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right] 
+\leq m(\eta)\,.
+}
+Checking the expectation we have
+\eq{
+\EE_Q[Z_{at}] 
+= \EEa \left[Y \ind{R_{at} \leq B_a}\right] 
+= \EEa Y - \EEa \left[Y\ind{R_{at} > B_a}\right] 
+= \mu_a - \beta_a\,,
+}
+where 
+\eq{
+0 \leq \beta_a = \EEa[Y \ind{R_{at} > B_a}] \leq \Pns{a}{R_{at} > B_a}
+}
+is the negative bias. 
+The bias may be bounded in terms of $m(\eta)$ via an application of Markov's inequality.
+\eq{
+\beta_a \leq \Pns{a}{R_{at} > B_a} \leq \frac{\EEa[R_{at}]}{B_a} \leq \frac{m(\eta)}{B_a}\,.
+}
+Let $\epsilon_a > 0$ be given by
+\eq{
+\epsilon_a = \sqrt{\frac{2m(\eta)}{T} \log\left(2T|\calA|\right)} + \frac{3B_a}{T} \log\left(2T|\calA|\right)\,.
+}
+Then by the union bound and Bernstein's inequality 
+\eq{
+\P{\text{exists } a \in \calA : \left|\hat \mu_a - \EE_Q[Z_{at}]\right| \geq \epsilon_a} 
+\leq \sum_{a \in \calA} \P{\left|\hat \mu_a - \EE_Q[Z_{at}]\right| \geq \epsilon_a} \leq \frac{1}{T}\,.
+}
+
+Let $I = \hat{a}^*_T$ be the action selected by the algorithm, $a^* = \argmax_{a \in \calA} \mu_a$ be the true optimal action and recall that $\EE_Q[Z_{at}] = \mu_a - \beta_a$. Assuming the above event does not occur we have,
+
+\eq{
+\mu_I \geq \hat \mu_I - \epsilon_I  
+\geq \hat \mu_{a^*} - \epsilon_I  
+\geq \mu^* - \epsilon_{a^*} - \epsilon_I - \beta_{a^*}\,. 
+}
+By the definition of the truncation
+we have
+\eq{
+\epsilon_a \leq \left(\sqrt{2} + 3\right)\sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)}
+}
+and
+\eq{
+\beta_a \leq \sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)}\,. 
+}
+Therefore for $C = \sqrt{2} + 4$ we have
+\eq{
+\P{\mu_I \geq \mu^* - C \sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)}} \leq \frac{1}{T}\,.
+}
+Therefore
+\eq{
+\mu^* - \EE[\mu_I] \leq C \sqrt{\frac{m(\eta)}{T} \log\left(2T|\calA|\right)} + \frac{1}{T}
+}
+as required.
+\end{proof}
+
+\subsection{Relationship between $m(\eta)$ and $m(\boldsymbol{q})$}\label{sec:m-equivelence}
+
+\begin{proposition} In the parallel bandit setting,
+$m(\eta^*) \leq 2m(\boldsymbol{q})$.
+\end{proposition} 
+
+\begin{proof}
+
+Recall that in the parallel bandit setting,
+
+\eq{
+\mathcal{A} = \set{do()} \cup \set{ do(X_i = j) \colon 1 \leq i \leq N \text{ and } j \in \set{0,1}}
+}
+
+Let:
+
+\eq {
+\eta_a = \ind{\P{X_i = j} < \frac{1}{m(\boldsymbol{q})}}\frac{1}{2m(\boldsymbol{q})} \text { for } a \in do(X_i = j)
+}
+
+Let $D =\sum_{a\in do(X_i=j)}\eta_a$. From the definition of $m(\boldsymbol{q})$, 
+\eq {
+\sum_{a\in do(X_i=j)} \ind{\P{X_i = j} < \frac{1}{m(\boldsymbol{q})}} \leq m(\boldsymbol{q}) \implies D \leq \frac{1}{2}
+}
+ 
+Let $\eta_a = \frac{1}{2} + (1-D)$ for $a = do()$ such that $\sum_{a \in \calA}\eta_a = 1$ 
+
+Recall that,
+
+\eq{
+m(\eta) &
+= \max_a \EEa\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right]
+}
+
+We now show that our choice of $\eta$ ensures $\EEa\left[\frac{\Pn{a}{\parents{Y}(X)}}{\Q{\parents{Y}(X)}}\right] \leq 2m(\boldsymbol{q})$ for all actions $a$.
+
+For the actions $a: \eta_a > 0$, ie $do()$ and $do(X_i = j):\P{X_i=j}<\frac{1}{m(\boldsymbol{q})}$,
+\eq{
+\EEa\left[\frac{\Pn{a}{X_1...X_N}}{\sum_{b}\eta_b\Pn{b}{X_1...X_N}}\right] \leq \EEa\left[\frac{\Pn{a}{X_1...X_N}}{\eta_a\Pn{a}{X_1...X_N}}\right] = \EEa\left[\frac{1}{\eta_a}\right] \leq 2m(\boldsymbol{q})
+}
+
+For the actions $a :\eta_a = 0$, ie $do(X_i=j):\P{X_i=j}\geq\frac{1}{m(\boldsymbol{q})}$,
+\eq{
+\EEa\left[\frac{\Pn{a}{X_1...X_N}}{\sum_{b}\eta_b\Pn{b}{X_1...X_N}}\right] \leq & \EEa\left[\frac{\ind{X_i=j}\prod_{k\neq i}\P{X_k}}{(1/2+D)\prod_k \P{X_k}}\right] \\=& \EEa\left[\frac{\ind{X_i=j}}{(1/2+D)\P{X_i = j}}\right]
+\leq  \EEa\left[\frac{\ind{X_i=j}}{(1/2)(1/m(\boldsymbol{q}))}\right] \leq 2m(\boldsymbol{q})
+}
+
+Therefore $m(\eta*) \leq m(\eta) \leq 2m(\boldsymbol{q})$ as required.
+
+\end{proof}
+\
+%in the parallel bandit setting the $m(\eta)$ given in this section approximately coincides with the $m(\vec{q})$ in Eq.\ \ref{eq:m-simple}.
+%Recall in that setting that 
+%\eq{
+%\actions = \set{do()} \cup \set{do(X_i = j) : 1 \leq i \leq N \text{ and } j \in \set{0,1}}\,.
+%}
+%For $a = do()$ choose $\eta_a = 1/2$. 
+%Let $m = m(\vec{q})$ and note that, by definition, there are at most $m$ pairs $(i,j)$ such that $\P{X_i = j} \leq 1/m$.
+%Thus, for $a = do(X_i = j)$ letting $\eta_a \propto \ind{\P{X_i = j} \leq 1/m} / (2m)$ guarantees $\eta_a \ge \frac{1}{2m}$ when $\eta_a \ne 0$.
+%It is then easy to check that $m(\eta) \leq 2m$ using an argument like that for Proposition~\ref{pro:m-bound}.
+
+

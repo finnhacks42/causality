@@ -131,7 +131,7 @@
 \newtheorem{definition}{Definition}[section]
 \maketitle
 
-\section{Introduction}
+\section{Problem Summary}
 
 Learning the outcome of an action is central to many real world problems. Does de-worming children in poor countries improve health and educational outcomes \cite{miguel2004,davey2015}? Would increasing the minimum wage lead to higher unemployment? Will offering this customer a discount improve my revenue? These questions are difficult as they require more than identifying a pattern in data.  There are two, very different, approaches to this problem within the machine learning community: reinforcement learning and causal inference. 
 
@@ -141,6 +141,7 @@ Causal inference makes use of assumptions to allow the outcome of actions to be 
 
 Both approaches can be seen as extensions to the concept of randomised controlled trials. Bandit algorithms deal with the sequential nature of the decision making process, causal inference with the problem that full randomisation is not always feasible, affordable or ethical. The similarities between the problems that these techniques have been developed to address raises the question of if there are problems best addressed by a combination of these approaches and how they can be combined. The goal of my thesis is to explore these questions. In the next sections I review the key literature in causal inference and bandits. I then present a general approach to  how causal models might be incorporated into bandit settings and conclude by demonstrating an algorithm that leverages causal assumptions to improve performance in a specific bandit setting. 
 
+\part{Literature review}
 \section{Causal Inference}
 
 \subsection{Models of causality and intervention}
@@ -296,7 +297,21 @@ Another problem that has attracted a lot of recent attention \cite{Bubeck2009,Au
 
 The classic multi-armed bandit is a powerful tool for sequential decision making. However, the regret grows linearly with the number of (sub-optimal) actions and many real world problems have large or even infinite action spaces. This has led to the development of a wide range of models that assume some structure across the reward distributions for different arms, for example generalized linear bandits \cite{filippi2010parametric}, dependent bandits \cite{Pandey2007}, X-armed bandits \cite{Bubeck2010} and gaussian process bandits \cite{srinivas2009gaussian}, or that consider more complex feedback, for example the recent work on graph feedback \cite{Mannor2011,Lelarge2012,Alon2013,Buccapatnam2014,Kocak2014,Alon2015} and partial monitoring \cite{Piccolboni2001,Bartok2014}. 
 
+\part{Approach and expected outcomes}
+
+The goal of my research is to explore a number of questions around learning to make good decisions. 
+
+\begin{itemize}
+\item Develop a framework to unify concepts causal inference concepts with reinforcement learning, starting with multi-armed bandits.(DONE - see section \ref{sec:unificaition})
+\item Demonstrate combining concepts from causal inference with multi-armed bandit algorithms can improve on state of the art performance in sequential decision making (DONE - paper submitted for NIPS 2016)
+\item Causal privacy paper
+
+\item something about identifiability
+\end{itemize}
+
+
 \section{Unifying the frameworks}
+\label{sec:unificaition}
 
 A natural way to connect the causal framework with the bandit setting is to model the problem as a causal directed acyclic graph. Each possible assignment of variables to values is an action (bandit arm). See figure \ref{fig:unify_frameworks} for a simple example. The reward could be a general function of the action selected and the final state of the graph. However for simplicity, we will consider the reward to be the value of a single specified node minus the cost of the selected action. The number of actions or arms grows exponentially with the number of variables in the graph, making it important to use algorithms that take account of the graph structure to reduce the search space. 
 
@@ -376,114 +391,112 @@ We only get this form of side information for actions that don't specify the val
 If the information on the value of additional nodes is available prior to selecting an action the problem resembles a contextual bandit. For example if we observe $A = 0$ then, in deciding between the actions $do(B=0)$ and $do(B=1)$, we would want information on $P(Y|A=0,B=0)$ and $P(Y|A=0,B=1)$.  Note, side information can still arise if we learn the value of some variables prior to selecting an action and some afterwards. 
 
 
-\subsection{Incorporating side information induced by casual graph}
-
-As a first step towards more general problems, we develop and evaluate a bandit algorithm that incorporates the side information induced by a specific causal graph. 
-
-Assume we have a known causal model with binary variables $\boldsymbol{X} = \{X_{1}..X_{N}\}$ that independently cause a target variable of interest $Y$, figure \ref{fig:causalStructure}. This is an expansion of the model shown in figure \ref{fig:unify_frameworks}. We can run sequential experiments on the system, where at each timestep $t$ we can either do nothing, $do()$, or select a single variable, $X_i$, on which to intervene, $do(X_{t,i} = J_t)$, and subsequently observe the complete result, $(\boldsymbol{X}_{t},Y_{t})$. 
-
-As an example, consider a farmer wishing to optimize the yield of her crop. She can invest in a green house to control temperature, a watering system to control soil moisture, fertilizers to set soil nutrients, etc. We assume only a single intervention is feasible due to cost and that each of these variables are independent of one-another (this may not always be the case - temperature could be related to rainfall for example). After having selected which variable to control, she plants her crops and observes the values of the remaining input variables and the yield. This repeats across many growing seasons, and the goal is to maximize the total cumulative yield.
-
-\begin{figure}[h]
-\centering
-\caption{Assumed Causal Structure}
-\label{fig:causalStructure}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
-  thick,main node/.style={observed}, hidden/.style={empty},tg/.style={target}]
-
- %nodes
-\node[main node](1){$X_{1}$};
-\node[main node, right=of 1](2){$X_{2}$};
-\node[hidden, right=of 2](3){$...$};
-\node[main node, right=of 3](4){$X_{N}$};
-\node[tg, below right=of 2](5){Y};
- \path[every node/.style={font=\sffamily\small}]
-    (1) edge (5)
-    	(2) edge (5)
-    (4) edge (5);
-	
-\end{tikzpicture}
-\end{figure}
-
-
-Let $\boldsymbol{q} \in [0,1]^N$ be a fixed vector where $q_i = P(X_i = 1)$. In each time-step $t$ upto a known horizon $T$:
- 
-\begin{enumerate}
-\item The learner chooses an $I_t \in \set{0,\ldots, N}$ and $J_t \in \set{0,1}$, where $I_t = 0$ represents $do()$.
-
-\item Variables not set by the learner take their values probabilistically according to $\boldsymbol{q}$ 
-\eq{
-X_{t,i} = \begin{cases}
-\sim \Ber(q_i) &\text{if } i \neq I_t \\
-J_t & \text{otherwise}\,.
-\end{cases}
-}
-\item The learner observes $(\boldsymbol{X}_{t},Y_{t})$ and receives reward $Y_t \sim \Ber(r(\boldsymbol{X}_{t}))$ where $r:\set{0,1}^N \to [0,1]$ is unknown and arbitrary. 
-\end{enumerate}
-
-The problem could be treated as a standard bandit problem with $K = 2N + 1$ arms, 
-
-\eq {
-\{do(), do(X_1=0), do(X_1 = 1)\;\; ... \;\;do(X_N = 1)\}
-}
-
-yielding a regret $\bigo{\sqrt{TN}}$. However, this doesn't leverage the side information induced by the causal structure: 
-
-\eqn {
-\label{eq:observe}
-P(Y_t|do(X_{i,t} = j)) &= P(Y_t|do(),X_{i,t} = j) \\
-\label{eq:estimation_transfer}
-&= P(Y_t|do(X_{l,t}=0),X_{i,t}=j)(1-q_l)+P(Y_t|do(X_{l,t}=1),X_{i,t}=j)q_l 
-}
-
-The hardness of this problem depends strongly on the vector $\boldsymbol{q}$. This is intuitive from a consideration of the extreme cases. If $\boldsymbol{q} = \boldsymbol{0}$ (or $\boldsymbol{1}$), then half of the actions we wish to explore will only occur if we explicitly select them. For these actions we get no side information by playing other actions. So at best we could expect a factor of two improvement over simply running a standard bandit algorithm. If $\boldsymbol{q} = \boldsymbol{\frac{1}{2}}$, the observe action, $do()$, effectively becomes a revealing action and we would anticipate obtaining a regret with minimal dependence on the number of variables $N$. 
-
-We consider a simple explore-exploit based algorithm, that will explore for $h$ timesteps, sampling actions in a way that depends on $\boldsymbol{q}$. We then select the arm with the highest expected reward for the remaining $T-h$ time steps. During the exploration phase, we will balance purely observing, $I_t = 0$, which takes advantage of equation \ref{eq:observe} to reveal the reward for frequently occurring arms, with explicit sampling of infrequently occurring arms. 
-
-Without loss of generality, we can assume $q_i \in [0,\frac{1}{2}]$ and $q_1 \leq q_2 ... \leq q_N$. Let:
-
-\eqn {
-m \in [2,N] = \set{m:q_m > \frac{1}{m}}
-}
-
-$m$ is a measure of the number of infrequently occurring arms. If the problem is completely balanced $q_1...q_N = \frac{1}{2}$ then $m = 2$. If the problem is completely unbalanced, $q_1...q_N = 0$ then $m=N$.  Let $q_{ij} = \P{X_i = j}$ and $\mu_{ij} = P(Y|do(X_i = j))$.
-
-
-Suppose we select $I_t = 0$ for the first $h/2$ timesteps. This is at worst half the optimal. We use these observations to estimate the rewards for all the frequently occurring arms, $\set{do(X_i = 0) \; \forall i}$, and $\set{X_i = 1:i \geq m}$ 
-
-\eqn {
-\hat{\mu}_{ij} = \frac{\sum_{t=1}^{h/2}\ind{Y_t=1,X_{t,i}=j}}{\frac{h}{2}q_{ij}}
-}
-
-We then explicitly play each of the $m$ infrequently occurring arms $\frac{h}{2m}$ times and estimate their rewards as:
-
-\eqn {
-\hat{\mu}_{ij} = \frac{2m}{h}\sum_{t = 1}^{h/2m}\ind{Y_t = 1|X_i=j}
-}
-
-We then simply play the arm with the highest estimated reward for the remaining $T-h$ timesteps. We can show that we can select an $h$ (based on $T$, $N$ and $m$) that leads to worst case regret $R_T = \bigotilde{T^{2/3}m^{1/3}}$. This result can still be obtained in the case where $\boldsymbol{q}$ is unknown and must be learned during the exploration time. Comparing this to the standard bandit regret, $R_T = \bigo{\sqrt{TK}}$, we expect the causal algorithm to do better if $m < \frac{K^{3/2}}{\sqrt{T}}$. We can also show that the simple regret $R_s \in \bigotilde{\sqrt{m/T}}$. If $m << K$, this represents a significant improvement over standard bandit setting. \footnote{ $\bigotilde{.}$ and $\bigthetatilde{.}$ suppress polylogarithmic factors}
-
-
-In this algorithm, we have only used the side information provided by the $do()$ action about other actions. Since the $do()$ action fully reveals the value of alternate actions we could have incorporated this information via the graph feedback model \cite{Mannor2011}, where at each timestep the feedback graph $G_t$ is selected stochastically, dependent on $\boldsymbol{q}$, and revealed after an action has been chosen. The feedback graph is distinct from the causal graph. A link $A \rightarrow B$ in $G_t$ indicates that selecting the action $A$ reveals the reward for action $B$. For this specific problem, $G_t$ will always be a star graph with the action $do()$ connected to half the remaining actions. The Exp3-IX algorithm \cite{Kocak2014} was developed for the adversarial version of this problem and has regret $\bigo{\sqrt{\bar{\alpha}T}}$, where $\bar{\alpha}$ is the average independence number of $G_t$. In our case $\bar{\alpha} = \frac{N}{2}$ so we again obtain the regret of the standard bandit algorithm. The issue here is that a malicious adversary can select the same graph each time, such that the rewards for half the arms are never revealed by the informative action. This is equivalent to a, nominally, stochastic selection of feedback graph where $\boldsymbol{q} = \boldsymbol{0}$
-
-\cite{Lelarge2012} consider a stochastic version of the graph feedback problem, but with a fixed graph available to the algorithm before it must select an action. In addition, their algorithm is not optimal for all graph structures and fails, in particular, to provide improvements for star like graphs as in our case. \cite{Buccapatnam2014} improve the dependence of the algorithm on the graph structure but still assume the graph is fixed and available to the algorithm before the action is selected. 
-
-More generally, assuming causal structure creates more complex types of side information, such as that shown in equation \ref{eq:estimation_transfer}. In this case, selecting one action does not fully reveal an alternate action but provides some information towards an estimate. The quality of the estimate notably depends not only on the number of times that action was selected. For example, to get a good estimate for $X_1 = 1$ by intervening on $X_2$ requires us to sample both $X_2=0$ and $X_2=1$, in proportions dependent on $q_2$. This more complex side information does not fit within the graph feedback framework.
-
-Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
-
-
-
-\subsection{Open questions}
-
-There are many open questions still to be addressed. For the specific setting described above I need to derive lower bounds for the worst case regret so as to determine how close the current approach is to optimal. 
-
-It is clearly desirable to obtain an algorithm that could be generalized to an arbitrary causal graph. This will likely require the development of a bandit algorithm that can leverage more complex forms of side information like that in equation \ref{eq:estimation_transfer}, in addition to an efficient algorithm for eliminating actions that need not be considered at all.
-
-Another open class of problem to consider are cases where the causal structure is not (fully) known and also needs to be learnt within the online setting. 
-
-\section{Paid work statement}
-I am not currently undertaking or planning to undertake any paid work.
+%\subsection{Incorporating side information induced by casual graph}
+%
+%As a first step towards more general problems, we develop and evaluate a bandit algorithm that incorporates the side information induced by a specific causal graph. 
+%
+%Assume we have a known causal model with binary variables $\boldsymbol{X} = \{X_{1}..X_{N}\}$ that independently cause a target variable of interest $Y$, figure \ref{fig:causalStructure}. This is an expansion of the model shown in figure \ref{fig:unify_frameworks}. We can run sequential experiments on the system, where at each timestep $t$ we can either do nothing, $do()$, or select a single variable, $X_i$, on which to intervene, $do(X_{t,i} = J_t)$, and subsequently observe the complete result, $(\boldsymbol{X}_{t},Y_{t})$. 
+%
+%As an example, consider a farmer wishing to optimize the yield of her crop. She can invest in a green house to control temperature, a watering system to control soil moisture, fertilizers to set soil nutrients, etc. We assume only a single intervention is feasible due to cost and that each of these variables are independent of one-another (this may not always be the case - temperature could be related to rainfall for example). After having selected which variable to control, she plants her crops and observes the values of the remaining input variables and the yield. This repeats across many growing seasons, and the goal is to maximize the total cumulative yield.
+%
+%\begin{figure}[h]
+%\centering
+%\caption{Assumed Causal Structure}
+%\label{fig:causalStructure}
+%\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+%  thick,main node/.style={observed}, hidden/.style={empty},tg/.style={target}]
+%
+% %nodes
+%\node[main node](1){$X_{1}$};
+%\node[main node, right=of 1](2){$X_{2}$};
+%\node[hidden, right=of 2](3){$...$};
+%\node[main node, right=of 3](4){$X_{N}$};
+%\node[tg, below right=of 2](5){Y};
+% \path[every node/.style={font=\sffamily\small}]
+%    (1) edge (5)
+%    	(2) edge (5)
+%    (4) edge (5);
+%	
+%\end{tikzpicture}
+%\end{figure}
+%
+%
+%Let $\boldsymbol{q} \in [0,1]^N$ be a fixed vector where $q_i = P(X_i = 1)$. In each time-step $t$ upto a known horizon $T$:
+% 
+%\begin{enumerate}
+%\item The learner chooses an $I_t \in \set{0,\ldots, N}$ and $J_t \in \set{0,1}$, where $I_t = 0$ represents $do()$.
+%
+%\item Variables not set by the learner take their values probabilistically according to $\boldsymbol{q}$ 
+%\eq{
+%X_{t,i} = \begin{cases}
+%\sim \Ber(q_i) &\text{if } i \neq I_t \\
+%J_t & \text{otherwise}\,.
+%\end{cases}
+%}
+%\item The learner observes $(\boldsymbol{X}_{t},Y_{t})$ and receives reward $Y_t \sim \Ber(r(\boldsymbol{X}_{t}))$ where $r:\set{0,1}^N \to [0,1]$ is unknown and arbitrary. 
+%\end{enumerate}
+%
+%The problem could be treated as a standard bandit problem with $K = 2N + 1$ arms, 
+%
+%\eq {
+%\{do(), do(X_1=0), do(X_1 = 1)\;\; ... \;\;do(X_N = 1)\}
+%}
+%
+%yielding a regret $\bigo{\sqrt{TN}}$. However, this doesn't leverage the side information induced by the causal structure: 
+%
+%\eqn {
+%\label{eq:observe}
+%P(Y_t|do(X_{i,t} = j)) &= P(Y_t|do(),X_{i,t} = j) \\
+%\label{eq:estimation_transfer}
+%&= P(Y_t|do(X_{l,t}=0),X_{i,t}=j)(1-q_l)+P(Y_t|do(X_{l,t}=1),X_{i,t}=j)q_l 
+%}
+%
+%The hardness of this problem depends strongly on the vector $\boldsymbol{q}$. This is intuitive from a consideration of the extreme cases. If $\boldsymbol{q} = \boldsymbol{0}$ (or $\boldsymbol{1}$), then half of the actions we wish to explore will only occur if we explicitly select them. For these actions we get no side information by playing other actions. So at best we could expect a factor of two improvement over simply running a standard bandit algorithm. If $\boldsymbol{q} = \boldsymbol{\frac{1}{2}}$, the observe action, $do()$, effectively becomes a revealing action and we would anticipate obtaining a regret with minimal dependence on the number of variables $N$. 
+%
+%We consider a simple explore-exploit based algorithm, that will explore for $h$ timesteps, sampling actions in a way that depends on $\boldsymbol{q}$. We then select the arm with the highest expected reward for the remaining $T-h$ time steps. During the exploration phase, we will balance purely observing, $I_t = 0$, which takes advantage of equation \ref{eq:observe} to reveal the reward for frequently occurring arms, with explicit sampling of infrequently occurring arms. 
+%
+%Without loss of generality, we can assume $q_i \in [0,\frac{1}{2}]$ and $q_1 \leq q_2 ... \leq q_N$. Let:
+%
+%\eqn {
+%m \in [2,N] = \set{m:q_m > \frac{1}{m}}
+%}
+%
+%$m$ is a measure of the number of infrequently occurring arms. If the problem is completely balanced $q_1...q_N = \frac{1}{2}$ then $m = 2$. If the problem is completely unbalanced, $q_1...q_N = 0$ then $m=N$.  Let $q_{ij} = \P{X_i = j}$ and $\mu_{ij} = P(Y|do(X_i = j))$.
+%
+%
+%Suppose we select $I_t = 0$ for the first $h/2$ timesteps. This is at worst half the optimal. We use these observations to estimate the rewards for all the frequently occurring arms, $\set{do(X_i = 0) \; \forall i}$, and $\set{X_i = 1:i \geq m}$ 
+%
+%\eqn {
+%\hat{\mu}_{ij} = \frac{\sum_{t=1}^{h/2}\ind{Y_t=1,X_{t,i}=j}}{\frac{h}{2}q_{ij}}
+%}
+%
+%We then explicitly play each of the $m$ infrequently occurring arms $\frac{h}{2m}$ times and estimate their rewards as:
+%
+%\eqn {
+%\hat{\mu}_{ij} = \frac{2m}{h}\sum_{t = 1}^{h/2m}\ind{Y_t = 1|X_i=j}
+%}
+%
+%We then simply play the arm with the highest estimated reward for the remaining $T-h$ timesteps. We can show that we can select an $h$ (based on $T$, $N$ and $m$) that leads to worst case regret $R_T = \bigotilde{T^{2/3}m^{1/3}}$. This result can still be obtained in the case where $\boldsymbol{q}$ is unknown and must be learned during the exploration time. Comparing this to the standard bandit regret, $R_T = \bigo{\sqrt{TK}}$, we expect the causal algorithm to do better if $m < \frac{K^{3/2}}{\sqrt{T}}$. We can also show that the simple regret $R_s \in \bigotilde{\sqrt{m/T}}$. If $m << K$, this represents a significant improvement over standard bandit setting. \footnote{ $\bigotilde{.}$ and $\bigthetatilde{.}$ suppress polylogarithmic factors}
+%
+%
+%In this algorithm, we have only used the side information provided by the $do()$ action about other actions. Since the $do()$ action fully reveals the value of alternate actions we could have incorporated this information via the graph feedback model \cite{Mannor2011}, where at each timestep the feedback graph $G_t$ is selected stochastically, dependent on $\boldsymbol{q}$, and revealed after an action has been chosen. The feedback graph is distinct from the causal graph. A link $A \rightarrow B$ in $G_t$ indicates that selecting the action $A$ reveals the reward for action $B$. For this specific problem, $G_t$ will always be a star graph with the action $do()$ connected to half the remaining actions. The Exp3-IX algorithm \cite{Kocak2014} was developed for the adversarial version of this problem and has regret $\bigo{\sqrt{\bar{\alpha}T}}$, where $\bar{\alpha}$ is the average independence number of $G_t$. In our case $\bar{\alpha} = \frac{N}{2}$ so we again obtain the regret of the standard bandit algorithm. The issue here is that a malicious adversary can select the same graph each time, such that the rewards for half the arms are never revealed by the informative action. This is equivalent to a, nominally, stochastic selection of feedback graph where $\boldsymbol{q} = \boldsymbol{0}$
+%
+%\cite{Lelarge2012} consider a stochastic version of the graph feedback problem, but with a fixed graph available to the algorithm before it must select an action. In addition, their algorithm is not optimal for all graph structures and fails, in particular, to provide improvements for star like graphs as in our case. \cite{Buccapatnam2014} improve the dependence of the algorithm on the graph structure but still assume the graph is fixed and available to the algorithm before the action is selected. 
+%
+%More generally, assuming causal structure creates more complex types of side information, such as that shown in equation \ref{eq:estimation_transfer}. In this case, selecting one action does not fully reveal an alternate action but provides some information towards an estimate. The quality of the estimate notably depends not only on the number of times that action was selected. For example, to get a good estimate for $X_1 = 1$ by intervening on $X_2$ requires us to sample both $X_2=0$ and $X_2=1$, in proportions dependent on $q_2$. This more complex side information does not fit within the graph feedback framework.
+%
+%Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \cite{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
+%
+%
+%
+%\subsection{Open questions}
+%
+%There are many open questions still to be addressed. For the specific setting described above I need to derive lower bounds for the worst case regret so as to determine how close the current approach is to optimal. 
+%
+%It is clearly desirable to obtain an algorithm that could be generalized to an arbitrary causal graph. This will likely require the development of a bandit algorithm that can leverage more complex forms of side information like that in equation \ref{eq:estimation_transfer}, in addition to an efficient algorithm for eliminating actions that need not be considered at all.
+%
+%Another open class of problem to consider are cases where the causal structure is not (fully) known and also needs to be learnt within the online setting. 
+%
 
 
 \bibliographystyle{apalike}% Select the citation style e.g. ieeetr
