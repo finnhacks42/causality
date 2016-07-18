@@ -14,8 +14,9 @@
 \usepackage{pgfplots}
 \usepackage[ruled]{algorithm}
 \usepackage{algpseudocode}
+\usepackage{subcaption}
 \usepackage{dsfont}
-\usepackage[bf]{caption}
+
 \usepackage{hyperref}
 \hypersetup{
     bookmarks=true,         % show bookmarks bar?
@@ -133,8 +134,9 @@
 \subsection*{Adjustment}
 
 \begin{figure}[H]
+    \begin{subfigure}[b]{0.45\textwidth}
 	\centering    
-          \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={observed}, hidden/.style={empty},background rectangle/.style={fill=olive!45}]
  %nodes
 \node[main node](2){$X$};
@@ -148,7 +150,30 @@
     (5) edge (2)
     (6) edge (4);
 \end{tikzpicture}
+        \caption{prior to intervention}
+        \label{fig:before}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+        \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed}, hidden/.style={empty},background rectangle/.style={fill=olive!45}]
+ %nodes
+\node[main node](2){$x$};
+\node[main node, above right=of 2](3){$Z$};
+\node[main node, below right=of 3](4){$Y$};
+\node[latent, above=of 4](6){$\varepsilon_y$};
+ \path[every node/.style={font=\tiny}]
+    (3) edge (4)
+    (2) edge (4)
+    (6) edge (4);
+\end{tikzpicture}
+        \caption{after $do(X=x)$}
+        \label{fig:after}
+    \end{subfigure}
+   
+    \caption{Data generating process}\label{fig:causalmodels}
 \end{figure}
+
 
 To estimate the causal effect of $X$ on $Y$, we need to condition on $Z$ so as to block the backdoor path $X \leftarrow Z \rightarrow Y$. 
 
