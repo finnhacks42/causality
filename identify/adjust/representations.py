@@ -14,6 +14,7 @@ import seaborn as sns
 from sklearn.metrics import mean_squared_error
 from sklearn.cross_validation import train_test_split
 from scipy.stats import beta
+import pandas as pd
 
 class DataModel:
     def __init__(self,mean_x,cov_x,w,b,epsilon_y):
@@ -126,7 +127,7 @@ class Settings:
         self.samples = samples
         self.simulations = simulations
         self.true_ate = true_ate
-        
+        self.params = [num_features,aw,bw,ab,bb,cm,epsilon,samples,simulations,true_ate]
         self.w = beta.rvs(aw, bw, size=num_features)
         self.b = np.append( beta.rvs(ab,bb,size=num_features),true_ate)
         self.x_mean = np.zeros(num_features)
@@ -138,7 +139,7 @@ class Settings:
         model = self.model
         r = np.zeros((self.simulations,3))
         for s in range(self.simulations):
-            model.sample(1000)
+            model.sample(self.samples)
             ate_unadjusted = model.y[(model.t==1)].mean() - model.y[(model.t==0)].mean()
             ate_fit,scores,selected= lasso_then_ridge(model)
             lsq_fit = least_squares(model)
@@ -148,27 +149,34 @@ class Settings:
         delta = (rm[1]-rm[0])/(re[1]+re[0])
         return delta,rm,re
     
-    def print_it(self):
-        print(self.num_features,"(",self.aw,self.bw,")","(",self.ab,self.bb,")",self.cm,self.epsilon,self.samples,self.simulations,self.true_ate)
-        
+    def __str__(self):
+        return "{0}, ({1},{2}), ({3},{4}), {5}, {6}, {7}, {8}, {9}".format(*self.params)
+      
+import time
+s = time.time()
 
 results = []
 settings = []
-for experiment in range(500):
+n_experiments = 10000
+data = np.zeros((n_experiments,1+3*2+10))
+for experiment in range(n_experiments):
     num_features = np.random.choice(range(5,20))
     aw = np.random.choice(range(1,10))
     bw = np.random.choice(range(1,10))
     ab = np.random.choice(range(1,10))
     bb = np.random.choice(range(1,10))
     cm = np.random.choice(range(1,5))
-    epsilon = np.random.choice(range(1,4))
-    context = Settings(num_features,aw,bw,ab,bb,cm,epsilon)
-    context.print_it()
+    epsilon = np.random.uniform(0.001,5.0)
+    samples = np.random.randint(50,1000)
+    context = Settings(num_features,aw,bw,ab,bb,cm,epsilon,samples=100,simulations=1000)
     delta,rm,re = context.run()
-    print(delta)
+    print(delta,context,experiment)
+    row = np.concatenate(([delta],rm,re,context.params))
+    data[experiment] = row
     settings.append(context)
     results.append((delta,rm,re))
-     
+print(time.time()-s)   
+df = pd.DataFrame(data,columns = ["delta","lsq_m","lnr_m","ua_m","lsq_e","lnr_e","ua_e","num_features","aw","bw","ab","bb","cm","epsilon","simulations","samples","true_ate"])
 
 
 
