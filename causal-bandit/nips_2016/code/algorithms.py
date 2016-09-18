@@ -7,8 +7,14 @@ Created on Tue Sep 13 11:15:43 2016
 
 import numpy as np
 from math import sqrt, log
-from causal_bandit_utils import random_eta, argmax_rand
-from scipy.optimize import minimize
+
+
+def argmax_rand(x):
+    """ return the index of the maximum element in the array, ignoring nans. 
+    If there are multiple max valued elements return 1 at random"""
+    max_val = np.nanmax(x)
+    indicies = np.where(x == max_val)[0]
+    return np.random.choice(indicies) 
 
 
 class GeneralCausal(object):
@@ -17,7 +23,6 @@ class GeneralCausal(object):
         n = len(eta)
         self.B = sqrt(m*T/log(2.0*T*n))
         actions = range(n)
-        print "possible actions",actions
         u = np.zeros(n)
         for t in xrange(T):
             a = np.random.choice(actions,p=eta)
@@ -31,14 +36,7 @@ class GeneralCausal(object):
         return model.optimal - model.expected_rewards[best_action]   
     
         
-    def find_eta(self,model,length_eta = None):
-        if length_eta is None:
-            length_eta = model.K
-        print "in here"
-        eta0 = random_eta(length_eta)
-        res = minimize(model.m, eta0,bounds = [(0.0,1.0)]*length_eta, constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0}),options={'disp': True},method='SLSQP')
-        assert res.success, " optimization failed to converge"+res.message
-        return res.x,res.fun
+
 
 #TODO modify so this can be run on non parallel model    
 class ParallelCausal(object):
@@ -68,14 +66,63 @@ class ParallelCausal(object):
         m_hat = ParallelCausal.calculate_m(qij_hat[s_indx])
         infrequent = s_indx[0:m_hat]
         return infrequent
+    
+class UCB(object):
+    """ 
+    Implements Generic UCB algorithm.
+    """
+        
+    def run(self,T,model):
+        if T <= model.K: # result is not defined if the horizon is shorter than the number of actions
+            return np.nan
+        
+        actions = range(0,model.K)
+        self.trials = np.ones(model.K)
+        self.success = model.sample_multiple(actions,1)
+        
+        for t in range(model.K,T):
+            arm = argmax_rand(self.upper_bound(t))
+            self.trials[arm] += 1
+            self.success[arm] +=model.sample_multiple(arm,1)
+        
+        mu = np.true_divide(self.success,self.trials)
+        best_action = argmax_rand(mu)
+        return model.optimal - model.expected_rewards[best_action]
+        
+class LilUCB(UCB):
+    """ 
+    Implementation based on lil’UCB : An Optimal Exploration Algorithm for Multi-Armed Bandits
+    Jamieson et al, COLT 2014
+    """
+    label = "LilUCB"
+    def __init__(self,epsilon,gamma,beta,delta,sigma = .5):
+        
+        self.e = epsilon
+        self.g = gamma
+        self.b = beta
+        self.d = delta
+        self.c1 = (1+beta)*(1+sqrt(epsilon))
+        self.c2 = 2*(sigma**2)*(1+epsilon)
+        
+    def upper_bound(self,t):
+        mu = np.true_divide(self.success,self.trials)
+        ratio = np.true_divide(self.c2*np.log(np.log((1+self.e)*self.trials)/self.delta),self.trials)
+        interval = self.c1*np.sqrt(ratio)
+        return mu+interval
         
 
-class LilUCB(object):
-    """ Implementation based on """
-    def run(self,T,model):
-        return
-       
- 
+class AlphaUCB(UCB):
+    """ Implementation based on ... """
+    
+    def __init__(self,alpha):
+        self.alpha = alpha
+    
+    def upper_bound(self,t):
+        mu = np.true_divide(self.success,self.trials)
+        interval = np.sqrt(self.alpha*np.log(t)/(2.0*self.trials))
+        return mu+interval
+
+        
 class SuccessiveRejects(object):
     """ Implementation based on the paper 'Best Arm Identification in Multi-Armed Bandits',Audibert,Bubeck & Munos"""
     label = "Successive Reject"
