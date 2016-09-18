@@ -1,0 +1,42 @@
+Thank you to all reviewers for your thoughtful comments. 
+
+There's a key distiction between context observed before the agent selects an action and feedback after action is selected. If we have context X observed prior to taking an action a, the agent must learn P(Y|X,a). If X is unknown at the point an action is chosen then the algorithm needs to learn P(Y|a). Real problems can involve a mixture of pre and post intervention feedback. In the farmer example the nutrition content might be measurable prior to selecting an action, but the temperature and rainfall are not observed until the end of the season, along with the reward. Incorporating context into this work is an interesting avenue for future research.
+
+We focused our experiments in the parallel setting as it allowed us to compare the performance of both our algorithms. We agree it would be worthwile to include some non-parralel settings and to demonstrate the consequences of applying Alg1 to a problem for which it is miss-specified. We can compare against additional algorithms such as UCB, the key point is that incorporating causal information allows us to avoid the lower bounds which all existing algorithms are subject to.
+
+
+Certainly in most real applications there will be some uncertainty in the causal model and the conditional distributions will be unknown. This is a very interesting (and challenging) topic for future research. We believe this work to be an important first step and worthy of publication. 
+
+
+Reviewer 1 - only regret was our strong assumptions - not much more to say?
+
+Reviewer 2 
+
+The causal information (graph + conditionals) determines R_a for each action and thus how much playing one action reveals about the reward for another. The effect of this information is nicely summerized by the  general version of m, which extends the idea of 'effective number of arms' to any causal bandit setting. Pearl's do-calculus can be used to determine if the conditional interventional distributions we need can be estimated from observational data. 
+
+
+Reviewer 3
+
+Bareinboim et al (2015) consider a specific causal graph where an unobserved confounder U effects both the action an agent would choose naturally X and the outcome Y. The outcome is ultimately a function of U and the action imposed by the algorithm. Their key insight is that X provides information about the unobserved U, so ignoring it could lead to linear regret. Their TS^c algorithm is a form of contextual bandit with X as context. Unlike in our setting, X must be observed prior to the algorithm selecting an action. 
+
+Although the causal relationship between P(Y|do(X)) and P(Y|X) is trivial in the parallel setting, Alg1 uses the fact that it holds to be able to update the rewards for actions that were not selected. Existing algorithms ignore causal structure and would have to learn the rewards for all the arms independently. 
+
+The probabilities P(Xi) relate to the value variables take when not intervened on. In the parallel bandit, only one variable is set at each timestep. The remaining variables take their values according to P(Xi).  
+
+The majority of existing causal inference liturature is in the batch setting. We used the term online to distinguish our work from this setting. 
+
+The analysis of Wu et al is for cummulative regret, doesn't apply to general causal graphs and requires stronger assumptions than we do for the parallel case. 
+
+Reviewer 4
+
+Our framework supports probabilistic actions by including proxy variables that influence the variables of interest and defining the set of allowed interventions over these proxies. If agents can't take actions, causal inference and bandit problems are both meaningless. 
+
+We nessesarily compare against a baseline that does not use the known causal structure as there are no existing algorithms that can exploit it. 
+
+We will improve the clarity of the proofs.
+
+Reviewer 5
+
+We did not make use of the reward signal in the main text as it complicates the algorithms without improving the minmax regret and risks obscuring our key results, particularly for readers from the causal inference side.
+
+

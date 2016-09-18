@@ -1,0 +1,6 @@
+The use of simulated data is common for evaluating causal algorithms as there is a paucity of data for which generating graph and true (individual) causal effects are known. However we will investiate using semi-simulated data, in which the covariate distribition is real but the outcome is simulated.
+
+We focused our experiments in the parallel setting as it allowed us to compare the performance of both our algorithms. We agree it would be worthwile to include some non-parralel settings to illustrate how Alg2 works in more complex graphs and what happens to Alg1 if it is applied for a problem for which it is misspecified. We can compare against additional algorithms such as UCB - the key point is that incorporating causal information allows us to avoid the lower bounds which all existing algorithms are subject to.
+
+We focused our experiments in the parallel setting as it allowed us to compare the performance of both our algorithms. We agree it would be worthwile to include some non-parralel settings and to demonstrate the consequences of applying Alg1 to a problem for which it is miss-specified. We can compare against additional algorithms such as UCB, the key point is that incorporating causal information allows us to avoid the lower bounds which all existing algorithms are subject to.
+
