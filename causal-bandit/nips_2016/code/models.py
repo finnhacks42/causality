@@ -24,9 +24,8 @@ from pgmpy.models import BayesianModel
 from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
 from pgmpy.sampling import BayesianModelSampling
-from scipy.stats import binom
 from scipy.optimize import minimize
-from scipy.optimize import fmin_slsqp
+
 
 np.set_printoptions(precision=6,suppress=True,linewidth=200)
 def prod_all_but_j(vector):
@@ -42,9 +41,54 @@ def prod_all_but_j(vector):
 
     joint = np.prod(vector)
     return np.true_divide(joint,vector)
-
+    
 
 class Model(object):
+                 
+    def _expected_Y(self):
+        """ Calculate the expected value of Y (over x sampled from p(x|a)) for each action """
+        return np.dot(self.PY,self.A)
+        
+    def set_action_costs(self,costs):
+        """ 
+        update expected rewards to to account for action costs.
+        costs should be an array of length K specifying the cost for each action.
+        The expcted reward is E[Y|a] - cost(a). 
+        If no costs are specified they are assume zero for all actions.
+        """
+        self.expected_rewards = self.expected_Y - costs
+        self.optimal = max(self.expected_rewards)
+    
+    def pre_compute(self,compute_py = True):
+        """ 
+        pre-computes expensive results 
+        A is an lxk matrix such that A[i,j] = P(ith assignment | jth action)
+        PY is an lx1 vector such that PY[i] = P(Y|ith assignment)
+        """
+        self.generate_binary_assignments()
+ 
+        A = np.zeros((len(self.parent_assignments),self.K))
+        if compute_py:
+            self.PY = np.zeros(len(self.parent_assignments))
+        
+        for indx,x in enumerate(self.parent_assignments):
+            A[indx,:] = self.P(x)
+            if compute_py:
+                self.PY[indx] = self.pYgivenX(x)
+            
+        self.A = A
+        self.A2T = (self.A**2).T
+        self.expected_Y = self._expected_Y()
+        self.expected_rewards = self.expected_Y
+        self.optimal = max(self.expected_rewards)
+        
+    
+        
+    def generate_binary_assignments(self):
+        """ generate all possible binary assignments to the N parents of Y. """
+        self.parent_assignments = map(np.asarray,product([0,1],repeat = self.N))
+        return self.parent_assignments
+    
     def R(self,pa,eta):
         """ returns the ratio of the probability of the given assignment under each action to the probability under the eta weighted sum of actions. """
         Q = (eta*pa).sum()
@@ -52,140 +96,37 @@ class Model(object):
         ratio[np.isnan(ratio)] = 0 # we get nan when 0/0 but should just be 0 in this case
         return ratio
                
-#    def V(self,eta):
-#        """ The expected value of R (over x sampled from p(x|a)), for each action """
-#        if self.parent_assignments is None:
-#            self.parent_assignments = self.generate_binary_assignments()
-#        expected_R = np.zeros(self.K)
-#        for x in self.parent_assignments:
-#            pa = self.P(x)
-#            expected_R += pa*self.R(pa,eta)
-#        return expected_R
-               
-#    def _calculate_expected_rewards(self):
-#        """ Calculate the expected value of Y (over x sampled from p(x|a)) for each action """
-#        expected_reward = np.zeros(self.K)
-#        for x in self.parent_assignments:
-#            pa = self.P(x)
-#            expected_reward += pa*self.pYgivenX(x)
-#        return expected_reward
         
     def V(self,eta):
         """ returns a vector of length K with the expected value of R (over x sampled from p(x|a)) for each action a """
         u = 1.0/np.dot(self.A,eta)
         v = np.dot(self.A2T,u)
         return np.nan_to_num(v)
-        
     
-    def initialize(self):
-        """ pre-computes expensive results """
-        self.generate_binary_assignments()
-        self._compute_A_and_PY()
-        self._calculate_expected_rewards()
-        
-    def _compute_A_and_PY(self):
-        """ 
-        compute the lxk matrix A such that A[i,j] = P(ith assignment | jth action)
-        compute the lx1 vector PY such that PY[i] = P(Y|ith assignment)
-        """
-        A = np.zeros((len(self.parent_assignments),self.K))
-        PY = np.zeros(len(self.parent_assignments))
-        
-        for indx,x in enumerate(self.parent_assignments):
-            A[indx,:] = self.P(x)
-            PY[indx] = self.pYgivenX(x)
-            
-        self.A = A
-        self.A2T = (self.A**2).T
-        self.PY = PY
-        return A
-        
-    def _calculate_expected_rewards(self):
-        """ Calculate the expected value of Y (over x sampled from p(x|a)) for each action """
-        self.expected_reward = np.dot(self.PY,self.A)
-    
-            
-                
-    def sample_multiple(self,actions,n):
-        """ draws n samples from the reward distributions of the specified actions. """
-        return binomial(n,self.expected_rewards[actions])
-        
-    def generate_binary_assignments(self):
-        """ generate all possible binary assignments to the N parents of Y. """
-        self.parent_assignments = map(np.asarray,product([0,1],repeat = self.N))
-        return self.parent_assignments
-        
-    
-    def random_eta_short(self):
-        weights = np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
-        eta0 = np.random.random(7)
-        eta0 = eta0/np.dot(weights,eta0)
-        return eta0
+    def m(self,eta):
+        """ The maximum value of V"""
+        V = self.V(eta)
+        maxV = V.max()
+        assert not np.isnan(maxV), "m should not be nan, \n{0}\n{1}".format(eta,V)
+        return maxV
         
     def random_eta(self):
         eta = np.random.random(self.K)
         return eta/eta.sum()
         
-    def weights(self):
-        return np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
-        
-        
-    def find_eta_rep(self,tol):
-        weights = np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
-        eta0 = self.random_eta_short()
-    
-        constraints=({'type':'eq','fun':lambda eta: np.dot(eta,weights)-1.0})
-        
-        res = minimize(self.m_rep,eta0,bounds = [(0.0,1.0)]*7, constraints = constraints ,options={'disp': True},method='SLSQP',tol=tol)
-        assert res.success, " optimisation failed "+res.message
-        return res.x,res.fun
-        
-    def find_eta2(self):
-        print "in find_eta2"
+    def find_eta(self,tol = 1e-6):
         eta0 = self.random_eta()
-        weights = np.ones(self.K)
-        #constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0})
-        constraints=({'type':'eq','fun':lambda eta: np.dot(eta,weights)-1.0})
+        constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0})
         res = minimize(self.m, eta0,bounds = [(0.0,1.0)]*self.K, constraints = constraints ,options={'disp': True},method='SLSQP')
         assert res.success, " optimization failed to converge"+res.message
         return res.x,res.fun
-        
-    def find_eta3(self):
-        weights = np.ones(self.K)
-        eta0 = self.random_eta()
-        ec1 = lambda eta: np.dot(eta,weights) - 1.0
-        y = fmin_slsqp(self.m,eta0,eqcons=[ec1],bounds=[(0,1)]*self.K)
-        return y
-        
-        
-    def m_rep(self,eta_short_form):
-        eta = self.expand_eta(eta_short_form)
-        V = self.V(eta)
-        maxV = V.max()
-        assert not np.isnan(maxV), "m must not be nan"
-        return maxV
-        
-    def m(self,eta):
-        """ The maximum value of V"""
-        V = self.V(eta)
-        maxV = V.max()
-        
-        assert not np.isnan(maxV), "m should not be nan, \n{0}\n{1}".format(eta,V)
-        return maxV
-
-    def expand_eta(self,eta_short_form):
-        eta = np.hstack((
-            np.full(self.N1,eta_short_form[0]),
-            np.full(self.N2,eta_short_form[1]),
-            np.full(self.N1,eta_short_form[2]),
-            np.full(self.N2,eta_short_form[3]),
-            eta_short_form[4],
-            eta_short_form[5],
-            eta_short_form[6]
-        ))
-        return eta        
+             
+    def sample_multiple(self,actions,n):
+        """ draws n samples from the reward distributions of the specified actions. """
+        return binomial(n,self.expected_rewards[actions])
         
 
+        
 class GeneralModel(Model):
     """ Allows construction of an arbitray causal graph & action space with discrete (currently assumed binary) CPD tables. 
         This implementation will not scale to large graphs. """
@@ -193,27 +134,30 @@ class GeneralModel(Model):
         """ model is a pgmpy.BayesianModel
             actions is a list of (var,value) tuples """
         self.parents = sorted(model.get_parents('Y'))
+        self.N = len(self.parents)
         self.actions = actions
+        self.K = len(actions)
+        
         self.post_action_models = [GeneralModel.do(model,action) for action in actions]
         self.samplers = [BayesianModelSampling(model_a) for model_a in self.post_action_models]
-        self.interventional_distributions = []
-        self.K = len(self.post_action_models)
-        self.expected_rewards = np.zeros(self.K)
-        self.N = len(self.parents)
-        self.parent_assignments = self.generate_binary_assignments()
         
+        self.interventional_distributions = []
         for indx,new_model in enumerate(self.post_action_models):
             infer = VariableElimination(new_model)
             _,distribution_over_parents = infer.query(self.parents)
-            self.interventional_distributions.append(distribution_over_parents)
-            
-            _,distribution_over_reward = infer.query(['Y'])
-            expected_reward = distribution_over_reward.reduce([('Y',1)],inplace=False).values #TODO demonstrate this fails when inplace=True is set
-            self.expected_rewards[indx] = expected_reward
+            self.interventional_distributions.append(distribution_over_parents)        
+           
+        self.pre_compute(compute_py = False)
         
-        self.optimal = max(self.expected_rewards)
-              
-       
+    def _expected_Y(self):
+        expected_Y = np.zeros(self.K)
+        for indx,new_model in enumerate(self.post_action_models):
+            infer = VariableElimination(new_model)
+            _,distribution_over_reward = infer.query(['Y'])
+            expected_reward = distribution_over_reward.reduce([('Y',1)],inplace=False).values #TODO investigate failing if inplace=True - bug in pgmpy?
+            expected_Y[indx] = expected_reward
+        return expected_Y
+        
     
     @classmethod
     def create_confounded_parallel(cls,N,N1,pz,q,epsilon):       
@@ -237,7 +181,8 @@ class GeneralModel(Model):
         model.check_model()
         actions = list(chain([(x,0) for x in xvars],[(x,1) for x in xvars],[("Z",i) for i in (0,1)],[(None,None)]))
 
-        pgm_model = cls(model,actions)        
+        pgm_model = cls(model,actions)  
+        
         return pgm_model
     
     @classmethod
@@ -362,7 +307,6 @@ class Parallel(Model):
         return eta,mq
 
       
-
            
 class ParallelConfounded(Model):
     """ Represents a parallel bandit with one common confounder. Z ->(X1 ... XN) and (X1,...,XN) -> Y 
@@ -381,28 +325,27 @@ class ParallelConfounded(Model):
         self.pX0 = np.vstack((1.0-pXgivenZ0,pXgivenZ0)) # PX0[i,j] = P(X_i = j|Z = 0)
         self.pX1 = np.vstack((1.0-pXgivenZ1,pXgivenZ1)) # PX1[i,j] = P(X_i = j|Z = 1)
         self.pX =  (1-self.pZ)*self.pX0 + self.pZ*self.pX1  # pX[i,j]  = P(X_i = j) = P(Z=0)*P(X_i = j|Z = 0)+P(Z=1)*P(X_i = j|Z = 1)
-        self.parent_assignments = None
-        self.set_epsilon(epsilon)
-        
+        self.epsilon = epsilon
+        self.epsilon2 = self.pX[1,0]/self.pX[0,0]*self.epsilon
+        self.pre_compute()     
                
     @classmethod
     def create(cls,N,N1,pz,q,epsilon):
-        """ builds ParallelConfounded model with ... """
+        """ builds ParallelConfounded model"""
         q10,q11,q20,q21 = q
         N2 = N - N1
-        return cls(q10,q11,q20,q21,pz,N1,N2,epsilon)
-        
-    def set_epsilon(self,epsilon):
-        """ set epsilon and update the expected_rewards."""
-        assert epsilon <= .5, "epsilon cannot exceed .5"
-        self.epsilon = epsilon
-        self.expected_rewards = np.zeros(self.K)#TODO fix this #self.calculate_expected_rewards()
-        self.optimal = max(self.expected_rewards)        
+        model = cls(q10,q11,q20,q21,pz,N1,N2,epsilon)
+        # adjust costs for do(Z=1), do(Z=0) such that the actions have expected reward .5 to match worse case 
+        costs = np.zeros(model.K)
+        costs[-2] = model.expected_Y[-2]-.5 
+        costs[-3] = model.expected_Y[-3]-.5
+        model.set_action_costs(costs)
+        return model
         
     def pYgivenX(self,x):
         if x[0] == 1:
             return .5+self.epsilon
-        return .5  #TODO 'fix' this
+        return .5-self.epsilon2
         
     def sample(self,action):
         """ samples given the specified action index and returns the values of the parents of Y, Y. """         
@@ -440,9 +383,47 @@ class ParallelConfounded(Model):
         return result
         
  
+    def random_eta_short(self):
+        weights = np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
+        eta0 = np.random.random(7)
+        eta0 = eta0/np.dot(weights,eta0)
+        return eta0
+        
+        
+    def weights(self):
+        return np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
+        
+        
+    def find_eta(self,tol = 1e-6):
+        weights = np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
+        eta0 = self.random_eta_short()
+        constraints=({'type':'eq','fun':lambda eta: np.dot(eta,weights)-1.0})
+        res = minimize(self.m_rep,eta0,bounds = [(0.0,1.0)]*7, constraints = constraints ,options={'disp': True},method='SLSQP',tol=tol)
+        assert res.success, " optimisation failed "+res.message
+        eta_full = self.expand_eta(res.x)
+        return eta_full,res.fun
+        
 
-from algorithms import GeneralCausal
-#p2 = GeneralModel.create_confounded_parallel(3,.1)
+    def m_rep(self,eta_short_form):
+        eta = self.expand_eta(eta_short_form)
+        V = self.V(eta)
+        maxV = V.max()
+        assert not np.isnan(maxV), "m must not be nan"
+        return maxV
+        
+    def expand_eta(self,eta_short_form):
+        eta = np.hstack((
+            np.full(self.N1,eta_short_form[0]),
+            np.full(self.N2,eta_short_form[1]),
+            np.full(self.N1,eta_short_form[2]),
+            np.full(self.N2,eta_short_form[3]),
+            eta_short_form[4],
+            eta_short_form[5],
+            eta_short_form[6]
+        ))
+        return eta  
+        
+        
 
 N = 5
 N1 = 3
@@ -452,40 +433,13 @@ q = (.1,.3,.4,.7)
 epsilon = .1
 
 p1 = ParallelConfounded.create(N,N1,pz,q,epsilon)  
-p2 = ScaleableParallelConfounded.create(N,N1,pz,q,epsilon)
-p3 = GeneralModel.create_confounded_parallel(N,N1,pz,q,epsilon)
-
-
-p1.compute_A()
-
-x = np.asarray([0,0,0,0,0])
-print p1.P(x)
-print p3.P(x)
-
-eta = np.random.random(p1.K)
-eta = eta/eta.sum()
-
-res = p1.find_eta2()
+#p2 = GeneralModel.create_confounded_parallel(N,N1,pz,q,epsilon)
 
 
 
 
-#mx10 = p3.post_action_models[0]
-#for cpd in mx10.get_cpds():
-#    print cpd
-
-#alg2 = GeneralCausal()
-#eta,m = alg2.find_eta(p1)
-#eta2,m2 = alg2.find_eta(p3) 
-#eta3,m3 = alg2.find_eta(p3)
-
-    
 
 
-#TODO get GeneralModel and ParallelModel to give the same results ...
-# already different at P(x) level ...
-
-# note re-perameterized version can't be checked at P(x) level - if this even works ...
 
 
 
@@ -500,99 +454,3 @@ res = p1.find_eta2()
 
 
     
-class VeryConfounded(object):
-    def __init__(self,a,b,n,q1,q2,pYgivenW):
-        #self.pV = np.vstack((1.0-q,q)) TODO fix this.
-        self.n = n # number of V variables
-        self.N = self.n + 2 # number of variables total
-        self.K = 2*self.N + 1 #v_1...v_n = 0,v_1...v_n=1,w0=0,w1=0,w0=1,w1=1,do()
-        self.pYgivenW = pYgivenW # 2*2 matrix p(y|0,0),p(y|0,1),p(y|1,0),p(y|1,1)
-        
-        self.pW0givenA = np.full(self.K,(1-q1)*a + q1*q2*(n-2)/(n-1.0))
-        self.pW0givenA[n:] = (1-q1)*a + q1*(q2*(n-2)/(n-1.0)+1/(n-1.0))
-        self.pW0givenA[0] = a
-        self.pW0givenA[n] = q2
-        self.pW0givenA[[-4,-2,-1]] = (1-q1)*a + q1*q2 # for do(w1=0),do(w1=1),do()
-        self.pW0givenA[-3] = 1 # for do(w0 = 1)
-        self.pW0givenA[-5] = 0 # for do(w0 = 0)
-        
-        self.pW1givenA = np.full(self.K,(1-q1)*b)
-        self.pW1givenA[n:] = (1-q1)*b+q1*q2**(n-2)
-        self.pW1givenA[0] = b
-        self.pW1givenA[n] = q2**(n-1)
-        self.pW1givenA[[-5,-3,-1]] = (1-q1)*b # for do(w0=0),do(w0=1),do()
-        self.pW1givenA[-2] = 1 # for do(w1 = 1)
-        self.pW1givenA[-4] = 0 # for do(w1 = 0)
-        
-        self.pW0givenA = np.vstack((1-self.pW0givenA,self.pW0givenA))
-        self.pW1givenA = np.vstack((1-self.pW1givenA,self.pW1givenA))
-        self.parent_vals = np.asarray([(0, 0), (0, 1), (1, 0), (1, 1)])
-        self.expected_rewards = self.estimate_rewards(100000)
-        self.optimal = np.max(self.expected_rewards)
-        
-    def estimate_rewards(self,samples_per_action):
-        total = np.zeros(self.K)
-        for s in xrange(samples_per_action):
-            for a in range(self.K):
-                x,y = self.sample(a)
-                total[a] += y
-        return total/float(samples_per_action)
-    
-    def P(self,w):
-        return self.pW0givenA[w[0],:]*self.pW1givenA[w[1],:] 
-        
-    def R(self,x,eta):
-        pa = self.P(x)
-        Q = (eta*pa).sum()
-        ratio = np.true_divide(pa,Q)
-        ratio[np.isnan(ratio)] = 0 # we get nan when 0/0 but should just be 0 in this case
-        return ratio
-        
-    def V(self,eta):
-        va = np.zeros(self.K)  
-        for x in self.parent_vals:
-            pa = self.P(x)
-            Q = (eta*pa).sum()
-            ratio = np.true_divide(pa**2,Q)
-            ratio[np.isnan(ratio)] = 0 # we get nan when 0/0 but should just be 0 in this case
-            va += ratio         
-        return va 
-        
-    def pW0(self,v):
-        return v.mean()
-    
-    def pW1(self,v):
-        return v.prod()
-    
-    def sample(self,action):
-        v = binomial(1,q2,size=self.n)
-        v[0] = binomial(1,q1)
-        if action < 2*self.n: # setting one of the V's
-            i,j = action % self.n, action/self.N
-            v[i] = j
-        w0 = binomial(1,self.pW0(v))
-        w1 = binomial(1,self.pW1(v))
-        if not action < 2*self.n:     
-            if action == self.K - 2:
-                w1 = 1
-            elif action == self.K - 3:
-                w0 = 1
-            elif action == self.K - 4:
-                w1 = 0
-            elif action == self.K - 5:
-                w0 = 0
-        x = np.zeros(self.N)  
-        x[0:self.n] = v
-        x[self.n] = w0
-        x[self.n+1]= w1
-        y = binomial(1,self.pYgivenW[w0,w1])
-        return x,y
-    
-    def sample_multiple(self,actions,n):
-        """ sample the specified actions, n times each """
-        return binomial(n,self.expected_rewards[actions])
-    
-    def m(self,eta):
-        maxV = self.V(eta).max()
-        assert not np.isnan(maxV), "m should not be nan"
-        return maxV
