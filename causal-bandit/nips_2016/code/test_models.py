@@ -9,6 +9,8 @@ import unittest
 import numpy.testing as np_test
 from models import ParallelConfounded,GeneralModel
 
+#TODO add test to ensure parrallel confounded has desired reward structure
+
 class TestModelParallelConfoundedEquivalence(unittest.TestCase):
     
     def setUp(self):
@@ -26,5 +28,8 @@ class TestModelParallelConfoundedEquivalence(unittest.TestCase):
             diff = self.model1.P(x) - self.model2.P(x)
             self.assertLess(max(diff),.01)
             #TODO understand and replace with numpy array almost equal test method
+            
+    def test_rewards(self):
+        np_test.assert_array_almost_equal(self.model1.expected_rewards,self.model2.expected_rewards)
             
         

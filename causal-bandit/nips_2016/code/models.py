@@ -25,7 +25,7 @@ from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
 from pgmpy.sampling import BayesianModelSampling
 from scipy.optimize import minimize
-
+import time
 
 np.set_printoptions(precision=6,suppress=True,linewidth=200)
 def prod_all_but_j(vector):
@@ -65,6 +65,7 @@ class Model(object):
         A is an lxk matrix such that A[i,j] = P(ith assignment | jth action)
         PY is an lx1 vector such that PY[i] = P(Y|ith assignment)
         """
+
         self.generate_binary_assignments()
  
         A = np.zeros((len(self.parent_assignments),self.K))
@@ -81,6 +82,7 @@ class Model(object):
         self.expected_Y = self._expected_Y()
         self.expected_rewards = self.expected_Y
         self.optimal = max(self.expected_rewards)
+        self.eta,self.m = self.find_eta()
         
     
         
@@ -173,15 +175,22 @@ class GeneralModel(Model):
         cpds = [TabularCPD(variable='Z',variable_card=2,values=pZ)]
         cpds.extend([TabularCPD(variable=v,variable_card=2,values=pXgivenZ_N1, evidence=['Z'], evidence_card = [2]) for v in xvars[0:N1] ])
         cpds.extend([TabularCPD(variable=v,variable_card=2,values=pXgivenZ_N2, evidence=['Z'], evidence_card = [2]) for v in xvars[N1:] ])
-        ycpd = np.full((2,2**len(xvars)),.5)
-        ycpd[0,0:ycpd.shape[1]/2] = .5 + epsilon
-        ycpd[1,0:ycpd.shape[1]/2] = .5 - epsilon                                                          
+        
+        px1 = (1-pz)*q10+pz*q11
+        epsilon2 = px1/(1-px1)*epsilon
+        pYis1 = np.hstack((np.full(2**(N-1),.5-epsilon2),np.full(2**(N-1),.5+epsilon)))
+        ycpd = np.vstack((1-pYis1,pYis1))
         cpds.append(TabularCPD(variable='Y',variable_card=2, values = ycpd, evidence = xvars,evidence_card = [2]*len(xvars)))
+        
         model.add_cpds(*cpds)
         model.check_model()
         actions = list(chain([(x,0) for x in xvars],[(x,1) for x in xvars],[("Z",i) for i in (0,1)],[(None,None)]))
-
         pgm_model = cls(model,actions)  
+        # adjust costs for do(Z=1), do(Z=0) such that the actions have expected reward .5 to match worse case 
+        costs = np.zeros(pgm_model.K)
+        costs[-2] = pgm_model.expected_Y[-2]-.5 
+        costs[-3] = pgm_model.expected_Y[-3]-.5
+        pgm_model.set_action_costs(costs)
         
         return pgm_model
     
@@ -313,6 +322,7 @@ class ParallelConfounded(Model):
         Actions are do(x_1 = 0),...,do(x_N = 0), do(x_1=1),...,do(x_N = 1),do(Z=0),do(Z=1),do()"""
     
     def __init__(self,q10,q11,q20,q21,pZ,N1,N2,epsilon):
+
         pXgivenZ0 = np.hstack((np.full(N1,q10),np.full(N2,q20)))
         pXgivenZ1 = np.hstack((np.full(N1,q11),np.full(N2,q21)))
         self.N1 = N1
@@ -328,6 +338,11 @@ class ParallelConfounded(Model):
         self.epsilon = epsilon
         self.epsilon2 = self.pX[1,0]/self.pX[0,0]*self.epsilon
         self.pre_compute()     
+    
+    def __str__(self):
+        string = "ParallelConfounded_mis{0:.1f}_Nis{1}_N1is{2}_qis{3:.1f}_{4:.1f}_{5:.1f}_{6:.1f}_pzis{7:.1f}_epsilonis{8:.1f}".format(self.m,self.N,self.N1,self.q10,self.q11,self.q20,self.q21,self.pZ,self.epsilon)
+        return string.replace(".","-")
+        
                
     @classmethod
     def create(cls,N,N1,pz,q,epsilon):
@@ -425,15 +440,6 @@ class ParallelConfounded(Model):
         
         
 
-N = 5
-N1 = 3
-
-pz = .1
-q = (.1,.3,.4,.7)
-epsilon = .1
-
-p1 = ParallelConfounded.create(N,N1,pz,q,epsilon)  
-#p2 = GeneralModel.create_confounded_parallel(N,N1,pz,q,epsilon)
 
 
 

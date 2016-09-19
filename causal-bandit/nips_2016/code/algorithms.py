@@ -17,9 +17,13 @@ def argmax_rand(x):
     return np.random.choice(indicies) 
 
 
+
 class GeneralCausal(object):
-    
-    def run(self,T,model,eta,m):
+    label = "Algorithm 2"
+
+    def run(self,T,model):
+        eta = model.eta
+        m = model.m
         n = len(eta)
         self.B = sqrt(m*T/log(2.0*T*n))
         actions = range(n)
@@ -38,9 +42,10 @@ class GeneralCausal(object):
         
 
 
-#TODO modify so this can be run on non parallel model    
+#TODO modify so this can be run on the confounded parallel problem (ignoring actions setting z)   
 class ParallelCausal(object):
-    
+    label = "Algorithm 1"
+  
     def run(self,T,model):
         self.trials = np.zeros(model.K)
         self.success = np.zeros(model.K)
@@ -113,6 +118,7 @@ class LilUCB(UCB):
 
 class AlphaUCB(UCB):
     """ Implementation based on ... """
+    label = "UCB"
     
     def __init__(self,alpha):
         self.alpha = alpha
