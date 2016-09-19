@@ -7,7 +7,8 @@ Created on Sat Sep 17 11:11:22 2016
 
 import unittest
 import numpy.testing as np_test
-from models import ParallelConfounded,GeneralModel
+from models import ParallelConfounded
+from pgmpy_model import GeneralModel
 
 #TODO add test to ensure parrallel confounded has desired reward structure
 
