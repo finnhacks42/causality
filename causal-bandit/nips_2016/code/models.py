@@ -78,6 +78,12 @@ class Model(object):
         self.expected_rewards = self.expected_Y
         self.optimal = max(self.expected_rewards)
         self.eta,self.m = self.find_eta()
+        self.eta = self.eta/self.eta.sum() # random choice demands more accuracy than contraint in minimizer
+        
+    def clean_up(self):
+        self.A = None
+        self.A2T = None
+        self.PY = None
         
     
         
@@ -96,9 +102,11 @@ class Model(object):
         
     def V(self,eta):
         """ returns a vector of length K with the expected value of R (over x sampled from p(x|a)) for each action a """
-        u = 1.0/np.dot(self.A,eta)
+        #with np.errstate(divide='ignore'):        
+        u = np.true_divide(1.0,np.dot(self.A,eta))
+        u = np.nan_to_num(u) # converts infinities to very large numbers such that multiplying by 0 gives 0
         v = np.dot(self.A2T,u)
-        return np.nan_to_num(v)
+        return v
     
     def m(self,eta):
         """ The maximum value of V"""
@@ -343,6 +351,18 @@ class ParallelConfounded(Model):
 
 
 
+if __name__ == "__main__":  
+
+    N = 3
+    pz = .5
+    q = (0,0,.8,.2)
+    epsilon = .1
+    N1 = 2
+    model = ParallelConfounded.create(N,N1,pz,q,epsilon)
+
+    #models = [ParallelConfounded.create(N,N1,pz,q,epsilon) for N1 in range(2,20,8)]
+    
+    
 
 
 
