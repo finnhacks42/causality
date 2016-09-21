@@ -43,7 +43,8 @@ class Experiment(object):
         ax.set_xlabel(xlabel)
         ax.set_ylabel(self.REGRET_LABEL)
         
-        ax.legend(loc = legend_loc,numpoints=1)
+        if legend_loc is not None:
+            ax.legend(loc = legend_loc,numpoints=1)
         fig_name = "experiment{0}_{1}.png".format(self.experiment_id,now_string)
         fig.savefig(fig_name,bbox_inches="tight")
     
