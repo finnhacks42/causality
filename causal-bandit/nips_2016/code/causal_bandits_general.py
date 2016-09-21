@@ -4,24 +4,7 @@ Created on Wed Feb  3 09:51:47 2016
 
 @author: finn
 """
-import numpy as np
-import matplotlib.pyplot as plt
-from models import ParallelConfounded
-from algorithms import GeneralCausal,  ParallelCausal, SuccessiveRejects, LilUCB,AlphaUCB
-import time
-import multiprocessing as mp
-import matplotlib.pyplot as plt
 
-REGRET_LABEL = "Regret"
-HORIZON_LABEL = "T"
-M_LABEL = "m(q)"
-
-markers=['s', 'o', 'D', '*']
-colors = ["red","green","blue","purple"]
-algorithms = [ParallelCausal,GeneralCausal,SuccessiveRejects,AlphaUCB]
-for indx,a in enumerate(algorithms):
-    a.marker = markers[indx]
-    a.color = colors[indx]
     
 
 def experiment1(model,T_vals,algorithms,simulations = 10):
@@ -66,21 +49,7 @@ def run_parallel_simulations(experiment, simulations, processes, parameters, key
     merged = np.concatenate(results,axis=results[0].ndim - 1)
     return merged
     
-def plot_regret(regret,xvals,xlabel,algorithms,detail_string,legend_loc = "upper right"):
-    s_axis = regret.ndim - 1 # assumes the last axis is over simulations
-    simulations = regret.shape[-1]
-    mu = regret.mean(s_axis)
-    error = 3*regret.std(s_axis)/np.sqrt(simulations)
-    fig,ax = plt.subplots()
-    for indx,alg in enumerate(algorithms):    
-        ax.errorbar(xvals,mu[indx,:],yerr = error[indx,:],label = alg.label,linestyle="",marker = alg.marker,color=alg.color)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(REGRET_LABEL)
-    
-    ax.legend(loc = legend_loc,numpoints=1)
-    fig_name = "regret_vs_{0}_{1}_{2:.0f}".format(xlabel,detail_string,time.time())
-    fig_name = fig_name.replace(".","-")+".png"
-    fig.savefig(fig_name,bbox_inches="tight")
+
     
     
 def regret_vs_m(model,T,algorithms,simulations=10):
@@ -142,7 +111,7 @@ if __name__ == "__main__":
     #TODO allow resetting of epsilon (and do variable epsilon version)
 
 
-
+# TODO check analytic eta matches what we get via find_eta on parallel
 
 
 

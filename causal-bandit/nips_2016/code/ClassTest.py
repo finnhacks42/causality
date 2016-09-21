@@ -17,7 +17,13 @@ class Animal(object):
 class Dog(Animal):
     label = "Dog"
     def noise(self):
+        print self.label
         return "woof"
+        
+        
+    @staticmethod
+    def add(x,y):
+        print x+y
         
 def variance(data):
     m = data[0]

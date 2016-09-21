@@ -129,41 +129,7 @@ def worst_case_constant():
 
         
 
-def regret_vs_m(N,epsilon,simulations,T):
-    m_vals = range(2,N,2)
-    causal = GeneralCausal()
-    causal_parallel = ParallelCausal()
-    baseline  = SuccessiveRejects()
-    
-    ts = time()   
-    regret = np.zeros((len(m_vals),3,simulations))
-    for s in xrange(simulations):
-        if s % 100 == 0:
-                print s
-        for m_indx,m in enumerate(m_vals): 
-            q = part_balanced_q(N,m)
-            model = Parallel(q,epsilon)
-            eta,mq = model.analytic_eta()
-            regret[m_indx,0,s] = causal.run(T,model,eta,mq)
-            regret[m_indx,1,s] = causal_parallel.run(T,model)
-            regret[m_indx,2,s] = baseline.run(T,model)
-            
-    te = time()
-    print 'took: %2.4f sec' % (te-ts)
-    
-    mean = regret.mean(axis=2)       
-    error = 3*regret.std(axis=2)/sqrt(simulations)
-    
-    fig,ax = plt.subplots()
-    ax.errorbar(m_vals,mean[:,0],yerr=error[:,0], label="Algorithm 2",linestyle="",marker="s",markersize=4) 
-    ax.errorbar(m_vals,mean[:,1],yerr=error[:,1], label="Algorithm 1",linestyle="",marker="o",markersize=5)    
-    ax.errorbar(m_vals,mean[:,2],yerr=error[:,2], label="Successive Rejects",linestyle="",marker="D",markersize=4) 
-    ax.set_xlabel(M_LABEL)
-    ax.set_ylabel(REGRET_LABEL)
-    ax.legend(loc="lower right",numpoints=1)
-    fig_name = "exp_regret_vs_m_N{0}_T{1}_s{2}_{3}.pdf".format(N,T,simulations,now_string())
-    fig.savefig(fig_name, bbox_inches='tight') 
-    return regret,mean,error
+
 
 
 
@@ -210,13 +176,7 @@ def experiment2():
 
 
 
-## Experiment 1
-#N = 50
-#epsilon = .3
-#simulations = 100
-#T = 400
-#regret,mean,error = regret_vs_m(N,epsilon,simulations,T)
-#pickle.dump(regret, open("experiment1_{0}.pickle".format(now_string()),"wb"))
+
 
 # Experiment 2
 #N= 50

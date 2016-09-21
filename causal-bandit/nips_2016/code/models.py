@@ -74,6 +74,7 @@ class Model(object):
             
         self.A = A
         self.A2T = (self.A**2).T
+        
         self.expected_Y = self._expected_Y()
         self.expected_rewards = self.expected_Y
         self.optimal = max(self.expected_rewards)
@@ -108,7 +109,7 @@ class Model(object):
         v = np.dot(self.A2T,u)
         return v
     
-    def m(self,eta):
+    def m_eta(self,eta):
         """ The maximum value of V"""
         V = self.V(eta)
         maxV = V.max()
@@ -119,25 +120,37 @@ class Model(object):
         eta = np.random.random(self.K)
         return eta/eta.sum()
         
-    def find_eta(self,tol = 1e-6):
+    def _minimize(self,tol = 1e-6):
         eta0 = self.random_eta()
         constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0})
-        res = minimize(self.m, eta0,bounds = [(0.0,1.0)]*self.K, constraints = constraints ,options={'disp': True},method='SLSQP')
-        assert res.success, " optimization failed to converge"+res.message
-        return res.x,res.fun
+        res = minimize(self.m_eta, eta0,bounds = [(0.0,1.0)]*self.K, constraints = constraints ,options={'disp': True},method='SLSQP')
+        return res
+        
+    def find_eta(self,tol = 1e-10,min_starts = 3, max_starts = 10):
+        m = self.K + 1
+        eta = None
+        starts = 0
+        success = 0
+        while success < min_starts and starts < max_starts:
+            res = self._minimize(tol)            
+            if res.success and res.fun <= self.K:
+                success +=1
+                if res.fun < m:
+                    m = res.fun
+                    eta = res.x
+            starts +=1
+        
+        if eta is None:
+            raise Exception("optimisation failed")
+    
+        return eta,m
              
     def sample_multiple(self,actions,n):
         """ draws n samples from the reward distributions of the specified actions. """
         return binomial(n,self.expected_rewards[actions])
         
 
-        
 
-        
-    
-  
-        
-    
 class Parallel(Model):
     """ Parallel model as described in the paper """
     def __init__(self,q,epsilon):
@@ -148,11 +161,11 @@ class Parallel(Model):
         self.K = 2*self.N+1 #number of actions
         self.pX = np.vstack((1.0-q,q))
         self.set_epsilon(epsilon)
-        self.parent_assignments = self.generate_binary_assignments()
+        self.eta,self.m = self.analytic_eta()
     
     @classmethod
-    def create(cls,N,epsilon):
-        q = cls.most_unbalanced_q(N,2)
+    def create(cls,N,m,epsilon):
+        q = cls.part_balanced_q(N,m)
         return cls(q,epsilon)
         
     @classmethod
@@ -167,14 +180,15 @@ class Parallel(Model):
         q = np.full(N,.5,dtype=float)
         q[0:m] = 0
         return q
-        
     
-    def calculate_m(self,qij_sorted):
+    @staticmethod
+    def calculate_m(qij_sorted):
         for indx,value in enumerate(qij_sorted):
             if value >= 1.0/(indx+1):
                 return indx
-        return len(qij_sorted)/2  
-
+        return len(qij_sorted)/2 
+        
+    
         
     def set_epsilon(self,epsilon):
         assert epsilon <= .5 ,"epsilon cannot exceed .5"
@@ -219,7 +233,7 @@ class Parallel(Model):
         probs = self.pX[:,:].reshape((self.N*2,)) # reshape such that first N are do(Xi=0)
         sort_order = np.argsort(probs)
         ordered = probs[sort_order]
-        mq = self.calculate_m(ordered)
+        mq = Parallel.calculate_m(ordered)
         unbalanced = sort_order[0:mq]
         eta[unbalanced] = 1.0/(2*mq)
         return eta,mq
@@ -308,8 +322,8 @@ class ParallelConfounded(Model):
         
  
     def random_eta_short(self):
-        weights = np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
-        eta0 = np.random.random(7)
+        weights = self.weights()
+        eta0 = np.random.random(len(weights))
         eta0 = eta0/np.dot(weights,eta0)
         return eta0
         
@@ -318,30 +332,17 @@ class ParallelConfounded(Model):
         return np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
         
         
-    def find_eta(self,tol = 1e-10,min_starts = 3, max_starts = 10):
-        m = self.K + 1
-        eta = None
-        starts = 0
-        success = 0
-        while success < min_starts and starts < max_starts:
-            weights = np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
-            eta0 = self.random_eta_short()
-            constraints=({'type':'eq','fun':lambda eta: np.dot(eta,weights)-1.0})
-            res = minimize(self.m_rep,eta0,bounds = [(0.0,1.0)]*7, constraints = constraints ,options={'disp': True},method='SLSQP',tol=tol)
+    def _minimize(self,tol = 1e-10):
+        weights = self.weights()
+        eta0 = self.random_eta_short()
+        constraints=({'type':'eq','fun':lambda eta: np.dot(eta,weights)-1.0})
+        res = minimize(self.m_rep,eta0,bounds = [(0.0,1.0)]*len(eta0), constraints = constraints ,options={'disp': True},method='SLSQP',tol=tol)      
+        return res
             
-            if res.success and res.fun <= self.K:
-                success +=1
-                if res.fun < m:
-                    m = res.fun
-                    eta = res.x
-
-            starts +=1
-        
-        if eta is None:
-            raise Exception("optimisation failed")
-        
+    def find_eta(self,tol=1e-10):
+        eta,m = Model.find_eta(self)
         eta_full = self.expand_eta(eta)
-        return eta_full,m
+        return eta_full,m 
         
 
     def m_rep(self,eta_short_form):
@@ -352,16 +353,49 @@ class ParallelConfounded(Model):
         return maxV
         
     def expand_eta(self,eta_short_form):
-        eta = np.hstack((
-            np.full(self.N1,eta_short_form[0]),
-            np.full(self.N2,eta_short_form[1]),
-            np.full(self.N1,eta_short_form[2]),
-            np.full(self.N2,eta_short_form[3]),
-            eta_short_form[4],
-            eta_short_form[5],
-            eta_short_form[6]
-        ))
-        return eta  
+        arrays = []
+        for indx, count in enumerate(self.weights()):
+            arrays.append(np.full(count,eta_short_form[indx]))
+        return np.hstack(arrays)
+        
+        
+class ParallelConfoundedNoZAction(ParallelConfounded):
+    """ the ParallelConfounded Model but without the actions that set Z """
+    def __init__(self,q10,q11,q20,q21,pZ,N1,N2,epsilon):
+        ParallelConfounded.__init__(self,q10,q11,q20,q21,pZ,N1,N2,epsilon)
+        self.K = 2*self.N + 1
+    
+    
+    def P(self,x):
+        """ calculate P(X = x|a) for each action a. 
+            x is an array of length N specifiying an assignment to the parents of Y
+            returns a vector of length K. 
+        """
+        # for do(), do(x_i=j)
+        p = self.pX[x,self.indx] # vector of lenght K, p[i] = P(X_i = x_i| do())
+        joint_j = prod_all_but_j(p) # vector of length K, joint_j = prod_k!=j(X_k = x_k)
+        pij = np.vstack((joint_j,joint_j))
+        pij[1-x,self.indx] = 0 # 2*N array, pij[i,j] = P(X=x|do(X_i=j)) = d(X_i-j)*prod_k!=j(X_k = x_k)
+        pij = pij.reshape((len(x)*2,)) #flatten first N-1 will be px=0,2nd px=1
+        p_obs = p.prod()
+        
+        result = np.hstack((pij,p_obs))
+        return result 
+        
+    def sample(self,action):
+        """ samples given the specified action index and returns the values of the parents of Y, Y. """         
+        x = binomial(1,self.pX[1,:])
+        if action != self.K - 1: # not do()
+            i,j = action % self.N, action/self.N
+            x[i] = j
+        y = binomial(1,self.pYgivenX(x))
+        return x,y
+          
+    def weights(self):
+        return np.asarray([self.N1,self.N2,self.N1,self.N2,1])
+              
+
+    
         
         
 class VeryConfounded(object):
@@ -469,7 +503,10 @@ if __name__ == "__main__":
     q = (0,0,.8,.2)
     epsilon = .1
     N1 = 2
-    model = ParallelConfounded.create(N,N1,pz,q,epsilon)
+    m = 2
+    #model = ParallelConfounded.create(N,N1,pz,q,epsilon)
+    
+    model = Parallel.create(N,m,epsilon)
 
     #models = [ParallelConfounded.create(N,N1,pz,q,epsilon) for N1 in range(2,20,8)]
     

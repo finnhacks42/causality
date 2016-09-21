@@ -7,6 +7,7 @@ Created on Tue Sep 13 11:15:43 2016
 
 import numpy as np
 from math import sqrt, log
+from models import Parallel
 
 
 def argmax_rand(x):
@@ -68,9 +69,11 @@ class ParallelCausal(object):
     def estimate_infrequent(self,h):
         qij_hat = np.true_divide(self.trials,h)
         s_indx = np.argsort(qij_hat) #indexes of elements from s in sorted(s)
-        m_hat = ParallelCausal.calculate_m(qij_hat[s_indx])
+        m_hat = Parallel.calculate_m(qij_hat[s_indx])
         infrequent = s_indx[0:m_hat]
         return infrequent
+        
+ 
     
 class UCB(object):
     """ 
@@ -97,7 +100,9 @@ class UCB(object):
 class LilUCB(UCB):
     """ 
     Implementation based on lil’UCB : An Optimal Exploration Algorithm for Multi-Armed Bandits
-    Jamieson et al, COLT 2014
+    Jamieson et al, COLT 2014.
+    
+    To convert the algorithm from fixed confidence to fixed budget, we use the halving trick.
     """
     label = "LilUCB"
     def __init__(self,epsilon,gamma,beta,delta,sigma = .5):
@@ -108,6 +113,16 @@ class LilUCB(UCB):
         self.d = delta
         self.c1 = (1+beta)*(1+sqrt(epsilon))
         self.c2 = 2*(sigma**2)*(1+epsilon)
+        
+    @classmethod
+    def theoretical(cls):
+        """ Returns LilUCB with parameters supported by theory (from Jameison et al) """
+        
+        return cls(epsilon = .01,gamma = 9.0,beta = 1.0)
+    
+    @classmethod
+    def heuristic(cls):
+        """ Returns LilUCB with parameters heuristically shown to perform well (from Jamieson et al)"""
         
     def upper_bound(self,t):
         mu = np.true_divide(self.success,self.trials)
