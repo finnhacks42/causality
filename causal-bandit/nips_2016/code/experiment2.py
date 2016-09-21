@@ -11,7 +11,7 @@ from algorithms import GeneralCausal, ParallelCausal, SuccessiveRejects
 from experiment_config import now_string, Experiment
 
 
-def regret_vs_T_vary_epsilon(model,algorithms,simulations = 10):
+def regret_vs_T_vary_epsilon(model,algorithms,T_vals,simulations = 10):
 
     regret = np.zeros((len(algorithms),len(T_vals),simulations))
     
@@ -26,7 +26,7 @@ def regret_vs_T_vary_epsilon(model,algorithms,simulations = 10):
     return regret
 
 N= 50
-simulations = 10
+simulations = 5
 a = 9.0
 m = 2
 model = Parallel.create(N,m,.1)
@@ -37,7 +37,7 @@ T_vals = range(Tmin,Tmax,10)
 
 algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects()]
 
-regret = regret_vs_T_vary_epsilon(model,algorithms,simulations = simulations)
+regret = regret_vs_T_vary_epsilon(model,algorithms,T_vals,simulations = simulations)
 finished = now_string()
 
 experiment = Experiment(2)
@@ -47,6 +47,3 @@ experiment.log_regret(regret,finished)
 
 
 
-
-#regret2,mean2,error2 = regret_vs_T(N,simulations,epsilon=None,Tstep=None,TperK=10)
-#pickle.dump(regret2, open("experiment2_{0}.pickle".format(now_string()),"wb"))

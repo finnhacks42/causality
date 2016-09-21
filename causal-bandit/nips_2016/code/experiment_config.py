@@ -56,7 +56,8 @@ class Experiment(object):
     
     def log_regret(self,regret,now_string):
         filename = "experiment{0}_{1}.pickle".format(self.experiment_id,now_string)
-        pickle.dump(regret,filename)
+        with open(filename,'wb') as out:
+            pickle.dump(regret,out)
         
         
     
