@@ -29,7 +29,7 @@ pz = .5
 q = (0,0,1,0)
 epsilon = .1
 simulations = 10
-model = ParallelConfoundedNoZAction(*q,pZ=pz,N1=1,N2 = N-1,epsilon=epsilon)
+model = ParallelConfoundedNoZAction.create(N,1,pz,q,epsilon)
 print "model",model.m
 T_vals = range(10,6*model.K,100)
 

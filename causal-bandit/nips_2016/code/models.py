@@ -21,6 +21,7 @@ import numpy as np
 from itertools import product
 from numpy.random import binomial
 from scipy.optimize import minimize
+from scipy.special import expit
 
 np.set_printoptions(precision=6,suppress=True,linewidth=200)
 def prod_all_but_j(vector):
@@ -246,6 +247,7 @@ class ParallelConfounded(Model):
         Actions are do(x_1 = 0),...,do(x_N = 0), do(x_1=1),...,do(x_N = 1),do(Z=0),do(Z=1),do()"""
     
     def __init__(self,q10,q11,q20,q21,pZ,N1,N2,epsilon):
+      
 
         pXgivenZ0 = np.hstack((np.full(N1,q10),np.full(N2,q20)))
         pXgivenZ1 = np.hstack((np.full(N1,q11),np.full(N2,q21)))
@@ -261,6 +263,11 @@ class ParallelConfounded(Model):
         self.pX =  (1-self.pZ)*self.pX0 + self.pZ*self.pX1  # pX[i,j]  = P(X_i = j) = P(Z=0)*P(X_i = j|Z = 0)+P(Z=1)*P(X_i = j|Z = 1)
         self.epsilon = epsilon
         self.epsilon2 = self.pX[1,0]/self.pX[0,0]*self.epsilon
+        
+        self.y_weights = np.full(self.N,.5)
+        self.y_weights[0] = 1  
+        self.y_weights = self.y_weights/self.y_weights.sum()
+        
         self.pre_compute()     
     
     def __str__(self):
@@ -282,9 +289,11 @@ class ParallelConfounded(Model):
         return model
         
     def pYgivenX(self,x):
-        if x[0] == 1:
-            return .5+self.epsilon
-        return .5-self.epsilon2
+        s = np.dot(x,self.y_weights)
+        return expit(s)
+        #if x[0] == 1:
+        #    return .5+self.epsilon
+        #return .5-self.epsilon2
         
     def sample(self,action):
         """ samples given the specified action index and returns the values of the parents of Y, Y. """         
@@ -363,6 +372,8 @@ class ParallelConfounded(Model):
 class ParallelConfoundedNoZAction(ParallelConfounded):
     """ the ParallelConfounded Model but without the actions that set Z """
     def __init__(self,q10,q11,q20,q21,pZ,N1,N2,epsilon):
+      
+        
         pXgivenZ0 = np.hstack((np.full(N1,q10),np.full(N2,q20)))
         pXgivenZ1 = np.hstack((np.full(N1,q11),np.full(N2,q21)))
         self.N1 = N1
@@ -377,7 +388,26 @@ class ParallelConfoundedNoZAction(ParallelConfounded):
         self.pX =  (1-self.pZ)*self.pX0 + self.pZ*self.pX1  # pX[i,j]  = P(X_i = j) = P(Z=0)*P(X_i = j|Z = 0)+P(Z=1)*P(X_i = j|Z = 1)
         self.epsilon = epsilon
         self.epsilon2 = self.pX[1,0]/self.pX[0,0]*self.epsilon
-        self.pre_compute()            
+
+        self.y_weights = np.full(self.N,.5)
+        self.y_weights[0] = 1  
+        self.y_weights = self.y_weights/self.y_weights.sum()        
+        
+        self.pre_compute() 
+
+    @classmethod
+    def create(cls,N,N1,pz,q,epsilon):
+        """ builds ParallelConfounded model"""
+        q10,q11,q20,q21 = q
+        N2 = N - N1
+        model = cls(q10,q11,q20,q21,pz,N1,N2,epsilon)
+        # adjust costs for do(Z=1), do(Z=0) such that the actions have expected reward .5 to match worse case 
+        costs = np.zeros(model.K)
+        costs = model.expected_Y - 0.5
+        costs[0] -= epsilon
+        print costs
+        model.set_action_costs(costs)
+        return model           
         
     def P(self,x):
         """ calculate P(X = x|a) for each action a. 
@@ -425,7 +455,8 @@ if __name__ == "__main__":
     q = (0,0,1,0)
     epsilon = .1
     simulations = 10
-    model = ParallelConfoundedNoZAction(*q,pZ=pz,N1=1,N2 = N-1,epsilon=epsilon)
+   
+    model = ParallelConfoundedNoZAction.create(N,1,pz,q,epsilon)
     
   
     
