@@ -123,7 +123,8 @@ class Model(object):
     def _minimize(self,tol = 1e-6):
         eta0 = self.random_eta()
         constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0})
-        res = minimize(self.m_eta, eta0,bounds = [(0.0,1.0)]*self.K, constraints = constraints ,options={'disp': True},method='SLSQP')
+        #options={'disp': True}
+        res = minimize(self.m_eta, eta0,bounds = [(0.0,1.0)]*self.K, constraints = constraints, method='SLSQP')
         return res
         
     def find_eta(self,tol = 1e-10,min_starts = 3, max_starts = 10):
@@ -336,7 +337,7 @@ class ParallelConfounded(Model):
         weights = self.weights()
         eta0 = self.random_eta_short()
         constraints=({'type':'eq','fun':lambda eta: np.dot(eta,weights)-1.0})
-        res = minimize(self.m_rep,eta0,bounds = [(0.0,1.0)]*len(eta0), constraints = constraints ,options={'disp': True},method='SLSQP',tol=tol)      
+        res = minimize(self.m_rep,eta0,bounds = [(0.0,1.0)]*len(eta0), constraints = constraints ,method='SLSQP',tol=tol)      
         return res
             
     def find_eta(self,tol=1e-10):
@@ -362,10 +363,22 @@ class ParallelConfounded(Model):
 class ParallelConfoundedNoZAction(ParallelConfounded):
     """ the ParallelConfounded Model but without the actions that set Z """
     def __init__(self,q10,q11,q20,q21,pZ,N1,N2,epsilon):
-        ParallelConfounded.__init__(self,q10,q11,q20,q21,pZ,N1,N2,epsilon)
+        pXgivenZ0 = np.hstack((np.full(N1,q10),np.full(N2,q20)))
+        pXgivenZ1 = np.hstack((np.full(N1,q11),np.full(N2,q21)))
+        self.N1 = N1
+        self.N2 = N2
+        self.q10,self.q11,self.q20,self.q21 = q10,q11,q20,q21
+        self.N = len(pXgivenZ0)
+        self.indx = np.arange(self.N)
         self.K = 2*self.N + 1
-    
-    
+        self.pZ = pZ
+        self.pX0 = np.vstack((1.0-pXgivenZ0,pXgivenZ0)) # PX0[i,j] = P(X_i = j|Z = 0)
+        self.pX1 = np.vstack((1.0-pXgivenZ1,pXgivenZ1)) # PX1[i,j] = P(X_i = j|Z = 1)
+        self.pX =  (1-self.pZ)*self.pX0 + self.pZ*self.pX1  # pX[i,j]  = P(X_i = j) = P(Z=0)*P(X_i = j|Z = 0)+P(Z=1)*P(X_i = j|Z = 1)
+        self.epsilon = epsilon
+        self.epsilon2 = self.pX[1,0]/self.pX[0,0]*self.epsilon
+        self.pre_compute()            
+        
     def P(self,x):
         """ calculate P(X = x|a) for each action a. 
             x is an array of length N specifiying an assignment to the parents of Y
@@ -398,117 +411,26 @@ class ParallelConfoundedNoZAction(ParallelConfounded):
     
         
         
-class VeryConfounded(object):
-    def __init__(self,a,b,n,q1,q2,pYgivenW):
-        #self.pV = np.vstack((1.0-q,q)) TODO fix this.
-        self.n = n # number of V variables
-        self.N = self.n + 2 # number of variables total
-        self.K = 2*self.N + 1 #v_1...v_n = 0,v_1...v_n=1,w0=0,w1=0,w0=1,w1=1,do()
-        self.pYgivenW = pYgivenW # 2*2 matrix p(y|0,0),p(y|0,1),p(y|1,0),p(y|1,1)
+
         
-        self.pW0givenA = np.full(self.K,(1-q1)*a + q1*q2*(n-2)/(n-1.0))
-        self.pW0givenA[n:] = (1-q1)*a + q1*(q2*(n-2)/(n-1.0)+1/(n-1.0))
-        self.pW0givenA[0] = a
-        self.pW0givenA[n] = q2
-        self.pW0givenA[[-4,-2,-1]] = (1-q1)*a + q1*q2 # for do(w1=0),do(w1=1),do()
-        self.pW0givenA[-3] = 1 # for do(w0 = 1)
-        self.pW0givenA[-5] = 0 # for do(w0 = 0)
         
-        self.pW1givenA = np.full(self.K,(1-q1)*b)
-        self.pW1givenA[n:] = (1-q1)*b+q1*q2**(n-2)
-        self.pW1givenA[0] = b
-        self.pW1givenA[n] = q2**(n-1)
-        self.pW1givenA[[-5,-3,-1]] = (1-q1)*b # for do(w0=0),do(w0=1),do()
-        self.pW1givenA[-2] = 1 # for do(w1 = 1)
-        self.pW1givenA[-4] = 0 # for do(w1 = 0)
         
-        self.pW0givenA = np.vstack((1-self.pW0givenA,self.pW0givenA))
-        self.pW1givenA = np.vstack((1-self.pW1givenA,self.pW1givenA))
-        self.parent_vals = np.asarray([(0, 0), (0, 1), (1, 0), (1, 1)])
-        self.expected_rewards = self.estimate_rewards(100000)
-        self.optimal = np.max(self.expected_rewards)
-        
-    def estimate_rewards(self,samples_per_action):
-        total = np.zeros(self.K)
-        for s in xrange(samples_per_action):
-            for a in range(self.K):
-                x,y = self.sample(a)
-                total[a] += y
-        return total/float(samples_per_action)
     
-    def P(self,w):
-        return self.pW0givenA[w[0],:]*self.pW1givenA[w[1],:] 
-        
-    def R(self,x,eta):
-        pa = self.P(x)
-        Q = (eta*pa).sum()
-        ratio = np.true_divide(pa,Q)
-        ratio[np.isnan(ratio)] = 0 # we get nan when 0/0 but should just be 0 in this case
-        return ratio
-        
-    def V(self,eta):
-        va = np.zeros(self.K)  
-        for x in self.parent_vals:
-            pa = self.P(x)
-            Q = (eta*pa).sum()
-            ratio = np.true_divide(pa**2,Q)
-            ratio[np.isnan(ratio)] = 0 # we get nan when 0/0 but should just be 0 in this case
-            va += ratio         
-        return va 
-        
-    def pW0(self,v):
-        return v.mean()
-    
-    def pW1(self,v):
-        return v.prod()
-    
-    def sample(self,action):
-        v = binomial(1,q2,size=self.n)
-        v[0] = binomial(1,q1)
-        if action < 2*self.n: # setting one of the V's
-            i,j = action % self.n, action/self.N
-            v[i] = j
-        w0 = binomial(1,self.pW0(v))
-        w1 = binomial(1,self.pW1(v))
-        if not action < 2*self.n:     
-            if action == self.K - 2:
-                w1 = 1
-            elif action == self.K - 3:
-                w0 = 1
-            elif action == self.K - 4:
-                w1 = 0
-            elif action == self.K - 5:
-                w0 = 0
-        x = np.zeros(self.N)  
-        x[0:self.n] = v
-        x[self.n] = w0
-        x[self.n+1]= w1
-        y = binomial(1,self.pYgivenW[w0,w1])
-        return x,y
-    
-    def sample_multiple(self,actions,n):
-        """ sample the specified actions, n times each """
-        return binomial(n,self.expected_rewards[actions])
-    
-    def m(self,eta):
-        maxV = self.V(eta).max()
-        assert not np.isnan(maxV), "m should not be nan"
-        return maxV
+
 
 
 if __name__ == "__main__":  
-
-    N = 3
+    N = 8
     pz = .5
-    q = (0,0,.8,.2)
+    q = (0,0,1,0)
     epsilon = .1
-    N1 = 2
-    m = 2
-    #model = ParallelConfounded.create(N,N1,pz,q,epsilon)
+    simulations = 10
+    model = ParallelConfoundedNoZAction(*q,pZ=pz,N1=1,N2 = N-1,epsilon=epsilon)
     
-    model = Parallel.create(N,m,epsilon)
-
-    #models = [ParallelConfounded.create(N,N1,pz,q,epsilon) for N1 in range(2,20,8)]
+  
+    
+   
+    
     
     
 

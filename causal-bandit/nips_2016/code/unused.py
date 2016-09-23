@@ -5,6 +5,80 @@ Created on Sun Sep 18 11:24:25 2016
 @author: finn
 """
 
+class VeryConfounded(Model):
+    def __init__(self,a,b,nZ,q1,q2,pYgivenX):
+        self.N = 2 # number of parents of Y
+        self.nZ = nZ # number of confounding variables
+        self.K = 2*(self.N+self.nZ)+1 # z_1 ... z_nz=0,z_1...z_nz=1,x1=0,x2=0,x1=1,x2=1,do()
+        self.q1,self.q2 = q1,q2
+        self.a,self.b = a,b
+        self.pygx = pYgivenX.reshape((2,2)) # 2*2 matrix [[p(y|0,0),p(y|0,1)],
+                                                           #  [p(y|1,0),p(y|1,1)]] 
+
+        self.pX2 = np.full(self.K,(1-q1)*b) # vector of length K, P(X2=1|a) for each action a
+        self.pX2[nZ:] = (1-q1)*b+q1*q2**(nZ-2)
+        self.pX2[0] = b
+        self.pX2[nZ] = q2**(nZ-1)
+        self.pX2[[-5,-3,-1]] = (1-q1)*b +q1*q2**(nZ-1)# for do(x1=0),do(x1=1),do() 
+        self.pX2[-2] = 1 # for do(x2 = 1)
+        self.pX2[-4] = 0 # for do(x2 = 0)
+        
+        
+        
+        self.pX2 = np.vstack((1-self.pX2,self.pX2))
+        
+        self.pre_compute()
+        
+    def sample_estimate_P(self,samples):
+        
+        return
+            
+ 
+    
+    def P(self,x):
+        px2 = self.pX2[x[1]] # probability X2 = x2
+                
+        
+        return self.pX1givenA[x[0]]*self.pX2[x[1]] 
+        
+    def pYgivenX(self,x):
+        return self.pygx[x[0],x[1]]
+        
+    def sample(self,action):
+        z = binomial(1,self.q2,size=self.nZ)
+        z[0] = binomial(1,self.q1)
+        
+        if action < 2*self.nZ: # setting one of the z's
+            i,j = action % self.nZ, action/self.nZ
+            z[i] = j
+            
+
+        s = z[1:].mean()
+        p = z[1:].prod()
+        
+        
+        if z[0] == 0:
+            x1 = binomial(1,self.a)
+            x2 = binomial(1,self.b)
+        else:
+            x1 = binomial(1,s)
+            x2 = binomial(1,p)
+            
+        if not action < 2*self.nZ: # setting one of the x's (or nothing)
+            if action == self.K - 2:
+                x2=1
+            elif action == self.K - 3:
+                x1=1
+            elif action == self.K - 4:
+                x2=0
+            elif action == self.K - 5:
+                x1=0
+                
+            
+        x = np.asarray([x1,x2])
+        y = binomial(1,self.pYgivenX(x))
+        return x,y
+
 class ScaleableParallelConfounded(ParallelConfounded):
     def __init__(self,q10,q11,q20,q21,pZ,N1,N2,epsilon):
         ParallelConfounded.__init__(self,q10,q11,q20,q21,pZ,N1,N2,epsilon)

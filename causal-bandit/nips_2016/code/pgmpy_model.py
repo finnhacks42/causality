@@ -10,7 +10,7 @@ from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
 from pgmpy.sampling import BayesianModelSampling
 import numpy as np
-from itertools import chain
+from itertools import chain,product
 
 class GeneralModel(Model):
     """ Allows construction of an arbitray causal graph & action space with discrete (currently assumed binary) CPD tables. 
@@ -76,6 +76,37 @@ class GeneralModel(Model):
         
         return pgm_model
     
+    @classmethod    
+    def create_very_confounded(cls,Nz,pZ1,pZ,a,b,py):
+        """ construct a very confounded model """
+    
+        zvars = ['Z'+str(i) for i in range(1,Nz+1)]
+        xvars = ['X'+str(i) for i in range(1,3)]
+        edges = chain(product(zvars,xvars),product(xvars,['Y']))
+        bayes_model = BayesianModel(edges)
+        
+        z_other = list(product((0,1),repeat=(Nz-1)))
+        
+        px1 = np.hstack((np.full(2**(Nz-1),a),[np.mean(z) for z in z_other]))       
+        px2 = np.hstack((np.full(2**(Nz-1),b),[np.prod(z) for z in z_other]))
+        
+        cpds = [TabularCPD(variable = 'Z1',variable_card=2,values = np.vstack((1-pZ1,pZ1)) )]
+        cpds.extend([TabularCPD(variable = v,variable_card=2,values = np.vstack((1-pZ,pZ)) ) for v in zvars[1:]])
+        cpds.append(TabularCPD(variable = 'X1', variable_card = 2, values = np.vstack((1-px1,px1)),evidence=zvars,evidence_card = [2]*Nz))
+        cpds.append(TabularCPD(variable = 'X2', variable_card = 2, values = np.vstack((1-px2,px2)),evidence=zvars,evidence_card = [2]*Nz))
+        cpds.append(TabularCPD(variable = 'Y', variable_card = 2, values = np.vstack((1-py,py)),evidence=xvars,evidence_card = [2]*len(xvars)))
+        
+        bayes_model.add_cpds(*cpds)
+        bayes_model.check_model()
+        actions = list(chain([(z,0) for z in zvars],
+                             [(z,1) for z in zvars],
+                             [(x,0) for x in xvars],
+                             [(x,1) for x in xvars],
+                             [(None,None)]))
+        
+        model = cls(bayes_model,actions)
+        return model
+    
     @classmethod
     def do(cls,model,action):
         var,value = action
@@ -103,9 +134,33 @@ class GeneralModel(Model):
         x = s.loc[:,self.parents].values[0]
         y = s.loc[:,['Y']].values[0][0]
         return x,y
-       
+        
+        
+     
     def P(self,x):
         """ returns the probability of the given assignment to the parents of Y for given each action. """
         assignment = zip(self.parents,x)
         pa = np.asarray([q.reduce(assignment,inplace=False).values for q in self.interventional_distributions])
         return pa
+        
+if __name__ == "__main__":  
+    Nz = 3
+    pZ1 = .1
+    pZ = .4
+    a = .3
+    b = .7
+    py = np.asarray([.1,.5,.3,.2])
+
+    model1 = GeneralModel.create_very_confounded(Nz,pZ1,pZ,a,b,py)
+    samples = 100000
+    s = model1.samplers[3].forward_sample(samples)
+    c = len(s[(s['X1']==0)&(s['X2']==0)])
+    print c/float(samples)
+    
+    
+
+    
+    
+    
+
+    #models = [ParallelConfounded.create(N,N1,pz,q,epsilon) for N1 in range(2,20,8)]
