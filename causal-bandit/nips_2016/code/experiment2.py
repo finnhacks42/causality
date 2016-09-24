@@ -26,14 +26,14 @@ def regret_vs_T_vary_epsilon(model,algorithms,T_vals,simulations = 10):
     return regret
 
 N= 50
-simulations = 5
+simulations = 100
 a = 9.0
 m = 2
 model = Parallel.create(N,m,.1)
 
 Tmin = int(ceil(4*model.K/a))
 Tmax = 10*model.K
-T_vals = range(Tmin,Tmax,10)
+T_vals = range(Tmin,Tmax,100)
 
 algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects()]
 

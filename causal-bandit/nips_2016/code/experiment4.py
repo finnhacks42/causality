@@ -28,12 +28,12 @@ def regret_vs_m_general(algorithms,N1_vals,N,T,pz,q,epsilon,simulations = 10):
    
 
     
-N = 20
-N1_vals = range(0,N,2)
+N = 15
+N1_vals = range(0,N,6)
 pz = .5
-q = (0,0,1,0)
+q = (0,0,.4,.6)
 epsilon = .1
-simulations = 10000
+simulations = 100
 T = 400
 algorithms = [SuccessiveRejects(),GeneralCausal()]
 

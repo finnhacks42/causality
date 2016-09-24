@@ -23,6 +23,7 @@ from numpy.random import binomial
 from scipy.optimize import minimize
 from scipy.special import expit
 
+
 np.set_printoptions(precision=6,suppress=True,linewidth=200)
 def prod_all_but_j(vector):
     """ returns a vector where the jth term is the product of all the entries except the jth one """
@@ -52,8 +53,16 @@ class Model(object):
         The expcted reward is E[Y|a] - cost(a). 
         If no costs are specified they are assume zero for all actions.
         """
+        self.costs = costs
         self.expected_rewards = self.expected_Y - costs
         self.optimal = max(self.expected_rewards)
+        
+    def make_first_arm_epsilon_best(self,epsilon):
+        """ adjusts the costs such that all arms have expected reward .5, expect the first one which has reward .5 + epsilon """
+        costs = self.expected_Y - 0.5
+        costs[0] -= epsilon
+        self.set_action_costs(costs)
+        
     
     def pre_compute(self,compute_py = True):
         """ 
@@ -62,7 +71,7 @@ class Model(object):
         PY is an lx1 vector such that PY[i] = P(Y|ith assignment)
         """
 
-        self.generate_binary_assignments()
+        self.get_parent_assignments()
  
         A = np.zeros((len(self.parent_assignments),self.K))
         if compute_py:
@@ -87,12 +96,22 @@ class Model(object):
         self.A2T = None
         self.PY = None
         
-    
+    def get_costs(self):
+        if not hasattr(self,"costs"):
+            self.costs = np.zeros(self.K)
+        return self.costs
         
-    def generate_binary_assignments(self):
-        """ generate all possible binary assignments to the N parents of Y. """
-        self.parent_assignments = map(np.asarray,product([0,1],repeat = self.N))
+    def get_parent_assignments(self):
+        if not hasattr(self,"parent_assignments") or self.parent_assignments is None:
+            self.parent_assignments = Model.generate_binary_assignments(self.N)
+    
         return self.parent_assignments
+    
+    @classmethod
+    def generate_binary_assignments(cls,N):
+        """ generate all possible binary assignments to the N parents of Y. """
+        return map(np.asarray,product([0,1],repeat = N))
+        
     
     def R(self,pa,eta):
         """ returns the ratio of the probability of the given assignment under each action to the probability under the eta weighted sum of actions. """
@@ -206,7 +225,7 @@ class Parallel(Model):
         if action != self.K - 1: # everything except the do() action
             i,j = action % self.N, action/self.N
             x[i] = j
-        y = binomial(1,self.pYgivenX(x))
+        y = binomial(1,self.pYgivenX(x))-self.get_costs()[action]
         return x,y
     
         
@@ -247,28 +266,30 @@ class ParallelConfounded(Model):
         Actions are do(x_1 = 0),...,do(x_N = 0), do(x_1=1),...,do(x_N = 1),do(Z=0),do(Z=1),do()"""
     
     def __init__(self,q10,q11,q20,q21,pZ,N1,N2,epsilon):
-      
-
+        self._init_pre_action(q10,q11,q20,q21,pZ,N1,N2,epsilon)
+        self.K = 2*self.N + 3        
+        self.pre_compute()  
+        
+    def _init_pre_action(self,q10,q11,q20,q21,pZ,N1,N2,epsilon):
+        """ The initialization that should occur regardless of whether we can act on Z """
         pXgivenZ0 = np.hstack((np.full(N1,q10),np.full(N2,q20)))
         pXgivenZ1 = np.hstack((np.full(N1,q11),np.full(N2,q21)))
+        self.pX0 = np.vstack((1.0-pXgivenZ0,pXgivenZ0)) # PX0[j,i] = P(X_i = j|Z = 0)
+        self.pX1 = np.vstack((1.0-pXgivenZ1,pXgivenZ1)) # PX1[i,j] = P(X_i = j|Z = 1)
+        self.pXgivenZ = np.stack((self.pX0,self.pX1),axis=2) # PXgivenZ[i,j,k] = P(X_i=j|Z=k)
+    
         self.N1 = N1
         self.N2 = N2
         self.q10,self.q11,self.q20,self.q21 = q10,q11,q20,q21
         self.N = len(pXgivenZ0)
         self.indx = np.arange(self.N)
-        self.K = 2*self.N + 3 
         self.pZ = pZ
-        self.pX0 = np.vstack((1.0-pXgivenZ0,pXgivenZ0)) # PX0[i,j] = P(X_i = j|Z = 0)
-        self.pX1 = np.vstack((1.0-pXgivenZ1,pXgivenZ1)) # PX1[i,j] = P(X_i = j|Z = 1)
-        self.pX =  (1-self.pZ)*self.pX0 + self.pZ*self.pX1  # pX[i,j]  = P(X_i = j) = P(Z=0)*P(X_i = j|Z = 0)+P(Z=1)*P(X_i = j|Z = 1)
-        self.epsilon = epsilon
-        self.epsilon2 = self.pX[1,0]/self.pX[0,0]*self.epsilon
+     
+        y_weights = np.full(self.N,1.0/self.N)
+        y_weights[0] = -1  
+        y_weights[self.N-1] = 1
+        self.y_weights = y_weights
         
-        self.y_weights = np.full(self.N,.5)
-        self.y_weights[0] = 1  
-        self.y_weights = self.y_weights/self.y_weights.sum()
-        
-        self.pre_compute()     
     
     def __str__(self):
         string = "ParallelConfounded_mis{0:.1f}_Nis{1}_N1is{2}_qis{3:.1f}_{4:.1f}_{5:.1f}_{6:.1f}_pzis{7:.1f}_epsilonis{8:.1f}".format(self.m,self.N,self.N1,self.q10,self.q11,self.q20,self.q21,self.pZ,self.epsilon)
@@ -281,32 +302,32 @@ class ParallelConfounded(Model):
         q10,q11,q20,q21 = q
         N2 = N - N1
         model = cls(q10,q11,q20,q21,pz,N1,N2,epsilon)
-        # adjust costs for do(Z=1), do(Z=0) such that the actions have expected reward .5 to match worse case 
-        costs = np.zeros(model.K)
-        costs[-2] = model.expected_Y[-2]-.5 
-        costs[-3] = model.expected_Y[-3]-.5
-        model.set_action_costs(costs)
+        model.make_first_arm_epsilon_best(epsilon)
         return model
+        
         
     def pYgivenX(self,x):
         s = np.dot(x,self.y_weights)
         return expit(s)
-        #if x[0] == 1:
-        #    return .5+self.epsilon
-        #return .5-self.epsilon2
+
         
     def sample(self,action):
-        """ samples given the specified action index and returns the values of the parents of Y, Y. """         
-        if action == self.K - 2: # do(z = 1)
-            x = binomial(1,self.pX1[1,:])
-        elif action == self.K - 3: # do(z = 0)
-            x = binomial(1,self.pX0[1,:])
+        """ samples given the specified action index and returns the values of the parents of Y, Y. """   
+        if action == 2*self.N+1: # do(z = 1)
+            z = 1       
+        elif action == 2*self.N: # do(z = 0)
+            z = 0     
         else: # we are not setting z
-            x = binomial(1,self.pX[1,:])
-            if action != self.K - 1: # not do()
-                 i,j = action % self.N, action/self.N
-                 x[i] = j
-        y = binomial(1,self.pYgivenX(x))
+            z = binomial(1,self.pZ)
+        
+        x = binomial(1,self.pXgivenZ[1,:,z]) # PXgivenZ[j,i,k] = P(X_i=j|Z=k)
+        
+        if action < 2*self.N: # setting x_i = j
+             i,j = action % self.N, action/self.N
+             x[i] = j
+             
+        y = binomial(1,self.pYgivenX(x)) - self.get_costs()[action]
+        
         return x,y
         
               
@@ -315,19 +336,20 @@ class ParallelConfounded(Model):
             x is an array of length N specifiying an assignment to the parents of Y
             returns a vector of length K. 
         """
-        # for do(), do(x_i=j)
-        p = self.pX[x,self.indx] # vector of lenght K, p[i] = P(X_i = x_i| do())
-        joint_j = prod_all_but_j(p) # vector of length K, joint_j = prod_k!=j(X_k = x_k)
-        pij = np.vstack((joint_j,joint_j))
+        pz1 = self.pXgivenZ[x,self.indx,1]
+        pz0 = self.pXgivenZ[x,self.indx,0]
+    
+        p_obs = self.pZ*pz1.prod()+(1-self.pZ)*pz0.prod()
+        
+        # for do(x_i = j)
+        joint_z0 = prod_all_but_j(pz0) # vector of length N
+        joint_z1 = prod_all_but_j(pz1) 
+        p = self.pZ * joint_z1+ (1-self.pZ) * joint_z0  
+        pij = np.vstack((p,p))
         pij[1-x,self.indx] = 0 # 2*N array, pij[i,j] = P(X=x|do(X_i=j)) = d(X_i-j)*prod_k!=j(X_k = x_k)
         pij = pij.reshape((len(x)*2,)) #flatten first N-1 will be px=0,2nd px=1
-        p_obs = p.prod()
         
-        # for do(z)
-        pz0 = self.pX0[x,self.indx].prod() # vector of length K p0[i] = P(X_i = x_i|do(z=0))
-        pz1 = self.pX1[x,self.indx].prod() # vector of length K p0[i] = P(X_i = x_i|do(z=1))
-        
-        result = np.hstack((pij,pz0,pz1,p_obs))
+        result = np.hstack((pij,pz0.prod(),pz1.prod(),p_obs))
         return result
         
  
@@ -372,66 +394,26 @@ class ParallelConfounded(Model):
 class ParallelConfoundedNoZAction(ParallelConfounded):
     """ the ParallelConfounded Model but without the actions that set Z """
     def __init__(self,q10,q11,q20,q21,pZ,N1,N2,epsilon):
-      
-        
-        pXgivenZ0 = np.hstack((np.full(N1,q10),np.full(N2,q20)))
-        pXgivenZ1 = np.hstack((np.full(N1,q11),np.full(N2,q21)))
-        self.N1 = N1
-        self.N2 = N2
-        self.q10,self.q11,self.q20,self.q21 = q10,q11,q20,q21
-        self.N = len(pXgivenZ0)
-        self.indx = np.arange(self.N)
-        self.K = 2*self.N + 1
-        self.pZ = pZ
-        self.pX0 = np.vstack((1.0-pXgivenZ0,pXgivenZ0)) # PX0[i,j] = P(X_i = j|Z = 0)
-        self.pX1 = np.vstack((1.0-pXgivenZ1,pXgivenZ1)) # PX1[i,j] = P(X_i = j|Z = 1)
-        self.pX =  (1-self.pZ)*self.pX0 + self.pZ*self.pX1  # pX[i,j]  = P(X_i = j) = P(Z=0)*P(X_i = j|Z = 0)+P(Z=1)*P(X_i = j|Z = 1)
-        self.epsilon = epsilon
-        self.epsilon2 = self.pX[1,0]/self.pX[0,0]*self.epsilon
-
-        self.y_weights = np.full(self.N,.5)
-        self.y_weights[0] = 1  
-        self.y_weights = self.y_weights/self.y_weights.sum()        
-        
+        self._init_pre_action(q10,q11,q20,q21,pZ,N1,N2,epsilon)
+        self.K = 2*self.N + 1        
         self.pre_compute() 
-
-    @classmethod
-    def create(cls,N,N1,pz,q,epsilon):
-        """ builds ParallelConfounded model"""
-        q10,q11,q20,q21 = q
-        N2 = N - N1
-        model = cls(q10,q11,q20,q21,pz,N1,N2,epsilon)
-        # adjust costs for do(Z=1), do(Z=0) such that the actions have expected reward .5 to match worse case 
-        costs = np.zeros(model.K)
-        costs = model.expected_Y - 0.5
-        costs[0] -= epsilon
-        print costs
-        model.set_action_costs(costs)
-        return model           
-        
+              
     def P(self,x):
-        """ calculate P(X = x|a) for each action a. 
-            x is an array of length N specifiying an assignment to the parents of Y
-            returns a vector of length K. 
-        """
-        # for do(), do(x_i=j)
-        p = self.pX[x,self.indx] # vector of lenght K, p[i] = P(X_i = x_i| do())
-        joint_j = prod_all_but_j(p) # vector of length K, joint_j = prod_k!=j(X_k = x_k)
-        pij = np.vstack((joint_j,joint_j))
-        pij[1-x,self.indx] = 0 # 2*N array, pij[i,j] = P(X=x|do(X_i=j)) = d(X_i-j)*prod_k!=j(X_k = x_k)
-        pij = pij.reshape((len(x)*2,)) #flatten first N-1 will be px=0,2nd px=1
-        p_obs = p.prod()
+        p = ParallelConfounded.P(self,x)
+        return np.hstack((p[0:-3],p[-1]))        
         
-        result = np.hstack((pij,p_obs))
-        return result 
         
     def sample(self,action):
-        """ samples given the specified action index and returns the values of the parents of Y, Y. """         
-        x = binomial(1,self.pX[1,:])
-        if action != self.K - 1: # not do()
-            i,j = action % self.N, action/self.N
-            x[i] = j
-        y = binomial(1,self.pYgivenX(x))
+        """ samples given the specified action index and returns the values of the parents of Y, Y. """   
+        z = binomial(1,self.pZ)        
+        x = binomial(1,self.pXgivenZ[1,:,z]) # PXgivenZ[j,i,k] = P(X_i=j|Z=k)
+        
+        if action < 2*self.N: # setting x_i = j
+             i,j = action % self.N, action/self.N
+             x[i] = j
+             
+        y = binomial(1,self.pYgivenX(x)) - self.get_costs()[action]
+        
         return x,y
           
     def weights(self):
@@ -451,12 +433,15 @@ class ParallelConfoundedNoZAction(ParallelConfounded):
 
 if __name__ == "__main__":  
     N = 8
+    N1 = 1
     pz = .5
-    q = (0,0,1,0)
+    q = (1,1,1,0)
     epsilon = .1
     simulations = 10
    
-    model = ParallelConfoundedNoZAction.create(N,1,pz,q,epsilon)
+    model = ParallelConfounded.create(N,N1,pz,q,epsilon)
+    
+    
     
   
     

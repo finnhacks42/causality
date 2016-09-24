@@ -11,18 +11,22 @@ from pgmpy.inference import VariableElimination
 from pgmpy.sampling import BayesianModelSampling
 import numpy as np
 from itertools import chain,product
+from scipy.special import expit
 
 class GeneralModel(Model):
     """ Allows construction of an arbitray causal graph & action space with discrete (currently assumed binary) CPD tables. 
         This implementation will not scale to large graphs. """
-    def __init__(self,model,actions):
+    def __init__(self,model,actions,py_func):
         """ model is a pgmpy.BayesianModel
             actions is a list of (var,value) tuples """
+        self.py_func = py_func
         self.parents = sorted(model.get_parents('Y'))
         self.N = len(self.parents)
         self.actions = actions
         self.K = len(actions)
         
+        self.observational_model = model
+        self.observational_inference = VariableElimination(self.observational_model)
         self.post_action_models = [GeneralModel.do(model,action) for action in actions]
         self.samplers = [BayesianModelSampling(model_a) for model_a in self.post_action_models]
         
@@ -32,7 +36,23 @@ class GeneralModel(Model):
             _,distribution_over_parents = infer.query(self.parents)
             self.interventional_distributions.append(distribution_over_parents)        
            
-        self.pre_compute(compute_py = False)
+        self.pre_compute()
+        
+    def expected_Y_observational(self):
+        """ return a vector of length K with the expected Y given we observe the variable-value pair corresponding to each action """
+        expected_Y = np.zeros(self.K)
+        
+        for indx,action in enumerate(self.actions):
+            var,value = action
+            if var is None:
+                _,distribution = self.observational_inference.query(['Y'])
+            else:
+                _,distribution = self.observational_inference.query(['Y'],evidence = dict([action]))
+            
+            pyis1 = distribution.reduce([('Y',1)],inplace=False).values
+            expected_Y[indx] = pyis1
+            
+        return expected_Y
         
     def _expected_Y(self):
         expected_Y = np.zeros(self.K)
@@ -43,8 +63,20 @@ class GeneralModel(Model):
             expected_Y[indx] = expected_reward
         return expected_Y
         
+    @staticmethod
+    def build_ycpd(py_func,N):
+        cpd = np.zeros((2,2**N))
+        for i,x in enumerate(Model.generate_binary_assignments(N)):
+            cpd[0,i] = 1 - py_func(x)
+            cpd[1,i] = py_func(x)
+        return cpd
+        
+    def pYgivenX(self,x):
+        return self.py_func(x)
+        
+        
     @classmethod
-    def create_confounded_parallel(cls,N,N1,pz,q,epsilon):       
+    def create_confounded_parallel(cls,N,N1,pz,q,epsilon, act_on_z = True):       
         """ convinience method for constructing equivelent models to Confounded_Parallel""" 
         q10,q11,q20,q21 = q
         pZ = [[1-pz,pz]] 
@@ -58,22 +90,30 @@ class GeneralModel(Model):
         cpds.extend([TabularCPD(variable=v,variable_card=2,values=pXgivenZ_N1, evidence=['Z'], evidence_card = [2]) for v in xvars[0:N1] ])
         cpds.extend([TabularCPD(variable=v,variable_card=2,values=pXgivenZ_N2, evidence=['Z'], evidence_card = [2]) for v in xvars[N1:] ])
         
-        px1 = (1-pz)*q10+pz*q11
-        epsilon2 = px1/(1-px1)*epsilon
-        pYis1 = np.hstack((np.full(2**(N-1),.5-epsilon2),np.full(2**(N-1),.5+epsilon)))
-        ycpd = np.vstack((1-pYis1,pYis1))
+        y_weights = np.full(N,1.0/N)
+        y_weights[0] = -1  
+        y_weights[N-1] = 1
+        
+        
+        def py(x):
+             s = np.dot(x,y_weights)
+             return expit(s)
+        
+        
+        ycpd = GeneralModel.build_ycpd(py,N)
         cpds.append(TabularCPD(variable='Y',variable_card=2, values = ycpd, evidence = xvars,evidence_card = [2]*len(xvars)))
         
         model.add_cpds(*cpds)
         model.check_model()
-        actions = list(chain([(x,0) for x in xvars],[(x,1) for x in xvars],[("Z",i) for i in (0,1)],[(None,None)]))
-        pgm_model = cls(model,actions)  
-        # adjust costs for do(Z=1), do(Z=0) such that the actions have expected reward .5 to match worse case 
-        costs = np.zeros(pgm_model.K)
-        costs[-2] = pgm_model.expected_Y[-2]-.5 
-        costs[-3] = pgm_model.expected_Y[-3]-.5
-        pgm_model.set_action_costs(costs)
         
+        if act_on_z:
+            actions = list(chain([(x,0) for x in xvars],[(x,1) for x in xvars],[("Z",i) for i in (0,1)],[(None,None)]))
+              
+        else:
+            actions = list(chain([(x,0) for x in xvars],[(x,1) for x in xvars],[(None,None)]))
+            
+        pgm_model = cls(model,actions,py)  
+        pgm_model.make_first_arm_epsilon_best(epsilon)
         return pgm_model
     
     @classmethod    
@@ -132,7 +172,7 @@ class GeneralModel(Model):
         """ samples given the specified action index and returns the values of the parents of Y, Y. """
         s = self.samplers[action].forward_sample()
         x = s.loc[:,self.parents].values[0]
-        y = s.loc[:,['Y']].values[0][0]
+        y = s.loc[:,['Y']].values[0][0] - self.get_costs()[action]
         return x,y
         
         
@@ -144,18 +184,24 @@ class GeneralModel(Model):
         return pa
         
 if __name__ == "__main__":  
-    Nz = 3
-    pZ1 = .1
-    pZ = .4
-    a = .3
-    b = .7
-    py = np.asarray([.1,.5,.3,.2])
+    N = 8
+    N1 = 1
+    pz = .1
+    q = (.9,.1,.9,.1)
+    epsilon = .1
 
-    model1 = GeneralModel.create_very_confounded(Nz,pZ1,pZ,a,b,py)
-    samples = 100000
-    s = model1.samplers[3].forward_sample(samples)
-    c = len(s[(s['X1']==0)&(s['X2']==0)])
-    print c/float(samples)
+    model = GeneralModel.create_confounded_parallel(N,N1,pz,q,epsilon,act_on_z = False)
+    print model.expected_Y - model.expected_Y_observational()
+    
+#    
+#    pXgivenZ0 = np.zeros(N)
+#    pXgivenZ1 = np.zeros(N)
+#    for indx,x in enumerate(model.parents):
+#        _,dist = model.observational_inference.query([x],evidence={'Z':0})
+#        _,dist1 = model.observational_inference.query([x],evidence={'Z':1})
+#        pXgivenZ0[indx] = dist.reduce([(x,1)],inplace=False).values
+#        pXgivenZ1[indx] = dist1.reduce([(x,1)],inplace=False).values
+   
     
     
 
@@ -163,4 +209,3 @@ if __name__ == "__main__":
     
     
 
-    #models = [ParallelConfounded.create(N,N1,pz,q,epsilon) for N1 in range(2,20,8)]

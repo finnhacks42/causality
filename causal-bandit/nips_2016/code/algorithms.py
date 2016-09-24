@@ -34,7 +34,7 @@ class GeneralCausal(object):
             x,y = model.sample(a) #x is an array containing values for each variable
             pa = model.P(x)
             r = model.R(pa,eta)
-            z = r*y #(r <= self.B)*r*y #Truncation turned off to run parallel bandit experiments
+            z = (r <= self.B)*r*y #Truncation turned off to run parallel bandit experiments
             u += z
         self.u = u/float(T)
         best_action = np.argmax(u)
@@ -52,7 +52,7 @@ class ParallelCausal(object):
         self.success = np.zeros(model.K)
         h = T/2
         for t in range(h):
-            x,y = model.sample(model.K) # do nothing
+            x,y = model.sample(model.K-1) # do nothing
             xij = np.hstack((1-x,x,1)) # first N actions represent x_i = 0,2nd N x_i=1, last do()
             self.trials += xij
             self.success += y*xij

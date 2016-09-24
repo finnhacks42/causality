@@ -3,14 +3,16 @@
 Created on Fri Sep 23 13:44:51 2016
 
 Compare the performance of the algorithms on a Confounded Parallel bandit for which 
-there is no action to set Z. The Parallel 
+there is no action to set Z. The Parallel algorithm is mis-specified in this setting, as it assumes there are no confounders.
+If the resulting bias exceeds epsilon then the Parallel algorithm will never identify the best arm.
 """
 
 
-from models import ParallelConfoundedNoZAction
+from models import ParallelConfoundedNoZAction,ParallelConfounded
 from algorithms import SuccessiveRejects,GeneralCausal,ParallelCausal
 from experiment_config import now_string,Experiment
 import numpy as np
+from pgmpy_model import GeneralModel
 
 
 def regret_vs_T(model,algorithms,T_vals,simulations = 10):
@@ -23,15 +25,29 @@ def regret_vs_T(model,algorithms,T_vals,simulations = 10):
                 
     return regret
            
-                     
-N = 20
+simulations = 100  
+epsilon = .2
+
+                  
+#N = 20
+#N1=1
+#pz = .3
+#q = (.9,.1,.8,.1)
+#model = ParallelConfoundedNoZAction.create(N,N1,pz,q,epsilon)
+
+N = 5
+N1 = 1
 pz = .5
-q = (0,0,1,0)
+q = (.9,.1,.9,.1)
 epsilon = .1
-simulations = 10
-model = ParallelConfoundedNoZAction.create(N,1,pz,q,epsilon)
-print "model",model.m
-T_vals = range(10,6*model.K,100)
+
+model = GeneralModel.create_confounded_parallel(N,N1,pz,q,epsilon,act_on_z=False)
+
+
+
+
+
+T_vals = range(10,1000,200)
 
 algorithms = [SuccessiveRejects(),GeneralCausal(),ParallelCausal()]
 
