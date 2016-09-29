@@ -76,7 +76,8 @@ class GeneralModel(Model):
         
         
     @classmethod
-    def create_confounded_parallel(cls,N,N1,pz,q,epsilon, act_on_z = True):       
+    
+    def create_confounded_parallel(cls,N,N1,pz,pY,q,epsilon, act_on_z = True):       
         """ convinience method for constructing equivelent models to Confounded_Parallel""" 
         q10,q11,q20,q21 = q
         pZ = [[1-pz,pz]] 
@@ -89,15 +90,11 @@ class GeneralModel(Model):
         cpds = [TabularCPD(variable='Z',variable_card=2,values=pZ)]
         cpds.extend([TabularCPD(variable=v,variable_card=2,values=pXgivenZ_N1, evidence=['Z'], evidence_card = [2]) for v in xvars[0:N1] ])
         cpds.extend([TabularCPD(variable=v,variable_card=2,values=pXgivenZ_N2, evidence=['Z'], evidence_card = [2]) for v in xvars[N1:] ])
-        
-        y_weights = np.full(N,1.0/N)
-        y_weights[0] = -1  
-        y_weights[N-1] = 1
-        
-        
+
+           
         def py(x):
-             s = np.dot(x,y_weights)
-             return expit(s)
+             i,j = x[0],x[N-1]
+             return pY[i,j] 
         
         
         ycpd = GeneralModel.build_ycpd(py,N)
@@ -113,7 +110,7 @@ class GeneralModel(Model):
             actions = list(chain([(x,0) for x in xvars],[(x,1) for x in xvars],[(None,None)]))
             
         pgm_model = cls(model,actions,py)  
-        pgm_model.make_first_arm_epsilon_best(epsilon)
+       
         return pgm_model
     
     @classmethod    
@@ -172,7 +169,7 @@ class GeneralModel(Model):
         """ samples given the specified action index and returns the values of the parents of Y, Y. """
         s = self.samplers[action].forward_sample()
         x = s.loc[:,self.parents].values[0]
-        y = s.loc[:,['Y']].values[0][0] - self.get_costs()[action]
+        y = s.loc[:,['Y']].values[0][0]
         return x,y
         
         

@@ -8,7 +8,7 @@ If the resulting bias exceeds epsilon then the Parallel algorithm will never ide
 """
 
 
-from models import ParallelConfoundedNoZAction
+from models import ParallelConfoundedNoZAction,ActionShuffler
 from algorithms import SuccessiveRejects,GeneralCausal,ParallelCausal,RandomArm
 from experiment_config import now_string,Experiment
 import numpy as np
@@ -23,32 +23,29 @@ def regret_vs_T(model,algorithms,T_vals,simulations = 10):
         for a_indx,algorithm in enumerate(algorithms):
             for s in xrange(simulations):
                 i = np.random.randint(0,model.K)
-                #model.make_ith_arm_epsilon_best(epsilon,0)
+                model.make_ith_arm_epsilon_best(epsilon,0)
                 regret[a_indx,T_indx,s] = algorithm.run(T,model)
                 if algorithm.best_action is not None:
                     pulls[a_indx,T_indx,algorithm.best_action] +=1
-        print T
+        print T,algorithms[1].B
                 
     return regret,pulls
            
-simulations = 100
+simulations = 1000
 
 # why doesn't pulls and eta line up
                   
 N =20
 N1 = 1
-pY = np.asarray([[.4,.4],[.7,.7]])
-pz = .3
-q = (.1,.9,.1,.7)
+pz = .1
+pz = .2
+q = (.1,.9,.2,.8)
 epsilon=.1
-model = ParallelConfoundedNoZAction.create(N,N1,pz,pY,q,epsilon)
+model = ParallelConfoundedNoZAction.create(N,N1,pz,q,epsilon)
 
-#alg = GeneralCausal()
-#alg.run(200,model)
+T_vals = range(model.K,200,10)
 
-T_vals = range(model.K,1000,100)
-
-algorithms = [GeneralCausal(),RandomArm(),ParallelCausal(),SuccessiveRejects()]
+algorithms = [SuccessiveRejects(),GeneralCausal(),ParallelCausal(),RandomArm()]
 
 regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
 finished = now_string()

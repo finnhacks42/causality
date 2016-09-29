@@ -9,24 +9,25 @@ import datetime as dt
 
 import numpy as np
 import matplotlib.pyplot as plt
-from algorithms import GeneralCausal,  ParallelCausal, SuccessiveRejects,AlphaUCB
+from algorithms import GeneralCausal,  ParallelCausal, SuccessiveRejects,AlphaUCB,RandomArm
 import cPickle as pickle
 
+print "LOADING EXPERIMENT CONFIG MODULE AGAIN"
 
 def now_string():
     return dt.datetime.now().strftime('%Y%m%d_%H%M')
 
   
 class Experiment(object):
-    REGRET_LABEL = "Regret"
-    HORIZON_LABEL = "T"
-    M_LABEL = "m(q)"
-    markers=['s', 'o', 'D', '*']
-    colors = ["red","green","blue","purple"]
-    algorithms = [ParallelCausal,GeneralCausal,SuccessiveRejects,AlphaUCB]
     
     def __init__(self,experiment_id):
         self.experiment_id = experiment_id
+        self.REGRET_LABEL = "Regret"
+        self.HORIZON_LABEL = "T"
+        self.M_LABEL = "m(q)"
+        self.markers=['s', 'o', 'D', '*',"^"]
+        self.colors = ["red","green","blue","purple","cyan"]
+        self.algorithms = [ParallelCausal,GeneralCausal,SuccessiveRejects,AlphaUCB,RandomArm]
 
         for indx,a in enumerate(self.algorithms):
             a.marker = self.markers[indx]

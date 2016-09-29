@@ -7,16 +7,17 @@ Created on Tue Sep 20 16:48:05 2016
 
 """
 from models import ParallelConfounded
-from algorithms import SuccessiveRejects,GeneralCausal
+from algorithms import SuccessiveRejects,GeneralCausal,AlphaUCB
 from experiment_config import now_string,Experiment
 import numpy as np
 
 
-def regret_vs_m_general(algorithms,N1_vals,N,T,pz,q,epsilon,simulations = 10): 
+def regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = 1000): 
     m_vals = []
     regret = np.zeros((len(algorithms),len(N1_vals),simulations))
     for m_indx,N1 in enumerate(N1_vals):
-        model = ParallelConfounded.create(N,N1,pz,q,epsilon)
+        model = ParallelConfounded.create(N,N1,pz,pY,q,epsilon)
+        model.make_ith_arm_epsilon_best(epsilon,0)
         print N1
         m_vals.append(model.m)
         for a_indx, algorithm in enumerate(algorithms):
@@ -28,17 +29,18 @@ def regret_vs_m_general(algorithms,N1_vals,N,T,pz,q,epsilon,simulations = 10):
    
 
     
-N = 15
-N1_vals = range(0,N,6)
-pz = .5
+N = 20
+N1_vals = range(1,N,2)
+pz = .4
 q = (0,0,.4,.6)
 epsilon = .1
-simulations = 100
+simulations = 10000
 T = 400
-algorithms = [SuccessiveRejects(),GeneralCausal()]
+algorithms = [SuccessiveRejects(),GeneralCausal(),AlphaUCB(2)]
+pY = np.asarray([[.4,.4],[.7,.7]])
 
 
-m_vals,regret = regret_vs_m_general(algorithms,N1_vals,N,T,pz,q,epsilon,simulations=simulations)
+m_vals,regret = regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = simulations)
 finished = now_string()
 
 experiment = Experiment(4)
