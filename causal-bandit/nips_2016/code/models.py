@@ -614,13 +614,16 @@ class ScaleableParallelConfounded():
         sum0 = np.zeros(self.K)
         sum1 = np.zeros(self.K)
         for x in Model.generate_binary_assignments(self.N):
-            pz0 = self.P0(x)            
-            Q0 = eta.dot(pz0)
-            sum0 += self.P(x)*np.nan_to_num(np.true_divide(pz0,Q0))
             
-            pz1 = self.P1(x)
-            Q1 = eta.dot(pz1)
-            sum1 += self.P(x)*np.nan_to_num(np.true_divide(pz1,Q1))
+            
+            pa = self.P(x)            
+            Q = eta.dot(pa)
+            ratio = np.nan_to_num(np.true_divide(pa,Q))
+            
+            sum0 += self.P0(x)*ratio
+            
+            
+            sum1 += self.P1(x)*ratio
     
         result = self.expand(self.pZgivenA)*sum1+self.expand(1-self.pZgivenA)*sum0
         return result 

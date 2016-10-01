@@ -126,7 +126,7 @@ class TestScaleableModel(unittest.TestCase):
     
 class TestScaleableModelEquivalance(unittest.TestCase):
     def setUp(self):
-        N = 20
+        N = 3
         N1 = 1
         q = .1,.3,.4,.7
         pZ = .2
