@@ -431,14 +431,17 @@ class ParallelConfoundedNoZAction(ParallelConfounded):
               
 class ScaleableParallelConfounded():
     """ Makes use of symetries to avoid exponential combinatorics in calculating V """
+    # do(x1=0),do(x2=0),do(x1=1),do(x2=1),do(z=0),do(z=1),do()
     
     def __init__(self,q,pZ,pY,N1,N2):
         self.pZ = pZ
+        self.pZgivenA = np.hstack((np.full(4,pZ),0,1,pZ))
         self.N1 = N1
         self.N2 = N2
         self.N = N1+N2
         self.K = 2*self.N + 3
         q10,q11,q20,q21 = q
+        self.q10,self.q11,self.q20,self.q21 = q
         self.qz0 = np.asarray([(1-q10),q10,(1-q20),q20])
         self.qz1 = np.asarray([(1-q11),q11,(1-q21),q21])
         self.pa = np.zeros(7)
@@ -457,7 +460,106 @@ class ScaleableParallelConfounded():
         result = np.hstack((pij,pc[4],pc[5],pc[6]))
         return result
         
+    def P02(self,x):
+        
+        pXgivenZ0 = np.hstack((np.full(self.N1,self.q10),np.full(self.N2,self.q20)))
+        pXgivenZ0 = np.vstack((1-pXgivenZ0,pXgivenZ0))
 
+        
+        pz0 = pXgivenZ0[x,self.indx]
+    
+        p_obs = pz0.prod()
+        
+        # for do(x_i = j)
+        p = prod_all_but_j(pz0) # vector of length N
+           
+        pij = np.vstack((p,p))
+        pij[1-x,self.indx] = 0 # 2*N array, pij[i,j] = P(X=x|do(X_i=j)) = d(X_i-j)*prod_k!=j(X_k = x_k)
+        pij = pij.reshape((len(x)*2,)) #flatten first N-1 will be px=0,2nd px=1
+        
+        result = np.hstack((pij,pz0.prod(),0,p_obs))
+        return result
+        
+    
+    def P0(self,x):
+        n1 = x[0:self.N1].sum()
+        n2 = x[self.N1:].sum()
+        pc = self.P_counts0(n1,n2)
+        doxi0 = np.hstack((np.full(self.N1,pc[0]),np.full(self.N2,pc[1])))
+        doxi1 = np.hstack((np.full(self.N1,pc[2]),np.full(self.N2,pc[3])))
+        pij = np.vstack((doxi0,doxi1))
+        pij[1-x,self.indx] = 0
+        pij = pij.reshape((self.N*2,))
+        result = np.hstack((pij,pc[4],pc[5],pc[6]))
+        return result
+        
+    def P1(self,x):
+        n1 = x[0:self.N1].sum()
+        n2 = x[self.N1:].sum()
+        pc = self.P_counts1(n1,n2)
+        doxi0 = np.hstack((np.full(self.N1,pc[0]),np.full(self.N2,pc[1])))
+        doxi1 = np.hstack((np.full(self.N1,pc[2]),np.full(self.N2,pc[3])))
+        pij = np.vstack((doxi0,doxi1))
+        pij[1-x,self.indx] = 0
+        pij = pij.reshape((self.N*2,))
+        result = np.hstack((pij,pc[4],pc[5],pc[6]))
+        return result
+        
+    def pcz0(self,n1,n2):
+        result = np.zeros(7)
+        result[0] = binom(self.N1-1,self.q10).pmf(n1)*binom(self.N2,self.q20).pmf(n2)
+        result[1] = binom(self.N1,self.q10).pmf(n1)*binom(self.N2-1,self.q20).pmf(n2)
+        result[2] = binom(self.N1-1,self.q10).pmf(n1-1)*binom(self.N2,self.q20).pmf(n2)
+        result[3] = binom(self.N1,self.q10).pmf(n1)*binom(self.N2-1,self.q20).pmf(n2-1)
+        result[4] = binom(self.N1,self.q10).pmf(n1)*binom(self.N2,self.q20).pmf(n2)
+        result[5] = 0
+        result[6] = result[4]
+        return result
+        
+    def pcz1(self,n1,n2):
+        result = np.zeros(7)
+        result[0] = binom(self.N1-1,self.q11).pmf(n1)*binom(self.N2,self.q21).pmf(n2)
+        result[1] = binom(self.N1,self.q11).pmf(n1)*binom(self.N2-1,self.q21).pmf(n2)
+        result[2] = binom(self.N1-1,self.q11).pmf(n1-1)*binom(self.N2,self.q21).pmf(n2)
+        result[3] = binom(self.N1,self.q11).pmf(n1)*binom(self.N2-1,self.q21).pmf(n2-1)
+        result[4] = 0
+        result[5] = binom(self.N1,self.q11).pmf(n1)*binom(self.N2,self.q21).pmf(n2)
+        result[6] = result[5]
+        return result
+                
+    def pc(self,n1,n2):
+        return self.pZgivenA*self.pcz1(n1,n2)+(1-self.pZgivenA)*self.pcz0(n1,n2)
+      
+    def counts(self):
+        return product(range(self.N1+1),range(self.N2+1))
+    
+    def V_short3(self,eta):
+        sum0 = np.zeros(7)
+        sum1 = np.zeros(7)
+        for n1,n2 in product(range(self.N1+1),range(self.N2+1)):
+            pz0 = self.pcz0(n1,n2)
+            Q0 = (eta*self.weights).dot(pz0)
+            sum0 += pz0*np.nan_to_num(np.true_divide(pz0,Q0))
+            pz1 = self.pcz1(n1,n2)
+            Q1 = (eta*self.weights).dot(pz1)
+            sum1 +=  pz1*np.nan_to_num(np.true_divide(pz1,Q1))
+            
+        result = (1-self.pZgivenA)*sum0+self.pZgivenA*sum1
+        return result
+        
+    def V_short(self,eta):
+        result = np.zeros(7)
+        for n1,n2 in product(range(self.N1+1),range(self.N2+1)):
+            pa = self.p_of_count_given_action(n1,n2)
+            Q = (eta*self.weights).dot(pa)
+            ratio = np.nan_to_num(np.true_divide(pa,Q))
+            
+            result += pa*ratio 
+            # it seems like we can only change the muliplier here
+            # changing pa earlier changes Q, which changes results for answers that are correct already ...
+        return result
+        
+    
     def p_of_count_given_action(self,n1,n2):
         pa = self.P_counts(n1,n2)
         wdo = comb(self.N1,n1,exact=True)*comb(self.N2,n2,exact=True)
@@ -468,7 +570,103 @@ class ScaleableParallelConfounded():
         w = np.asarray([wdox10,wdox20,wdox11,wdox21,wdo,wdo,wdo])
         #print (n1,n2),"weight",w,pa
         return w*pa
-                
+        
+    def pos_power(self,a,b):
+        result = a**b
+        neg = np.where(b<0)[0]
+        result[neg] = 0
+        return result
+        
+        
+    def p_of_x_given_a_z(self,x,z):
+        n1,n2 = x[0:self.N1].sum(),x[self.N1:].sum()
+#        print x,n1,n2
+        powers = np.tile([self.N1-n1,n1,self.N2-n2,n2],7).reshape((7,4))
+        powers[0,0]-=1 #do(x1=0)
+        powers[1,2]-=1 #do(x2=0)
+        powers[2,1]-=1 #do(x1=1)
+        powers[3,3]-=1 #do(x2=1)
+        
+        if z == 0:
+            return self.pcz0(n1,n2)
+            #return self.pos_power(self.qz0,powers).prod(axis=1)
+        else:
+            return self.pcz1(n1,n2)
+            #return self.pos_power(self.qz1,powers).prod(axis=1)
+    
+    
+    def V_short2(self,eta):
+        sum0 = np.zeros(7)
+        sum1 = np.zeros(7)
+        for x in Model.generate_binary_assignments(self.N):
+            pz0 = self.p_of_x_given_a_z(x,0)            
+            Q0 = (eta*self.weights).dot(pz0)
+            sum0 += pz0*np.nan_to_num(np.true_divide(pz0,Q0))
+            
+            pz1 = self.p_of_x_given_a_z(x,1)
+            Q1 = (eta*self.weights).dot(pz1)
+            sum1 += pz1*np.nan_to_num(np.true_divide(pz1,Q1))
+    
+        result = self.pZgivenA*sum1+(1-self.pZgivenA)*sum0
+        return result 
+        
+    def V(self,eta):
+        sum0 = np.zeros(self.K)
+        sum1 = np.zeros(self.K)
+        for x in Model.generate_binary_assignments(self.N):
+            pz0 = self.P0(x)            
+            Q0 = eta.dot(pz0)
+            sum0 += self.P(x)*np.nan_to_num(np.true_divide(pz0,Q0))
+            
+            pz1 = self.P1(x)
+            Q1 = eta.dot(pz1)
+            sum1 += self.P(x)*np.nan_to_num(np.true_divide(pz1,Q1))
+    
+        result = self.expand(self.pZgivenA)*sum1+self.expand(1-self.pZgivenA)*sum0
+        return result 
+            
+  
+    def P_counts0(self,n1,n2):
+        """ joint probability of variables not set for each action """
+        counts = np.asarray([(self.N1-n1),n1,(self.N2-n2),n2]) 
+        self.pa[4] = np.power(self.qz0,counts).prod() #do(z=0)
+        self.pa[5] = 0 #do(z=1)
+        self.pa[6] = self.pa[4] #do()
+        
+        counts[0] = (self.N1-n1) - 1
+        self.pa[0] = np.power(self.qz0,counts).prod() #do(x1=0)
+        
+        counts[0],counts[2] = (self.N1-n1), (self.N2-n2) - 1
+        self.pa[1] = np.power(self.qz0,counts).prod() #do(x2=0)
+        
+        counts[2],counts[1] = (self.N2-n2), n1-1
+        self.pa[2] = np.power(self.qz0,counts).prod()#do(x1=1)
+        
+        counts[1],counts[3] = n1,n2-1
+        self.pa[3]= np.power(self.qz0,counts).prod()#do(x2=1)
+        return self.pa
+        
+    def P_counts1(self,n1,n2):
+        """ joint probability of variables not set for each action """
+        counts = np.asarray([(self.N1-n1),n1,(self.N2-n2),n2]) 
+        self.pa[4] = 0 #do(z=0)
+        self.pa[5] = np.power(self.qz1,counts).prod() #do(z=1)
+        self.pa[6] = self.pa[5]#do()
+        
+        counts[0] = (self.N1-n1) - 1
+        self.pa[0] = np.power(self.qz1,counts).prod() #do(x1=0)
+        
+        counts[0],counts[2] = (self.N1-n1), (self.N2-n2) - 1
+        self.pa[1] = np.power(self.qz1,counts).prod() #do(x2=0)
+        
+        counts[2],counts[1] = (self.N2-n2), n1-1
+        self.pa[2] = np.power(self.qz1,counts).prod()#do(x1=1)
+        
+        counts[1],counts[3] = n1,n2-1
+        self.pa[3]= np.power(self.qz1,counts).prod()#do(x2=1)
+        return self.pa
+        
+        
     
     def P_counts(self,n1,n2):
         """ joint probability of variables not set for each action """
@@ -491,16 +689,6 @@ class ScaleableParallelConfounded():
         return self.pa
         
     
-        
-        
-    def V_short(self,eta):
-        result = np.zeros(7)
-        for n1,n2 in product(range(self.N1+1),range(self.N2+1)):
-            pa = self.p_of_count_given_action(n1,n2)
-            Q = (eta*self.weights).dot(pa)
-            ratio = np.nan_to_num(np.true_divide(pa,Q))
-            result += pa*ratio
-        return result
         
     def expand(self,short_form):
         arrays = []
@@ -586,18 +774,61 @@ class ScaleableParallelConfounded():
 
 
 if __name__ == "__main__":  
-    N = 20
+    import numpy.testing as np_test
+    N = 3
     N1 = 1
-    q = 1,1,.4,.7
+    N2 = N-N1
+    q = .1,.3,.4,.7
+    q10,q11,q20,q21 = q
     pZ = .2
     pY = np.asanyarray([[.2,.8],[.3,.9]])
     model1 = ParallelConfounded.create(N,N1,pZ,pY,q,.1)
+    model2 = ScaleableParallelConfounded(q,pZ,pY,N1,N2)
     
-    eta = np.zeros(model1.K)
-    eta[0:N1] = 1.0/2*N1
-    eta[-1] = 1.0/2
+    m = model2  
     
-    #model2 = ScaleableParallelConfounded(q,pZ,pY,N1,N-N1)
+    eta = model1.expand_eta(model1.random_eta_short())
+    
+    print model1.V(eta)
+    print model2.V(eta)
+    
+    totals0 = np.zeros(7)
+    totals1 = np.zeros(7)    
+    for n1,n2 in model2.counts():
+        totals0 += model2.pcz0(n1,n2)
+        totals1 += model2.pcz1(n1,n2)
+    print "t",totals0
+    print "t",totals1
+#    
+#    
+    totals = np.zeros(model2.K)
+    for x in Model.generate_binary_assignments(N):
+        totals+=m.P1(x)
+    print "t",totals
+    
+    
+    
+#    totals = np.zeros(model2.K)
+#    for x in Model.generate_binary_assignments(N):
+#        totals+=m.P0(x)
+#        print m.P0(x)
+#        print m.P02(x)
+#        print "\n"
+#        np_test.assert_almost_equal(m.P0(x),m.P02(x))
+#    print totals
+#    
+    
+    
+   
+
+    
+    
+    
+    #eta = np.zeros(model1.K)
+    #eta[0:N1] = 1.0/2*N1
+    #eta[-1] = 1.0/2
+    
+    
     
     
     

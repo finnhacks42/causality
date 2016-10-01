@@ -22,7 +22,7 @@ def regret_vs_T(model,algorithms,T_vals,simulations = 10):
     return regret
            
                      
-simulations = 10
+simulations = 100
 N = 50
 m = 2
 epsilon = .3
