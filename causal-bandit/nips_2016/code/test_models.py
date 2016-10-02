@@ -160,9 +160,11 @@ class TestScaleableModelEquivalance(unittest.TestCase):
             
     def test_V(self):
         for t in range(10):
-            eta = self.model1.random_eta_short()
-            v1 = self.model1.V(self.model1.expand_eta(eta))
-            v2 = self.model2.expand(self.model2.V_short(eta))
+            eta = self.model1.expand_eta(self.model1.random_eta_short())
+            
+            v1 = self.model1.V(eta)
+            v2 = self.model2.V(eta)
+            #v2 = self.model2.expand(self.model2.V_short(eta))
             np_test.assert_array_almost_equal(v1,v2,err_msg="eta:"+str(eta))
         
         

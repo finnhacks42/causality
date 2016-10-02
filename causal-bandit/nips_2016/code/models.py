@@ -119,6 +119,17 @@ class Model(object):
         u = np.nan_to_num(u) # converts infinities to very large numbers such that multiplying by 0 gives 0
         v = np.dot(self.A2T,u)
         return v
+        
+    def V2(self,eta):
+        """ The expected value of R (over x sampled from p(x|a)), for each action """
+        
+        expected_R = np.zeros(self.K)
+        for x in self.get_parent_assignments():
+            pa = self.P(x)
+            Q = eta.dot(pa)
+            ratio = np.nan_to_num(np.true_divide(pa,Q))
+            expected_R += pa*ratio
+        return expected_R
     
     def m_eta(self,eta):
         """ The maximum value of V"""
@@ -547,7 +558,7 @@ class ScaleableParallelConfounded():
         result = (1-self.pZgivenA)*sum0+self.pZgivenA*sum1
         return result
         
-    def V_short(self,eta):
+    def V_short4(self,eta):
         result = np.zeros(7)
         for n1,n2 in product(range(self.N1+1),range(self.N2+1)):
             pa = self.p_of_count_given_action(n1,n2)
@@ -588,13 +599,53 @@ class ScaleableParallelConfounded():
         powers[3,3]-=1 #do(x2=1)
         
         if z == 0:
-            return self.pcz0(n1,n2)
-            #return self.pos_power(self.qz0,powers).prod(axis=1)
+            #return self.pcz0(n1,n2)
+            return self.pos_power(self.qz0,powers).prod(axis=1)
         else:
-            return self.pcz1(n1,n2)
-            #return self.pos_power(self.qz1,powers).prod(axis=1)
-    
-    
+            #return self.pcz1(n1,n2)
+            return self.pos_power(self.qz1,powers).prod(axis=1)
+            
+    def V_short(self,eta):
+        sum0 = np.zeros(7)
+        sum1 = np.zeros(7)
+        for n1,n2 in product(range(self.N1+1),range(self.N2+1)):
+             wdo = comb(self.N1,n1,exact=True)*comb(self.N2,n2,exact=True)
+             wdox10 = comb(self.N1-1,n1,exact=True)*comb(self.N2,n2,exact=True)
+             wdox11 = comb(self.N1-1,n1-1,exact=True)*comb(self.N2,n2,exact=True)
+             wdox20 = comb(self.N1,n1,exact=True)*comb(self.N2-1,n2,exact=True)
+             wdox21 = comb(self.N1,n1,exact=True)*comb(self.N2-1,n2-1,exact=True)
+             w = np.asarray([wdox10,wdox20,wdox11,wdox21,wdo,wdo,wdo])
+             
+             pz0 = self.p_n(n1,n2,0)
+             pz1 = self.p_n(n1,n2,1)
+             
+             counts = [self.N1-n1,self.N2-n2,n1,n2,1,1,1]
+             Q = (eta*pz0*counts*(1-self.pZgivenA)+eta*pz1*counts*self.pZgivenA).sum()
+             
+          
+             ratio = np.nan_to_num(np.true_divide(pz0*(1-self.pZgivenA)+pz1*self.pZgivenA,Q))
+             sum0 += w*pz0*ratio
+             sum1 += w*pz1*ratio
+        result = self.pZgivenA*sum1+(1-self.pZgivenA)*sum0
+        return result
+        
+            
+            
+    def p_n(self,n1,n2,z):
+        powers = np.tile([self.N1-n1,n1,self.N2-n2,n2],7).reshape((7,4))
+        powers[0,0]-=1 #do(x1=0)
+        powers[1,2]-=1 #do(x2=0)
+        powers[2,1]-=1 #do(x1=1)
+        powers[3,3]-=1 #do(x2=1)
+        
+        if z == 0:
+            #return self.pcz0(n1,n2)
+            return self.pos_power(self.qz0,powers).prod(axis=1)
+        else:
+            #return self.pcz1(n1,n2)
+            return self.pos_power(self.qz1,powers).prod(axis=1)
+            
+        
     def V_short2(self,eta):
         sum0 = np.zeros(7)
         sum1 = np.zeros(7)
@@ -609,24 +660,79 @@ class ScaleableParallelConfounded():
     
         result = self.pZgivenA*sum1+(1-self.pZgivenA)*sum0
         return result 
+     
+     
+    def Q3(self,x,eta):
+         p0 = self.P0(x) #self.expand(self.p_of_x_given_a_z(x,0)) #self.P0(x)
+         p1 = self.P1(x) #self.expand(self.p_of_x_given_a_z(x,1)) #       
+         pa = self.expand(self.pZgivenA)*p1+self.expand(1-self.pZgivenA)*p0
+         return eta.dot(pa)
+         
+    def Q2(self,x,eta):
+        """ Q just in terms of n1,n2 """
+        n1,n2 = x[0:self.N1].sum(),x[self.N1:].sum()
+        eta = self.contract(eta)
+        pz0 = self.p_n(n1,n2,0)
+        pz1 = self.p_n(n1,n2,1)
+        counts = [self.N1-n1,self.N2-n2,n1,n2,1,1,1]
+        Q = (eta*pz0*counts*(1-self.pZgivenA)+eta*pz1*counts*self.pZgivenA).sum()
+        return Q
+   
+        
+        
         
     def V(self,eta):
         sum0 = np.zeros(self.K)
         sum1 = np.zeros(self.K)
         for x in Model.generate_binary_assignments(self.N):
+            n1,n2 = x[0:self.N1].sum(),x[self.N1:].sum()
+            
+            p0 = self.P0(x) #self.expand(self.p_of_x_given_a_z(x,0)) #self.P0(x)
+            p1 = self.P1(x) #self.expand(self.p_of_x_given_a_z(x,1)) #      
+            
+            pa = self.expand(self.pZgivenA)*p1+self.expand(1-self.pZgivenA)*p0
+            
+            eta_short = self.contract(eta)
+            
+            pz0 = self.p_n(n1,n2,0)
+            pz1 = self.p_n(n1,n2,1)
             
             
-            pa = self.P(x)            
-            Q = eta.dot(pa)
+            #Q = self.expand(eta_short*pz0*counts*(1-self.pZgivenA)+eta_short*pz1*counts*self.pZgivenA)
+            
+            Q = self.Q2(x,eta)
+            
+
+            #pa = self.P(x)            
+            #Q = eta.dot(pa)
+            
             ratio = np.nan_to_num(np.true_divide(pa,Q))
             
-            sum0 += self.P0(x)*ratio
+           
+            #p0 = self.expand(self.pcz0(n1,n2))
+            #p1 = self.expand(self.pcz1(n1,n2))             
             
-            
-            sum1 += self.P1(x)*ratio
+           
+            sum0 += p0*ratio
+            sum1 += p1*ratio
     
         result = self.expand(self.pZgivenA)*sum1+self.expand(1-self.pZgivenA)*sum0
         return result 
+        
+    def V_short5(self,eta):
+    
+        sum0 = np.zeros(7)
+        sum1 = np.zeros(7)
+        for n1,n2 in product(range(self.N1+1),range(self.N2+1)):
+            pa = self.p_of_count_given_action(n1,n2)
+            Q = (eta*self.weights).dot(pa)
+            ratio = np.nan_to_num(np.true_divide(pa,Q))
+            
+            sum0 += self.pcz0(n1,n2)*ratio
+            sum1 += self.pcz1(n1,n2)*ratio
+        result = self.pZgivenA*sum1+(1-self.pZgivenA)*sum0
+            
+        return result
             
   
     def P_counts0(self,n1,n2):
@@ -779,7 +885,7 @@ class ScaleableParallelConfounded():
 if __name__ == "__main__":  
     import numpy.testing as np_test
     N = 3
-    N1 = 1
+    N1 = 2
     N2 = N-N1
     q = .1,.3,.4,.7
     q10,q11,q20,q21 = q
@@ -790,24 +896,41 @@ if __name__ == "__main__":
     
     m = model2  
     
-    eta = model1.expand_eta(model1.random_eta_short())
+    #eta = model1.expand_eta(model1.random_eta_short())
     
-    print model1.V(eta)
-    print model2.V(eta)
+    #eta = np.zeros(7)
+    #eta[1] = .5
     
-    totals0 = np.zeros(7)
-    totals1 = np.zeros(7)    
-    for n1,n2 in model2.counts():
-        totals0 += model2.pcz0(n1,n2)
-        totals1 += model2.pcz1(n1,n2)
-    print "t",totals0
-    print "t",totals1
+    for i in range(5):
+        eta_short = model1.random_eta_short()
+        eta = model1.expand_eta(eta_short)#model1.random_eta()
+        print model1.V(eta)
+        print model2.V(eta)
+        print model2.expand(model2.V_short(eta_short))
+        print "\n"
+    
+    #eta = model1.expand_eta(eta)
+    #v1 =  model2.V(eta)
+    #v2 =  model1.V(eta) 
+    #print v1
+    #print v2
+    
+#    #print model1.V(eta)
+#    #print model2.V(eta)
 #    
-#    
-    totals = np.zeros(model2.K)
-    for x in Model.generate_binary_assignments(N):
-        totals+=m.P1(x)
-    print "t",totals
+#    totals0 = np.zeros(model2.K)
+#    totals1 = np.zeros(model2.K)    
+#    for x in Model.generate_binary_assignments(N):
+#        totals0 += model2.P0(x)
+#        totals1 += model2.P1(x)
+#    print "t",totals0
+#    print "t",totals1
+##    
+##    
+#    totals = np.zeros(model2.K)
+#    for x in Model.generate_binary_assignments(N):
+#        totals+=m.P1(x)
+#    print "t",totals
     
     
     
