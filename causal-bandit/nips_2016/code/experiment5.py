@@ -8,8 +8,8 @@ If the resulting bias exceeds epsilon then the Parallel algorithm will never ide
 """
 
 
-from models import ParallelConfoundedNoZAction
-from algorithms import SuccessiveRejects,GeneralCausal,ParallelCausal,RandomArm
+from models import ScaleableParallelConfoundedNoZAction
+from algorithms import SuccessiveRejects,GeneralCausal,ParallelCausal,RandomArm,AlphaUCB,ThompsonSampling
 from experiment_config import now_string,Experiment
 import numpy as np
 
@@ -22,7 +22,7 @@ def regret_vs_T(model,algorithms,T_vals,simulations = 10):
         
         for a_indx,algorithm in enumerate(algorithms):
             for s in xrange(simulations):
-                i = np.random.randint(0,model.K)
+                #i = np.random.randint(0,model.K)
                 #model.make_ith_arm_epsilon_best(epsilon,0)
                 regret[a_indx,T_indx,s] = algorithm.run(T,model)
                 if algorithm.best_action is not None:
@@ -31,24 +31,24 @@ def regret_vs_T(model,algorithms,T_vals,simulations = 10):
                 
     return regret,pulls
            
-simulations = 100
+simulations = 10000
 
 # why doesn't pulls and eta line up
                   
-N =20
+N =50
 N1 = 1
 pY = np.asarray([[.4,.4],[.7,.7]])
-pz = .3
-q = (.1,.9,.1,.7)
-epsilon=.1
-model = ParallelConfoundedNoZAction.create(N,N1,pz,pY,q,epsilon)
+pz = .4
+q = (.1,.9,.2,.7)
 
+#model = ParallelConfoundedNoZAction.create(N,N1,pz,pY,q,epsilon)
+model = ScaleableParallelConfoundedNoZAction(q,pz,pY,N1,N-N1)
 #alg = GeneralCausal()
 #alg.run(200,model)
 
-T_vals = range(model.K,1000,100)
+T_vals = range(25,451,25)
 
-algorithms = [GeneralCausal(),RandomArm(),ParallelCausal(),SuccessiveRejects()]
+algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects(),ThompsonSampling(),AlphaUCB(2)]
 
 regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
 finished = now_string()

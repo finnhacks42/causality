@@ -8,7 +8,7 @@ Created on Sat Sep 17 11:11:22 2016
 import unittest
 import numpy.testing as np_test
 import numpy as np
-from models import ParallelConfounded,ParallelConfoundedNoZAction,Parallel,ScaleableParallelConfounded
+from models import ParallelConfounded,ParallelConfoundedNoZAction,Parallel,ScaleableParallelConfounded,ScaleableParallelConfoundedNoZAction
 from pgmpy_model import GeneralModel
 from itertools import chain,product
 
@@ -80,54 +80,68 @@ from itertools import chain,product
     
 
 
-#class TestModelParallelConfoundedNoZEquivalence(unittest.TestCase):
-#    
-#    def setUp(self):
-#        N = 3
-#        N1 = 1
-#        pz = .1
-#        q = 1,1,1,0
-#        pY = np.asanyarray([[.2,.8],[.3,.9]])
-#        epsilon = .2
-#        self.model1 = ParallelConfoundedNoZAction.create(N,N1,pz,pY,q,epsilon)          
-#        self.model2 = GeneralModel.create_confounded_parallel(N,N1,pz,pY,q,epsilon,act_on_z=False)
-#        
-#    def test_P(self):
-#        assignments = self.model1.get_parent_assignments()
-#        for x in assignments:
-#            np_test.assert_array_almost_equal(self.model1.P(x),self.model2.P(x),decimal=2,err_msg="x:"+str(x))
-#           
-#    def test_rewards(self):
-#        np_test.assert_array_almost_equal(self.model1.expected_rewards,self.model2.expected_rewards)
-#        
-#    def test_expected_y(self):
-#        np_test.assert_almost_equal(self.model1.expected_Y,self.model2.expected_Y)
-#        
-#    def test_m(self):
-#        difference = abs(self.model1.m - self.model2.m)
-#        self.assertLess(difference,.5)
-
-
-class TestScaleableModel(unittest.TestCase):
-    def setUp(self):
-        q = .1,.3,.4,.7
-        pZ = .2
-        pY = np.asanyarray([[.2,.8],[.3,.9]])
-        self.model = ScaleableParallelConfounded(q,pZ,pY,1,2)
-
-        
-    def test_p_x_givenz0(self):
-        np_test.assert_array_almost_equal([.6**2,.6*.9,.6*.9,0,0,0,.6*.6*.9,0,.6*.6*.9],self.model.P0(np.asarray([0,0,0],dtype=int))) 
-        np_test.assert_array_almost_equal([.6*.4,.9*.4,0,0,0,.9*.6,.9*.6*.4,0,.9*.6*.4],self.model.P0(np.asarray([0,0,1],dtype=int)))
-        np_test.assert_array_almost_equal([.4*.6,0,.9*.4,0,.9*.6,0,.9*.4*.6,0,.9*.4*.6],self.model.P0(np.asarray([0,1,0],dtype=int)))
-        np_test.assert_array_almost_equal([.4*.4,0,0,0,.9*.4,.9*.4,.9*.4*.4,0,.9*.4*.4],self.model.P0(np.asarray([0,1,1],dtype=int)))
-        
+class TestModelParallelConfoundedNoZEquivalence(unittest.TestCase):
     
-    
-class TestScaleableModelEquivalance(unittest.TestCase):
     def setUp(self):
         N = 3
         N1 = 1
+        pz = .1
+        q = 1,1,1,0
+        pY = np.asanyarray([[.2,.8],[.3,.9]])
+        epsilon = .2
+        self.model1 = ParallelConfoundedNoZAction.create(N,N1,pz,pY,q,epsilon)          
+        self.model2 = GeneralModel.create_confounded_parallel(N,N1,pz,pY,q,epsilon,act_on_z=False)
+        self.model3 = ScaleableParallelConfoundedNoZAction(q,pz,pY,N1,N-N1)
+        
+    def test_P(self):
+        assignments = self.model1.get_parent_assignments()
+        for x in assignments:
+            p1 = self.model1.P(x)
+            p2 = self.model2.P(x)
+            p3 = self.model3.P(x)
+            np_test.assert_array_almost_equal(p1,p2,decimal=2,err_msg="x:"+str(x))
+            np_test.assert_array_almost_equal(p2,p3,decimal=2,err_msg="x:"+str(x))
+           
+           
+    def test_rewards(self):
+        r1 = self.model1.expected_rewards
+        r2 = self.model2.expected_rewards
+        r3 = self.model3.expected_rewards
+        np_test.assert_array_almost_equal(r1,r2)
+        np_test.assert_array_almost_equal(r2,r3)
+        
+        
+    def test_expected_y(self):
+        y1 = self.model1.expected_Y
+        y2 = self.model2.expected_Y
+        y3 = self.model3.expected_Y
+        np_test.assert_array_almost_equal(y1,y2)
+        np_test.assert_array_almost_equal(y2,y3)
+        
+    def test_m(self):
+        difference = abs(self.model1.m - self.model2.m)
+        self.assertLess(difference,.5)
+        
+    def test_eta(self):
+        np_test.assert_array_almost_equal(self.model1.eta,self.model2.eta,decimal=2)
+        np_test.assert_array_almost_equal(self.model2.eta,self.model3.eta,decimal=2)
+        
+    def test_V(self):
+        eta_short = self.model1.random_eta_short()
+        eta = self.model1.expand(eta_short)
+        
+        v1 = self.model1.V(eta)
+        v2 = self.model2.V(eta)
+        v3 = self.model3.V(eta)
+        np_test.assert_array_almost_equal(v1,v2)
+        np_test.assert_array_almost_equal(v2,v3)
+
+
+           
+class TestScaleableModelEquivalance(unittest.TestCase):
+    def setUp(self):
+        N = 5
+        N1 = 2
         q = .1,.3,.4,.7
         pZ = .2
         pY = np.asanyarray([[.2,.8],[.3,.9]])
@@ -136,36 +150,23 @@ class TestScaleableModelEquivalance(unittest.TestCase):
         self.N1 = N1
         self.N2 = N - N1
         
-#    def test_P(self):
-#        for x in self.model1.get_parent_assignments():
-#            np_test.assert_array_almost_equal(self.model1.P(x),self.model2.P(x),err_msg="x:"+str(x))
-#            
-#    def test_P_counts(self):
-#        d = {}
-#        for x in self.model1.get_parent_assignments():
-#            n1,n2 = x[0:self.N1].sum(),x[self.N1:].sum()
-#            p1 = self.model1.P(x)
-#            v = d.get((n1,n2),0)
-#            d[(n1,n2)]=v+p1
-#        for key,value in d.iteritems():
-#            np_test.assert_array_almost_equal(value,self.model2.expand(self.model2.p_of_count_given_action(*key)))
-#            
-#            
-#    def test_P_counts_sum(self):
-#        result = np.zeros(7)
-#        for n1,n2 in product(range(self.model2.N1+1),range(self.model2.N2+1)):
-#            result+=self.model2.p_of_count_given_action(n1,n2)
-#        np_test.assert_array_almost_equal(np.ones(7),result)
-            
-            
+    def test_P(self):
+        for x in self.model1.get_parent_assignments():
+            np_test.assert_array_almost_equal(self.model1.P(x),self.model2.P(x),err_msg="x:"+str(x))
+
     def test_V(self):
         for t in range(10):
-            eta = self.model1.expand_eta(self.model1.random_eta_short())
+            eta_short = self.model1.random_eta_short()
+            eta = self.model1.expand(eta_short)
             
             v1 = self.model1.V(eta)
-            v2 = self.model2.V(eta)
-            #v2 = self.model2.expand(self.model2.V_short(eta))
+            v2 = self.model2.expand(self.model2.V_short(eta_short))
+            
             np_test.assert_array_almost_equal(v1,v2,err_msg="eta:"+str(eta))
+    
+    def test_rewards(self):
+        np_test.assert_almost_equal(self.model1.expected_Y,self.model2.expected_Y)
+        np_test.assert_array_almost_equal(self.model1.expected_rewards,self.model2.expected_rewards)
         
         
 class TestModelParallelConfoundedEquivalence(unittest.TestCase):

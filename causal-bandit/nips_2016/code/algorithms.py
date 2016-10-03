@@ -7,7 +7,8 @@ Created on Tue Sep 13 11:15:43 2016
 
 import numpy as np
 from math import sqrt, log
-from models import Parallel,ParallelConfoundedNoZAction
+from scipy.stats import beta
+from models import Parallel,ParallelConfoundedNoZAction,ScaleableParallelConfounded
 
 
 def argmax_rand(x):
@@ -22,9 +23,9 @@ def argmax_rand(x):
 class GeneralCausal(object):
     label = "Algorithm 2"
     
-    def __init__(self,truncate = "zero"):
+    def __init__(self,truncate = "clip"):
         self.truncate = truncate
-        self.label = "Algorithm 2-"+truncate
+        #self.label = "Algorithm 2-"+truncate
 
     def run(self,T,model):
         eta = model.eta
@@ -91,14 +92,35 @@ class ParallelCausal(object):
         return infrequent
         
  
+class ThompsonSampling(object):
+    """ Sample actions via the Thomson sampling approach and return the empirically best arm 
+        when the number of rounds is exhausted """
+    label = "Thompson Sampling"
     
+    def run(self,T,model):
+        self.trials = np.full(model.K,2,dtype=int)
+        self.success = np.full(model.K,1,dtype=int)
+        
+        for t in xrange(T):
+            fails = self.trials - self.success
+            theta = np.random.beta(self.success,fails)
+            arm = argmax_rand(theta)
+            self.trials[arm] +=1
+            self.success[arm]+= model.sample_multiple(arm,1)
+        
+        mu = np.true_divide(self.success,self.trials)
+        self.best_action = argmax_rand(mu)
+        return max(model.expected_rewards) - model.expected_rewards[self.best_action]
+        
+        
+        
 class UCB(object):
     """ 
     Implements Generic UCB algorithm.
     """
-        
     def run(self,T,model):
         if T <= model.K: # result is not defined if the horizon is shorter than the number of actions
+            self.best_action = None
             return np.nan
         
         actions = range(0,model.K)
@@ -114,6 +136,7 @@ class UCB(object):
         self.best_action = argmax_rand(mu)
         return max(model.expected_rewards) - model.expected_rewards[self.best_action]
         
+
 class LilUCB(UCB):
     """ 
     Implementation based on lil’UCB : An Optimal Exploration Algorithm for Multi-Armed Bandits
@@ -207,24 +230,37 @@ class SuccessiveRejects(object):
         return np.random.choice(indicies) # select one at random
 
 if __name__ == "__main__":  
-    alg = GeneralCausal(truncate = "zero")
     
-    N =10
+    
+    
+    N =5
     N1 = 1
     pz = .1
     pz = .2
     q = (.1,.9,.2,.8)
+    pY = np.asarray([[.4,.4],[.7,.7]])
     epsilon=.1
-    model = ParallelConfoundedNoZAction.create(N,N1,pz,q,epsilon)
-    model.make_ith_arm_epsilon_best(epsilon,0)
+    model = ScaleableParallelConfounded(q,pz,pY,N1,N-N1)
+    alg = ThompsonSampling()
+    alg2 = AlphaUCB(2)
+    import time
+    start = time.time()
+    alg.run(1000,model)
+    end = time.time()
+    print end - start
+        
+    
+    
+    #model = ParallelConfoundedNoZAction.create(N,N1,pz,q,epsilon)
+    #model.make_ith_arm_epsilon_best(epsilon,0)
     
     #alg.run(200,model)
   
     
-    sims = 1000
-    pulls = np.zeros(model.K,dtype=int)
-    regret = np.zeros(sims)
-    for s in range(1000):
-        regret[s] = alg.run(200,model)
-        pulls[alg.best_action] +=1
-    print regret.mean()
+#    sims = 1000
+#    pulls = np.zeros(model.K,dtype=int)
+#    regret = np.zeros(sims)
+#    for s in range(1000):
+#        regret[s] = alg.run(200,model)
+#        pulls[alg.best_action] +=1
+#    print regret.mean()

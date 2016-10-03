@@ -6,8 +6,8 @@ Created on Tue Sep 20 16:48:05 2016
 
 
 """
-from models import ParallelConfounded
-from algorithms import SuccessiveRejects,GeneralCausal,AlphaUCB
+from models import ParallelConfounded,ScaleableParallelConfounded
+from algorithms import SuccessiveRejects,GeneralCausal,AlphaUCB,ThompsonSampling
 from experiment_config import now_string,Experiment
 import numpy as np
 
@@ -16,8 +16,9 @@ def regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = 100
     m_vals = []
     regret = np.zeros((len(algorithms),len(N1_vals),simulations))
     for m_indx,N1 in enumerate(N1_vals):
-        model = ParallelConfounded.create(N,N1,pz,pY,q,epsilon)
-        model.make_ith_arm_epsilon_best(epsilon,0)
+        model = ScaleableParallelConfounded(q,pz,pY,N1,N-N1)
+        #model = ParallelConfounded.create(N,N1,pz,pY,q,epsilon)
+        #model.make_ith_arm_epsilon_best(epsilon,0)
         print N1
         m_vals.append(model.m)
         for a_indx, algorithm in enumerate(algorithms):
@@ -29,14 +30,14 @@ def regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = 100
    
 
     
-N = 20
+N = 50
 N1_vals = range(1,N,2)
 pz = .4
-q = (0,0,.4,.6)
+q = (0.00001,0.00001,.4,.6)
 epsilon = .1
 simulations = 10000
 T = 400
-algorithms = [SuccessiveRejects(),GeneralCausal(),AlphaUCB(2)]
+algorithms = [SuccessiveRejects(),GeneralCausal(),AlphaUCB(2),ThompsonSampling()]
 pY = np.asarray([[.4,.4],[.7,.7]])
 
 

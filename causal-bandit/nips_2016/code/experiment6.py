@@ -20,8 +20,8 @@ from algorithms import ParallelCausal
 
 N = 10
 N1 = 1
-pz = .3
-q = (.1,.9,.1,.7)
+pz = .4
+q = (.1,.9,.2,.7)
 q10,q11,q20,q21 = q
 a,b,c,d = .4,.4,.7,.7
 epsilon = .1

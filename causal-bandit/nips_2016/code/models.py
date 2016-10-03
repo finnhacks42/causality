@@ -59,9 +59,9 @@ class Model(object):
     def make_ith_arm_epsilon_best(self,epsilon,i):
         """ adjusts the costs such that all arms have expected reward .5, expect the first one which has reward .5 + epsilon """
         # TODO not clear that truncation in general is correct given this        
-        #costs = self.expected_Y - 0.5
-        #costs[i] -= epsilon
-        #self.set_action_costs(costs)
+        costs = self.expected_Y - 0.5
+        costs[i] -= epsilon
+        self.set_action_costs(costs)
         
     def pre_compute(self,compute_py = True):
         """ 
@@ -120,17 +120,6 @@ class Model(object):
         v = np.dot(self.A2T,u)
         return v
         
-    def V2(self,eta):
-        """ The expected value of R (over x sampled from p(x|a)), for each action """
-        
-        expected_R = np.zeros(self.K)
-        for x in self.get_parent_assignments():
-            pa = self.P(x)
-            Q = eta.dot(pa)
-            ratio = np.nan_to_num(np.true_divide(pa,Q))
-            expected_R += pa*ratio
-        return expected_R
-    
     def m_eta(self,eta):
         """ The maximum value of V"""
         V = self.V(eta)
@@ -290,14 +279,15 @@ class ParallelConfounded(Model):
         Actions are do(x_1 = 0),...,do(x_N = 0), do(x_1=1),...,do(x_N = 1),do(Z=0),do(Z=1),do()"""
     
     def __init__(self,q,pZ,pY,N1,N2,epsilon):
-        self._init_pre_action(q,pZ,pY,N1,N2,epsilon)
+        self._init_pre_action(q,pZ,pY,N1,N2)
         self.K = 2*self.N + 3        
         self.pre_compute()  
         
-    def _init_pre_action(self,q,pZ,pY,N1,N2,epsilon):
+    def _init_pre_action(self,q,pZ,pY,N1,N2):
         """ The initialization that should occur regardless of whether we can act on Z """
         self.N1 = N1
         self.N2 = N2
+        self.q = q
         self.q10,self.q11,self.q20,self.q21 = q
         self.N = N1+N2
         self.indx = np.arange(self.N)
@@ -310,11 +300,17 @@ class ParallelConfounded(Model):
         self.pXgivenZ = np.stack((self.pX0,self.pX1),axis=2) # PXgivenZ[i,j,k] = P(X_i=j|Z=k)
     
         
-        self.pytable = pY#np.asarray([[.4,.4],[.7,.7]])   
-    
-    def __str__(self):
-        string = "ParallelConfounded_mis{0:.1f}_Nis{1}_N1is{2}_qis{3:.1f}_{4:.1f}_{5:.1f}_{6:.1f}_pzis{7:.1f}_epsilonis{8:.1f}".format(self.m,self.N,self.N1,self.q10,self.q11,self.q20,self.q21,self.pZ,self.epsilon)
-        return string.replace(".","-")
+        self.pytable = pY #np.asarray([[.4,.4],[.7,.7]])  
+        
+    @classmethod
+    def pY_epsilon_best(cls,q,pZ,epsilon):
+        """ returns a table pY with Y depending only on X1 so that the rewards for all arms except """
+        q10,q11,q20,q21 = q
+        px1 = (1-pZ)*q10+pZ*q11
+        px0 = (1-pZ)*(1-q10)+pZ*(1-q11)              
+        epsilon2 = (px1/px0)*epsilon
+        pY = np.asarray([[.5-epsilon2,.5-epsilon2],[.5+epsilon,.5+epsilon]])         
+        return pY
         
                
     @classmethod
@@ -393,28 +389,37 @@ class ParallelConfounded(Model):
             
     def find_eta(self,tol=1e-10):
         eta,m = Model.find_eta(self)
-        eta_full = self.expand_eta(eta)
+        eta_full = self.expand(eta)
         return eta_full,m 
         
- 
     def m_rep(self,eta_short_form):
-        eta = self.expand_eta(eta_short_form)
+        eta = self.expand(eta_short_form)
         V = self.V(eta)
         maxV = V.max()
         assert not np.isnan(maxV), "m must not be nan"
         return maxV
         
-    def expand_eta(self,eta_short_form):
+    def expand(self,short_form):
         arrays = []
         for indx, count in enumerate(self.weights()):
-            arrays.append(np.full(count,eta_short_form[indx]))
+            arrays.append(np.full(count,short_form[indx]))
         return np.hstack(arrays)
+        
+    def contract(self,long_form):
+        result = np.zeros(7)
+        result[0] = long_form[0]
+        result[1] = long_form[self.N-1]
+        result[2] = long_form[self.N]
+        result[3] = long_form[2*self.N-1]
+        result[4:] = long_form[-3:]
+        return result
+        
         
         
 class ParallelConfoundedNoZAction(ParallelConfounded):
     """ the ParallelConfounded Model but without the actions that set Z """
     def __init__(self,q,pZ,pY,N1,N2,epsilon):
-        self._init_pre_action(q,pZ,pY,N1,N2,epsilon)
+        self._init_pre_action(q,pZ,pY,N1,N2)
         self.K = 2*self.N + 1        
         self.pre_compute() 
               
@@ -438,176 +443,66 @@ class ParallelConfoundedNoZAction(ParallelConfounded):
           
     def weights(self):
         return np.asarray([self.N1,self.N2,self.N1,self.N2,1])
+        
+    def contract(self,long_form):
+        result = np.zeros(5)
+        result[0] = long_form[0]
+        result[1] = long_form[self.N-1]
+        result[2] = long_form[self.N]
+        result[3] = long_form[2*self.N-1]
+        result[4] = long_form[-1]
+        return result
               
+
+    
               
-class ScaleableParallelConfounded():
+class ScaleableParallelConfounded(ParallelConfounded):
     """ Makes use of symetries to avoid exponential combinatorics in calculating V """
     # do(x1=0),do(x2=0),do(x1=1),do(x2=1),do(z=0),do(z=1),do()
-    
+        
     def __init__(self,q,pZ,pY,N1,N2):
-        self.pZ = pZ
+        self._init_pre_action(q,pZ,pY,N1,N2)
+        
         self.pZgivenA = np.hstack((np.full(4,pZ),0,1,pZ))
-        self.N1 = N1
-        self.N2 = N2
-        self.N = N1+N2
         self.K = 2*self.N + 3
-        q10,q11,q20,q21 = q
-        self.q10,self.q11,self.q20,self.q21 = q
-        self.qz0 = np.asarray([(1-q10),q10,(1-q20),q20])
-        self.qz1 = np.asarray([(1-q11),q11,(1-q21),q21])
-        self.pa = np.zeros(7)
-        self.indx = np.arange(self.N)
-        self.weights = np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
-         
+        self.qz0 = np.asarray([(1-self.q10),self.q10,(1-self.q20),self.q20])
+        self.qz1 = np.asarray([(1-self.q11),self.q11,(1-self.q21),self.q21])
+        self.eta,self.m = self.find_eta()
+        self._compute_expected_reward()
+        
+    def _compute_expected_reward(self):
+        q10,q11,q20,q21 = self.q
+        pz = self.pZ
+        a,b,c,d = self.pytable[0,0],self.pytable[0,1],self.pytable[1,0],self.pytable[1,1]
+        alpha = (1-pz)*(1-q10)*(1-q20)+pz*(1-q11)*(1-q21)
+        beta = (1-pz)*(1-q10)*q20+pz*(1-q11)*q21
+        gamma = (1-pz)*q10*(1-q20)+pz*q11*(1-q21)
+        delta = (1-pz)*q10*q20+pz*q11*q21
+        dox10 = a*((1-pz)*(1-q20)+pz*(1-q21)) + b*((1-pz)*q20+pz*q21)
+        dox11 = c*((1-pz)*(1-q20)+pz*(1-q21)) + d*((1-pz)*q20+pz*q21)
+        dox20 = a*((1-pz)*(1-q10)+pz*(1-q11))+c*((1-pz)*q10+pz*q11)
+        dox21 = b*((1-pz)*(1-q10)+pz*(1-q11))+d*((1-pz)*q10+pz*q11)
+        doxj = a*alpha+b*beta+c*gamma+d*delta
+        doz0 = a*(1-q10)*(1-q20)+b*(1-q10)*q20+c*q10*(1-q20)+d*q10*q20
+        doz1 = a*(1-q11)*(1-q21)+b*(1-q11)*q21+c*q11*(1-q21)+d*q11*q21
+        self.expected_Y = np.hstack((dox10,np.full(self.N-2,doxj),dox20,dox11,np.full(self.N-2,doxj),dox21,doz0,doz1,doxj))
+        self.expected_rewards = self.expected_Y
+        
     def P(self,x):
-        n1 = x[0:self.N1].sum()
-        n2 = x[self.N1:].sum()
-        pc = self.P_counts(n1,n2)
-        doxi0 = np.hstack((np.full(self.N1,pc[0]),np.full(self.N2,pc[1])))
-        doxi1 = np.hstack((np.full(self.N1,pc[2]),np.full(self.N2,pc[3])))
-        pij = np.vstack((doxi0,doxi1))
-        pij[1-x,self.indx] = 0
-        pij = pij.reshape((self.N*2,))
-        result = np.hstack((pij,pc[4],pc[5],pc[6]))
-        return result
-        
-    def P02(self,x):
-        
-        pXgivenZ0 = np.hstack((np.full(self.N1,self.q10),np.full(self.N2,self.q20)))
-        pXgivenZ0 = np.vstack((1-pXgivenZ0,pXgivenZ0))
-
-        
-        pz0 = pXgivenZ0[x,self.indx]
-    
-        p_obs = pz0.prod()
-        
-        # for do(x_i = j)
-        p = prod_all_but_j(pz0) # vector of length N
-           
-        pij = np.vstack((p,p))
-        pij[1-x,self.indx] = 0 # 2*N array, pij[i,j] = P(X=x|do(X_i=j)) = d(X_i-j)*prod_k!=j(X_k = x_k)
-        pij = pij.reshape((len(x)*2,)) #flatten first N-1 will be px=0,2nd px=1
-        
-        result = np.hstack((pij,pz0.prod(),0,p_obs))
-        return result
-        
-    
-    def P0(self,x):
-        n1 = x[0:self.N1].sum()
-        n2 = x[self.N1:].sum()
-        pc = self.P_counts0(n1,n2)
-        doxi0 = np.hstack((np.full(self.N1,pc[0]),np.full(self.N2,pc[1])))
-        doxi1 = np.hstack((np.full(self.N1,pc[2]),np.full(self.N2,pc[3])))
-        pij = np.vstack((doxi0,doxi1))
-        pij[1-x,self.indx] = 0
-        pij = pij.reshape((self.N*2,))
-        result = np.hstack((pij,pc[4],pc[5],pc[6]))
-        return result
-        
-    def P1(self,x):
-        n1 = x[0:self.N1].sum()
-        n2 = x[self.N1:].sum()
-        pc = self.P_counts1(n1,n2)
-        doxi0 = np.hstack((np.full(self.N1,pc[0]),np.full(self.N2,pc[1])))
-        doxi1 = np.hstack((np.full(self.N1,pc[2]),np.full(self.N2,pc[3])))
-        pij = np.vstack((doxi0,doxi1))
-        pij[1-x,self.indx] = 0
-        pij = pij.reshape((self.N*2,))
-        result = np.hstack((pij,pc[4],pc[5],pc[6]))
-        return result
-        
-    def pcz0(self,n1,n2):
-        result = np.zeros(7)
-        result[0] = binom(self.N1-1,self.q10).pmf(n1)*binom(self.N2,self.q20).pmf(n2)
-        result[1] = binom(self.N1,self.q10).pmf(n1)*binom(self.N2-1,self.q20).pmf(n2)
-        result[2] = binom(self.N1-1,self.q10).pmf(n1-1)*binom(self.N2,self.q20).pmf(n2)
-        result[3] = binom(self.N1,self.q10).pmf(n1)*binom(self.N2-1,self.q20).pmf(n2-1)
-        result[4] = binom(self.N1,self.q10).pmf(n1)*binom(self.N2,self.q20).pmf(n2)
-        result[5] = 0
-        result[6] = result[4]
-        return result
-        
-    def pcz1(self,n1,n2):
-        result = np.zeros(7)
-        result[0] = binom(self.N1-1,self.q11).pmf(n1)*binom(self.N2,self.q21).pmf(n2)
-        result[1] = binom(self.N1,self.q11).pmf(n1)*binom(self.N2-1,self.q21).pmf(n2)
-        result[2] = binom(self.N1-1,self.q11).pmf(n1-1)*binom(self.N2,self.q21).pmf(n2)
-        result[3] = binom(self.N1,self.q11).pmf(n1)*binom(self.N2-1,self.q21).pmf(n2-1)
-        result[4] = 0
-        result[5] = binom(self.N1,self.q11).pmf(n1)*binom(self.N2,self.q21).pmf(n2)
-        result[6] = result[5]
-        return result
-                
-    def pc(self,n1,n2):
-        return self.pZgivenA*self.pcz1(n1,n2)+(1-self.pZgivenA)*self.pcz0(n1,n2)
-      
-    def counts(self):
-        return product(range(self.N1+1),range(self.N2+1))
-    
-    def V_short3(self,eta):
-        sum0 = np.zeros(7)
-        sum1 = np.zeros(7)
-        for n1,n2 in product(range(self.N1+1),range(self.N2+1)):
-            pz0 = self.pcz0(n1,n2)
-            Q0 = (eta*self.weights).dot(pz0)
-            sum0 += pz0*np.nan_to_num(np.true_divide(pz0,Q0))
-            pz1 = self.pcz1(n1,n2)
-            Q1 = (eta*self.weights).dot(pz1)
-            sum1 +=  pz1*np.nan_to_num(np.true_divide(pz1,Q1))
-            
-        result = (1-self.pZgivenA)*sum0+self.pZgivenA*sum1
-        return result
-        
-    def V_short4(self,eta):
-        result = np.zeros(7)
-        for n1,n2 in product(range(self.N1+1),range(self.N2+1)):
-            pa = self.p_of_count_given_action(n1,n2)
-            Q = (eta*self.weights).dot(pa)
-            ratio = np.nan_to_num(np.true_divide(pa,Q))
-            
-            result += pa*ratio 
-            # it seems like we can only change the muliplier here
-            # changing pa earlier changes Q, which changes results for answers that are correct already ...
-        return result
-        
-    
-    def p_of_count_given_action(self,n1,n2):
-        pa = self.P_counts(n1,n2)
-        wdo = comb(self.N1,n1,exact=True)*comb(self.N2,n2,exact=True)
-        wdox10 = comb(self.N1-1,n1,exact=True)*comb(self.N2,n2,exact=True)
-        wdox11 = comb(self.N1-1,n1-1,exact=True)*comb(self.N2,n2,exact=True)
-        wdox20 = comb(self.N1,n1,exact=True)*comb(self.N2-1,n2,exact=True)
-        wdox21 = comb(self.N1,n1,exact=True)*comb(self.N2-1,n2-1,exact=True)
-        w = np.asarray([wdox10,wdox20,wdox11,wdox21,wdo,wdo,wdo])
-        #print (n1,n2),"weight",w,pa
-        return w*pa
-        
-    def pos_power(self,a,b):
-        result = a**b
-        neg = np.where(b<0)[0]
-        result[neg] = 0
-        return result
-        
-        
-    def p_of_x_given_a_z(self,x,z):
         n1,n2 = x[0:self.N1].sum(),x[self.N1:].sum()
-#        print x,n1,n2
-        powers = np.tile([self.N1-n1,n1,self.N2-n2,n2],7).reshape((7,4))
-        powers[0,0]-=1 #do(x1=0)
-        powers[1,2]-=1 #do(x2=0)
-        powers[2,1]-=1 #do(x1=1)
-        powers[3,3]-=1 #do(x2=1)
+        pz0,pz1 = self.p_n_given_z(n1,n2)
+        pc = self.pZgivenA*pz1+(1-self.pZgivenA)*pz0
+        doxi0 = np.hstack((np.full(self.N1,pc[0]),np.full(self.N2,pc[1])))
+        doxi1 = np.hstack((np.full(self.N1,pc[2]),np.full(self.N2,pc[3])))
+        pij = np.vstack((doxi0,doxi1))
+        pij[1-x,self.indx] = 0
+        pij = pij.reshape((self.N*2,))
+        result = np.hstack((pij,pc[4],pc[5],pc[6]))
+        return result
         
-        if z == 0:
-            #return self.pcz0(n1,n2)
-            return self.pos_power(self.qz0,powers).prod(axis=1)
-        else:
-            #return self.pcz1(n1,n2)
-            return self.pos_power(self.qz1,powers).prod(axis=1)
-            
     def V_short(self,eta):
-        sum0 = np.zeros(7)
-        sum1 = np.zeros(7)
+        sum0 = np.zeros(7,dtype=float)
+        sum1 = np.zeros(7,dtype=float)
         for n1,n2 in product(range(self.N1+1),range(self.N2+1)):
              wdo = comb(self.N1,n1,exact=True)*comb(self.N2,n2,exact=True)
              wdox10 = comb(self.N1-1,n1,exact=True)*comb(self.N2,n2,exact=True)
@@ -616,298 +511,145 @@ class ScaleableParallelConfounded():
              wdox21 = comb(self.N1,n1,exact=True)*comb(self.N2-1,n2-1,exact=True)
              w = np.asarray([wdox10,wdox20,wdox11,wdox21,wdo,wdo,wdo])
              
-             pz0 = self.p_n(n1,n2,0)
-             pz1 = self.p_n(n1,n2,1)
-             
+             pz0,pz1 = self.p_n_given_z(n1,n2)
+
              counts = [self.N1-n1,self.N2-n2,n1,n2,1,1,1]
              Q = (eta*pz0*counts*(1-self.pZgivenA)+eta*pz1*counts*self.pZgivenA).sum()
              
-          
              ratio = np.nan_to_num(np.true_divide(pz0*(1-self.pZgivenA)+pz1*self.pZgivenA,Q))
-             sum0 += w*pz0*ratio
-             sum1 += w*pz1*ratio
+          
+             sum0 += np.asfarray(w*pz0*ratio)
+             sum1 += np.asfarray(w*pz1*ratio)
         result = self.pZgivenA*sum1+(1-self.pZgivenA)*sum0
         return result
         
+    def m_rep(self,eta_short_form):
+        V = self.V_short(eta_short_form)
+        maxV = V.max()
+        assert not np.isnan(maxV), "m must not be nan"
+        return maxV
+                   
             
-            
-    def p_n(self,n1,n2,z):
+    def p_n_given_z(self,n1,n2):
         powers = np.tile([self.N1-n1,n1,self.N2-n2,n2],7).reshape((7,4))
         powers[0,0]-=1 #do(x1=0)
         powers[1,2]-=1 #do(x2=0)
         powers[2,1]-=1 #do(x1=1)
         powers[3,3]-=1 #do(x2=1)
         
-        if z == 0:
-            #return self.pcz0(n1,n2)
-            return self.pos_power(self.qz0,powers).prod(axis=1)
-        else:
-            #return self.pcz1(n1,n2)
-            return self.pos_power(self.qz1,powers).prod(axis=1)
-            
+        pnz0 = (self.qz0**powers).prod(axis=1)
+        pnz1 = (self.qz1**powers).prod(axis=1)
+        return pnz0,pnz1
         
-    def V_short2(self,eta):
-        sum0 = np.zeros(7)
-        sum1 = np.zeros(7)
-        for x in Model.generate_binary_assignments(self.N):
-            pz0 = self.p_of_x_given_a_z(x,0)            
-            Q0 = (eta*self.weights).dot(pz0)
-            sum0 += pz0*np.nan_to_num(np.true_divide(pz0,Q0))
-            
-            pz1 = self.p_of_x_given_a_z(x,1)
-            Q1 = (eta*self.weights).dot(pz1)
-            sum1 += pz1*np.nan_to_num(np.true_divide(pz1,Q1))
     
-        result = self.pZgivenA*sum1+(1-self.pZgivenA)*sum0
-        return result 
-     
-     
-    def Q3(self,x,eta):
-         p0 = self.P0(x) #self.expand(self.p_of_x_given_a_z(x,0)) #self.P0(x)
-         p1 = self.P1(x) #self.expand(self.p_of_x_given_a_z(x,1)) #       
-         pa = self.expand(self.pZgivenA)*p1+self.expand(1-self.pZgivenA)*p0
-         return eta.dot(pa)
-         
-    def Q2(self,x,eta):
-        """ Q just in terms of n1,n2 """
-        n1,n2 = x[0:self.N1].sum(),x[self.N1:].sum()
-        eta = self.contract(eta)
-        pz0 = self.p_n(n1,n2,0)
-        pz1 = self.p_n(n1,n2,1)
-        counts = [self.N1-n1,self.N2-n2,n1,n2,1,1,1]
-        Q = (eta*pz0*counts*(1-self.pZgivenA)+eta*pz1*counts*self.pZgivenA).sum()
-        return Q
-   
-        
-        
-        
-    def V(self,eta):
-        sum0 = np.zeros(self.K)
-        sum1 = np.zeros(self.K)
-        for x in Model.generate_binary_assignments(self.N):
-            n1,n2 = x[0:self.N1].sum(),x[self.N1:].sum()
-            
-            p0 = self.P0(x) #self.expand(self.p_of_x_given_a_z(x,0)) #self.P0(x)
-            p1 = self.P1(x) #self.expand(self.p_of_x_given_a_z(x,1)) #      
-            
-            pa = self.expand(self.pZgivenA)*p1+self.expand(1-self.pZgivenA)*p0
-            
-            eta_short = self.contract(eta)
-            
-            pz0 = self.p_n(n1,n2,0)
-            pz1 = self.p_n(n1,n2,1)
-            
-            
-            #Q = self.expand(eta_short*pz0*counts*(1-self.pZgivenA)+eta_short*pz1*counts*self.pZgivenA)
-            
-            Q = self.Q2(x,eta)
-            
 
-            #pa = self.P(x)            
-            #Q = eta.dot(pa)
-            
-            ratio = np.nan_to_num(np.true_divide(pa,Q))
-            
-           
-            #p0 = self.expand(self.pcz0(n1,n2))
-            #p1 = self.expand(self.pcz1(n1,n2))             
-            
-           
-            sum0 += p0*ratio
-            sum1 += p1*ratio
+class ScaleableParallelConfoundedNoZAction(ScaleableParallelConfounded):
     
-        result = self.expand(self.pZgivenA)*sum1+self.expand(1-self.pZgivenA)*sum0
-        return result 
+    def __init__(self,q,pZ,pY,N1,N2):
+        self._init_pre_action(q,pZ,pY,N1,N2)
+        self.pZgivenA = np.hstack((np.full(4,pZ),0,1,pZ))
+        self.K = 2*self.N + 1
+        self.qz0 = np.asarray([(1-self.q10),self.q10,(1-self.q20),self.q20])
+        self.qz1 = np.asarray([(1-self.q11),self.q11,(1-self.q21),self.q21])
+        self.eta,self.m = self.find_eta()
+        self._compute_expected_reward()
+        self.expected_rewards = self._mask(self.expected_rewards)
+        self.expected_Y = self._mask(self.expected_Y)
         
-    def V_short5(self,eta):
-    
-        sum0 = np.zeros(7)
-        sum1 = np.zeros(7)
-        for n1,n2 in product(range(self.N1+1),range(self.N2+1)):
-            pa = self.p_of_count_given_action(n1,n2)
-            Q = (eta*self.weights).dot(pa)
-            ratio = np.nan_to_num(np.true_divide(pa,Q))
-            
-            sum0 += self.pcz0(n1,n2)*ratio
-            sum1 += self.pcz1(n1,n2)*ratio
-        result = self.pZgivenA*sum1+(1-self.pZgivenA)*sum0
-            
-        return result
-            
-  
-    def P_counts0(self,n1,n2):
-        """ joint probability of variables not set for each action """
-        counts = np.asarray([(self.N1-n1),n1,(self.N2-n2),n2]) 
-        self.pa[4] = np.power(self.qz0,counts).prod() #do(z=0)
-        self.pa[5] = 0 #do(z=1)
-        self.pa[6] = self.pa[4] #do()
-        
-        counts[0] = (self.N1-n1) - 1
-        self.pa[0] = np.power(self.qz0,counts).prod() #do(x1=0)
-        
-        counts[0],counts[2] = (self.N1-n1), (self.N2-n2) - 1
-        self.pa[1] = np.power(self.qz0,counts).prod() #do(x2=0)
-        
-        counts[2],counts[1] = (self.N2-n2), n1-1
-        self.pa[2] = np.power(self.qz0,counts).prod()#do(x1=1)
-        
-        counts[1],counts[3] = n1,n2-1
-        self.pa[3]= np.power(self.qz0,counts).prod()#do(x2=1)
-        return self.pa
-        
-    def P_counts1(self,n1,n2):
-        """ joint probability of variables not set for each action """
-        counts = np.asarray([(self.N1-n1),n1,(self.N2-n2),n2]) 
-        self.pa[4] = 0 #do(z=0)
-        self.pa[5] = np.power(self.qz1,counts).prod() #do(z=1)
-        self.pa[6] = self.pa[5]#do()
-        
-        counts[0] = (self.N1-n1) - 1
-        self.pa[0] = np.power(self.qz1,counts).prod() #do(x1=0)
-        
-        counts[0],counts[2] = (self.N1-n1), (self.N2-n2) - 1
-        self.pa[1] = np.power(self.qz1,counts).prod() #do(x2=0)
-        
-        counts[2],counts[1] = (self.N2-n2), n1-1
-        self.pa[2] = np.power(self.qz1,counts).prod()#do(x1=1)
-        
-        counts[1],counts[3] = n1,n2-1
-        self.pa[3]= np.power(self.qz1,counts).prod()#do(x2=1)
-        return self.pa
-        
+    def _mask(self,vect):
+        return np.hstack((vect[0:-3],vect[-1]))
         
     
-    def P_counts(self,n1,n2):
-        """ joint probability of variables not set for each action """
-        counts = np.asarray([(self.N1-n1),n1,(self.N2-n2),n2]) 
-        self.pa[4] = np.power(self.qz0,counts).prod() #do(z=0)
-        self.pa[5] = np.power(self.qz1,counts).prod() #do(z=1)
-        self.pa[6] = self.pa[4]*(1-self.pZ)+self.pa[5]*self.pZ #do()
-        
-        counts[0] = (self.N1-n1) - 1
-        self.pa[0] = np.power(self.qz0,counts).prod()*(1-self.pZ)+np.power(self.qz1,counts).prod()*self.pZ #do(x1=0)
-        
-        counts[0],counts[2] = (self.N1-n1), (self.N2-n2) - 1
-        self.pa[1] = np.power(self.qz0,counts).prod()*(1-self.pZ)+np.power(self.qz1,counts).prod()*self.pZ #do(x2=0)
-        
-        counts[2],counts[1] = (self.N2-n2), n1-1
-        self.pa[2] = np.power(self.qz0,counts).prod()*(1-self.pZ)+np.power(self.qz1,counts).prod()*self.pZ#do(x1=1)
-        
-        counts[1],counts[3] = n1,n2-1
-        self.pa[3]= np.power(self.qz0,counts).prod()*(1-self.pZ)+np.power(self.qz1,counts).prod()*self.pZ#do(x2=1)
-        return self.pa
-        
+    def P(self,x):
+        p = ScaleableParallelConfounded.P(self,x)
+        return self._mask(p)
     
+    def V(self,eta):
+        eta_short_form = self.contract(eta)
+        eta = np.hstack((eta_short_form[0:-1],0,0,eta_short_form[-1]))
+        v = self.V_short(eta) # length 7
+        v = self._mask(v) # length 5
+        v_long = self.expand(v)
+        return v_long
         
-    def expand(self,short_form):
-        arrays = []
-        for indx, count in enumerate(self.weights):
-            arrays.append(np.full(count,short_form[indx]))
-        return np.hstack(arrays)
+    def sample(self,action):
+        """ samples given the specified action index and returns the values of the parents of Y, Y. """   
+        z = binomial(1,self.pZ)        
+        x = binomial(1,self.pXgivenZ[1,:,z]) # PXgivenZ[j,i,k] = P(X_i=j|Z=k)
+        
+        if action < 2*self.N: # setting x_i = j
+             i,j = action % self.N, action/self.N
+             x[i] = j
+             
+        y = binomial(1,self.pYgivenX(x)) 
+        
+        return x,y
+    
+    def weights(self):
+        return np.asarray([self.N1,self.N2,self.N1,self.N2,1])   
+        
+    def m_rep(self,eta_short_form):
+        eta = np.hstack((eta_short_form[0:-1],0,0,eta_short_form[-1]))
+        V = self.V_short(eta)
+        V[-3:-1] = 0 # exclude do(z=0) and do(z=1)
+        maxV = V.max()
+        assert not np.isnan(maxV), "m must not be nan"
+        return maxV
         
     def contract(self,long_form):
-        result = np.zeros(7)
+        result = np.zeros(5)
         result[0] = long_form[0]
         result[1] = long_form[self.N-1]
         result[2] = long_form[self.N]
         result[3] = long_form[2*self.N-1]
-        result[4:] = long_form[-3:]
+        result[4] = long_form[-1]
         return result
-        
-    
-        
-    
-            
-        
-
-        
-
-            
-        
-
-    
-    
-#    def __init__(self,q,pZ,pY,N1,N2):
-#       
-#        self.parent_assignments = list(product(range(N1+1),range(N2+1))) # all combinations of vector of length 2 specifying [num x_i: i<= N1 = 1, num x_i: i > N = 1]
-#        self.pa_given_assignment = np.asarray([self.P_of_reparameterized_assignment(n1,n2) for (n1,n2) in self.parent_assignments])
-#                
-#    def P_of_reparameterized_assignment(self,n1,n2):
-#         pa = np.zeros(7)
-#         pa[0] = (1-self.pZ)*binom(self.N1-1,self.q10).pmf(n1)*binom(self.N2,self.q20).pmf(n2)+self.pZ*binom(self.N1-1,self.q11).pmf(n1)*binom(self.N2,self.q21).pmf(n2) # do(X1 = 0)
-#         pa[1] = (1-self.pZ)*binom(self.N1,self.q10).pmf(n1)*binom(self.N2-1,self.q20).pmf(n2)+self.pZ*binom(self.N1,self.q11).pmf(n1)*binom(self.N2-1,self.q21).pmf(n2) # do(X2 = 0)
-#         pa[2] = (1-self.pZ)*binom(self.N1-1,self.q10).pmf(n1-1)*binom(self.N2,self.q20).pmf(n2)+self.pZ*binom(self.N1-1,self.q11).pmf(n1-1)*binom(self.N2,self.q21).pmf(n2) # do(X1=1)
-#         pa[3] = (1-self.pZ)*binom(self.N1,self.q10).pmf(n1)*binom(self.N2-1,self.q20).pmf(n2-1)+self.pZ*binom(self.N1,self.q11).pmf(n1)*binom(self.N2-1,self.q21).pmf(n2-1) # do(X2 = 1)
-#         pa[4] = binom(self.N1,self.q10).pmf(n1)*binom(self.N2,self.q20).pmf(n2) # do(Z = 0)
-#         pa[5] = binom(self.N1,self.q11).pmf(n1)*binom(self.N2,self.q21).pmf(n2) # do(Z = 1)
-#         pa[6] = (1-self.pZ)*pa[4]+self.pZ*pa[5] # do()
-#         return pa
-#         
-#    
-#    
-#        
-#    # group variables for which pXgivenZ0 and pXgivenZ1 are equal
-#    def V(self,eta):
-#        """ eta should be a vector of length 7, do(X_i: i < N1) = 0, do(X_i: i >= N1) = 0,  do(X_i: i < N1) = 0, do(X_i: i >= N1) = 0 do(Z=0),do(Z=1),do().
-#            returns a corresponding vector of length 7"""
-#        nom = (self.pa_given_assignment**2).T
-#        denom = np.dot(self.pa_given_assignment,eta)
-#        r = np.true_divide(nom,denom)
-#        return r.sum(axis=1)
-#       
-#    def unparameterize_eta(self,eta):
-#        """ transform 7 dimensional eta back to K dimensional eta """
-#        result = np.hstack((np.full(self.N1,eta[0]/self.N1),
-#                            np.full(self.N2,eta[1]/self.N2),
-#                            np.full(self.N1,eta[2]/self.N1),
-#                            np.full(self.N2,eta[3]/self.N2),
-#                            eta[4],eta[5],eta[6]))
-#        #TODO check if this ordering is correct ...
-#        return result
-#    
-#    def parameterize(x,self):
-#        """ transform x into n1,n2 counts """
-#        n1 = sum(x[0:self.N1])
-#        n2 = sum(x[self.N1:])
-#        return n1,n2 
-
-    
-        
-        
-
-        
-        
-        
-    
-
-
 
 if __name__ == "__main__":  
     import numpy.testing as np_test
-    N = 3
-    N1 = 2
+    import time
+    
+    N = 4
+    N1 = 1
     N2 = N-N1
-    q = .1,.3,.4,.7
+    #q = .1,.3,.4,.7
+    q = (0.0001,0.0001,.4,.6)
     q10,q11,q20,q21 = q
     pZ = .2
     pY = np.asanyarray([[.2,.8],[.3,.9]])
-    model1 = ParallelConfounded.create(N,N1,pZ,pY,q,.1)
+    model1 = ParallelConfoundedNoZAction.create(N,N1,pZ,pY,q,.1)
     model2 = ScaleableParallelConfounded(q,pZ,pY,N1,N2)
+    model3 = ScaleableParallelConfoundedNoZAction(q,pZ,pY,N1,N2)
     
-    m = model2  
+    eta = model3.random_eta_short() 
+    eta_long = model3.expand(eta)
+    
+    v1 = model1.V(eta_long)
+    v2 = model3.V(eta_long)
+    
+    
+#    start = time.time()
+#      
+#    for i in xrange(100):
+#        eta = np.random.random(7)
+#        eta = eta/eta.sum()
+#        model2.V_short(eta)
+#    
+#    end = time.time()
+    
+#    print end - start
     
     #eta = model1.expand_eta(model1.random_eta_short())
     
     #eta = np.zeros(7)
     #eta[1] = .5
     
-    for i in range(5):
-        eta_short = model1.random_eta_short()
-        eta = model1.expand_eta(eta_short)#model1.random_eta()
-        print model1.V(eta)
-        print model2.V(eta)
-        print model2.expand(model2.V_short(eta_short))
-        print "\n"
+#    for i in range(5):
+#        eta_short = model1.random_eta_short()
+#        eta = model1.expand_eta(eta_short)#model1.random_eta()
+#        print model1.V(eta)
+#        print model2.expand(model2.V_short(eta_short))
+#        print "\n"
     
     #eta = model1.expand_eta(eta)
     #v1 =  model2.V(eta)
