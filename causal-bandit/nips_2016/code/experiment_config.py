@@ -9,7 +9,7 @@ import datetime as dt
 
 import numpy as np
 import matplotlib.pyplot as plt
-from algorithms import GeneralCausal,  ParallelCausal, SuccessiveRejects,AlphaUCB,RandomArm
+from algorithms import GeneralCausal,  ParallelCausal, SuccessiveRejects,AlphaUCB,RandomArm,ThompsonSampling
 import cPickle as pickle
 
 print "LOADING EXPERIMENT CONFIG MODULE AGAIN"
@@ -25,9 +25,9 @@ class Experiment(object):
         self.REGRET_LABEL = "Regret"
         self.HORIZON_LABEL = "T"
         self.M_LABEL = "m(q)"
-        self.markers=['s', 'o', 'D', '*',"^"]
-        self.colors = ["red","green","blue","purple","cyan"]
-        self.algorithms = [ParallelCausal,GeneralCausal,SuccessiveRejects,AlphaUCB,RandomArm]
+        self.markers=['s', 'o', 'D', '*',"^","p"]
+        self.colors = ["red","green","blue","purple","cyan","orange"]
+        self.algorithms = [ParallelCausal,GeneralCausal,SuccessiveRejects,AlphaUCB,RandomArm,ThompsonSampling]
 
         for indx,a in enumerate(self.algorithms):
             a.marker = self.markers[indx]
@@ -46,17 +46,17 @@ class Experiment(object):
         
         if legend_loc is not None:
             ax.legend(loc = legend_loc,numpoints=1)
-        fig_name = "experiment{0}_{1}.png".format(self.experiment_id,now_string)
+        fig_name = "results/experiment{0}_{1}.pdf".format(self.experiment_id,now_string)
         fig.savefig(fig_name,bbox_inches="tight")
     
     def log_code(self,now_string):
-        out = "experiment{0}_{1}_settings.txt".format(self.experiment_id,now_string)
+        out = "results/experiment{0}_{1}_settings.txt".format(self.experiment_id,now_string)
         experiment_file = "experiment{0}.py".format(self.experiment_id)
         with open(experiment_file,"r") as f, open(out,"w") as o:
             o.write(f.read())
     
     def log_regret(self,regret,now_string):
-        filename = "experiment{0}_{1}.pickle".format(self.experiment_id,now_string)
+        filename = "results/experiment{0}_{1}.pickle".format(self.experiment_id,now_string)
         with open(filename,'wb') as out:
             pickle.dump(regret,out)
         
