@@ -8,7 +8,7 @@ If the resulting bias exceeds epsilon then the Parallel algorithm will never ide
 """
 
 
-from models import ScaleableParallelConfoundedNoZAction
+from models import ScaleableParallelConfoundedNoZAction, ParallelConfounded
 from algorithms import SuccessiveRejects,GeneralCausal,ParallelCausal,RandomArm,AlphaUCB,ThompsonSampling
 from experiment_config import now_string,Experiment
 import numpy as np
@@ -33,27 +33,27 @@ def regret_vs_T(model,algorithms,T_vals,simulations = 10):
            
 simulations = 10000
 
-# why doesn't pulls and eta line up
                   
 N =50
 N1 = 1
-pY = np.asarray([[.4,.4],[.7,.7]])
 pz = .4
 q = (.1,.9,.2,.7)
+epsilon = .2
+pY = ParallelConfounded.pY_epsilon_best(q,pz,epsilon)
 
 #model = ParallelConfoundedNoZAction.create(N,N1,pz,pY,q,epsilon)
 model = ScaleableParallelConfoundedNoZAction(q,pz,pY,N1,N-N1)
 #alg = GeneralCausal()
 #alg.run(200,model)
 
-T_vals = range(25,451,25)
-
-algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects(),ThompsonSampling(),AlphaUCB(2)]
-
-regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
-finished = now_string()
-
-experiment = Experiment(5)
-experiment.log_code(finished)
-experiment.log_regret(regret,finished)
-experiment.plot_regret(regret,T_vals,"T",algorithms,finished,legend_loc = "lower left")
+#T_vals = range(25,451,25)
+#
+#algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects(),ThompsonSampling(),AlphaUCB(2)]
+#
+#regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
+#finished = now_string()
+#
+#experiment = Experiment(5)
+#experiment.log_code(finished)
+#experiment.log_regret(regret,finished)
+#experiment.plot_regret(regret,T_vals,"T",algorithms,finished,legend_loc = "lower left")

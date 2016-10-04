@@ -135,7 +135,7 @@ class Model(object):
         eta0 = self.random_eta()
         constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0})
         #options={'disp': True}
-        res = minimize(self.m_eta, eta0,bounds = [(0.0,1.0)]*self.K, constraints = constraints, method='SLSQP')
+        res = minimize(self.m_eta, eta0,bounds = [(0.0,1.0)]*self.K, constraints = constraints, method='SLSQP',options={'disp': True})
         return res
         
     def find_eta(self,tol = 1e-10,min_starts = 3, max_starts = 10):
@@ -278,7 +278,7 @@ class ParallelConfounded(Model):
     """ Represents a parallel bandit with one common confounder. Z ->(X1 ... XN) and (X1,...,XN) -> Y 
         Actions are do(x_1 = 0),...,do(x_N = 0), do(x_1=1),...,do(x_N = 1),do(Z=0),do(Z=1),do()"""
     
-    def __init__(self,q,pZ,pY,N1,N2,epsilon):
+    def __init__(self,q,pZ,pY,N1,N2):
         self._init_pre_action(q,pZ,pY,N1,N2)
         self.K = 2*self.N + 3        
         self.pre_compute()  
@@ -309,16 +309,17 @@ class ParallelConfounded(Model):
         px1 = (1-pZ)*q10+pZ*q11
         px0 = (1-pZ)*(1-q10)+pZ*(1-q11)              
         epsilon2 = (px1/px0)*epsilon
+        assert epsilon2 < .5
         pY = np.asarray([[.5-epsilon2,.5-epsilon2],[.5+epsilon,.5+epsilon]])         
         return pY
         
                
     @classmethod
-    def create(cls,N,N1,pz,pY,q,epsilon):
+    def create(cls,N,N1,pz,pY,q):
         """ builds ParallelConfounded model"""
         q10,q11,q20,q21 = q
         N2 = N - N1
-        model = cls(q,pz,pY,N1,N2,epsilon)
+        model = cls(q,pz,pY,N1,N2)
         return model
         
         
@@ -384,11 +385,12 @@ class ParallelConfounded(Model):
         weights = self.weights()
         eta0 = self.random_eta_short()
         constraints=({'type':'eq','fun':lambda eta: np.dot(eta,weights)-1.0})
-        res = minimize(self.m_rep,eta0,bounds = [(0.0,1.0)]*len(eta0), constraints = constraints ,method='SLSQP',tol=tol)      
+        res = minimize(self.m_rep,eta0,bounds = [(0.0,1.0)]*len(eta0), constraints = constraints ,method='SLSQP',tol=tol,options={'disp': True})      
         return res
             
     def find_eta(self,tol=1e-10):
         eta,m = Model.find_eta(self)
+        self.eta_short = eta
         eta_full = self.expand(eta)
         return eta_full,m 
         
@@ -418,7 +420,7 @@ class ParallelConfounded(Model):
         
 class ParallelConfoundedNoZAction(ParallelConfounded):
     """ the ParallelConfounded Model but without the actions that set Z """
-    def __init__(self,q,pZ,pY,N1,N2,epsilon):
+    def __init__(self,q,pZ,pY,N1,N2):
         self._init_pre_action(q,pZ,pY,N1,N2)
         self.K = 2*self.N + 1        
         self.pre_compute() 
@@ -467,8 +469,11 @@ class ScaleableParallelConfounded(ParallelConfounded):
         self.K = 2*self.N + 3
         self.qz0 = np.asarray([(1-self.q10),self.q10,(1-self.q20),self.q20])
         self.qz1 = np.asarray([(1-self.q11),self.q11,(1-self.q21),self.q21])
-        self.eta,self.m = self.find_eta()
+        print "computing reward"
         self._compute_expected_reward()
+        print "computing eta"
+        self.eta,self.m = self.find_eta()
+        print "done init"
         
     def _compute_expected_reward(self):
         q10,q11,q20,q21 = self.q
@@ -605,27 +610,53 @@ class ScaleableParallelConfoundedNoZAction(ScaleableParallelConfounded):
         result[4] = long_form[-1]
         return result
 
+
+from itertools import chain
+
+def estimate_px_and_y_from_samples(model,samples):
+        expected_y = np.zeros(model.K,dtype=float)
+        shape = list(chain([model.K],[2]*model.N))
+        xcounts = np.zeros(shape)
+        for a in range(model.K):
+            for s in xrange(samples):
+                x,y = model.sample(a)
+                pos = tuple(chain([a],x))
+                
+                xcounts[pos] +=1
+               
+                expected_y[a] += y
+            expected_y[a] = expected_y[a]/samples
+        xcounts = xcounts/samples
+        return xcounts,expected_y
+        
 if __name__ == "__main__":  
     import numpy.testing as np_test
     import time
+    from pgmpy_model import GeneralModel
     
     N = 4
     N1 = 1
     N2 = N-N1
-    #q = .1,.3,.4,.7
-    q = (0.0001,0.0001,.4,.6)
+    q = (.1,.3,.4,.7)
     q10,q11,q20,q21 = q
     pZ = .2
     pY = np.asanyarray([[.2,.8],[.3,.9]])
-    model1 = ParallelConfoundedNoZAction.create(N,N1,pZ,pY,q,.1)
-    model2 = ScaleableParallelConfounded(q,pZ,pY,N1,N2)
-    model3 = ScaleableParallelConfoundedNoZAction(q,pZ,pY,N1,N2)
     
-    eta = model3.random_eta_short() 
-    eta_long = model3.expand(eta)
+    model = ParallelConfounded.create(N,N1,pZ,pY,q)
+    xcounts,y = estimate_px_and_y_from_samples(model,10000)
     
-    v1 = model1.V(eta_long)
-    v2 = model3.V(eta_long)
+    
+    for x in model.get_parent_assignments():
+        p_in_sample = [xcounts[tuple(chain([a],x))] for a in range(model.K)]
+        np_test.assert_almost_equal(model.P(x),p_in_sample,decimal=2)
+    
+#    model1 = ParallelConfoundedNoZAction.create(N,N1,pZ,pY,q,.1)
+#    model2 = ScaleableParallelConfounded(q,pZ,pY,N1,N2)
+#    model3 = ScaleableParallelConfoundedNoZAction(q,pZ,pY,N1,N2)
+    
+   
+       
+        
     
     
 #    start = time.time()
