@@ -35,24 +35,23 @@ simulations = 10000
 N =50
 N1 = 1
 pz = .4
-q = (.1,.9,.2,.7)
-epsilon = .2
-pY = ParallelConfounded.pY_epsilon_best(q,pz,epsilon)
+
+
+q = (.1,.99,.2,.7)
+epsilon = .1
+pY = np.asarray([[.4,.3],[.7,.6]])
 
 model = ScaleableParallelConfoundedNoZAction(q,pz,pY,N1,N-N1)
-model.make_ith_arm_epsilon_best(epsilon,N)
+model.make_ith_arm_epsilon_best(epsilon,1)
 
-#alg = GeneralCausal()
-#alg.run(200,model)
+T_vals = range(25,2026,100)
 
-#T_vals = range(25,451,50)
-##
-#algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects(),ThompsonSampling(),AlphaUCB(2)]
-##
-#regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
-#finished = now_string()
-#
-#experiment = Experiment(5)
-#experiment.log_code(finished)
-#experiment.log_regret(regret,finished)
-#experiment.plot_regret(regret,T_vals,"T",algorithms,finished,legend_loc = "lower left")
+algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects(),ThompsonSampling(),AlphaUCB(2)]
+
+regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
+finished = now_string()
+
+experiment = Experiment(5)
+experiment.log_code(finished)
+experiment.log_regret(regret,finished)
+experiment.plot_regret(regret,T_vals,"T",algorithms,finished,legend_loc = "lower left")

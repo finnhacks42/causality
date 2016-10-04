@@ -16,14 +16,14 @@ from algorithms import ParallelCausal
 #q =.9,.9,.9,.1# .1,.3,.4,.7
 #epsilon = .2
 
-
+np.set_printoptions(precision=2)
 
 N = 10
 N1 = 1
 pz = .4
-q = (.1,.9,.2,.7)
+q = (.1,.99,.2,.7)
 q10,q11,q20,q21 = q
-a,b,c,d = 0.355172,0.355172,.7,.7
+a,b,c,d = .4,.3,.7,.6
 epsilon = .1
 T=2000
 
@@ -63,12 +63,26 @@ doxj = a*alpha+b*beta+c*gamma+d*delta
 xj0 = a*(z00*(1-q10)*(1-q20)+z01*(1-q11)*(1-q21))+b*(z00*(1-q10)*q20+z01*(1-q11)*q21)+c*(z00*q10*(1-q20)+z01*q11*(1-q21))+d*(z00*q10*q20+z01*q11*q21) 
 xj1 = a*(z10*(1-q10)*(1-q20)+z11*(1-q11)*(1-q21))+b*(z10*(1-q10)*q20+z11*(1-q11)*q21)+c*(z10*q10*(1-q20)+z11*q11*(1-q21))+d*(z10*q10*q20+z11*q11*q21) 
 
-print dox10,x10,x10-dox10
-print dox11,x11,x11-dox11
-print dox20,x20,x20-dox20
-print dox21,x21,x21-dox21
-print doxj,xj0, xj0 - doxj
-print doxj,xj1, xj1 - doxj
+expected_rewards = np.asarray([dox10,dox20,doxj,dox11,dox21,doxj])
+observational_rewards = np.asarray([x10,x20,xj0,x11,x21,xj1])
+
+costs = expected_rewards - 0.50
+costs[1] -= .1
+
+print expected_rewards
+print observational_rewards
+print expected_rewards - observational_rewards
+print "\n"
+print costs
+print expected_rewards - costs
+print observational_rewards - costs
+
+#print dox10,x10,x10-dox10
+#print dox11,x11,x11-dox11
+#print dox20,x20,x20-dox20
+#print dox21,x21,x21-dox21
+#print doxj,xj0, xj0 - doxj
+#print doxj,xj1, xj1 - doxj
 
 #alg = ParallelCausal()
 #model = ParallelConfoundedNoZAction.create(N,N1,pz,q,epsilon)

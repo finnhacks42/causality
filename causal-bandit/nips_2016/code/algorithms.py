@@ -38,7 +38,7 @@ class GeneralCausal(object):
         for t in xrange(T):
             a = np.random.choice(actions,p=eta)
             x,y = model.sample(a) #x is an array containing values for each variable
-            y = y - model.get_costs()[a]
+            #y = y - model.get_costs()[a]
             pa = model.P(x)
             r = model.R(pa,eta)
             if self.truncate == "zero":
@@ -50,7 +50,7 @@ class GeneralCausal(object):
                 
             u += z
         self.u = u/float(T)
-        r = self.u
+        r = self.u - model.get_costs()
         self.best_action = np.argmax(r)
         return max(model.expected_rewards) - model.expected_rewards[self.best_action]   
     
