@@ -32,30 +32,40 @@ def regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = 100
 N = 50
 N1_vals = range(1,N,2)
 pz = .4
-q = (0.00001,0.00001,.4,.6)
+q = (0.00001,0.00001,.4,.65)
 epsilon = .1
-simulations = 10000
+simulations = 1000
 T = 400
 #algorithms = [SuccessiveRejects(),GeneralCausal(),AlphaUCB(2),ThompsonSampling()]
 pY = np.asarray([[.4,.4],[.7,.7]])
 
-model = ScaleableParallelConfounded(q,pz,pY,33,N-33)
+models = [ScaleableParallelConfounded(q,pz,pY,N1,N-N1) for N1 in range(29,36,2)]
 
-print "built model 1"
+#model = ScaleableParallelConfounded(q,pz,pY,33,N-33)
 
-model2 = ScaleableParallelConfounded(q,pz,pY,35,N-35)
+#print "built model 1"
+
+#model2 = ScaleableParallelConfounded(q,pz,pY,35,N-35)
 
 print "built model 2"
 
 alg = GeneralCausal()
 
-regret = np.zeros((2,1000),dtype=float)
-pulls = np.zeros((2,1000,model.K),dtype=int)
+regret = np.zeros((len(models),1000),dtype=float)
+pulls = np.zeros((len(models),1000,models[0].K),dtype=int)
 for s in xrange(1000):
-    regret[0,s] = alg.run(T,model)
-    pulls[0,s,alg.best_action] += 1
-    regret[1,s] = alg.run(T,model2)
-    pulls[1,s,alg.best_action] += 1
+    for i,model in enumerate(models):
+        regret[i,s] = alg.run(T,model)
+        pulls[i,s,alg.best_action] += 1
+        
+etas = [model.contract(model.eta) for model in models]
+print regret.mean(axis=1)
+for e in etas:
+    print e
+        
+
+      
+en = [ [0,0,1/(N1+6),0,0,0,1-N1/(N1+6)] for N1 in range(29,36,2)]
     
     
 #

@@ -30,25 +30,29 @@ def regret_vs_T(model,algorithms,T_vals,simulations = 10):
 
 
                   
-N = 5
+N = 50
 N1 = 1
 pz = .3
 q = (.1,.9,.2,.7) #q = (.3,.3,.4,.6)
 epsilon = .2
 pY = ScaleableParallelConfounded.pY_epsilon_best(q,pz,epsilon)
 
-#simulations = 10000
+simulations = 1000
 #
 model = ScaleableParallelConfounded(q,pz,pY,N1,N-N1)
+model.compute_m()
+model.make_ith_arm_epsilon_best(epsilon,N)
+
+
 #
-#T_vals = range(25,451,25)
-#
-#algorithms = [GeneralCausal(),SuccessiveRejects(),AlphaUCB(2),ThompsonSampling()]
-#
-#regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
-#finished = now_string()
-#
-#experiment = Experiment(7)
-#experiment.log_code(finished)
-#experiment.log_regret(regret,finished)
-#experiment.plot_regret(regret,T_vals,"T",algorithms,finished,legend_loc = None)
+T_vals = range(25,451,25)
+
+algorithms = [GeneralCausal(),SuccessiveRejects(),AlphaUCB(2),ThompsonSampling()]
+
+regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
+finished = now_string()
+
+experiment = Experiment(7)
+experiment.log_code(finished)
+experiment.log_regret(regret,finished)
+experiment.plot_regret(regret,T_vals,"T",algorithms,finished,legend_loc = None)

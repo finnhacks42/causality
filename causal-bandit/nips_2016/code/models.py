@@ -55,10 +55,11 @@ class Model(object):
         """
         self.costs = costs
         self.expected_rewards = self.expected_Y - costs
+        assert max(self.expected_rewards) <= 1
+        assert min(self.expected_rewards) >= 0
         
     def make_ith_arm_epsilon_best(self,epsilon,i):
         """ adjusts the costs such that all arms have expected reward .5, expect the first one which has reward .5 + epsilon """
-        # TODO not clear that truncation in general is correct given this        
         costs = self.expected_Y - 0.5
         costs[i] -= epsilon
         self.set_action_costs(costs)
@@ -222,8 +223,6 @@ class Parallel(Model):
                 return indx
         return len(qij_sorted)/2 
         
-    
-        
     def set_epsilon(self,epsilon):
         assert epsilon <= .5 ,"epsilon cannot exceed .5"
         self.epsilon = epsilon
@@ -304,7 +303,7 @@ class ParallelConfounded(Model):
         
     @classmethod
     def pY_epsilon_best(cls,q,pZ,epsilon):
-        """ returns a table pY with Y depending only on X1 so that the rewards for all arms except """
+        """ returns a table pY with Y epsilon-optimal for X1=1, sub-optimal for X1=0 and .5 for all others"""
         q10,q11,q20,q21 = q
         px1 = (1-pZ)*q10+pZ*q11
         px0 = (1-pZ)*(1-q10)+pZ*(1-q11)              
@@ -472,8 +471,15 @@ class ScaleableParallelConfounded(ParallelConfounded):
         print "computing reward"
         self._compute_expected_reward()
         print "computing eta"
-        self.eta,self.m = self.find_eta()
+        #self.eta,self.m = self.find_eta()
         print "done init"
+    
+    def compute_m(self,eta_short = None):
+        if eta_short is not None:
+            self.m = max(self.V_short(eta_short))
+            self.eta = self.expand(eta_short)
+        else:
+            self.eta,self.m = self.find_eta()
         
     def _compute_expected_reward(self):
         q10,q11,q20,q21 = self.q

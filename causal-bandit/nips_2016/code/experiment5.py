@@ -22,8 +22,6 @@ def regret_vs_T(model,algorithms,T_vals,simulations = 10):
         
         for a_indx,algorithm in enumerate(algorithms):
             for s in xrange(simulations):
-                #i = np.random.randint(0,model.K)
-                #model.make_ith_arm_epsilon_best(epsilon,0)
                 regret[a_indx,T_indx,s] = algorithm.run(T,model)
                 if algorithm.best_action is not None:
                     pulls[a_indx,T_indx,algorithm.best_action] +=1
@@ -41,19 +39,21 @@ q = (.1,.9,.2,.7)
 epsilon = .2
 pY = ParallelConfounded.pY_epsilon_best(q,pz,epsilon)
 
-#model = ParallelConfoundedNoZAction.create(N,N1,pz,pY,q,epsilon)
 model = ScaleableParallelConfoundedNoZAction(q,pz,pY,N1,N-N1)
+model.compute_m()
+model.make_ith_arm_epsilon_best(epsilon,N)
+
 #alg = GeneralCausal()
 #alg.run(200,model)
 
-#T_vals = range(25,451,25)
+T_vals = range(25,451,50)
 #
-#algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects(),ThompsonSampling(),AlphaUCB(2)]
+algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects(),ThompsonSampling(),AlphaUCB(2)]
 #
-#regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
-#finished = now_string()
-#
-#experiment = Experiment(5)
-#experiment.log_code(finished)
-#experiment.log_regret(regret,finished)
-#experiment.plot_regret(regret,T_vals,"T",algorithms,finished,legend_loc = "lower left")
+regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
+finished = now_string()
+
+experiment = Experiment(5)
+experiment.log_code(finished)
+experiment.log_regret(regret,finished)
+experiment.plot_regret(regret,T_vals,"T",algorithms,finished,legend_loc = "lower left")

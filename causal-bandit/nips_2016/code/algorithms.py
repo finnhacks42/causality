@@ -38,6 +38,7 @@ class GeneralCausal(object):
         for t in xrange(T):
             a = np.random.choice(actions,p=eta)
             x,y = model.sample(a) #x is an array containing values for each variable
+            y = y - model.get_costs()[a]
             pa = model.P(x)
             r = model.R(pa,eta)
             if self.truncate == "zero":
