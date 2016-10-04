@@ -468,11 +468,10 @@ class ScaleableParallelConfounded(ParallelConfounded):
         self.K = 2*self.N + 3
         self.qz0 = np.asarray([(1-self.q10),self.q10,(1-self.q20),self.q20])
         self.qz1 = np.asarray([(1-self.q11),self.q11,(1-self.q21),self.q21])
-        print "computing reward"
         self._compute_expected_reward()
-        print "computing eta"
+
         #self.eta,self.m = self.find_eta()
-        print "done init"
+
     
     def compute_m(self,eta_short = None):
         if eta_short is not None:

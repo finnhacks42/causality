@@ -50,7 +50,7 @@ class GeneralCausal(object):
                 
             u += z
         self.u = u/float(T)
-        r = self.u - model.get_costs()
+        r = self.u
         self.best_action = np.argmax(r)
         return max(model.expected_rewards) - model.expected_rewards[self.best_action]   
     
