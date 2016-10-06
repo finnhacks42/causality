@@ -21,6 +21,7 @@ def now_string():
 class Experiment(object):
     
     def __init__(self,experiment_id):
+        self.started = now_string()
         self.experiment_id = experiment_id
         self.REGRET_LABEL = "Regret"
         self.HORIZON_LABEL = "T"
@@ -33,7 +34,7 @@ class Experiment(object):
             a.marker = self.markers[indx]
             a.color = self.colors[indx]
               
-    def plot_regret(self,regret,xvals,xlabel,algorithms,now_string,legend_loc = "upper right"):
+    def plot_regret(self,regret,xvals,xlabel,algorithms,legend_loc = "upper right"):
         s_axis = regret.ndim - 1 # assumes the last axis is over simulations
         simulations = regret.shape[-1]
         mu = regret.mean(s_axis)
@@ -46,19 +47,25 @@ class Experiment(object):
         
         if legend_loc is not None:
             ax.legend(loc = legend_loc,numpoints=1)
-        fig_name = "results/experiment{0}_{1}.pdf".format(self.experiment_id,now_string)
+        fig_name = "results/experiment{0}_{1}.pdf".format(self.experiment_id,self.started)
         fig.savefig(fig_name,bbox_inches="tight")
     
-    def log_code(self,now_string):
-        out = "results/experiment{0}_{1}_settings.txt".format(self.experiment_id,now_string)
+    def log_code(self):
+        out = "results/experiment{0}_{1}_settings.txt".format(self.experiment_id,self.started)
         experiment_file = "experiment{0}.py".format(self.experiment_id)
         with open(experiment_file,"r") as f, open(out,"w") as o:
             o.write(f.read())
     
-    def log_regret(self,regret,now_string):
-        filename = "results/experiment{0}_{1}.pickle".format(self.experiment_id,now_string)
+    def log_regret(self,regret,xvals):
+        filename = "results/experiment{0}_{1}.pickle".format(self.experiment_id,self.started)
         with open(filename,'wb') as out:
-            pickle.dump(regret,out)
+            tpl = (regret,xvals)
+            pickle.dump(tpl,out)
+            
+    def read_data(self,filename):
+        with open(filename,"rb") as f:
+            tpl = pickle.load(f)
+        return tpl
         
         
     

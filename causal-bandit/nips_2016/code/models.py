@@ -325,6 +325,16 @@ class ParallelConfounded(Model):
     def pYgivenX(self,x):
         i,j = x[0],x[self.N-1]
         return self.pytable[i,j] 
+        
+    def action_tuple(self,action):
+        """ convert from action id to the tuple (varaible,value) """
+        if action == 2*self.N+1:
+            return ('z',1)
+        if action ==  2*self.N:
+            return ('z',0)
+        if action == 2*self.N+2:
+            return ((None,None))
+        return (action % self.N, action/self.N)
      
              
     def sample(self,action):
@@ -461,7 +471,7 @@ class ScaleableParallelConfounded(ParallelConfounded):
     """ Makes use of symetries to avoid exponential combinatorics in calculating V """
     # do(x1=0),do(x2=0),do(x1=1),do(x2=1),do(z=0),do(z=1),do()
         
-    def __init__(self,q,pZ,pY,N1,N2):
+    def __init__(self,q,pZ,pY,N1,N2,compute_m = True):
         self._init_pre_action(q,pZ,pY,N1,N2)
         
         self.pZgivenA = np.hstack((np.full(4,pZ),0,1,pZ))
@@ -469,9 +479,11 @@ class ScaleableParallelConfounded(ParallelConfounded):
         self.qz0 = np.asarray([(1-self.q10),self.q10,(1-self.q20),self.q20])
         self.qz1 = np.asarray([(1-self.q11),self.q11,(1-self.q21),self.q21])
         self._compute_expected_reward()
-
-        #self.eta,self.m = self.find_eta()
-
+        
+        if compute_m:
+            self.compute_m()
+            
+        
     
     def compute_m(self,eta_short = None):
         if eta_short is not None:
@@ -532,6 +544,12 @@ class ScaleableParallelConfounded(ParallelConfounded):
              sum1 += np.asfarray(w*pz1*ratio)
         result = self.pZgivenA*sum1+(1-self.pZgivenA)*sum0
         return result
+        
+    def V(self,eta):
+        eta_short_form = self.contract(eta)
+        v = self.V_short(eta_short_form)
+        v_long = self.expand(v)
+        return v_long
         
     def m_rep(self,eta_short_form):
         V = self.V_short(eta_short_form)
