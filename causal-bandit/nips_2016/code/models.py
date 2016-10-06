@@ -132,20 +132,20 @@ class Model(object):
         eta = np.random.random(self.K)
         return eta/eta.sum()
         
-    def _minimize(self,tol = 1e-6):
+    def _minimize(self,tol,options):
         eta0 = self.random_eta()
         constraints=({'type':'eq','fun':lambda eta: eta.sum()-1.0})
         #options={'disp': True}
-        res = minimize(self.m_eta, eta0,bounds = [(0.0,1.0)]*self.K, constraints = constraints, method='SLSQP',options={'disp': True})
+        res = minimize(self.m_eta, eta0,bounds = [(0.0,1.0)]*self.K, constraints = constraints, method='SLSQP',options = options)
         return res
         
-    def find_eta(self,tol = 1e-10,min_starts = 3, max_starts = 10):
+    def find_eta(self,tol = 1e-10,min_starts = 1, max_starts = 10,  options={'disp': True, 'maxItr':150}):
         m = self.K + 1
         eta = None
         starts = 0
         success = 0
         while success < min_starts and starts < max_starts:
-            res = self._minimize(tol)            
+            res = self._minimize(tol,options)            
             if res.success and res.fun <= self.K:
                 success +=1
                 if res.fun < m:
@@ -390,11 +390,11 @@ class ParallelConfounded(Model):
         return np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
         
         
-    def _minimize(self,tol = 1e-10):
+    def _minimize(self,tol,options):
         weights = self.weights()
         eta0 = self.random_eta_short()
         constraints=({'type':'eq','fun':lambda eta: np.dot(eta,weights)-1.0})
-        res = minimize(self.m_rep,eta0,bounds = [(0.0,1.0)]*len(eta0), constraints = constraints ,method='SLSQP',tol=tol,options={'disp': True})      
+        res = minimize(self.m_rep,eta0,bounds = [(0.0,1.0)]*len(eta0), constraints = constraints ,method='SLSQP',tol=tol,options=options)      
         return res
             
     def find_eta(self,tol=1e-10):

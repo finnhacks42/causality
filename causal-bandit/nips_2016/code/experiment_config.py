@@ -11,6 +11,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from algorithms import GeneralCausal,  ParallelCausal, SuccessiveRejects,AlphaUCB,RandomArm,ThompsonSampling
 import cPickle as pickle
+import shelve
+
 
 print "LOADING EXPERIMENT CONFIG MODULE AGAIN"
 
@@ -66,6 +68,36 @@ class Experiment(object):
         with open(filename,"rb") as f:
             tpl = pickle.load(f)
         return tpl
+        
+    def log_state(self,object_to_value_dict):
+        self.state_filename = "results/experiment_state{0}_{1}.shelve".format(self.experiment_id,self.started)
+        db = shelve.open(self.state_filename)
+        for key,value in object_to_value_dict.iteritems():
+            try:
+                db[key] = value
+            except TypeError:
+                print "failed to write, {0} -> {1}".format(key,value)
+        db.close()
+            
+              
+    def read_state(self,filename):
+        d = {}
+        db = shelve.open(filename)
+        for key in db:
+            try:
+                value = db[key]
+                d[key] = value
+            except AttributeError:
+                print "unable to load value for {0}".format(key)
+        db.close()
+        return d
+   
+                
+
+            
+            
+
+            
         
         
     

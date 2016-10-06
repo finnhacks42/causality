@@ -16,6 +16,7 @@ def regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = 100
     m_vals = []
     models = []
     regret = np.zeros((len(algorithms),len(N1_vals),simulations))
+
     for m_indx,N1 in enumerate(N1_vals):
         model = ScaleableParallelConfounded(q,pz,pY,N1,N-N1)
         #eta = [0,0,1.0/(N1+6.0),0,0,0,1-N1/(N1+6.0)]
@@ -27,8 +28,8 @@ def regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = 100
         models.append(model)
         for a_indx, algorithm in enumerate(algorithms):
             for s in xrange(simulations):
-                #model.make_ith_arm_epsilon_best(epsilon,i)
                 regret[a_indx,m_indx,s] = algorithm.run(T,model)
+                
     
     return m_vals,regret,models
     
@@ -40,16 +41,36 @@ N = 50
 N1_vals = range(1,N,3)
 pz = .4
 q = (0.00001,0.00001,.4,.65)
-epsilon = .2
+epsilon = .3
 simulations = 5000
 T = 400
 algorithms = [SuccessiveRejects(),GeneralCausal(),AlphaUCB(2),ThompsonSampling()]
 pY = np.asarray([[.4,.4],[.7,.7]])
+
 m_vals,regret,models = regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = simulations)
 
 experiment.plot_regret(regret,m_vals,"m",algorithms,legend_loc = "lower right")
 experiment.log_regret(regret,m_vals)
+experiment.log_state(globals())
 
+
+#etas = np.zeros((len(m_vals),7))
+#for m_indx,model in enumerate(models):
+#    etas[m_indx] = model.eta_short
+
+#import matplotlib.pyplot as plt
+#
+#fig,ax = plt.subplots()
+#for m_indx in range(len(models)):
+#    eta = etas[m_indx,:]
+#    print len(eta)
+#    print len(m_vals)
+#    ax.plot(m_vals,eta)
+
+#        for indx,alg in enumerate(algorithms):    
+#            ax.errorbar(xvals,mu[indx,:],yerr = error[indx,:],label = alg.label,linestyle="",marker = alg.marker,color=alg.color)
+#        ax.set_xlabel(xlabel)
+#        ax.set_ylabel(self.REGRET_LABEL)
 
 # compare against N1  =N1_vals[7]
 #N1 = N1_vals[6]
