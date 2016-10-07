@@ -77,7 +77,7 @@ class GeneralModel(Model):
         
     @classmethod
     
-    def create_confounded_parallel(cls,N,N1,pz,pY,q,epsilon, act_on_z = True):       
+    def create_confounded_parallel(cls,N,N1,pz,pY,q, act_on_z = True):       
         """ convinience method for constructing equivelent models to Confounded_Parallel""" 
         q10,q11,q20,q21 = q
         pZ = [[1-pz,pz]] 

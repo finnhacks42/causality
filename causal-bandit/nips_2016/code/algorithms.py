@@ -55,12 +55,7 @@ class GeneralCausal(object):
         return max(model.expected_rewards) - model.expected_rewards[self.best_action]   
     
         
-class RandomArm(object):
-    label = "Random arm"
-    
-    def run(self,T,model):
-        self.best_action = np.random.randint(0,model.K)
-        return max(model.expected_rewards) - model.expected_rewards[self.best_action] 
+
   
 class ParallelCausal(object):
     label = "Algorithm 1"
@@ -92,7 +87,6 @@ class ParallelCausal(object):
         infrequent = s_indx[0:m_hat]
         return infrequent
         
- 
 class ThompsonSampling(object):
     """ Sample actions via the Thomson sampling approach and return the empirically best arm 
         when the number of rounds is exhausted """
@@ -112,8 +106,6 @@ class ThompsonSampling(object):
         mu = np.true_divide(self.success,self.trials)
         self.best_action = argmax_rand(mu)
         return max(model.expected_rewards) - model.expected_rewards[self.best_action]
-        
-        
         
 class UCB(object):
     """ 
@@ -137,7 +129,6 @@ class UCB(object):
         self.best_action = argmax_rand(mu)
         return max(model.expected_rewards) - model.expected_rewards[self.best_action]
         
-
 class LilUCB(UCB):
     """ 
     Implementation based on lil’UCB : An Optimal Exploration Algorithm for Multi-Armed Bandits
@@ -183,7 +174,6 @@ class AlphaUCB(UCB):
         mu = np.true_divide(self.success,self.trials)
         interval = np.sqrt(self.alpha*np.log(t)/(2.0*self.trials))
         return mu+interval
-
         
 class SuccessiveRejects(object):
     """ Implementation based on the paper 'Best Arm Identification in Multi-Armed Bandits',Audibert,Bubeck & Munos"""
@@ -229,6 +219,44 @@ class SuccessiveRejects(object):
         min_val = np.min(mu)
         indicies = np.where(mu == min_val)[0] # these are the arms reported as worst
         return np.random.choice(indicies) # select one at random
+
+
+# Some models useful for sanity checks
+# -------------------------------------------------------------------------------------------------
+
+class ObservationalEstimate(object):
+    """ Just observes for all actions, and then selects the arm with the best emprical mean. 
+        Assumes P(Y|do(X)) = P(Y|X) as for ParallelCausal. Some actions may be entirely unexplored. """
+    label = "Observational"
+    
+    def run(self,T,model):
+        self.trials = np.zeros(model.K)
+        self.success = np.zeros(model.K)
+        for t in xrange(T):
+            x,y = model.sample(model.K-1)
+            xij = np.hstack((1-x,x,1)) # first N actions represent x_i = 0,2nd N x_i=1, last do()
+            self.trials += xij
+            self.success += y*xij
+        self.u = np.true_divide(self.success,self.trials)
+        self.best_action = argmax_rand(self.u)
+        return max(model.expected_rewards) - model.expected_rewards[self.best_action]
+        
+class UniformSampling(object):
+    label = "Uniform"
+    
+    def run(self,T,model):
+        trials_per_action = T/model.K
+        success = model.sample_multiple(range(model.K),trials_per_action)
+        self.u = np.true_divide(success,trials_per_action)
+        self.best_action = argmax_rand(self.u)
+        return max(model.expected_rewards) - model.expected_rewards[self.best_action]
+        
+class RandomArm(object):
+    label = "Random arm"
+    
+    def run(self,T,model):
+        self.best_action = np.random.randint(0,model.K)
+        return max(model.expected_rewards) - model.expected_rewards[self.best_action] 
 
 if __name__ == "__main__":  
     

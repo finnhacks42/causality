@@ -316,8 +316,6 @@ class ParallelConfounded(Model):
         
     def pYgivenX(self,x):
         return self.pYfunc(x)
-        #i,j = x[0],x[self.N-1]
-        #return self.pytable[i,j] 
         
     def action_tuple(self,action):
         """ convert from action id to the tuple (varaible,value) """
@@ -370,19 +368,6 @@ class ParallelConfounded(Model):
         
         result = np.hstack((pij,pz0.prod(),pz1.prod(),p_obs))
         return result
-    
-    
-        
- 
-#    def random_eta_short(self):
-#        weights = self.weights()
-#        eta0 = np.random.random(len(weights))
-#        eta0 = eta0/np.dot(weights,eta0)
-#        return eta0
-#        
-#        
-#    def weights(self):
-#        return np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
         
         
     def _minimize(self,tol,options):

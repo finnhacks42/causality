@@ -63,11 +63,6 @@ class TestSamplingAndExpectedRewardsMatch(unittest.TestCase):
         self.assert_samples_consistent_probabilities(model,50000)
         
     
-            
-    
-
-            
-            
         
         
 #    def test_parallel_confounded_no_z(self):
@@ -92,9 +87,6 @@ class TestSamplingAndExpectedRewardsMatch(unittest.TestCase):
 #        
         
         
-        
-    
-
 
 class TestModelParallelConfoundedNoZEquivalence(unittest.TestCase):
     
