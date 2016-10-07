@@ -55,7 +55,7 @@ class TestSamplingAndExpectedRewardsMatch(unittest.TestCase):
         self.assert_samples_consistent_probabilities(model,50000)
         
     def test_scalable_confounded(self):
-        model = ScaleableParallelConfoundedNoZAction(self.q,self.pz,self.pY,self.N1,self.N-self.N1)
+        model = ScaleableParallelConfounded(self.q,self.pz,self.pY,self.N1,self.N-self.N1)
         self.assert_samples_consistent_probabilities(model,50000)
         
     def test_scalable_noz(self):

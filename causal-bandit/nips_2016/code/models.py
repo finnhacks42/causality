@@ -528,6 +528,25 @@ class ScaleableParallelConfounded(Model):
         result = np.hstack((pij,pc[4],pc[5],pc[6]))
         return result
         
+    def sample(self,action):
+        """ samples given the specified action index and returns the values of the parents of Y, Y. """   
+        if action == 2*self.N+1: # do(z = 1)
+            z = 1       
+        elif action == 2*self.N: # do(z = 0)
+            z = 0     
+        else: # we are not setting z
+            z = binomial(1,self.pZ)
+        
+        x = binomial(1,self.pXgivenZ[1,:,z]) # PXgivenZ[j,i,k] = P(X_i=j|Z=k)
+        
+        if action < 2*self.N: # setting x_i = j
+             i,j = action % self.N, action/self.N
+             x[i] = j
+             
+        y = binomial(1,self.pYgivenX(x)) 
+        
+        return x,y
+        
         
     def V_short(self,eta):
         sum0 = np.zeros(7,dtype=float)
