@@ -52,15 +52,15 @@ class TestSamplingAndExpectedRewardsMatch(unittest.TestCase):
         
     def test_parallel_confounded(self):
         model = ParallelConfounded.create(self.N,self.N1,self.pz,self.pY,self.q)
-        self.assert_samples_consistent_probabilities(model,10000)
+        self.assert_samples_consistent_probabilities(model,50000)
         
     def test_scalable_confounded(self):
         model = ScaleableParallelConfoundedNoZAction(self.q,self.pz,self.pY,self.N1,self.N-self.N1)
-        self.assert_samples_consistent_probabilities(model,10000)
+        self.assert_samples_consistent_probabilities(model,50000)
         
     def test_scalable_noz(self):
         model = ScaleableParallelConfoundedNoZAction(self.q,self.pz,self.pY,self.N1,self.N-self.N1)
-        self.assert_samples_consistent_probabilities(model,10000)
+        self.assert_samples_consistent_probabilities(model,50000)
         
     
             
@@ -104,9 +104,8 @@ class TestModelParallelConfoundedNoZEquivalence(unittest.TestCase):
         pz = .1
         q = 1,1,1,0
         pY = np.asanyarray([[.2,.8],[.3,.9]])
-        epsilon = .2
         self.model1 = ParallelConfoundedNoZAction.create(N,N1,pz,pY,q)          
-        self.model2 = GeneralModel.create_confounded_parallel(N,N1,pz,pY,q,epsilon,act_on_z=False)
+        self.model2 = GeneralModel.create_confounded_parallel(N,N1,pz,pY,q,act_on_z=False)
         self.model3 = ScaleableParallelConfoundedNoZAction(q,pz,pY,N1,N-N1)
         
     def test_P(self):
@@ -141,8 +140,8 @@ class TestModelParallelConfoundedNoZEquivalence(unittest.TestCase):
         
     def test_V(self):
         for s in xrange(100):
-            eta_short = self.model1.random_eta_short()
-            eta = self.model1.expand(eta_short)
+            eta_short = self.model3.random_eta_short()
+            eta = self.model3.expand(eta_short)
             
             v1 = self.model1.V(eta)
             v2 = self.model2.V(eta)
@@ -170,8 +169,8 @@ class TestScaleableModelEquivalance(unittest.TestCase):
 
     def test_V(self):
         for t in range(10):
-            eta_short = self.model1.random_eta_short()
-            eta = self.model1.expand(eta_short)
+            eta_short = self.model2.random_eta_short()
+            eta = self.model2.expand(eta_short)
             
             v1 = self.model1.V(eta)
             v2 = self.model2.expand(self.model2.V_short(eta_short))
@@ -191,9 +190,8 @@ class TestModelParallelConfoundedEquivalence(unittest.TestCase):
         pz = .2
         q = .1,.3,.4,.7
         pY = np.asanyarray([[.2,.8],[.3,.9]])
-        epsilon = .2
         self.model1 = ParallelConfounded.create(N,N1,pz,pY,q)          
-        self.model2 = GeneralModel.create_confounded_parallel(N,N1,pz,pY,q,epsilon)
+        self.model2 = GeneralModel.create_confounded_parallel(N,N1,pz,pY,q)
         
         
     def test_pxgivenz(self):
@@ -205,8 +203,8 @@ class TestModelParallelConfoundedEquivalence(unittest.TestCase):
             pXgivenZ0[indx] = dist.reduce([(x,1)],inplace=False).values
             pXgivenZ1[indx] = dist1.reduce([(x,1)],inplace=False).values
         
-        np_test.assert_almost_equal(pXgivenZ0,self.model1.pX0[1])
-        np_test.assert_almost_equal(pXgivenZ1,self.model1.pX1[1])
+        np_test.assert_almost_equal(pXgivenZ0,self.model1.pXgivenZ[1,:,0])
+        np_test.assert_almost_equal(pXgivenZ1,self.model1.pXgivenZ[1,:,1])
    
     def test_V(self):
         for t in range(10):

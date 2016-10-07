@@ -18,7 +18,7 @@ Methods
 @author: finn
 """
 import numpy as np
-from itertools import product
+from itertools import product,chain
 from numpy.random import binomial
 from scipy.optimize import minimize
 from scipy.stats import binom
@@ -139,7 +139,7 @@ class Model(object):
         res = minimize(self.m_eta, eta0,bounds = [(0.0,1.0)]*self.K, constraints = constraints, method='SLSQP',options = options)
         return res
         
-    def find_eta(self,tol = 1e-10,min_starts = 1, max_starts = 10,  options={'disp': True, 'maxItr':150}):
+    def find_eta(self,tol = 1e-10,min_starts = 1, max_starts = 10,  options={'disp': True, 'maxiter':200}):
         m = self.K + 1
         eta = None
         starts = 0
@@ -162,30 +162,6 @@ class Model(object):
         """ draws n samples from the reward distributions of the specified actions. """
         return binomial(n,self.expected_rewards[actions])
         
-class ActionShuffler(object):
-    """ takes an input model and re-orders all the actions """    
-    def __init__(self,model):
-        self.model = model
-        self.indx = np.arange(model.K)
-        np.random.shuffle(self.indx) 
-        self.m = model.m
-        self.K = model.K
-        self.eta = model.eta[self.indx]
-        self.expected_rewards = model.expected_rewards[self.indx]
-        
-    
-    def get_costs(self):
-        return self.model.get_costs()[self.indx]
-        
-    def P(self,x):
-        return self.model.P(x)[self.indx]
-        
-    def sample_multiple(self,actions,n):
-        return self.model.sample_multiple(self.indx[actions])
-        
-        
-
-
 class Parallel(Model):
     """ Parallel model as described in the paper """
     def __init__(self,q,epsilon):
@@ -277,29 +253,39 @@ class ParallelConfounded(Model):
     """ Represents a parallel bandit with one common confounder. Z ->(X1 ... XN) and (X1,...,XN) -> Y 
         Actions are do(x_1 = 0),...,do(x_N = 0), do(x_1=1),...,do(x_N = 1),do(Z=0),do(Z=1),do()"""
     
-    def __init__(self,q,pZ,pY,N1,N2):
-        self._init_pre_action(q,pZ,pY,N1,N2)
-        self.K = 2*self.N + 3        
+    def __init__(self,pZ,pXgivenZ,pYfunc):
+        self._init_pre_action(pZ,pXgivenZ,pYfunc,3)
         self.pre_compute()  
         
-    def _init_pre_action(self,q,pZ,pY,N1,N2):
+    def _init_pre_action(self,pZ,pXgivenZ,pYfunc,num_non_x_actions):
         """ The initialization that should occur regardless of whether we can act on Z """
-        self.N1 = N1
-        self.N2 = N2
-        self.q = q
-        self.q10,self.q11,self.q20,self.q21 = q
-        self.N = N1+N2
+        self.N = pXgivenZ.shape[1]
         self.indx = np.arange(self.N)
         self.pZ = pZ
+        self.pXgivenZ = pXgivenZ # PXgivenZ[i,j,k] = P(X_j=i|Z=k)
+        self.pYfunc = pYfunc
+        #self.pytable = pY #np.asarray([[.4,.4],[.7,.7]])  
         
-        pXgivenZ0 = np.hstack((np.full(N1,self.q10),np.full(N2,self.q20)))
-        pXgivenZ1 = np.hstack((np.full(N1,self.q11),np.full(N2,self.q21)))
-        self.pX0 = np.vstack((1.0-pXgivenZ0,pXgivenZ0)) # PX0[j,i] = P(X_i = j|Z = 0)
-        self.pX1 = np.vstack((1.0-pXgivenZ1,pXgivenZ1)) # PX1[i,j] = P(X_i = j|Z = 1)
-        self.pXgivenZ = np.stack((self.pX0,self.pX1),axis=2) # PXgivenZ[i,j,k] = P(X_i=j|Z=k)
-    
+        # variables X for which pXgivenZ is identical must have the same value for eta.
+        group_values = []
+        self.group_members = [] #variables in each group
+        for var in range(self.N):
+            matched = False
+            value = self.pXgivenZ[:,var,:]
+            for group,gv in enumerate(group_values):
+                if np.allclose(value,gv):
+                    self.group_members[group].append(var)
+                    matched = True
+                    break
+            if not matched:
+                group_values.append(value)
+                self.group_members.append([var])
+        counts = [len(members) for members in self.group_members]
+        self.group_members = [np.asarray(members,dtype=int) for members in self.group_members]
         
-        self.pytable = pY #np.asarray([[.4,.4],[.7,.7]])  
+        self.weights = list(chain(counts*2,[1]*num_non_x_actions))
+        self.K = 2*self.N + num_non_x_actions
+        self.nnx = num_non_x_actions
         
     @classmethod
     def pY_epsilon_best(cls,q,pZ,epsilon):
@@ -318,13 +304,20 @@ class ParallelConfounded(Model):
         """ builds ParallelConfounded model"""
         q10,q11,q20,q21 = q
         N2 = N - N1
-        model = cls(q,pz,pY,N1,N2)
+        pXgivenZ0 = np.hstack((np.full(N1,q10),np.full(N2,q20)))
+        pXgivenZ1 = np.hstack((np.full(N1,q11),np.full(N2,q21)))
+        pX0 = np.vstack((1.0-pXgivenZ0,pXgivenZ0)) # PX0[j,i] = P(X_i = j|Z = 0)
+        pX1 = np.vstack((1.0-pXgivenZ1,pXgivenZ1)) # PX1[i,j] = P(X_i = j|Z = 1)
+        pXgivenZ = np.stack((pX0,pX1),axis=2) # PXgivenZ[i,j,k] = P(X_i=j|Z=k)
+        pYfunc = lambda x: pY[x[0],x[N-1]]
+        model = cls(pz,pXgivenZ,pYfunc)
         return model
         
         
     def pYgivenX(self,x):
-        i,j = x[0],x[self.N-1]
-        return self.pytable[i,j] 
+        return self.pYfunc(x)
+        #i,j = x[0],x[self.N-1]
+        #return self.pytable[i,j] 
         
     def action_tuple(self,action):
         """ convert from action id to the tuple (varaible,value) """
@@ -377,23 +370,26 @@ class ParallelConfounded(Model):
         
         result = np.hstack((pij,pz0.prod(),pz1.prod(),p_obs))
         return result
+    
+    
         
  
-    def random_eta_short(self):
-        weights = self.weights()
-        eta0 = np.random.random(len(weights))
-        eta0 = eta0/np.dot(weights,eta0)
-        return eta0
-        
-        
-    def weights(self):
-        return np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
+#    def random_eta_short(self):
+#        weights = self.weights()
+#        eta0 = np.random.random(len(weights))
+#        eta0 = eta0/np.dot(weights,eta0)
+#        return eta0
+#        
+#        
+#    def weights(self):
+#        return np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
         
         
     def _minimize(self,tol,options):
-        weights = self.weights()
-        eta0 = self.random_eta_short()
-        constraints=({'type':'eq','fun':lambda eta: np.dot(eta,weights)-1.0})
+        eta0 = np.random.random(len(self.group_members)*2+self.nnx)
+        eta0 = eta0/np.dot(self.weights,eta0)
+        
+        constraints=({'type':'eq','fun':lambda eta: np.dot(eta,self.weights)-1.0})
         res = minimize(self.m_rep,eta0,bounds = [(0.0,1.0)]*len(eta0), constraints = constraints ,method='SLSQP',tol=tol,options=options)      
         return res
             
@@ -410,28 +406,38 @@ class ParallelConfounded(Model):
         assert not np.isnan(maxV), "m must not be nan"
         return maxV
         
-    def expand(self,short_form):
-        arrays = []
-        for indx, count in enumerate(self.weights()):
-            arrays.append(np.full(count,short_form[indx]))
-        return np.hstack(arrays)
+    def expand(self,short_form): # not quite right
+        # short form is group1=0,group2=0,group3=0,...,group1=1,...group
+        eta_full = np.zeros(self.K)
+        eta_full[-self.nnx:] = short_form[-self.nnx:]
+        num_groups = len(self.group_members)
+        for group,members in enumerate(self.group_members):
+            eta0 = short_form[group]
+            eta1 = short_form[num_groups+group]
+            eta_full[members] = eta0
+            eta_full[members+self.N] = eta1
+    
+#        arrays = []
+#        for indx, count in enumerate(self.weights()):
+#            arrays.append(np.full(count,short_form[indx]))
+#        result = np.hstack(arrays)
+        return eta_full
         
-    def contract(self,long_form):
-        result = np.zeros(7)
-        result[0] = long_form[0]
-        result[1] = long_form[self.N-1]
-        result[2] = long_form[self.N]
-        result[3] = long_form[2*self.N-1]
-        result[4:] = long_form[-3:]
-        return result
+#    def contract(self,long_form):
+#        result = np.zeros(7)
+#        result[0] = long_form[0]
+#        result[1] = long_form[self.N-1]
+#        result[2] = long_form[self.N]
+#        result[3] = long_form[2*self.N-1]
+#        result[4:] = long_form[-3:]
+#        return result
         
         
         
 class ParallelConfoundedNoZAction(ParallelConfounded):
     """ the ParallelConfounded Model but without the actions that set Z """
-    def __init__(self,q,pZ,pY,N1,N2):
-        self._init_pre_action(q,pZ,pY,N1,N2)
-        self.K = 2*self.N + 1        
+    def __init__(self,pZ,pXgivenZ,pYfunc):
+        self._init_pre_action(pZ,pXgivenZ,pYfunc,1)
         self.pre_compute() 
               
     def P(self,x):
@@ -452,45 +458,60 @@ class ParallelConfoundedNoZAction(ParallelConfounded):
         
         return x,y
           
-    def weights(self):
-        return np.asarray([self.N1,self.N2,self.N1,self.N2,1])
-        
-    def contract(self,long_form):
-        result = np.zeros(5)
-        result[0] = long_form[0]
-        result[1] = long_form[self.N-1]
-        result[2] = long_form[self.N]
-        result[3] = long_form[2*self.N-1]
-        result[4] = long_form[-1]
-        return result
+#    def weights(self):
+#        return np.asarray([self.N1,self.N2,self.N1,self.N2,1])
+#        
+#    def contract(self,long_form):
+#        result = np.zeros(5)
+#        result[0] = long_form[0]
+#        result[1] = long_form[self.N-1]
+#        result[2] = long_form[self.N]
+#        result[3] = long_form[2*self.N-1]
+#        result[4] = long_form[-1]
+#        return result
               
 
     
               
-class ScaleableParallelConfounded(ParallelConfounded):
+class ScaleableParallelConfounded(Model):
     """ Makes use of symetries to avoid exponential combinatorics in calculating V """
     # do(x1=0),do(x2=0),do(x1=1),do(x2=1),do(z=0),do(z=1),do()
         
-    def __init__(self,q,pZ,pY,N1,N2,compute_m = True):
-        self._init_pre_action(q,pZ,pY,N1,N2)
-        
+    def __init__(self,q,pZ,pY,N1,N2,compute_m = True):       
+        self._init_pre_action(q,pZ,pY,N1,N2,compute_m = True,num_nonx_actions=3)
+            
+    def _init_pre_action(self,q,pZ,pY,N1,N2,compute_m,num_nonx_actions):
+        q10,q11,q20,q21 = q
+        self.N = N1+N2
+        self.indx = np.arange(self.N)
+        self.N1,self.N2 = N1,N2
+        self.q = q
+        self.pZ = pZ
+        self.pytable = pY
         self.pZgivenA = np.hstack((np.full(4,pZ),0,1,pZ))
-        self.K = 2*self.N + 3
-        self.qz0 = np.asarray([(1-self.q10),self.q10,(1-self.q20),self.q20])
-        self.qz1 = np.asarray([(1-self.q11),self.q11,(1-self.q21),self.q21])
+        pXgivenZ0 = np.hstack((np.full(N1,q10),np.full(N2,q20)))
+        pXgivenZ1 = np.hstack((np.full(N1,q11),np.full(N2,q21)))
+        pX0 = np.vstack((1.0-pXgivenZ0,pXgivenZ0)) # PX0[j,i] = P(X_i = j|Z = 0)
+        pX1 = np.vstack((1.0-pXgivenZ1,pXgivenZ1)) # PX1[i,j] = P(X_i = j|Z = 1)
+        self.pXgivenZ = np.stack((pX0,pX1),axis=2) # PXgivenZ[i,j,k] = P(X_j=i|Z=k)
+        self.K = 2*self.N + num_nonx_actions
+        self.qz0 = np.asarray([(1-q10),q10,(1-q20),q20])
+        self.qz1 = np.asarray([(1-q11),q11,(1-q21),q21])
         self._compute_expected_reward()
         
         if compute_m:
             self.compute_m()
             
-        
-    
     def compute_m(self,eta_short = None):
         if eta_short is not None:
             self.m = max(self.V_short(eta_short))
             self.eta = self.expand(eta_short)
         else:
             self.eta,self.m = self.find_eta()
+            
+    def pYgivenX(self,x):
+        i,j = x[0],x[self.N-1]
+        return self.pytable[i,j]
         
     def _compute_expected_reward(self):
         q10,q11,q20,q21 = self.q
@@ -521,6 +542,7 @@ class ScaleableParallelConfounded(ParallelConfounded):
         pij = pij.reshape((self.N*2,))
         result = np.hstack((pij,pc[4],pc[5],pc[6]))
         return result
+        
         
     def V_short(self,eta):
         sum0 = np.zeros(7,dtype=float)
@@ -556,6 +578,22 @@ class ScaleableParallelConfounded(ParallelConfounded):
         maxV = V.max()
         assert not np.isnan(maxV), "m must not be nan"
         return maxV
+    
+    def find_eta(self,tol=1e-10):
+        eta,m = Model.find_eta(self)
+        self.eta_short = eta
+        eta_full = self.expand(eta)
+        return eta_full,m 
+        
+    def _minimize(self,tol,options):
+        weights = self.weights()
+        eta0 = self.random_eta_short()
+        constraints=({'type':'eq','fun':lambda eta: np.dot(eta,weights)-1.0})
+        res = minimize(self.m_rep,eta0,bounds = [(0.0,1.0)]*len(eta0), constraints = constraints ,method='SLSQP',tol=tol,options=options)      
+        return res
+    
+    def weights(self):
+        return np.asarray([self.N1,self.N2,self.N1,self.N2,1,1,1])
                    
             
     def p_n_given_z(self,n1,n2):
@@ -569,21 +607,37 @@ class ScaleableParallelConfounded(ParallelConfounded):
         pnz1 = (self.qz1**powers).prod(axis=1)
         return pnz0,pnz1
         
+    def random_eta_short(self):
+        weights = self.weights()
+        eta0 = np.random.random(len(weights))
+        eta0 = eta0/np.dot(weights,eta0)
+        return eta0
+        
+    def contract(self,long_form):
+        result = np.zeros(7)
+        result[0] = long_form[0]
+        result[1] = long_form[self.N-1]
+        result[2] = long_form[self.N]
+        result[3] = long_form[2*self.N-1]
+        result[4:] = long_form[-3:]
+        return result
+        
+    def expand(self,short_form):
+        arrays = []
+        for indx, count in enumerate(self.weights()):
+            arrays.append(np.full(count,short_form[indx]))
+        result = np.hstack(arrays)
+        return result
+        
     
 
 class ScaleableParallelConfoundedNoZAction(ScaleableParallelConfounded):
-    
-    def __init__(self,q,pZ,pY,N1,N2):
-        self._init_pre_action(q,pZ,pY,N1,N2)
-        self.pZgivenA = np.hstack((np.full(4,pZ),0,1,pZ))
-        self.K = 2*self.N + 1
-        self.qz0 = np.asarray([(1-self.q10),self.q10,(1-self.q20),self.q20])
-        self.qz1 = np.asarray([(1-self.q11),self.q11,(1-self.q21),self.q21])
-        self.eta,self.m = self.find_eta()
-        self._compute_expected_reward()
+      
+    def __init__(self,q,pZ,pY,N1,N2,compute_m = True):
+        self._init_pre_action(q,pZ,pY,N1,N2,compute_m,1)
         self.expected_rewards = self._mask(self.expected_rewards)
         self.expected_Y = self._mask(self.expected_Y)
-        
+
     def _mask(self,vect):
         return np.hstack((vect[0:-3],vect[-1]))
         
@@ -615,6 +669,8 @@ class ScaleableParallelConfoundedNoZAction(ScaleableParallelConfounded):
     
     def weights(self):
         return np.asarray([self.N1,self.N2,self.N1,self.N2,1])   
+        
+    
         
     def m_rep(self,eta_short_form):
         eta = np.hstack((eta_short_form[0:-1],0,0,eta_short_form[-1]))
@@ -657,8 +713,8 @@ if __name__ == "__main__":
     import time
     from pgmpy_model import GeneralModel
     
-    N = 4
-    N1 = 1
+    N = 5
+    N1 = 2
     N2 = N-N1
     q = (.1,.3,.4,.7)
     q10,q11,q20,q21 = q
@@ -666,12 +722,16 @@ if __name__ == "__main__":
     pY = np.asanyarray([[.2,.8],[.3,.9]])
     
     model = ParallelConfounded.create(N,N1,pZ,pY,q)
-    xcounts,y = estimate_px_and_y_from_samples(model,10000)
+    model2 = ScaleableParallelConfounded(q,pZ,pY,N1,N2)
     
-    
-    for x in model.get_parent_assignments():
-        p_in_sample = [xcounts[tuple(chain([a],x))] for a in range(model.K)]
-        np_test.assert_almost_equal(model.P(x),p_in_sample,decimal=2)
+    model3 = ParallelConfoundedNoZAction.create(N,N1,pZ,pY,q)
+    model4 = ScaleableParallelConfoundedNoZAction(q,pZ,pY,N1,N2)
+#    xcounts,y = estimate_px_and_y_from_samples(model,10000)
+#    
+#    
+#    for x in model.get_parent_assignments():
+#        p_in_sample = [xcounts[tuple(chain([a],x))] for a in range(model.K)]
+#        np_test.assert_almost_equal(model.P(x),p_in_sample,decimal=2)
     
 #    model1 = ParallelConfoundedNoZAction.create(N,N1,pZ,pY,q,.1)
 #    model2 = ScaleableParallelConfounded(q,pZ,pY,N1,N2)
