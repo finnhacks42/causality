@@ -7,7 +7,10 @@
 
 
 Assume without loss of generality that $q_1 \leq q_2 \leq \ldots \leq q_N \leq 1/2$. The assumption is non-restrictive since all variables
-are independent and permutations of the variables can be pushed to the reward function.
+are independent and permutations of the variables can be pushed to the reward function. 
+
+Throughout, let $m$ be shorthand for $m(\vec{q})$ and $\hat{m}$ for $m(\hat{\vec{q}})$
+
 The proof of Theorem \ref{thm:uq-simple} requires some lemmas. \
 
 \begin{lemma}\label{lem:conc1}
@@ -50,6 +53,8 @@ by Hoeffding's bound and the union bound:
 
 
 \begin{lemma}\label{lem:m_est}
+
+
 Let $\delta \in (0,1)$ and assume $T \geq 48m \log\frac{2N}{\delta}$. Then
 \eq{
 \P{2m(\vec{q}) / 3 \leq m(\vec{\hat q}) \leq 2m(\vec{q})} \geq 1 - \delta\,.
@@ -95,7 +100,7 @@ Therefore by Hoeffding's inequality and the union bound we have
 \eq{
 \P{\exists a \in A : |\mu_a - \hat \mu_a| \geq \sqrt{\frac{8m}{T} \log\frac{2N}{\delta}}} \leq \delta\,.
 }
-For arms not in $a$ we have $\hat p_a \geq 1/m(\vec{\hat q}) \geq 1/(2m)$.
+For arms not in $A$ we have $\hat p_a \geq 1/m(\vec{\hat q}) \geq 1/(2m)$.
 Therefore if $a = do(X_i = j)$, then 
 \eq{
 \hat p_a = \frac{2}{T} \sum_{t=1}^{T/2} \ind{X_i = j} \geq \frac{1}{2m}\,. 
