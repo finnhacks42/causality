@@ -18,9 +18,9 @@ def regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = 100
     regret = np.zeros((len(algorithms),len(N1_vals),simulations))
 
     for m_indx,N1 in enumerate(N1_vals):
-        model = ScaleableParallelConfounded(q,pz,pY,N1,N-N1)
-        #eta = [0,0,1.0/(N1+6.0),0,0,0,1-N1/(N1+6.0)]
-        #model.compute_m()
+        model = ScaleableParallelConfounded(q,pz,pY,N1,N-N1,compute_m = False)
+        eta = [0,0,1.0/(N1+2.0),0,0,0,1-N1/(N1+2.0)]
+        model.compute_m(eta_short = eta)
         # find the v 
         
         print N1,model.m
@@ -42,10 +42,13 @@ N1_vals = range(1,N,3)
 pz = .4
 q = (0.00001,0.00001,.4,.65)
 epsilon = .3
-simulations = 5000
+simulations = 10000
 T = 400
 algorithms = [SuccessiveRejects(),GeneralCausal(),AlphaUCB(2),ThompsonSampling()]
-pY = np.asarray([[.4,.4],[.7,.7]])
+#pY = np.asarray([[.4,.4],[.7,.7]])
+
+epsilon = .3
+pY = ParallelConfounded.pY_epsilon_best(q,pz,epsilon)
 
 m_vals,regret,models = regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = simulations)
 

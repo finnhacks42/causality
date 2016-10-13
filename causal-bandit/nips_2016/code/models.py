@@ -199,6 +199,12 @@ class Parallel(Model):
                 return indx
         return len(qij_sorted)/2 
         
+    def action_tuple(self,action):
+        """ convert from action id to the tuple (varaible,value) """
+        if action == 2*self.N+1:
+            return ((None,None))
+        return (action % self.N, action/self.N)
+        
     def set_epsilon(self,epsilon):
         assert epsilon <= .5 ,"epsilon cannot exceed .5"
         self.epsilon = epsilon

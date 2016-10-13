@@ -7,7 +7,7 @@ Created on Wed Sep 21 11:30:34 2016
 import numpy as np
 from math import sqrt,ceil
 from models import Parallel
-from algorithms import GeneralCausal, ParallelCausal, SuccessiveRejects
+from algorithms import GeneralCausal, ParallelCausal, SuccessiveRejects, AlphaUCB, ThompsonSampling
 from experiment_config import now_string, Experiment
 
 
@@ -24,9 +24,12 @@ def regret_vs_T_vary_epsilon(model,algorithms,T_vals,simulations = 10):
                 regret[a_indx,T_indx,s] = algorithm.run(T,model)
         
     return regret
+    
+experiment = Experiment(2)
+experiment.log_code()
 
 N= 50
-simulations = 100
+simulations = 10000
 a = 9.0
 m = 2
 model = Parallel.create(N,m,.1)
@@ -35,15 +38,14 @@ Tmin = int(ceil(4*model.K/a))
 Tmax = 10*model.K
 T_vals = range(Tmin,Tmax,100)
 
-algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects()]
+algorithms = [GeneralCausal(truncate='None'),ParallelCausal(),SuccessiveRejects(),AlphaUCB(2),ThompsonSampling()]
 
 regret = regret_vs_T_vary_epsilon(model,algorithms,T_vals,simulations = simulations)
 finished = now_string()
 
-experiment = Experiment(2)
-experiment.plot_regret(regret,T_vals,"T",algorithms,finished)
-experiment.log_code(finished)
-experiment.log_regret(regret,finished)
+experiment.plot_regret(regret,T_vals,"T",algorithms,legend_loc = None)
+experiment.log_regret(regret,T_vals)
+experiment.log_state(globals())
 
 
 

@@ -5,7 +5,7 @@ Created on Mon Oct  3 08:19:07 2016
 @author: finn
 """
 
-from models import ScaleableParallelConfounded
+from models import ScaleableParallelConfounded,ParallelConfounded
 from algorithms import SuccessiveRejects,GeneralCausal,AlphaUCB,ThompsonSampling
 from experiment_config import now_string,Experiment
 import numpy as np
@@ -32,16 +32,16 @@ experiment.log_code()
                 
 N = 50
 N1 = 1
-pz = .3
-q = (.1,.9,.2,.7) #q = (.3,.3,.4,.6)
-epsilon = .2
-pY = ScaleableParallelConfounded.pY_epsilon_best(q,pz,epsilon)
+pz = .4
+q = (0.00001,0.00001,.4,.65)
+epsilon = .3
+pY = ParallelConfounded.pY_epsilon_best(q,pz,epsilon)
 
-simulations = 1000
+simulations = 10000
 
 model = ScaleableParallelConfounded(q,pz,pY,N1,N-N1)
 
-T_vals = range(25,451,25)
+T_vals = range(25,626,25)
 
 algorithms = [GeneralCausal(),SuccessiveRejects(),AlphaUCB(2),ThompsonSampling()]
 
