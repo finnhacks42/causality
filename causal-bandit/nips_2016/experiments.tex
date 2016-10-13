@@ -13,24 +13,22 @@ We compare the performance of the Algorithm 1, which is specific to the parallel
 
 In figure \ref{fig:simple_vs_m} we fix the number of variables $N$ and the horizon $T$ and compare the performance of the algorithms as $m$ increases. The regret for the Successive Reject algorithm is constant as it depends only on the reward distribution and has no knowledge of the causal structure. For the causal algorithms it increases approximately with $\sqrt{m}$. As $m$ approaches $N$, the gain the causal algorithms obtain from knowledge of the structure is outweighed by fact they do not leverage the observed rewards to focus sampling effort on actions with high pay-offs.
 
-
-
 \begin{figure}
     \begin{subfigure}[t]{0.3\textwidth}
 		\centering    
-    		\includegraphics[width=\textwidth]{exp_regret_vs_m_N50_T400_s10000_20160519_1030.pdf}
+    		\includegraphics[width=\textwidth]{experiment1_20161012_1105.pdf}
     		\caption{Simple regret vs $m(\boldsymbol{q})$ for fixed horizon $T=400$ and number of variables $N = 50$}
         \label{fig:simple_vs_m}
     \end{subfigure}\hfill
     \begin{subfigure}[t]{0.3\textwidth}
     		\centering
-        \includegraphics[width=\textwidth]{experiment2_N50_a4_s10000_20160519_1030.pdf}
+        \includegraphics[width=\textwidth]{experiment2_20161010_1210.pdf}
     		\caption{Simple regret vs horizon, $T$, with $N = 50$, $m=2$ and $\epsilon = \sqrt{\frac{N}{8T}}$}
         \label{fig:simple_vs_T_vary_epsilon}
     \end{subfigure}\hfill
     \begin{subfigure}[t]{0.3\textwidth}
     		\centering
-    		\includegraphics[width=\textwidth]{experiment3_N50_s10000_20160519_1030.pdf}
+    		\includegraphics[width=\textwidth]{experiment3_20161012_1106.pdf}
     		\caption{Simple regret vs horizon, $T$, with $N = 50$, $m=2$ and fixed $\epsilon = .3$}
     		\label{fig:simple_vs_T}
     \end{subfigure}
