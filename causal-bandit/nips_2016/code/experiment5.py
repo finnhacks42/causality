@@ -33,14 +33,15 @@ def regret_vs_T(model,algorithms,T_vals,simulations = 10):
 experiment = Experiment(5)
 experiment.log_code()
            
-simulations = 5000                 
+simulations = 10000                 
 N =20
 N1 = 1
 q = (.2,.8,.7,.3)
 pz = 0.523878528335 
-pY = np.asarray([[ 0.02 , 0.95  ],[0.9  , 0.03]])
+#pY = np.asarray([[ 0 , 0.95  ],[0.9  , 0.03]])
+pY = np.asarray([[ 0 , 1  ],[1 , 0]])
 
-N0 = 5
+N0 = 6
 N1 = 1
 N2 = 14
 
@@ -51,7 +52,7 @@ pXgivenZ = np.stack((np.vstack((1.0-pXgivenZ0,pXgivenZ0)),np.vstack((1.0-pXgiven
 pYfunc = lambda x: pY[x[N0],x[N-1]]
 model = ParallelConfoundedNoZAction(pz,pXgivenZ,pYfunc)
 
-T_vals = range(25,2026,500)
+T_vals = range(25,401,25)
 
 algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects()]
 
