@@ -9,8 +9,6 @@
 Assume without loss of generality that $q_1 \leq q_2 \leq \ldots \leq q_N \leq 1/2$. The assumption is non-restrictive since all variables
 are independent and permutations of the variables can be pushed to the reward function. 
 
-Throughout, let $m$ be shorthand for $m(\vec{q})$ and $\hat{m}$ for $m(\hat{\vec{q}})$
-
 The proof of Theorem \ref{thm:uq-simple} requires some lemmas. \
 
 \begin{lemma}\label{lem:conc1}
@@ -32,28 +30,29 @@ Letting $\delta = 2e^{-\frac{T\epsilon^2}{6q_i}}$ and solving for $\epsilon$ com
 \end{proof}
 
 \begin{lemma}\label{lem:conc2}
-Let $X_1,X_2\ldots,$ be a sequence of random variables with $X_i \in [0,1]$ and $\EE[X_i] = p$ and $\delta \in [0,1]$.
-Then 
+Let $X_1,X_2\ldots,$ be a sequence of random variables with $X_i \in [0,1]$ and $\EE[X_i] = p$ and $\delta \in [0,1]$. 
 \eq{
 \P{\exists t \geq n_0 : \left|\frac{1}{t} \sum_{s=1}^t X_s - p\right| \geq \sqrt{\frac{2}{n_0} \log \frac{2}{\delta}}} \leq 4\delta\,.
 }
 \end{lemma}
 
 \begin{proof}
-For $\delta \geq 1/4$ the result is trivial. Otherwise 
-by Hoeffding's bound and the union bound:
+For $\delta \geq 1/4$ the result is trivial. Otherwise, Hoeffding's inequality gives,
+\eq{
+\P{\left|\frac{1}{t}\sum_{s=1}^t{X_s} - p \right| > \epsilon} \leq 2 e^{-2t\epsilon^2}
+} Let $\epsilon = \sqrt{\frac{2}{n_0}\log{\frac{2}{\delta}}}$ and taking the union bound over $t\geq n_0$,
+
 \eq{
 \P{\exists t \geq n_0 : \left|\frac{1}{t} \sum_{s=1}^t X_s - p\right| \geq \sqrt{\frac{2}{n_0} \log \frac{2}{\delta}}} 
-&\leq \sum_{t = n_0}^\infty \P{\left|\frac{1}{t} \sum_{s=1}^t X_s - p\right| \geq \sqrt{\frac{2}{n_0} \log \frac{2}{\delta}}} \\
-&\leq 2\sum_{t=n_0}^\infty \exp\left(-\frac{t}{n_0} \log \frac{2}{\delta}\right) 
-\leq 4\delta\,. \qedhere
+&\leq 2\sum_{t=n_0}^\infty \exp\left(-\frac{4t}{n_0} \log \frac{2}{\delta}\right)\\
+& = 2\frac{r^{n0}}{1-r} \text{ where } r = (\frac{\delta}{2})^{4/n_0}
 }
 \end{proof}
+THIS WOULD SEEM TO DIVERGE AS $n_0$ goes to $\infty$. HOW DO WE GET $\leq 4\delta\,. \qedhere$
 
 
 
 \begin{lemma}\label{lem:m_est}
-
 
 Let $\delta \in (0,1)$ and assume $T \geq 48m \log\frac{2N}{\delta}$. Then
 \eq{
@@ -68,51 +67,52 @@ Let $F$ be the event that there exists and $1 \leq i \leq N$ for which
 }
 Then by the union bound and Lemma \ref{lem:conc1} we have $\P{F} \leq \delta$. The result will be completed by showing that
 when $F$ does not hold we have $2m(\vec{q})/3 \leq m(\vec{\hat q}) \leq 2m(\vec{q})$.
-From the definition of $m(\vec{q})$ and our assumption on $\vec{q}$ we have for $i > m$ that $q_i \geq q_m \geq 1/m$ and so by Lemma \ref{lem:conc1} we have
+From the definition of $m(\vec{q})$ and our assumption on $\vec{q}$ we have for $i > m(\vec{q})$ that $q_i \geq q_m \geq 1/m(\vec{q})$ and so by Lemma \ref{lem:conc1} we have
 \eq{
 \frac{3}{4} 
 &\geq \frac{1}{2} + \sqrt{\frac{3}{T} \log \frac{2N}{\delta}} 
 \geq q_i + \sqrt{\frac{6q_i}{T} \log \frac{2N}{\delta}} 
 \geq \hat q_i \\
 &\geq q_i - \sqrt{\frac{6q_i}{T} \log \frac{2N}{\delta}}
-\geq q_i - \sqrt{\frac{q_i}{8m}}
-\geq \frac{1}{2m}\,.
+\geq q_i - \sqrt{\frac{q_i}{8m(\vec{q})}}
+\geq \frac{1}{2m(\vec{q})}\,.
 }
-Therefore by the pigeonhole principle we have $m(\vec{\hat q}) \leq 2m$.
-For the other direction we proceed in a similar fashion. Since the failure event $F$ does not hold we have for $i \leq m$ that
+Therefore by the pigeonhole principle we have $m(\vec{\hat q}) \leq 2m(\vec{q})$.
+For the other direction we proceed in a similar fashion. Since the failure event $F$ does not hold we have for $i \leq m(\vec{q})$ that
 \eq{
 \hat q_i 
 \leq q_i + \sqrt{\frac{6q_i}{T} \log\frac{2N}{\delta}} 
-\leq \frac{1}{m} \left(1 + \sqrt{\frac{1}{8}}\right)
-\leq \frac{3}{2m}\,.
+\leq \frac{1}{m(\vec{q})} \left(1 + \sqrt{\frac{1}{8}}\right)
+\leq \frac{3}{2m(\vec{q})}\,.
 }
 Therefore $m(\vec{\hat q}) \geq 2m(\vec{q}) / 3$ as required. 
 \end{proof}
 
 \begin{proof}[Proof of Theorem \ref{thm:uq-simple}]
-Let $\delta = m = m(\vec{q}) / N$. Then by Lemma \ref{lem:m_est} we have 
-\eq{
-\P{2m/3 \leq m(\vec{\hat q}) \leq 2m} \geq 1 - \delta\,.
-}
 Recall that $A = \set{a \in \actions : \hat p_a \leq 1/m(\vec{\hat q})}$. Then
-for $a \in A$ the algorithm estimates $\mu_a$ from $T/(2m(\vec{\hat q})) \geq T/(4m)$ samples.
+for $a \in A$ the algorithm estimates $\mu_a$ from $T/(2m(\vec{\hat q})) \geq T/(4m(\vec{q}))$ samples.
 Therefore by Hoeffding's inequality and the union bound we have
 \eq{
-\P{\exists a \in A : |\mu_a - \hat \mu_a| \geq \sqrt{\frac{8m}{T} \log\frac{2N}{\delta}}} \leq \delta\,.
+\P{\exists a \in A : |\mu_a - \hat \mu_a| \geq \sqrt{\frac{2m(\vec{q})}{T} \log\frac{2N}{\delta}}} \leq \delta\,.
 }
-For arms not in $A$ we have $\hat p_a \geq 1/m(\vec{\hat q}) \geq 1/(2m)$.
-Therefore if $a = do(X_i = j)$, then 
+For arms not in $A$ we have $\hat p_a \geq 1/m(\vec{\hat q})$ For $a = do(X_i = j)$, if $a = do(X_i = j)$, then from Lemma \ref{lem:m_est},
 \eq{
-\hat p_a = \frac{2}{T} \sum_{t=1}^{T/2} \ind{X_i = j} \geq \frac{1}{2m}\,. 
+\hat p_a = \frac{2}{T} \sum_{t=1}^{T/2} \ind{X_i = j} \geq \frac{1}{2m(\vec{q})}\, \text{ with probability } 1-\delta
 }
-Therefore $\sum_{t=1}^{T/2} \ind{X_{t,i} = j} \geq T/4m$
-and by Lemma \ref{lem:conc2} we have
+
+Let $H$ be the event $\sum_{t=1}^{T/2} \ind{X_{t,i} = j} < T/4m(\vec{q})$ and $G$ be the event $\exists a \notin A:  \left|\hat \mu_a - \mu_a\right| \geq \sqrt{\frac{8m}{T} \log \frac{2N}{\delta}}$.
+
 \eq{
-\P{\sum_{t=1}^{T/2} \ind{X_i = j} \geq \frac{T}{4m} \text{ and } \left|\hat \mu_a - \mu_a\right| \geq \sqrt{\frac{8m}{T} \log \frac{2N}{\delta}}} \leq 4\delta / N\,.
+P(G) & \leq P(H) + P(G|\neg H)\\
+& \leq \delta + 4\delta \longleftarrow \text{ by Lemma \ref{lem:conc2}, letting } n_0 = \frac{T}{4m(\vec{q})}
 }
-Therefore with probability at least $1 - 6\delta$ we have
+
+
+WHY DO WE NEED THE UNION BOUND AND THUS Lemma \ref{lem:conc2}. For each of these arms we select them some $t > n_0$ times. This $t$ is a random variable but doesn't depend on the empirical reward estimates for $s \in {n_0 ... t}$. 
+
+Therefore, combining this result with the bound for arms $a \in A$, we have with probability at least $1 - 6\delta$ that,
 \eq{
-(\forall a \in \actions) \qquad |\hat \mu_a - \mu_a| \leq \sqrt{\frac{8m}{T} \log \frac{N}{\delta}} = \epsilon\,.
+(\forall a \in \actions) \qquad |\hat \mu_a - \mu_a| \leq \sqrt{\frac{8m}{T} \log \frac{2N}{\delta}} = \epsilon\,.
 }
 If this occurs, then 
 \eq{
@@ -121,8 +121,9 @@ If this occurs, then
 Therefore
 \eq{
 \mu^* - \EE[\mu_{\hat a^*_T}] 
-\leq 6\delta + \epsilon 
-\leq \frac{6m}{T} + \sqrt{\frac{32m}{T} \log \frac{NT}{m}}\,, 
+& \leq 6\delta + \epsilon\\
+& \leq \frac{6m}{T} + \sqrt{\frac{16m}{T} \log \frac{NT}{m}}, \longleftarrow \text{ letting } \delta = \frac{m}{T}\\
+& \leq \sqrt{\frac{44m}{T} \log \frac{NT}{m}}\ \longleftarrow \text{ via Jenson's Inequality}
 }
 which completes the result.
 \end{proof}
