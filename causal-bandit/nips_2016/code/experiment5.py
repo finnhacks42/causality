@@ -35,7 +35,6 @@ experiment.log_code()
            
 simulations = 10000                 
 N =20
-N1 = 1
 q = (.2,.8,.7,.3)
 pz = 0.523878528335 
 #pY = np.asarray([[ 0 , 0.95  ],[0.9  , 0.03]])
