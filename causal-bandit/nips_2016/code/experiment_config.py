@@ -48,6 +48,8 @@ class Experiment(object):
             ax.errorbar(xvals,mu[indx,:],yerr = error[indx,:],label = alg.label,linestyle="",marker = alg.marker,color=alg.color)
         ax.set_xlabel(xlabel)
         ax.set_ylabel(self.REGRET_LABEL)
+        ax.set_ylim(bottom = 0)
+        ax.set_xlim(left = 0,right = max(xvals))
         
         if legend_loc is not None:
             ax.legend(loc = legend_loc,numpoints=1)
