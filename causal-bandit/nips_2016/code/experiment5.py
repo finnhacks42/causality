@@ -8,8 +8,8 @@ If the resulting bias exceeds epsilon then the Parallel algorithm will never ide
 """
 
 
-from models import ScaleableParallelConfoundedNoZAction,ParallelConfoundedNoZAction
-from algorithms import SuccessiveRejects,GeneralCausal,ParallelCausal,RandomArm,AlphaUCB,ThompsonSampling
+from models import ParallelConfoundedNoZAction
+from algorithms import SuccessiveRejects,GeneralCausal,ParallelCausal,AlphaUCB,ThompsonSampling
 from experiment_config import Experiment
 import numpy as np
 
@@ -54,9 +54,9 @@ model = ParallelConfoundedNoZAction(pz,pXgivenZ,pYfunc)
 
 T_vals = range(25,401,25)
 
-algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects()]
+algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects(),ThompsonSampling(),AlphaUCB(2)]
 
 regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
 
-experiment.plot_regret(regret,T_vals,"T",algorithms,legend_loc = "lower left")
+experiment.plot_regret(regret,T_vals,"T",algorithms,legend_loc = None)
 experiment.log_state(globals())
