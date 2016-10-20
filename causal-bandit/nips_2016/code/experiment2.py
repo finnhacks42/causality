@@ -44,7 +44,6 @@ regret = regret_vs_T_vary_epsilon(model,algorithms,T_vals,simulations = simulati
 finished = now_string()
 
 experiment.plot_regret(regret,T_vals,"T",algorithms,legend_loc = None)
-experiment.log_regret(regret,T_vals)
 experiment.log_state(globals())
 
 

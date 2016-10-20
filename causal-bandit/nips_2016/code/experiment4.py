@@ -8,7 +8,7 @@ Created on Tue Sep 20 16:48:05 2016
 """
 from models import ParallelConfounded,ScaleableParallelConfounded
 from algorithms import SuccessiveRejects,GeneralCausal,AlphaUCB,ThompsonSampling
-from experiment_config import now_string,Experiment
+from experiment_config import Experiment
 import numpy as np
 
 
@@ -53,7 +53,6 @@ pY = ParallelConfounded.pY_epsilon_best(q,pz,epsilon)
 m_vals,regret,models = regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = simulations)
 
 experiment.plot_regret(regret,m_vals,"m",algorithms,legend_loc = "lower right")
-experiment.log_regret(regret,m_vals)
 experiment.log_state(globals())
 
 

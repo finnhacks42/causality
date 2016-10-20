@@ -36,7 +36,6 @@ regret = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
 finished = now_string()
 
 
-experiment.log_regret(regret,T_vals)
 experiment.plot_regret(regret,T_vals,"T",algorithms,legend_loc = None)
 experiment.log_state(globals())
 

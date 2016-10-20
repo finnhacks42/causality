@@ -58,6 +58,5 @@ algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects()]
 
 regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
 
-experiment.log_regret(regret,T_vals)
 experiment.plot_regret(regret,T_vals,"T",algorithms,legend_loc = "lower left")
 experiment.log_state(globals())

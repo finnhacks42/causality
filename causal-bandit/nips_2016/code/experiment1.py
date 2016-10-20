@@ -38,7 +38,6 @@ regret,models = regret_vs_m(algorithms,m_vals,N,T,epsilon,simulations = simulati
 
 
 experiment.plot_regret(regret,m_vals,"m",algorithms,legend_loc="lower right")
-experiment.log_regret(regret,m_vals)
 experiment.log_state(globals())
 
 

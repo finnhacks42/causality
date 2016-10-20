@@ -9,10 +9,12 @@ import datetime as dt
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['ps.fonttype'] = 42
 from algorithms import GeneralCausal,  ParallelCausal, SuccessiveRejects,AlphaUCB,RandomArm,ThompsonSampling
 import cPickle as pickle
 import shelve
-
 
 print "LOADING EXPERIMENT CONFIG MODULE AGAIN"
 
@@ -36,7 +38,7 @@ class Experiment(object):
             a.marker = self.markers[indx]
             a.color = self.colors[indx]
               
-    def plot_regret(self,regret,xvals,xlabel,algorithms,legend_loc = "upper right"):
+    def plot_regret(self,regret,xvals,xlabel,algorithms,legend_loc = "upper right", log = True):
         s_axis = regret.ndim - 1 # assumes the last axis is over simulations
         simulations = regret.shape[-1]
         mu = regret.mean(s_axis)
@@ -51,17 +53,20 @@ class Experiment(object):
             ax.legend(loc = legend_loc,numpoints=1)
         fig_name = "results/experiment{0}_{1}.pdf".format(self.experiment_id,self.started)
         fig.savefig(fig_name,bbox_inches="tight")
-    
+        
+        if log:
+            self.log_regret(regret,xvals,xlabel,algorithms)
+        
     def log_code(self):
         out = "results/experiment{0}_{1}_settings.txt".format(self.experiment_id,self.started)
         experiment_file = "experiment{0}.py".format(self.experiment_id)
         with open(experiment_file,"r") as f, open(out,"w") as o:
             o.write(f.read())
     
-    def log_regret(self,regret,xvals):
+    def log_regret(self,regret,xvals,xlabel,algorithms):
         filename = "results/experiment{0}_{1}.pickle".format(self.experiment_id,self.started)
         with open(filename,'wb') as out:
-            tpl = (regret,xvals)
+            tpl = (regret,xvals,xlabel,algorithms)
             pickle.dump(tpl,out)
             
     def read_data(self,filename):
