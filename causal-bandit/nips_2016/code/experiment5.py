@@ -12,6 +12,7 @@ from models import ParallelConfoundedNoZAction
 from algorithms import SuccessiveRejects,GeneralCausal,ParallelCausal,AlphaUCB,ThompsonSampling,RandomArm
 from experiment_config import Experiment
 import numpy as np
+from itertools import chain
 
 
 
@@ -51,14 +52,14 @@ pXgivenZ = np.stack((np.vstack((1.0-pXgivenZ0,pXgivenZ0)),np.vstack((1.0-pXgiven
 pYfunc = lambda x: pY[x[N0],x[N-1]]
 model = ParallelConfoundedNoZAction(pz,pXgivenZ,pYfunc)
 
-T_vals = range(10,601,50)
+T_vals = list(chain(range(10,100,25),range(85+50,450,50),range(435+100,1036,100)))
 
 algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects(),ThompsonSampling(),AlphaUCB(2)]
 
 regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
 
 experiment.plot_regret(regret,T_vals,"T",algorithms,legend_loc = None)
-#experiment.log_state(globals())
+
 
 print "m",model.m
 

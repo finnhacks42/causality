@@ -7,7 +7,7 @@ Created on Tue Sep 20 16:48:05 2016
 
 """
 from models import ParallelConfounded,ScaleableParallelConfounded
-from algorithms import SuccessiveRejects,GeneralCausal,AlphaUCB,ThompsonSampling
+from algorithms import SuccessiveRejects,GeneralCausal,AlphaUCB,ThompsonSampling,ParallelCausal
 from experiment_config import Experiment
 import numpy as np
 
@@ -21,8 +21,7 @@ def regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = 100
         model = ScaleableParallelConfounded(q,pz,pY,N1,N-N1,compute_m = False)
         eta = [0,0,1.0/(N1+2.0),0,0,0,1-N1/(N1+2.0)]
         model.compute_m(eta_short = eta)
-        # find the v 
-        
+       
         print N1,model.m
         m_vals.append(model.m)
         models.append(model)
@@ -45,15 +44,15 @@ epsilon = .3
 simulations = 10000
 T = 400
 algorithms = [SuccessiveRejects(),GeneralCausal(),AlphaUCB(2),ThompsonSampling()]
-#pY = np.asarray([[.4,.4],[.7,.7]])
+
 
 epsilon = .3
 pY = ParallelConfounded.pY_epsilon_best(q,pz,epsilon)
 
 m_vals,regret,models = regret_vs_m_general(algorithms,N1_vals,N,T,pz,pY,q,epsilon,simulations = simulations)
 
-experiment.plot_regret(regret,m_vals,"m",algorithms,legend_loc = "lower right")
-experiment.log_state(globals())
+experiment.plot_regret(regret,m_vals,"m",algorithms,legend_loc = "lower right",legend_extra = [ParallelCausal])
+
 
 
 #etas = np.zeros((len(m_vals),7))

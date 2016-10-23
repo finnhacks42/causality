@@ -22,7 +22,7 @@
 \end{figure}
 
 
-In this section we compare performance of our algorithms with the standard bandit algorithms on the confounded graph in figure \ref{fig:parallel_confounded}. All the variables are binary and the action space consists of the set of single variable interventions plus the do nothing action, $\calA = \set{\set{do(X_i = j)} \cup \set{do(Z = j)} \cup \set{do()}: 1\leq i \leq N,\; j \in \set{0,1}}$. We choose this setting as it can be seen as a generalisation of the parallel bandit case and allows for factorizations that enable us to compute the exact reward distribution and interventional distributions for large $N$ (in general inference in graphical models is exponential in $N$). As before, we show the average regret over 10,000 simulations with error bars showing three standard errors. 
+In this section we compare performance of the general algorithm with the standard bandit algorithms on the confounded graph in figure \ref{fig:parallel_confounded}. All the variables are binary and the action space consists of the set of single variable interventions plus the do nothing action, $\calA = \set{\set{do(X_i = j)} \cup \set{do(Z = j)} \cup \set{do()}: 1\leq i \leq N,\; j \in \set{0,1}}$. We choose this setting as it can be seen as a generalisation of the parallel bandit case and allows for factorizations that enable us to compute the exact reward distribution and interventional distributions for large $N$ (in general inference in graphical models is exponential in $N$). As before, we show the average regret over 10,000 simulations with error bars showing three standard errors. 
 
 In figure \ref{fig:simple_vs_m_general} we fix $N$ and $T$ and $P(Z=1) = .4$. 
 
@@ -31,11 +31,11 @@ P(X_i = 1|Z = 0) &= \begin{cases} 0 & \text{ if } i \in \set{1,...N_1} \\ .4 & \
 P(X_i = 1|Z = 1) &= \begin{cases} 0 & \text{ if } i \in \set{1,...N_1} \\ .65 & \text{ otherwise } \end{cases}
 }
 
-As in the parallel bandit case, we let $Y$ depend only on $X_1$, $P(Y|do(X_1=1)) = \frac{1}{2} + \epsilon$ amd $P(Y|do(X_1=0)) = \frac{1}{2}-\epsilon'$, where $\epsilon' = \epsilon\frac{P(X_1=1)}{P(X_1=0)}$. We vary $N_1$ from 2 to $N$ to vary $m$. The values for the CPD's have been chosen such that the reward distribution is independent of $m$ and so that we can analytically calculate $\eta*$. This allows us to just show the dependence on $m$, removing the noise associated with different models selecting values for $\eta*$ with the same $m$ (and thus same worst case performance) but different performance for a given reward distribution. 
+As in the parallel bandit case, we let $Y$ depend only on $X_1$, $P(Y|do(X_1=1)) = \frac{1}{2} + \epsilon$ and $P(Y|do(X_1=0)) = \frac{1}{2}-\epsilon'$, where $\epsilon' = \epsilon\frac{P(X_1=1)}{P(X_1=0)}$. We vary $N_1$ from 2 to $N$ to vary $m$. The values for the CPD's have been chosen such that the reward distribution is independent of $m$ and so that we can analytically calculate $\eta*$. This allows us to just show the dependence on $m$, removing the noise associated with different models selecting values for $\eta*$ with the same $m$ (and thus same worst case performance) but different performance for a given reward distribution. 
 
 In figure \ref{fig:simple_vs_T_general} we fix the model and number of variables, $N$, and vary the horizon $T$. $P(Z)$ and $P(X|Z)$ are the same as for the previous experiment.  
 
-In figure \ref{fig:simple_vs_T_misspecified} we exclude actions on $Z$ from the set of allowable actions to demonstrate how algorithm 1 can fail in the presence of a confounding variable. Algorithm 1 incorrectly assumes $P(Y|do(X)) = P(Y|X)$ leading to biased estimates. We let $P(Z) = .6$, $P(Y|\boldsymbol{X}) = X_7 \oplus X_N$ and $P(X|Z)$ be given by:
+In figure \ref{fig:simple_vs_T_misspecified} we additionally show the performance of Algorithm 1. We exclude actions on $Z$ from the set of allowable actions to demonstrate how Algorithm 1 can fail in the presence of a confounding variable, as it incorrectly assumes $P(Y|do(X)) = P(Y|X)$ leading to biased estimates. We let $P(Z) = .6$, $P(Y|\boldsymbol{X}) = X_7 \oplus X_N$ and $P(X|Z)$ be given by:
 
 \eq{
 P(X_i = 1|Z = 0) &= 
@@ -53,11 +53,11 @@ P(X_i = 1|Z = 0) &=
 }
 
 In this setting $X_7$ tends to agree with $Z$ and $X_N$ tends to disagree. It is sub-optimal to act on either $X_7$ or $X_N$, all other actions are optimal. The first group of $X$ variables with $i \leq 6$ will be identified by the parallel bandit as the most unbalanced ones and played explicitly. All remaining variables are likely to be identified as balanced and estimated from observational estimates. The CPD values have been chosen to demonstrate the worst case outcome, where the bias in the estimates leads Algorithm 1 to asymptotically select a sub-optimal action.
- 
+
 \begin{figure}[H]
     \begin{subfigure}[t]{0.3\textwidth}
 		\centering    
-    		\includegraphics[width=\textwidth]{experiment4_20161020_1254.pdf}
+    		\includegraphics[width=\textwidth]{experiment4_20161023_2120.pdf}
     		\caption{Simple regret vs $m(\eta*)$ for fixed horizon $T=400$ and number of variables $N = 50$}
         \label{fig:simple_vs_m_general}
     \end{subfigure}\hfill
@@ -69,8 +69,8 @@ In this setting $X_7$ tends to agree with $Z$ and $X_N$ tends to disagree. It is
     \end{subfigure}\hfill
     \begin{subfigure}[t]{0.3\textwidth}
     		\centering
-    		\includegraphics[width=\textwidth]{experiment5_20161021_2026.pdf}
-    		\caption{Simple regret vs horizon, $T$, with $N = 21$, $m=4.3$ with no actions setting $Z$}
+    		\includegraphics[width=\textwidth]{experiment5_20161023_2118.pdf}
+    		\caption{Simple regret vs horizon, $T$, with $N = 21$, $m(\eta*)=4.3$ with no actions setting $Z$}
     		\label{fig:simple_vs_T_misspecified}
     \end{subfigure}
     \caption{Experimental results on the confounded graph}

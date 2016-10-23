@@ -38,7 +38,7 @@ class Experiment(object):
             a.marker = self.markers[indx]
             a.color = self.colors[indx]
               
-    def plot_regret(self,regret,xvals,xlabel,algorithms,legend_loc = "upper right", log = True):
+    def plot_regret(self,regret,xvals,xlabel,algorithms,legend_loc = "upper right", legend_extra = [],log = True):
         s_axis = regret.ndim - 1 # assumes the last axis is over simulations
         simulations = regret.shape[-1]
         mu = regret.mean(s_axis)
@@ -46,9 +46,16 @@ class Experiment(object):
         fig,ax = plt.subplots()
         for indx,alg in enumerate(algorithms):    
             ax.errorbar(xvals,mu[indx,:],yerr = error[indx,:],label = alg.label,linestyle="",marker = alg.marker,color=alg.color)
+        
+        for alg in legend_extra: # trick matplotlib into adding legend for additional algorithms
+            ax.errorbar(-1,-1,yerr=.0001,label = alg.label,color=alg.color, marker = alg.marker,linestyle="")
+
+        upper = np.nanmax(mu+error)
+            
+        
         ax.set_xlabel(xlabel)
         ax.set_ylabel(self.REGRET_LABEL)
-        ax.set_ylim(bottom = 0)
+        ax.set_ylim(bottom = 0,top = upper)
         ax.set_xlim(left = 0,right = max(xvals))
         
         if legend_loc is not None:
@@ -98,7 +105,8 @@ class Experiment(object):
                 print "unable to load value for {0}".format(key)
         db.close()
         return d
-   
+        
+
                 
 
             
