@@ -9,7 +9,7 @@ If the resulting bias exceeds epsilon then the Parallel algorithm will never ide
 
 
 from models import ParallelConfoundedNoZAction
-from algorithms import SuccessiveRejects,GeneralCausal,ParallelCausal,AlphaUCB,ThompsonSampling
+from algorithms import SuccessiveRejects,GeneralCausal,ParallelCausal,AlphaUCB,ThompsonSampling,RandomArm
 from experiment_config import Experiment
 import numpy as np
 
@@ -34,28 +34,34 @@ experiment = Experiment(5)
 experiment.log_code()
            
 simulations = 10000                 
-N =20
+
 q = (.2,.8,.7,.3)
-pz = 0.523878528335 
-#pY = np.asarray([[ 0 , 0.95  ],[0.9  , 0.03]])
+pz = 0.6 
 pY = np.asarray([[ 0 , 1  ],[1 , 0]])
 
 N0 = 6
 N1 = 1
 N2 = 14
+N = N0+N1+N2
 
 q10,q11,q20,q21 = q
-pXgivenZ0 = np.hstack((np.full(N0,1.0/N0),np.full(N1,q10),np.full(N2,q20)))    #(np.full(N1,q10),np.full(N2,q20))
+pXgivenZ0 = np.hstack((np.full(N0,1.0/N0),np.full(N1,q10),np.full(N2,q20)))    
 pXgivenZ1 = np.hstack((np.full(N0,1.0/N0),np.full(N1,q11),np.full(N2,q21)))
 pXgivenZ = np.stack((np.vstack((1.0-pXgivenZ0,pXgivenZ0)),np.vstack((1.0-pXgivenZ1,pXgivenZ1))),axis=2) # PXgivenZ[i,j,k] = P(X_j=i|Z=k)
 pYfunc = lambda x: pY[x[N0],x[N-1]]
 model = ParallelConfoundedNoZAction(pz,pXgivenZ,pYfunc)
 
-T_vals = range(25,401,25)
+T_vals = range(10,601,50)
 
 algorithms = [GeneralCausal(),ParallelCausal(),SuccessiveRejects(),ThompsonSampling(),AlphaUCB(2)]
 
 regret,pulls = regret_vs_T(model,algorithms,T_vals,simulations = simulations)
 
 experiment.plot_regret(regret,T_vals,"T",algorithms,legend_loc = None)
-experiment.log_state(globals())
+#experiment.log_state(globals())
+
+print "m",model.m
+
+    
+
+

@@ -59,7 +59,7 @@ class GeneralCausal(object):
   
 class ParallelCausal(object):
     label = "Algorithm 1"
-  
+    
     def run(self,T,model):
         self.trials = np.zeros(model.K)
         self.success = np.zeros(model.K)
@@ -70,10 +70,10 @@ class ParallelCausal(object):
             self.trials += xij
             self.success += y*xij
             
-        infrequent = self.estimate_infrequent(h)
-        n = int(float(h)/len(infrequent))
-        self.trials[infrequent] = n # note could be improved by adding to rather than reseting observation results - does not change worst case. 
-        self.success[infrequent] = model.sample_multiple(infrequent,n)
+        self.infrequent = self.estimate_infrequent(h)
+        n = int(float(h)/len(self.infrequent))
+        self.trials[self.infrequent] = n # note could be improved by adding to rather than reseting observation results - does not change worst case. 
+        self.success[self.infrequent] = model.sample_multiple(self.infrequent,n)
         self.u = np.true_divide(self.success,self.trials)
         self.r = self.u - model.get_costs()
         self.best_action = argmax_rand(self.r)
