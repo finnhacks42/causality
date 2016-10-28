@@ -1,4 +1,4 @@
-We now consider the more general problem where the graph structure is known, but arbitrary. For general graphs, $\P{Y|X_i=j} \neq \P{Y|do(X_i=j)}$ (correlation is not causation). However, if all the variables are observable, any causal distribution $\P{X_1...X_N|do(X_i=j)}$ can be expressed in terms of observational distributions via the truncated factorization formula \cite{Pearl2000}. 
+We now consider the more general problem where the graph structure is known, but arbitrary. For general graphs, $\P{Y|X_i=j} \neq \P{Y|do(X_i=j)}$ (correlation is not causation). However, if all the variables are observable, any causal distribution $\P{X_1...X_N|do(X_i=j)}$ can be expressed in terms of observational distributions via the truncated factorization formula \citep{Pearl2000}. 
 \eq{
 \P{X_1...X_N|do(X_i=j)} = 
 \prod_{k \neq i}\P{X_k|\parents{X_k}}\delta(X_i - j)\,, 
