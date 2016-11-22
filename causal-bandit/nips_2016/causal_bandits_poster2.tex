@@ -1,20 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Jacobs Landscape Poster
-% LaTeX Template
-% Version 1.0 (29/03/13)
-%
-% Created by:
-% Computational Physics and Biophysics Group, Jacobs University
-% https://teamwork.jacobs-university.de:8443/confluence/display/CoPandBiG/LaTeX+Poster
-% 
-% Further modified by:
-% Nathaniel Johnston (nathaniel@njohnston.ca)
-%
-% This template has been downloaded from:
-% http://www.LaTeXTemplates.com
-%
-% License:
-% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -23,7 +8,7 @@
 %----------------------------------------------------------------------------------------
 \documentclass[12pt]{beamer}
 
-\usepackage[scale=1.24]{beamerposter} % Use the beamerposter package for laying out the poster
+\usepackage[scale=1.3]{beamerposter} % Use the beamerposter package for laying out the poster
 \usepackage{graphicx} % more modern 
 \usepackage{caption}
 \usepackage{subcaption}
@@ -36,11 +21,15 @@
 \usepackage{natbib}
 \usepackage{xcolor}
 \usepackage[noend]{algorithmic}
-%\algrenewcommand\algorithmicindent{2.0em}%
-\algsetup{indent=4em}
+\algsetup{indent=6em}
 \usepackage{algorithm}
 
 \usetheme{confposter} % Use the confposter theme supplied with this template
+
+\setbeamerfont{itemize/enumerate subbody}{size=\normalsize} %to set the body size
+\setbeamertemplate{itemize subitem}{\normalsize\raise1.25pt\hbox{\donotcoloroutermaths$\blacktriangleright$}}  %to set the symbol size
+
+\setbeamertemplate{itemize item}{\normalsize\raise1.25pt\hbox{\donotcoloroutermaths$\blacktriangleright$}}  %to set the symbol size
 
 \setbeamercolor{block title}{fg=ngreen,bg=white} % Colors of the block titles
 \setbeamercolor{block body}{fg=black,bg=white} % Colors of the body of blocks
@@ -63,7 +52,7 @@
 \setlength{\paperwidth}{48in} % A0 width: 46.8in
 \setlength{\paperheight}{36in} % A0 height: 33.1in
 \setlength{\sepwid}{0.024\paperwidth} % Separation width (white space) between columns
-\setlength{\onecolwid}{0.22\paperwidth} % Width of one column
+\setlength{\onecolwid}{0.3\paperwidth} % Width of one column
 \setlength{\twocolwid}{0.464\paperwidth} % Width of two columns
 \setlength{\threecolwid}{0.708\paperwidth} % Width of three columns
 \setlength{\topmargin}{-0.5in} % Reduce the top margin size
@@ -176,7 +165,7 @@
 
 \author{Finnian Lattimore*, Tor Lattimore** and Mark Reid*} % Author(s)
 
-\institute{*Australian National University and Data61, **University of Indiana Bloomington} % Institution(s)
+\institute{*Australian National University and Data61, ** Indiana University Bloomington} % Institution(s)
 
 %----------------------------------------------------------------------------------------
 
@@ -185,8 +174,13 @@
 \addtobeamertemplate{block end}{}{\vspace*{2ex}} % White space under blocks
 \addtobeamertemplate{block alerted end}{}{\vspace*{2ex}} % White space under highlighted (alert) blocks
 
-\setlength{\belowcaptionskip}{2ex} % White space under figures
-\setlength\belowdisplayshortskip{2ex} % White space under equations
+\setlength{\belowcaptionskip}{12pt} % White space under figures
+%\setlength\belowdisplayshortskip{2ex} % White space under equations
+
+%\setlength\abovedisplayskip{40pt}
+%\setlength\belowdisplayskip{40pt}
+%\setlength\abovedisplayshortskip{40pt}
+%\setlength\belowdisplayshortskip{40pt}
 
 \begin{frame}[t] % The whole poster is enclosed in one beamer frame
 
@@ -194,40 +188,19 @@
 
 \begin{column}{\sepwid}\end{column} % Empty spacer column
 
-\begin{column}{\onecolwid} % The first column
+\begin{column}{.8\onecolwid} % The first column
 
-%----------------------------------------------------------------------------------------
-%	OBJECTIVES
-%----------------------------------------------------------------------------------------
-
-%\begin{alertblock}{Objectives}
-%
-%Lorem ipsum dolor sit amet, consectetur, nunc tellus pulvinar tortor, commodo eleifend risus arcu sed odio:
-%\begin{itemize}
-%\item Mollis dignissim, magna augue tincidunt dolor, interdum vestibulum urna
-%\item Sed aliquet luctus lectus, eget aliquet leo ullamcorper consequat. Vivamus eros sem, iaculis ut euismod non, sollicitudin vel orci.
-%\item Nascetur ridiculus mus.  
-%\item Euismod non erat. Nam ultricies pellentesque nunc, ultrices volutpat nisl ultrices a.
-%\end{itemize}
-%
-%\end{alertblock}
-
-%----------------------------------------------------------------------------------------
-%	INTRODUCTION
-%----------------------------------------------------------------------------------------
 
 \begin{block}{Introduction}
 
 We study the problem of using causal models to improve the rate at which good interventions can be learned online in a stochastic environment. 
 Our formalism combines multi-arm bandits and causal inference to model a novel type of bandit feedback that is not exploited by existing approaches.
-We propose a new algorithm that exploits the causal feedback and prove a bound on its simple regret that is strictly better (in all quantities) 
-than algorithms that do not use the additional causal information.
-
 \end{block}
 
 %------------------------------------------------
 \begin{block}{Setup}
 \begin{itemize}
+\setlength\itemsep{28pt}
 \item Learner given causal graph $\mathcal{G}$ over a set of random variables $\mathcal{X}$
 \item Actions assign values to subsets of variables in $\mathcal{G}$. The set of allowed actions/arms $\mathcal{A}$ is a subset of all possible assignments.
 \item One variable $Y \in \mathcal{X}$ is designated as the \emph{reward variable} and takes on values in $\{0, 1\}$.
@@ -235,6 +208,10 @@ than algorithms that do not use the additional causal information.
 \item Simple regret: goal is to minimize $\simpleregret = \mu^* - \E{\mu_{\hat a^*_T}}$, where $\mu^*$ is the expected reward of the best action and $\hat a^*_T$ is the action the learner estimates to be optimal at time $T$
 \end{itemize}
 
+
+\end{block}
+
+\begin{block}{Parallel Model}
 
 \begin{figure}
     \begin{subfigure}[b]{0.45\textwidth}
@@ -256,42 +233,38 @@ than algorithms that do not use the additional causal information.
         \caption{Parallel graph}
         \label{fig:parallel}
     \end{subfigure}
-    \begin{subfigure}[b]{0.5\textwidth}
-    \centering    
+   \begin{subfigure}[b]{0.45\textwidth}
+	\centering    
           \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.0em,
   thick,main node/.style={observed}, hidden/.style={empty},background rectangle/.style={fill=olive!45}]
 %every node/.style={scale=0.6}
  %nodes
-\node[main node](1){$X_{1}$};
+\node[main node](1){$x$};
 \node[main node, right=of 1](2){$X_{2}$};
 \node[hidden, right=of 2](3){$...$};
 \node[main node, right=of 3](4){$X_{N}$};
 \node[main node, below right=of 2](5){$Y$};
-\node[main node, above right=of 2](6){$Z$};
  \path[every node/.style={font=\tiny}]
     (1) edge (5)
     	(2) edge (5)
-    (4) edge (5)
-    (6) edge (1) edge (2) edge (4);
+    (4) edge (5);
 \end{tikzpicture}
-        \caption{Confounded parallel graph}
-        \label{fig:parallel_confounded} 
-    \end{subfigure} 
-\caption{Causal graphs}
-\label{fig:causal graphs} 
+        \caption{after $do(X_1=x)$}
+        \label{fig:parallel_post_action}
+    \end{subfigure}
+\caption{Intervention in the Parallel Model}
+\label{fig:parallel_model} 
 \end{figure}
-
-\end{block}
-
-\begin{block}{Parallel Model}
-
+%\vspace{-1cm}
 \begin{itemize}
+\setlength\itemsep{28pt}
 \item Causal graph as in figure \ref{fig:parallel} with all variables binary.
 \item $\mathcal{A} = \set{do()} \cup \set{ do(X_i = j) \colon 1 \leq i \leq N \text{ and } j \in \set{0,1}}$
 \item For this causal model, $P(Y|do(X_i = j)) = P(Y|X_i = j)$
 \item $\vec{q} = (q_1, \ldots, q_N) \in [0,1]^N$ so that $q_i = \P{X_i = 1}$
 \item $I_\tau = \set{ i : \min\set{q_i, 1-q_i} < \frac{1}{\tau}}$ is set of 'unbalanced' variables using a threshold $1/\tau$
 \item The difficulty of the problem is captured by:
+\vspace*{.5cm}
 \eq{
 \label{eq:m-simple}
 m(\vec{q}) = \min \set{ \tau : |I_{\tau}| \leq \tau}\,.
@@ -306,7 +279,7 @@ m(\vec{q}) = \min \set{ \tau : |I_{\tau}| \leq \tau}\,.
 
 
 %----------------------------------------------------------------------------------------
-\begin{column}{\onecolwid} % The 2nd
+\begin{column}{1.1\onecolwid} % The 2nd
 \begin{block}{Parallel Algorithm}
 \setbeamercolor*{block body}{bg=white!95!blue,fg=black}
 \begin{algorithm}[H]
@@ -339,29 +312,71 @@ m(\vec{q}) = \min \set{ \tau : |I_{\tau}| \leq \tau}\,.
 &\textbf{lower-bound, }\simpleregret \in \Omega\left(\sqrt{\frac{m(\vec{q})}{T}}\right)\,.\\
 &\textbf{standard lower-bound, }\simpleregret \in \Omega\left(\sqrt{\frac{N}{T}}\right)\,.
 }
-
+\vspace*{-1cm}
 \end{block}
 
 \begin{block}{General Graphs}
+\begin{figure}
+    \begin{subfigure}[b]{0.48\textwidth}
+    \centering    
+          \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.0em,
+  thick,main node/.style={observed}, hidden/.style={empty},background rectangle/.style={fill=olive!45}]
+%every node/.style={scale=0.6}
+ %nodes
+\node[main node](1){$X_{1}$};
+\node[main node, right=of 1](2){$X_{2}$};
+\node[hidden, right=of 2](3){$...$};
+\node[main node, right=of 3](4){$X_{N}$};
+\node[main node, below right=of 2](5){$Y$};
+\node[main node, above right=of 2](6){$Z$};
+ \path[every node/.style={font=\tiny}]
+    (1) edge (5)
+    	(2) edge (5)
+    (4) edge (5)
+    (6) edge (1) edge (2) edge (4);
+\end{tikzpicture}
+        \caption{Confounded parallel graph}
+        \label{fig:parallel_confounded} 
+    \end{subfigure} 
+    \begin{subfigure}[b]{0.48\textwidth}
+    \centering    
+          \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.0em,
+  thick,main node/.style={observed}, hidden/.style={empty},background rectangle/.style={fill=olive!45}]
+%every node/.style={scale=0.6}
+ %nodes
+\node[main node](1){$x$};
+\node[main node, right=of 1](2){$X_{2}$};
+\node[hidden, right=of 2](3){$...$};
+\node[main node, right=of 3](4){$X_{N}$};
+\node[main node, below right=of 2](5){$Y$};
+\node[main node, above right=of 2](6){$Z$};
+ \path[every node/.style={font=\tiny}]
+    (1) edge (5)
+    	(2) edge (5)
+    (4) edge (5)
+    (6) edge (2) edge (4);
+\end{tikzpicture}
+        \caption{after $do(X_1=x)$}
+        \label{fig:parallel_confounded_post_action} 
+    \end{subfigure} 
+\caption{Intervention in confounded parallel graph}
+\label{fig:causal graphs} 
+\end{figure}
 \begin{itemize}
-\item Known but arbitrary causal structure.
+\item Known but arbitrary causal graph.
 \item It's no longer optimal to split between $do()$ and explicitly playing actions. 
 \item We assume the conditional interventional distributions over the parents of $Y$, $\P{\parents{Y}|a}$, are known.
-\item $\eta$ is a distribution on available interventions that allocates samples to actions.
-\item We use a (truncated) importance weighted estimator to transfer information across different actions. 
-\item The (untruncated) weights for each action, $R_a(X,\eta) = \frac{\Pn{a}{\parents{Y}(X)}}{ \sum_{a \in \calA} \eta_a \P{\parents{Y}|a}}$, depend on how different the distribution of the parents of $Y$ is under $a$ to the distribution given actions sampled from $\eta$.
-\item We optimise $\eta$ to minimize the simple regret.
+\item $\eta$ is a distribution over interventions from which we sample actions.
+\item We use a (truncated) importance weighted estimator to transfer information across different actions.
 \eq {
-\eta^*  = \argmin_\eta \underbrace{\max_{a \in \calA} \EEa \left[R_a(X,\eta)\right]}_{m(\eta)}\,.
+R_a(X,\eta) = \frac{\Pn{a}{\parents{Y}(X)}}{ \sum_{b \in \calA} \eta_b \P{\parents{Y}|b}} \; \leftarrow \text{untruncated weights}
 } 
-\item The difficulty of the problem is captured by $m(\eta*)$
-
 \end{itemize}
 \end{block}
 \end{column}
 
 
-\begin{column}{\onecolwid} % The 2nd
+\begin{column}{1.1\onecolwid} % The 2nd
 \begin{block}{General Algorithm}
 \begin{algorithm}[H]
 \caption{General Algorithm  \textcolor{white}{\Large A}}\label{alg:general}
@@ -387,14 +402,28 @@ m(\vec{q}) = \min \set{ \tau : |I_{\tau}| \leq \tau}\,.
 
 
 
-\end{block}
+\begin{itemize}
+\item $\eta$ optimised to minimize the simple regret.
+\eq {
+\eta^*  = \argmin_\eta \underbrace{\max_{a \in \calA} \EEa \left[R_a(X,\eta)\right]}_{m(\eta)}\,.
+} 
+\item The difficulty of the problem is captured by $m(\eta*)$.
+\begin{itemize}
+\item $m(\eta)$ is convex in $\eta$.
+\item $m(\eta*) \leq  |\calA|$.
+\item In the parallel setting $m(\eta*) \leq 2 m(\boldsymbol{q})$.
+\end{itemize}
 
+\end{itemize}
+
+
+\end{block}
 \begin{block}{Experiments}
 \begin{figure}
     \begin{subfigure}[t]{0.3\textwidth}
 		\centering    
     		\includegraphics[width=\textwidth]{experiment1_20161020_1247.pdf}
-    		\caption{Simple regret vs $m(\boldsymbol{q})$ for fixed horizon $T=400$ and number of variables $N = 50$}
+    		\caption{Simple regret vs $m(\boldsymbol{q})$. $T=400$, $N = 50$}
         \label{fig:simple_vs_m}
     \end{subfigure}\hfill
     \begin{subfigure}[t]{0.3\textwidth}
@@ -419,7 +448,7 @@ m(\vec{q}) = \min \set{ \tau : |I_{\tau}| \leq \tau}\,.
     \begin{subfigure}[t]{0.3\textwidth}
 		\centering    
     		\includegraphics[width=\textwidth]{experiment4_20161023_2120.pdf}
-    		\caption{Simple regret vs $m(\eta*)$ for fixed horizon $T=400$ and number of variables $N = 50$}
+    		\caption{Simple regret vs $m(\eta*)$. $T=400$, $N = 50$}
         \label{fig:simple_vs_m_general}
     \end{subfigure}\hfill
     \begin{subfigure}[t]{0.3\textwidth}
@@ -439,75 +468,90 @@ m(\vec{q}) = \min \set{ \tau : |I_{\tau}| \leq \tau}\,.
 \end{figure}
 
 \end{block}
+
 \end{column}
 
-\begin{column}{\onecolwid} % The third column
-
-%----------------------------------------------------------------------------------------
-%	CONCLUSION
-%----------------------------------------------------------------------------------------
-\begin{block}{Conclusion}
-\begin{itemize}
-\item For parallel bandits we have an optimal algorithm (upto log factors) and simple measure of the difficulty of the problem $m(\vec{q})$.
-\item For general graphs, $m(\eta) < N$ measures the difficulty of the problem. Finding an algorithm that only requires the causal graph and lower bounds for its simple regret in the general case is left as future work.
-\end{itemize}
-\end{block}
-
-\begin{block}{Discussion \& Future work}
-
-\begin{itemize}
-\item The parallel bandit problem can be viewed as an instance of a time varying graph feedback problem, however the algorithms developed for this problem are not optimal for the parallel bandit.
-\item Our algorithms only use the reward signal to estimate $\hat{\mu}_a$, not to inform which arms to sample. Making better use of the reward signal could substantially improve practical performance (but not minimax regret). 
-\item Cumulative Regret
-
-\item Generalize to consider causal bandit problems where the causal graph is partially or completely unknown. 
-
-\end{itemize}
-
-
-
-
-
- 
-
-\end{block}
-
-
-
+%\begin{column}{\onecolwid} % The 4th column
+%
 %%----------------------------------------------------------------------------------------
-%%	ACKNOWLEDGEMENTS
+%%	CONCLUSION
 %%----------------------------------------------------------------------------------------
-%
-%\setbeamercolor{block title}{fg=red,bg=white} % Change the block title color
-%
-%\begin{block}{Acknowledgements}
-%
-%\small{\rmfamily{Nam mollis tristique neque eu luctus. Suspendisse rutrum congue nisi sed convallis. Aenean id neque dolor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.}} \\
-%
+%\begin{block}{Conclusion}
+%\begin{itemize}
+%\item For parallel bandits we have an optimal algorithm (upto log factors) and simple measure of the difficulty of the problem $m(\vec{q})$.
+%\item For general graphs, $m(\eta) < N$ measures the difficulty of the problem. Finding an algorithm that only requires the causal graph and lower bounds for its simple regret in the general case is left as future work.
+%\end{itemize}
 %\end{block}
-
-%----------------------------------------------------------------------------------------
-%	CONTACT INFORMATION
-%----------------------------------------------------------------------------------------
-
-\setbeamercolor{block alerted title}{fg=black,bg=norange} % Change the alert block title colors
-\setbeamercolor{block alerted body}{fg=black,bg=white} % Change the alert block body colors
-
-%\begin{alertblock}{Contact Information}
+%
+%\begin{block}{Discussion \& Future work}
 %
 %\begin{itemize}
-%\item Web: \href{http://www.university.edu/smithlab}{http://www.university.edu/smithlab}
-%\item Email: \href{mailto:john@smith.com}{john@smith.com}
-%\item Phone: +1 (000) 111 1111
+%\item The parallel bandit problem can be viewed as an instance of a time varying graph feedback problem,
+%\begin{itemize}
+%\item this does not apply to general causal graphs
+%\item algorithms for feedback graphs are not optimal for the parallel bandit.
 %\end{itemize}
 %
-%\end{alertblock}
-
-
-
-%----------------------------------------------------------------------------------------
-
-\end{column} % End of the third column
+%\item Our algorithms only use the reward signal to estimate $\hat{\mu}_a$, not to inform which arms to sample. Making better use of the reward signal could substantially improve practical performance (but not minimax regret). 
+%\item Cumulative Regret
+%
+%\item Generalize to consider causal bandit problems where the causal graph is partially or completely unknown. 
+%
+%\end{itemize}
+%
+%
+%
+%
+%
+% 
+%
+%\end{block}
+%
+%\begin{block}
+%
+%%\includegraphics{indiana_university_logo} 
+%%\includegraphics[scale=1]{data61_logo.png} 
+%%\includegraphics[scale=1]{ANU_logo.jpg} 
+%
+%
+%
+%
+%\end{block}
+%
+%%%----------------------------------------------------------------------------------------
+%%%	ACKNOWLEDGEMENTS
+%%%----------------------------------------------------------------------------------------
+%%
+%%\setbeamercolor{block title}{fg=red,bg=white} % Change the block title color
+%%
+%%\begin{block}{Acknowledgements}
+%%
+%%\small{\rmfamily{Nam mollis tristique neque eu luctus. Suspendisse rutrum congue nisi sed convallis. Aenean id neque dolor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.}} \\
+%%
+%%\end{block}
+%
+%%----------------------------------------------------------------------------------------
+%%	CONTACT INFORMATION
+%%----------------------------------------------------------------------------------------
+%
+%\setbeamercolor{block alerted title}{fg=black,bg=norange} % Change the alert block title colors
+%\setbeamercolor{block alerted body}{fg=black,bg=white} % Change the alert block body colors
+%
+%%\begin{alertblock}{Contact Information}
+%%
+%%\begin{itemize}
+%%\item Web: \href{http://www.university.edu/smithlab}{http://www.university.edu/smithlab}
+%%\item Email: \href{mailto:john@smith.com}{john@smith.com}
+%%\item Phone: +1 (000) 111 1111
+%%\end{itemize}
+%%
+%%\end{alertblock}
+%
+%
+%
+%%----------------------------------------------------------------------------------------
+%
+%\end{column} % End of the 4th column
 
 \end{columns} % End of all the columns in the poster
 
