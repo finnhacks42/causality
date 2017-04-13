@@ -197,33 +197,33 @@ Y|do(X=x) &= w_{y0}+w_{yu}U+w_{yx}x+\varepsilon_y  \\
 
 The final equation is purely in terms of $x$ and properties of the joint (non interventional) distribution $\P{X,Y,Z}$ so we get unbiased point estimates for both the mean and variance of $\P{Y|do(X=x)}$ provided $\Sigma_{zx} \neq 0$, that is if $v_z \neq 0$ and $w_{xz} \neq 0$. 
 
-%We can identify the difference in the average causal effect for two interventions on $X$ (assuming $v_z,w_{xz} > 0$) .
-%\eq{
-%\E{Y|do(X=x)} - \E{Y|do(X=x')} = w_{yx}(x-x') = \frac{\Sigma_{zy}}{\Sigma_{zx}}(x-x')
-%}
-%
-%We can also identify the variance of $\P{Y|do(X=x)}$.
-%
-%\eq{
-%w_{yu}^2 v_u+\epsilon_y = \Sigma_{yy} + \frac{\Sigma_{zy}}{\Sigma_{zx}}\left(\frac{\Sigma_{zy}}{\Sigma_{zx}}\Sigma_{xx} - 2\Sigma_{xy} \right)
-%}
-%
-%Conditional distributions are also gaussian.
-%
-%\eq{
-%%P(Y|X=x)& \sim \N{\mu_y + \Sigma_{yx}\Sigma_{yy}^{-1}(x-\mu_x)}{\Sigma_{yy} - \Sigma_{yx}\Sigma_{yy}^{-1}\Sigma_{yx}^T}\\
-%P(Y|X=x) &= \N{\mu_y+\frac{\Sigma_{xy}}{\Sigma_{yy}}(x-\mu_x)}{\Sigma_{yy} - \frac{\Sigma_{xy}^2}{\Sigma_{yy}}} \\
-% &= 
-%}
-%
-%Intuitively we want the link $Z \rightarrow X \rightarrow Y$ to be stronger than $Z \rightarrow X\rightarrow U \rightarrow Y$. If we can see that X is mostly determined by Z then this must be the case. Similarly it would be good if Y is strongly determined by X (then U cannot have much influence). Quantify this statement.
-%
-%Start by looking at the variance of $P(X|Z)$ - relative to the mean?
-%Also the variance of $P(Y|X)$. 
-%
-%Look at some extreme examples - what happens when $Z$ exactly determines $X$. 
-%
-%We know all the diagonal terms in the covariance matrix are positive. This will create bounds on terms that cannot be exactly identified.
+We can identify the difference in the average causal effect for two interventions on $X$ (assuming $v_z,w_{xz} > 0$) .
+\eq{
+\E{Y|do(X=x)} - \E{Y|do(X=x')} = w_{yx}(x-x') = \frac{\Sigma_{zy}}{\Sigma_{zx}}(x-x')
+}
+
+We can also identify the variance of $\P{Y|do(X=x)}$.
+
+\eq{
+w_{yu}^2 v_u+\epsilon_y = \Sigma_{yy} + \frac{\Sigma_{zy}}{\Sigma_{zx}}\left(\frac{\Sigma_{zy}}{\Sigma_{zx}}\Sigma_{xx} - 2\Sigma_{xy} \right)
+}
+
+Conditional distributions are also gaussian.
+
+\eq{
+%P(Y|X=x)& \sim \N{\mu_y + \Sigma_{yx}\Sigma_{yy}^{-1}(x-\mu_x)}{\Sigma_{yy} - \Sigma_{yx}\Sigma_{yy}^{-1}\Sigma_{yx}^T}\\
+P(Y|X=x) &= \N{\mu_y+\frac{\Sigma_{xy}}{\Sigma_{yy}}(x-\mu_x)}{\Sigma_{yy} - \frac{\Sigma_{xy}^2}{\Sigma_{yy}}} \\
+ &= 
+}
+
+Intuitively we want the link $Z \rightarrow X \rightarrow Y$ to be stronger than $Z \rightarrow X\rightarrow U \rightarrow Y$. If we can see that X is mostly determined by Z then this must be the case. Similarly it would be good if Y is strongly determined by X (then U cannot have much influence). Quantify this statement.
+
+Start by looking at the variance of $P(X|Z)$ - relative to the mean?
+Also the variance of $P(Y|X)$. 
+
+Look at some extreme examples - what happens when $Z$ exactly determines $X$. 
+
+We know all the diagonal terms in the covariance matrix are positive. This will create bounds on terms that cannot be exactly identified.
 
 
 

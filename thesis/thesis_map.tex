@@ -1,0 +1,349 @@
+\documentclass[11pt,a4paper]{book}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{dsfont}
+\usepackage{listings}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithm
+\usepackage[noend]{algpseudocode}% http://ctan.org/pkg/algorithmicx
+\usepackage{parskip}
+\usepackage{tikz}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usetikzlibrary{arrows,positioning} 
+\usepackage{subcaption}
+
+
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+\DeclareUnicodeCharacter{00A0}{ }
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=2.2em,
+           minimum height=2.2em,
+           font=\footnotesize,
+           text centered,
+           },
+     latent/.style={
+           circle,
+           rounded corners,
+           draw=black, thick, dashed,
+           minimum width=2.2em,
+           minimum height=2.2em,
+           font=\footnotesize,
+           text centered,
+           fill=black!10!white
+           },
+    target/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=2.2em,
+           minimum height=2.2em,
+           font=\footnotesize,
+           text centered,
+           fill=black!20!white,
+           },
+    observedrect/.style={
+           rectangle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=6em,
+           minimum height=2em,
+           font=\footnotesize,
+           text centered,
+           },
+     targetrect/.style={
+           rectangle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=6em,
+           minimum height=2em,
+           font=\footnotesize,
+           text centered,
+           fill=black!20!white,
+           },
+     empty/.style={
+           circle,
+           rounded corners,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 }   
+}
+
+
+
+
+
+
+\newcommand{\defined}{\vcentcolon =}
+\newcommand{\rdefined}{=\vcentcolon}
+\newcommand{\E}[1]{\mathbb E\left[{#1}\right]}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\calF}{\mathcal F}
+\newcommand{\sr}[1]{\stackrel{#1}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\ind}[1]{\mathds{1}\!\!\set{#1}}
+\newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
+\newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
+\newcommand{\floor}[1]{\left \lfloor {#1} \right\rfloor}
+\newcommand{\ceil}[1]{\left \lceil {#1} \right\rceil}
+\newcommand{\eqn}[1]{\begin{align}#1\end{align}}
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+\newcommand{\Ber}{\operatorname{Bernoulli}}
+\newcommand{\bigo}[1]{\mathcal{O}\left( #1 \right)}
+\newcommand{\bigotilde}[1]{\tilde{\mathcal{O}}\left( #1 \right)}
+\newcommand{\bigtheta}[1]{\Theta\left( #1 \right)}
+\newcommand{\bigthetatilde}[1]{\tilde{\Theta}\left( #1 \right)}
+\newcommand{\bigomega}[1]{\Omega\left( #1 \right)}
+
+\renewcommand{\P}[1]{\operatorname{P}\left\{#1\right\}}
+
+
+
+\author{Finnian Lattimore}
+\title{Learning how to act: making good decisions with machine learning}
+
+\begin{document}
+\def\ci{\perp\!\!\!\perp} % from Wikipedia
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\maketitle
+
+\section{This Thesis}
+\begin{itemize}
+\item clarify where causal inference fits within machine learing, for which problems it is required and ...
+\end{itemize}
+
+\section*{Uncategorized}
+http://www.news.com.au/finance/money/costs/insurance-companies-secrets-spilt/news-story/f6ef17ae73e3a5636343845666532b91 insurance decisions voodoo because of lack of transparancy and absense of obvious causal link. Claim: People are more comfortable with desicion making on the basis of factors they believe to be causally relevet.
+
+\chapter*{Introduction (3500 words)}
+
+\paragraph*{Motivating summary}
+
+\section*{What is causality and why do we care? (2000 words)}
+
+\subsection*{Defining causality}
+\begin{itemize}
+\item widely debated in science and philosophy (FIND SOME REFERENCES)
+\item what is explaination?
+\item any model that aims to predict the outcome of an action or intervention in a system
+\item I do not see the distinction between explaination and (causal) prediction. Explaination is all about the ability to compress and to generalize. The more a model can do this, the more we view as providing an understanding of the why. 
+\item mediation?
+\end{itemize}
+
+\subsection*{Identifying when we have a causal problem}
+
+\subsubsection*{Examples of typical machine learning probems. Are they causal?}
+
+\begin{itemize}
+\item Speech recognition (for systems like Siri or Google)
+\item Machine translation 
+\item Image classification
+\item Forecasting the weather
+\item Playing Go 
+\item Identiying spam emails
+\item Automated essay marking
+\item Predicting the risk of death in patients with pnumonia.
+\item Predicting who will re-offend on release from prison 
+\item Predicting which customers will cease to be your customers
+\item Demand prediction for inventory control
+\item Predicting who will click on an ad
+\item Financial trading
+\item Recommending movies
+\item Online search
+\item Self driving cars
+\end{itemize}
+
+\subsubsection*{What aspects of a problem determine if causal inference is required?}
+(When is pure prediction useful?)
+\begin{itemize}
+\item To decide between actions we only need to rank them (not estimate their actual effect). 
+\item The predicted outcome in the absence of an intervention provides a single point. We can use this to find which problems are most serious if left alone - and priortise those for modelling changes. 
+\item Any decision we take does not significanly impact the system from which the data was drawn to make it (for repeat decision making)
+\item Does acting on the result of the prediction change the predictive distribution p(y|x)? Ie change people's behaviour.
+
+\end{itemize}
+
+
+\section*{Approaches to causality (1000 words)}
+
+\paragraph*{Two broad approaches} 
+\begin{itemize}
+\item Build a model to map the natural behaviour of the system to what will happen for some action
+\item Take the action and see what happens
+\end{itemize}
+
+\paragraph*{The first is causal inference}
+
+\paragraph*{The second is reinforcement learning}
+
+\paragraph*{Both generalize from randomized experiment} Reinforcment learning to sequential decisions, causal inference to non-experimental conditions
+
+\paragraph*{Both approaches involve assumptions} the latter that we can group context and actions.
+
+\paragraph*{Limitations of causal inference}
+
+\paragraph*{Limitations of experimets} What are the issues with standard randomized experiments?
+
+\chapter*{Causal models (5000 words)}
+\subsection*{Causal graphical models}
+Although seemingly simplistic, the notion of hard interventions is surprisingly powerful. 
+
+A complaint leveled against this view point of causality is that the 'surgery' is too precise and that, in the real world, any intervention will effect many variables (eg Cartwright 2007). However, 
+
+\subsection*{Counterfactuals}
+\subsection*{Structural Equation models}
+\subsection*{Comparing and unifying the models}
+\subsubsection{A translator from graphical independence to counter factual statements}
+
+
+\chapter*{Two key questions (5000 words)}
+\section*{Causal Inference} 
+\paragraph*{You are willing to assume the causal graph}
+\paragraph*{extremely widely appliled} Implicitly accounts 10,000 of studies in phycology, medicine, business, etc. 
+
+\subsection*{Identifiability}
+\paragraph*{Under what conditions in is the problem solveable}
+\subsubsection*{The Do Calculus}
+
+\subsubsection*{Open questions within identifiablity}
+
+\subsection*{Estimation}
+\paragraph*{How well do we actually do with finite datasets?}
+
+
+\section*{Causal Discovery}
+\paragraph*{You want to learn the graph}
+\paragraph*{Equates to the aim of automating scientific discovery}
+\paragraph*{Increadibly hard}
+\subsection*{Discovery with Conditional independence}
+\subsection*{Discovery with Functional Models}
+
+\chapter*{Multi-Armed Bandits (5000 words)}
+
+What is the role of randomization? How do bandits algorithms work despite being only partially randomized? 
+What else can you do to improve randomized studies (variance reduction, lower regret).
+
+\chapter*{Causal Bandits: Unifying the approaches (5000 words)}
+
+
+
+\chapter*{Causal Inference \& Machine Learning (5000 words)}
+A more detailed discussion on where causal inference sits within machine learning and what it can offer.
+
+
+
+\section*{Different approaches}
+\paragraph{The two cultures}
+
+
+\subsubsection*{Translating terminology}
+Economist -> ML
+
+\section*{Challenges for the Machine learning approach}
+\subsection*{No cross validation}
+\paragraph*{The challenge of model selection}
+\paragraph*{Does predictive accuracy indicate a good causal model?}
+\subsection*{Less large, real world datasets}
+\paragraph*{The dearth of experimental data}
+\subsubsection*{Data for testing causal models}
+Simulators. Open competitions. Converting other data sets. Existing data sets.
+
+\section*{Relation to other areas of ML}
+\subsection*{Covariate shift}
+\subsection*{Generalizability}
+\paragraph*{Invariants}
+\paragraph{more stable} Variables causally directly causally related to the outcome (either causes or effects) should be more stable predictors over time. The assumption is there are less places for change to come in. 
+
+\paragraph{change input distribution}If a feature is a cause of an outcome then changing the input distribution over that feature won't break the model. If its an effect it could.
+
+\paragraph{feature selection} The direct causes (and effects) of a variable of interest make up a sufficient set for prediction (is this true)? This may be a reason for using structure learning type algorithms even if you are simply doing prediction.
+\subsection*{Interpretabilty}
+\paragraph*{interpretable models as proxies for causal models} Let the human do the work. If we know the training and test data will be sampled from different distributions, knowing what the features that the model is looking at are, allows people use their background understanding of the world to evaluate whether or not those features are likely to be transferable to the test domain. 
+
+A desire for interpretability indicates that something has been left out of the loss function. 
+
+One form of interpretability gives people insight into what the features are that the model is relying on.
+
+Specifically, people can
+\begin{itemize}
+\item rule out many possible features as highly unlikely to be relevent to a problem
+\end{itemize}
+
+People have access to a lot of detailed prior knowledge.  
+\subsection*{Transfer Learning}
+find a feature representation in which $P(Y|X)$ is the same in many different domains (or stable over time). Causal models predict the outcome of actions. We could directly take these actions and learn $P(Y|a,X)$ for every $(a,X)$ but, in reality, no two situations (or actions) are exactly alike. So we have to make representations such that things are stable. 
+
+This is tightly related to generalizability. If we take a person undergoing a medical test, we might describe the situation by the year and location, the person's age, gender, heart rate, medical condition and test results. We don't include , the color of the doctors shirt, the size of the room, ...
+
+For example, in the advertising setting, we want to know how our on expenditure on paid search ads is linked to sales. However, this relationship may be very unstable over time because the ad slots are sold at auction. The amount we have to pay to obtain a given position for keyword depends crucially on the amount our competitors are bidding for that keyword. However, the relationship between displaying the ad at a particular position and the probability that someone clicks it an then makes a purchase may be much more consistent. 
+\subsection*{Fair Machine Learning}
+
+
+
+
+
+\subsubsection*{Structural Equation Models}
+
+
+
+\subsubsection*{Identifiability}
+
+The notion of identifiability is binary. How could it be softened. There are two obvious approaches. 
+1) Look at the finite time convergence for identifiable queries.
+2) For non identifiable queries, look at what bounds can be achieved or what additional assumptions would be required to make them identifiable. 
+
+Question - why does everyone use the backdoor criterion. Is it much more frequent in the world. Easier to estimate? 
+
+\subsection*{Defifinitions}
+\subsubsection*{Interactions}
+\subsubsection*{Causal effects}
+
+\subsection*{Estimation of causal effects}
+
+\subsubsection*{Relationship to covariate shift}
+
+\subsection*{Discovering causal structure}
+
+\subsubsection*{Discovery based on conditional independence}
+
+\subsubsection*{Discovery with functional models}
+
+\chapter*{Conclusions (1000 words)}
+
+\section*{Interesting open questions}
+Cycles - a huge issue. Not covered by Pearl,Rubin etc. 
+
+Places to look, statistical control theory, etc. any interesting papers along these lines?
+
+
+\bibliographystyle{apalike}% Select the citation style e.g. ieeetr
+\bibliography{../library}% write the directory to the .bib file
+\end{document}
+
+
+
+

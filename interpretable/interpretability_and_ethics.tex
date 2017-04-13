@@ -1,0 +1,377 @@
+\documentclass{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{accents}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage[ruled]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{dsfont}
+\usepackage[bf]{caption}
+\usepackage{hyperref}
+\hypersetup{
+    bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in AcrobatÕs bookmarks
+    pdftoolbar=true,        % show AcrobatÕs toolbar?
+    pdfmenubar=true,        % show AcrobatÕs menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={My title},    % title
+    pdfauthor={Author},     % author
+    pdfsubject={Subject},   % subject of the document
+    pdfcreator={Creator},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfkeywords={keyword1} {key2} {key3}, % list of keywords
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=red,          % color of internal links (change box color with linkbordercolor)
+    citecolor=blue,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+\usepackage{amsthm}
+\usepackage{natbib}
+\usepackage[capitalize]{cleveref}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{tikz} 
+\usetikzlibrary{arrows,positioning} 
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+%\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MACROS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\defined}{\vcentcolon =}
+\newcommand{\rdefined}{=\vcentcolon}
+\newcommand{\E}[1]{\mathbb E\left[#1\right]}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\calF}{\mathcal F}
+\newcommand{\sr}[1]{\stackrel{#1}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\ind}[1]{\mathds{1}\!\!\set{#1}}
+\newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
+\newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
+\newcommand{\floor}[1]{\left \lfloor {#1} \right\rfloor}
+\newcommand{\ceil}[1]{\left \lceil {#1} \right\rceil}
+\newcommand{\eqn}[1]{\begin{align}#1\end{align}}
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+\newcommand{\Ber}{\operatorname{Bernoulli}}
+\renewcommand{\P}[1]{\operatorname{P}\left\{#1\right\}}
+\newcommand{\N}[2]{\mathcal{N}\left({#1}\;,\;{#2}\right)}
+
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=2.5em,
+           minimum height=2.5em,
+           font=\footnotesize,
+           text centered,
+           scale=1,
+           fill=blue!20!white},
+     latent/.style={
+           circle,
+           rounded corners,
+           draw=black, thick, dashed,
+           minimum width=2.5em,
+           minimum height=2.5em,
+           font=\footnotesize,
+           text centered,
+           fill=black!10!white
+           },
+     empty/.style={
+           circle,
+           rounded corners,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 }  
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+\title{Causality, Ethics and Identifiability}
+\author{Finnian Lattimore}
+
+
+\begin{document}
+\def\ci{\perp\!\!\!\perp}
+
+\maketitle
+\section{What, Why, When Where, How? (Finale Doschi-Velez)}
+Interpretability - What Why When Where How (Finale Doschi-Velez)
+\begin{itemize}
+\item What: To give or provide meaning to; explain [to humans] (dictionary.com)
+\item Related: transparent, accountable, trustworthy, fair, actionable, reliable
+\end{itemize}
+
+Why,When,Where needed?
+\begin{itemize}
+\item Science (why) - understand 'nature of the thing' 
+\item debugging
+\item safety - decisions are sound, what if inputs are wrong
+\item miss-matched objectives - eg side-effects of medication not included in objective
+\item legal/ethics
+\item unknown, unknowns - something we can't properly quantify in model plus humans involved in decision making.
+\end{itemize}
+
+How (to evaluate)?
+\begin{itemize}
+\item need scientific way of measuring interpret-ability
+\item indirect measurement in terms of goal - eg interpret-ability in context of application success measured in terms of some specific application outcome - like increased use of model, better patient welfare, etc. 
+\item measure interpret-ability in terms of proxies like sparsity, 'size of model', 'additive', non-negativity.
+\item Test how well explanation worked by testing how well people can predict the output of a model for  a given input (simulation)
+\item Test how well explanation worked by testing how well people can answer counter-factual queries of the form:
+ - What changes to input, weight, cost would change [prediction for X]    
+\end{itemize}
+
+Where are the unknown unknowns?
+\begin{itemize}
+\item in the structure of the data (eg science)
+\item in reward function (eg missmatched objective)
+\item inputs (ie safety checks)
+\item internal features (ie debugging)
+\end{itemize}
+What kind of interpret-ability do we want?
+\begin{itemize}
+\item Global:What factors important for decision making in general
+\item Local: What factors lead to a particular decision.
+\end{itemize}
+
+
+\subsection{Feature Importance}
+Instance based approach  - compute conditional expected value of classifier output given each pixel individually. (Empirical approach).
+
+Unification of model interpret-ability SHAP (read this paper for sure).
+
+\subsection{Maya Gupta (Google)}
+Don't trust your data
+cross-validation - uses train set data - the problem is that train data doesn't represent test data. 
+
+Semantic regularisation - add human structural/human knowledge. 
+Non-iid, early adopters, clicks data, past vs future, 
+
+Empirical loss trusts the data, regularizers say "don't trust the data"
+Loss function is not right - also its not a convex relaxation of the right thing. Ie end goal is not more clicks, its users happiness, revenue, etc.
+
+What makes a great regularizer? 
+Captures prior knowledge about the world
+Parameter free (no tuning because cross-validation is hard)
+Will it work whatever the test distribution
+Does it help trust and interpret trained model.
+These things may only apply to semantically meaningful features.  
+
+An example: monotonicity. Gupta et al JMLR 2016.
+Could you build a normal model and then apply constraints, knowing that the solution should be close to optimal?  
+
+Alternate constraints: fairness, egregious examples - must not get these wrong, low-churn - similar to another model. Satisfying real world with dataset constraints.  
+
+\section{Last talk in interpret-ability session}
+Data does not arrive as a given - majority of time is spent getting/cleaning/labelling data. Theory Data -> Algorithm -> Model. In reality there are loops and iterations.
+
+Structured Labelling [CHI 2014] MSR
+ModelTracker [CHI 2015, VAST 2016] tool for comparing/examining what models are doing. What is a severe false positive/negative? You should be using a cost function - to decide which model to use (not just predictive accuracy). You can click through to data to see where model is failing and fix it. 
+
+concept evolution occurs - as you see the data you get a greater idea of how to classify it. Solve by structured labelling. ie tagging - create subgroups. 
+
+\section{Panel discussion}
+- are there commonalities or does context matter for interpret-ability. I think it depends on some underlying motivations. 
+- providing an explanation can result in people trusting an algorithm too much. 
+- trying to explain learned policy in MDPs. Additional question is if you control the system using this policy, what happens? Addition of dynamics adds additional questions. 
+- Learning a classifier when we should be learning a policy leads to problems (oscillations etc) because of feedback loops.
+Example: what kind of explanation does the FDA want? Should be provably robust - works in out of sample clinical trials. Should make sense with respect to existing models of disease. 
+
+- in healthcare causality is the goal and interpret-ability is a first step. We don't do causality because problem is just too complex - but it at least gives us a set of hypothesis. 
+
+Thomas Deitrich - causality allows generalizability beyond statistical.
+Do as much as you can in an explicit causal way then add statistical residual. 
+
+Do we always need interpret-ability in real applications? People sometimes say yes for critical situations? Or is demonstrated predictive success enough. Maya thinks that if there is a trade off we are doing it wrong. 
+
+Is it a trade off or should interpret-able models ultimately be more generalizable?  
+
+If ML works - we have to be able to apply assumptions. 
+
+To get insurance against something I don't know - the unknown unknowns. Sample. 
+Human explanations are reconstructed and do not relate to the decision making process. 
+
+want to avoid system errors (as goal of interpretable models)
+- if you know what you want (transparency, accountability, other things) then you should target that rather than interpretability. 
+
+-violation of reasonable explaination/ EU rules makes you liable for up to 4\% of global turn-over. Yikes!
+- importance of understanding worst case performance of machine learning algorithms. 
+- if task is transfer, you don't care about interpretability
+- structure may be added to make better predictions (does not have to be more interpretable). 
+
+\section{Finn Random ideas}
+- what about if you want to be able to see what would happen if you changed your loss function without re-learning the full model. 
+
+
+Another way of measuring the success of interpretable models is to see if adding a human in the loop can improve desired metric. Ie if motivation for interpret-ability is to allow humans to debug then making this possible should improve accuracy. 
+
+I should really spend a few hours per week writing my thesis!
+
+A starting point is what is causal inference and when do you need it. 
+
+There is a hierarchy of ethical/philosophical difficulty relating to disparate impact.
+\begin{enumerate}
+\item The disparate impact is due to biased data collection (solution fix the data)
+\item The disparate impact is due to historical/short term causative factors (eg race $\rightarrow$ disadvantage)
+\item The disparate impact is due to fundamental/long term causative factors (eg women $\rightarrow$ pregnancy)
+\end{enumerate}
+
+wifi 92gf92eh2d
+92gf92eh2d
+
+Are simple models (like logistic regression) really interpretable? Not in the presence of unobserved confounding where we have an objective miss-match.
+
+A thing to do
+\begin{enumerate}
+\item enumerate desirable properties of 'fair' algorithms
+\item quantify trade-offs between these properties
+\item connect these properties for underlying reasons for desiring fair algorithms
+\end{enumerate}
+
+
+
+What determines which attributes we consider protected? eg why don't we protect things like intelligence?
+\begin{itemize}
+\item Not a choice
+\item Generally not 'fundamentally' relevant 
+\item Easily measurable/observable
+\end{itemize}
+
+Justifications for interpretability
+\begin{itemize}
+\item  better integration with human decision making
+\item improved generalization
+\item 'debuging'
+\item ability to incorporate additional constraints without explicitly defining loss function
+\item better adherence
+\end{itemize}
+
+
+Fundamentally causal relationships - those which we expect to be invariant (the system cannot change to remove the relationship).
+
+The closer a variable is to being a direct cause - the more stable that relationship should  be over time (as other things can vary) - also the better the relationship should generalize across situations (eg different countries). 
+
+The idealised scenario, under which the target variable and optimisation metric truly capture the desired outcome and the training data is sampled iid from the population of interest can almost never be expected to hold. 
+
+Claim: Many of the scenarios motivating interpretable models really require casual models. This is an important distinction to make. Although historically, causal modelling is generally based on interpretable models such as linear or logistic regression, there is no fundamental requirement that this be the case. There has been substantial work on estimating causal effects with complex non linear models, eg \cite{}.
+
+Some of the major risks highlighted with the use of big data and machine learning algorithms for critical decision making are the result of apply non causal algorithms to fundamentally causal problems. 
+
+Causality mentioned as a motivating factor for interpretable models \cite{Lipton2016}
+
+
+Interpretable model not consistently defined because they are motivated by a number of different considerations \& applications. We should first ask why we want an interpretable model then construct a definition that is compatible with our goals and finally develop a solution. 
+
+
+\cite{Barocas2014} consider including a variable indicating membership of a protected class in a model as formal discrimination on the basis of disparate treatment, even in the absence of a discriminatory effect.
+
+data mining may require us to re-evaluate why and whether we care about not discriminating \cite{Barocas2014}
+
+role of randomisation and experiment
+
+Protected class membership is a proxy for variables which are "genuinely relevant in making rational and well- informed decisions" \cite{Barocas2014}
+
+Other potential issues with use of ML/Big Data
+\begin{itemize}
+\item Lack of a 2nd chance. If everyone has the same picture of you, through a federation of many data sources then failure in one domain may lead to rejection and failure in many others. (at an individual level)
+\item Overly homogeneous decision making (at a group level). If everyone is using the same data and algorithms, then we could reinforce current stereotypes and remove opportunities for gradual change. For example, suppose theoretically 
+\end{itemize}
+
+Problems motivating interpretable models
+\begin{itemize}
+\item Models are deployed where their use alters the environment, invalidating future predictions
+\item Trust that a model will perform well with respect to real (unmeasurable/hard to quantify) objectives
+\item Adversarial settings. 
+\item Participatory - critical decisions otherwise made by a small technical elite. 
+\item Understand, validate, edit trust \cite{Caruana2015}
+\item "trust, which is fundamental if one plans to take action based on a prediction" \cite{Ribeiro2016}
+\item trust so that a user will use the model.
+\item real world data different (to that used to train/validate)
+\item evaluation function used doesn't reflect true goal.
+\end{itemize}
+
+\cite{Ribeiro2016} Problems with ML: propagation of feedback loops, failing to notice data leaks, over-estimating model accuracy.
+
+\cite{Duvenaud2000} define a causal model as one which can predict the outcome of an intervention.
+
+
+Strong arguments for building an interpretable model, at least in an early phase to diagnose potential problems. 
+Humans can evaluate for which features P(Y|X) is unlikely to change. People can (at least sometimes) identify features that will not lead to good generalization. 
+
+It is important to distinguish 'trust' required for no other reason than to make the user use the model versus 'trust' associated with properties of the model that make it more accurate (ie via being more robust to changes in environment). In the former case, one valid solution would be to train the users to accept machine decisions or hire less questioning people. However, if the fundamental issue is a miss-match between the real world problem and the quantity being optimised by the machine learning algorithm, this would be disastrous. More subtlety, solutions that lead users to place a greater trust in the model that do not alleviate any fundamental mis-match are similarly bad. 
+
+Note: related to. Shown that the pattern of likes on facebook can significantly predict sensitive aspects. 
+
+
+
+
+Properties of causal models
+\begin{itemize}
+\item may be more easily contrasted or combined with human reasoning.
+\item come with theory on transferability
+\item are explicitly designed to predict the outcome of an intervention 
+\item can remove conflict between transparency and continued effectiveness.
+In some situations, making a model transparent is directly in conflict with its predictive accuracy. 
+\end{itemize}
+
+
+
+
+Causality is frequently mentioned in conjunction with interpretebility \cite{}, however the relationship between them remains unclear. 
+
+Despite recent work in the area \cite{}, there is still not a unified motivation for or definition of interpretability. 
+
+The extent to which interpretability is plausible or genuinely desirable is still under debate in the ML community \cite{}. 
+
+There is growing concern in the wider community over the use of automated or machine decision systems and a strong desire for transparency and intpretability. A particularly pertinant example is the introduction of legislation in the European union that grants a right to XXX. This is due to come into effect in 2018 and has major ramifications for the application of machine learning. There are components of this relating to explaination and discrimination. 
+
+
+Demonstrate the need to increase the clarity around issues such as algorithmic discrimination and interpretability. 
+
+\cite{Lipton2016} raise the interesting point that interpretability can only be important if we care about more than simply high predictive accuracy. In other words a desire for interpretability implies a miss-match between the real world goal and the optimisation problem presented to a machine learning algorithm.
+
+If a model is non-causal making it transparent can lead to changes in people's behaviour that reduce the predictive accuracy of the model. This creates a trade-off between transparency and the utility of the model that remains even without imposing any requirements for model simplicity. If the model is causal, then any changes in the choices people make will be reflected in the predictions, removing this conflict. For example, if students know exactly what factors lead to a high score from an automated essay marking system they are strongly motivated to change their writing to reflect this. If these factors are direct causes of the desired outcome (clear and compelling writing) this is a good outcome. However, if they are merely associated with good writing then we will end up with impressive sounding gobbledygook. As a more serious example, consider an algorithm used to help make parole decisions that looks at prisoners participation in various programs to assesses the risk of recidivism. Suppose the algorithm determines that book clubs are associated with lower risk, whilst sex offender programs are associated with higher risk. If the model is made transparent to prisoners, then we expect to see the participation in sex offender programs plummet and a strong demand for book clubs. Again if the effects are causal, perhaps the book club fundamentally changes peoples outlook on life and the sex offender programs were poorly designed, this is a positive outcome. However it might be that participation in sex offender programs actually lowers the risk of re-offending in those who take them but that the group who currently participate are simply higher risk than the general prison population. Similarly, the majority of the apparent benefit of the book club could be a function of who opts to take part. 
+
+Note: the causal attribute needs to be sufficiently measurable. Proxies may still be subject to manipulation. 
+
+
+\end{document}
+

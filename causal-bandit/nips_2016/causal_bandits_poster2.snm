@@ -1,0 +1,27 @@
+\beamer@slide {fig:parallel}{1}
+\beamer@slide {sub@fig:parallel}{1}
+\beamer@slide {fig:parallel_post_action}{1}
+\beamer@slide {sub@fig:parallel_post_action}{1}
+\beamer@slide {fig:parallel_model}{1}
+\beamer@slide {eq:m-simple}{1}
+\beamer@slide {alg:simple}{1}
+\beamer@slide {fig:parallel_confounded}{1}
+\beamer@slide {sub@fig:parallel_confounded}{1}
+\beamer@slide {fig:parallel_confounded_post_action}{1}
+\beamer@slide {sub@fig:parallel_confounded_post_action}{1}
+\beamer@slide {fig:causal graphs}{1}
+\beamer@slide {alg:general}{1}
+\beamer@slide {fig:simple_vs_m}{1}
+\beamer@slide {sub@fig:simple_vs_m}{1}
+\beamer@slide {fig:simple_vs_T_vary_epsilon}{1}
+\beamer@slide {sub@fig:simple_vs_T_vary_epsilon}{1}
+\beamer@slide {fig:simple_vs_T}{1}
+\beamer@slide {sub@fig:simple_vs_T}{1}
+\beamer@slide {fig:experiments}{1}
+\beamer@slide {fig:simple_vs_m_general}{1}
+\beamer@slide {sub@fig:simple_vs_m_general}{1}
+\beamer@slide {fig:simple_vs_T_general}{1}
+\beamer@slide {sub@fig:simple_vs_T_general}{1}
+\beamer@slide {fig:simple_vs_T_misspecified}{1}
+\beamer@slide {sub@fig:simple_vs_T_misspecified}{1}
+\beamer@slide {fig:experiments_confounded}{1}

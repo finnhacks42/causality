@@ -1,0 +1,186 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+% \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading nips_2016
+%
+% to avoid loading the natbib package, add option nonatbib:
+% \usepackage[nonatbib]{nips_2016}
+
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+% \usepackage[final]{nips_2016}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+
+% additional packages
+\usepackage{graphicx} % more modern 
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{dsfont}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{times}
+\usepackage{natbib}
+\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+\usepackage{wrapfig}
+%
+
+
+\graphicspath{ {figures/} }
+\usetikzlibrary{arrows,positioning,backgrounds} 
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           minimum width=2.2em,
+           minimum height=2.2em,
+           font=\tiny,
+           text centered,
+           scale=.8,
+           fill=blue!20!white},
+     latent/.style={
+           circle,
+           rounded corners,
+           draw=black, thick, dashed,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           fill=black!10!white
+           },
+     empty/.style={
+           circle,
+           rounded corners,
+           minimum width=.5em,
+           minimum height=.5em,
+           font=\footnotesize,
+           text centered,
+           },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 }  
+}
+
+\newcommand{\defined}{\vcentcolon =}
+\newcommand{\rdefined}{=\vcentcolon}
+\newcommand{\E}[1]{\mathbb E\left[#1\right]}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\calF}{\mathcal F}
+\newcommand{\sr}[1]{\stackrel{#1}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\ind}[1]{\mathds{1}\!\!\set{#1}}
+%\newcommand{\ind}[1]{\set{#1}}
+\newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
+\newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
+\newcommand{\floor}[1]{\left \lfloor {#1} \right\rfloor}
+\newcommand{\ceil}[1]{\left \lceil {#1} \right\rceil}
+\newcommand{\eqn}[1]{\begin{align}#1\end{align}}
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+\newcommand{\Ber}{\operatorname{Bernoulli}}
+\renewcommand{\P}[1]{\operatorname{P}\left\{#1\right\}}
+\newcommand{\Pri}[1]{\operatorname{P}_i\left\{#1\right\}}
+\newcommand{\Prz}[1]{\operatorname{P}_0\left\{#1\right\}}
+\newcommand{\bigo}[1]{\mathcal{O}\left( #1 \right)}
+\newcommand{\bigotilde}[1]{\tilde{\mathcal{O}}\left( #1 \right)}
+\newcommand{\bigtheta}[1]{\Theta\left( #1 \right)}
+\newcommand{\bigthetatilde}[1]{\tilde{\Theta}\left( #1 \right)}
+\newcommand{\bigomega}[1]{\Omega\left( #1 \right)}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\simpleregret}{R_T}
+\newcommand{\Pij}[1]{\operatorname{P}_{ij}\!\left\{#1\right\}}
+\newcommand{\Pkl}[1]{\operatorname{P}_{kl}\!\left\{#1\right\}}
+\newcommand{\Q}[1]{\operatorname{Q}\left\{#1\right\}}
+\newcommand{\EE}{\mathbb E}
+\newcommand{\EEa}{\EE_a}
+\newcommand{\Pns}[2]{\operatorname{P}_{#1}\left\{#2\right\}}
+\newcommand{\Pn}[2]{\operatorname{P}\left\{#2|#1\right\}}
+\newcommand{\parents}[1]{\operatorname{\mathcal{P}a}_{#1}}
+\newcommand{\actions}{\mathcal{A}}
+\newcommand{\calA}{\mathcal A}
+\newcommand{\etc}{\textit{etc}}
+\newcommand{\ie}{\textit{i.e.}}
+\newcommand{\eg}{\textit{e.g.}}
+\newcommand{\calP}{\mathcal P}
+\newcommand{\x}{\boldsymbol{x}}
+\newcommand{\Ps}{\operatorname{P}}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\let\temp\epsilon
+\let\epsilon\varepsilon
+
+
+\title{Interpret-ability, Causality and Transparency}
+
+% The \author macro works with any number of authors. There are two
+% commands used to separate the names and addresses of multiple
+% authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to
+% break the lines. Using \AND forces a line break at that point. So,
+% if LaTeX puts 3 of 4 authors names on the first line, and the last
+% on the second line, try using \AND instead of \And before the third
+% author name.
+\author{
+  Finnian Lattimore \\
+  Australian National University and Data61/NICTA \\
+  \texttt{finn.lattimore@gmail.com} \\
+}
+
+
+\begin{document}
+% \nipsfinalcopy is no longer used
+
+
+\maketitle
+
+\begin{abstract} 
+As machine learning is incorporated into decision making systems that have fundamental impacts on people's lives, such as in employment, criminal justice, health and financial services, there are increasing concerns over transparency and fairness. The European Union's General Data Protection Regulation, due to come into effect in 2018, requires that people can obtain "meaningful information about the logic involved" in an automated decision process. It also stipulates that such decisions should not be based on special categories of personal data (related to ethnicity, political and religions affiliation or sexuality) unless there "suitable measures" to safeguard individual interests. 
+
+A key concern is discrimination against disadvantaged groups. Discrimination is frequently defined in terms of either 'disparate treatment'- treating otherwise similar individuals differently on the basis of a protected attribute such as race or gender, or 'disparate impact' - a substantial difference in outcome between groups.  We consider how the notions of disparate treatment and impact may be formalised and the implications of how this is done for machine learning. We examine the overlap between the motivations for interpretable and causal models, especially with respect to assessing fairness. We look at how causal models mitigate some of the trade-offs between transparency and predictive accuracy and we examine to what extent the causal relationship between an attribute, any protected attributes and the outcome of interest is relevant to assessing the impact on fairness of its inclusion in a machine learning model. 
+\end{abstract} 
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INTRODUCTION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Random Ideas}
+
+
+
+
+
+
+
+
+\end{document}

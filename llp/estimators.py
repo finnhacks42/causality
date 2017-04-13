@@ -184,6 +184,7 @@ class CausalLLMEstimator(object):
                          verbose=0, n_jobs=4)
 
         # TODO figure out how to modify LMM to handle differences in proportions
+        # TODO figure out how validation/cross-validation works inside this llm implementation
         self.lmm = lmm.fit(X, labels, bag_ids, X_val, labels_val, bag_ids_val)
 
 
@@ -295,6 +296,62 @@ def compare_errors(n_features, nrows ,simulations, c_vals = [0,.5,1],test_sample
             scores[0,c_indx,s] = mean_squared_error(ce_true,ce1)
             scores[1,c_indx,s] = mean_squared_error(ce_true,ce2)
     return scores
+
+
+class EMEstimator2(object):
+    """ Implementation assuming no defiers as described by Tiberio """
+    def fit(self,x_treat,x_control,y_treat,y_control, tol = 1e-2, max_iter = 500):
+         m_treat = LogisticRegression().fit(x_treat,y_treat)
+         m_control = LogisticRegression(x_control,y_control)
+
+         xt0,xc1,xt1,xc0 = x_treat[y_treat == 0],x_control[y_control == 1],x_treat[y_treat == 1],x_control[y_control == 0]
+
+         x = np.vstack((
+             xt0, # have label N
+             xc1, # have label A
+             xt1, # have label A with weight w_A
+             xt1, # have label C with weight w_C
+             xc0, # have label N with weight w_N
+             xc0)) # have label C with weight w_C'
+
+         blocks = [xt0.shape[0],xc1.shape[0],xt1.shape[0],xt1.shape[0],xc0.shape[0],xc0.shape[0]]
+
+         w_A = np.true_divide(m_control.predict_proba(xt1),m_treat.predict_proba(xt1))
+         w_N = np.true_divide(1-m_treat.predict_proba(xc0),1-m_control.predict_proba(xc0))
+
+         sample_weights = np.concatenate((np.ones(blocks[0]+blocks[1]),w_A,1-w_A,w_N,1-w_N))
+
+         y = np.repeat([0,1,1,2,0,2],blocks) #N=0,A=1,C=2
+
+         epsilon = np.Inf
+
+         model = LogisticRegression()
+         while (epsilon > tol):
+             model.fit(x,y,sample_weight = sample_weights)
+             p_xt1 = model.predict_proba(xt1)
+             p_xc0 = model.predict_proba(xc0)
+
+             #check for convergence
+
+             w_A = p_xt1[1]
+             w_C = p_xt1[2]
+             w_N = p_xc0[0]
+             w_C2 = p_xc0[2]
+             sample_weights = np.concatenate((np.ones(blocks[0]+blocks[1]),w_A,w_C,w_N,w_C2))
+
+
+
+
+
+
+
+    def predict_causal_effect(self,x):
+        return self.model_t.predict_proba(x)[:,1] - self.model_c.predict_proba(x)[:,1]
+
+
+
+if __name__ == "__main__":
+    print(5)
 
 
 
