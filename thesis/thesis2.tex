@@ -136,30 +136,51 @@ Would from the apparent what conclude the why,
 Infer the Motive from the Deed, and show
 That what we chanced, was what we meant, to do.}{Alexander Pope}
 
+\chapter{Random Notes}
+\begin{itemize}
+\item With enough variables it becomes almost a given that we will be able to classify observations by what period they were collected in (eg detecting covariate shift). This means we can conclude the model will fail (when in most cases it will not). Is a form of regularization/reparameterization with an penalty on covariate shift the solution? Focus detection of covariate shift to those variables that actually influence the prediction.
+
+\item If variables are (conditionally) independent they are unlikely to be directly causally linked. 
+\end{itemize}
+
+
 \chapter*{Introduction (3500 words)}
 
-\paragraph*{My thesis in a sentence:} Unifying causal inference with multi-armed bandits.
-
-\paragraph*{This thesis contributes to knoweldge by:} Introducing a framework connecting causal graphical models with multi-armed bandits as a first step towards a unified approach to estimating the effect of interventions.  
-
-\paragraph*{My key research questions are:} 
-\begin{itemize}
-\item To understand and the difference between prediction and causal inference in machine learning and clarify which problems require causal approaches.
-\item To summarize the key strands of causal inference research from economics and social sciences for the machine learning community
-\item To make connections between learning to act from observational versus experimental data. In particular, between causal graphical models and multi-armed bandits.
-\end{itemize}
 
 \section*{Motivation}
 Many of the most important questions in science and in our personal lives are about the outcomes of doing something. Will asking people to pay upfront at the doctors reduce long term health expenditure? If we developed a drug to suppress particular genes, could we cure MS and would delaying teen-aged pregnancies improve the outcome for their kids.  
 
-These are hard questions because they require more than identifying a pattern in data. Correlation is not causation. Causal inference has proven so difficult that there is barely any consensus on even enduring questions like the returns to education or the long-term consequences of early life events – like teenage pregnancy, where the variables involved are susceptible to human intuition and understanding. 
+These are hard questions because they require more than identifying a pattern in data. Correlation is not causation. Causal inference has proven so difficult using standard methods (such as instrumental variables and propensity scoring) that there is barely any consensus on even enduring questions like the returns to education or the long-term consequences of early life events – like teenage pregnancy, where the variables involved are susceptible to human intuition and understanding. 
 
-We now live in a world of data. Hours of our lives are spent online, where every click can be recorded, tiny computers and sensors are cheap enough to incorporate into everything and the US Institute of Health is considering if all infants should be genetically sequenced at birth. Such data gives us a window into many aspects of our lives at an unprecedented scale and detail but it is messy, complicated and often generated as a by product of some other purpose. It does not come from the controlled world of a randomised experiment.
+We now live in a world of data. Hours of our lives are spent online, where every click can be recorded, tiny computers and sensors are cheap enough to incorporate into everything and the US Institute of Health is considering if all infants should be genetically sequenced at birth. Such data gives us a window into many aspects of our lives at an unprecedented scale and detail but it is messy, complicated and often generated as a by product of some other purpose. It does not come from the controlled world of a randomised experiment. 
 
-The rise of big data sets and powerful computers has seen an explosion in the application of machine learning. From healthcare, to entertainment and self driving cars; machine learning algorithms will transform many industries. It has been suggested that the impressive ability of statistical machine learning to detect complex patterns in huge datasets heralds the end of theory (Reference) and that we may be only a short step from the Singularity, where artifcial intelligence exceeds our own and then grows exponentially. 
 
-However, despite the huge advances in specific areas of machine learning (in particular deep learning), machine learning algorithms are effective only within very narrow problem settings. Getting them to generalize to even slightly different problems or datasets remains very challenging. Deciding how we should act or what policies we should implement requires us to be able to predict how a system will behave if we change it. The correlations detected by standard machine learning algorithms do not enable us to do this, no matter how many petabytes of data they are based on. As machine learning algorithms are incorporated into more and more of the decision making processes that shape the world we live it, it is critical to ensure that we understand the distinction between causality and prediction and that we develop techniques for learning how to act that are as effective as those we have for pattern recognition.
+Traditional techniques that assume linearity or substantial prior knowledge of causal structure are poorly suited to data sets that may be high dimensional, have non-linear relationships between variables, and where we have limited theory specifying how the variables are related.
 
+
+
+
+
+Statistical machine learning has been very successful, but generalizing remains very challenging. 
+
+
+How much data do humans get? 
+
+
+
+\paragraph*{Big data and machine learning are a huge deal}
+
+\paragraph*{Data age} Exciting times, larger data sets. Hype, opportunities for Machine learnig. Algorithms beign incorporated everywhere. 
+
+\paragraph*{The end of theory} (it is not) correlation is not enough no matter how many petabytes sit behind it. There are two seperate issues with a correlation only one of which is addressed by larger datasets. One is noise - it may have happened by chance. The other is much more fundamental.
+
+\paragraph*{Large datasets have allowed us to relax assumptions} We can fit more flexible models, rely less on strong parametric assumptions about the form of the curve. 
+
+\paragraph*{Theory is what allows you to extrapolate outside the observed domain (Hal Varian)}
+
+\paragraph*{A cautionary tale} Much hard work remains to be done before we can call and end to theory or the for the automation of science. 
+
+\paragraph*{There is nothing special about humans.} We do have some limited capacity to experiment - but can (or believe we can) draw inferenes about the likely role of variables we have never directy manipulated ourselves. Current ML algorithms are limited. If we ignore this, we will pay a price.
 
 \section*{What is causality and why do we care? (2000 words)}
 
@@ -168,7 +189,7 @@ The two cultures \cite{Breiman2001}
 
 \subsection*{Defining causality}
 \begin{itemize}
-\item widely debated in science and philosophy (REFERENCES)
+\item widely debated in science and philosophy (FIND SOME REFERENCES)
 \item what is explaination?
 \item any model that aims to predict the outcome of an action or intervention in a system
 \item I do not see the distinction between explaination and (causal) prediction. Explaination is all about the ability to compress and to generalize. The more a model can do this, the more we view as providing an understanding of the why. 
@@ -199,7 +220,7 @@ The two cultures \cite{Breiman2001}
 \item Pricing insurance
 \end{itemize}
 
-%For image recognition, we do not particularly care about building a strong model for exactly how the thing that was photographed translates to the image we see. In fact this is because we already have one. We can be confident that the process will not change. If we develop a discriminative model that is hightly accurate at classifying cats from dogs, we do not care a lot about its internal workings (provided we have strong grounds to believe that the situations in which we will be using our model will match those under which it was trained). Covariate shift clearly comes in here. Because there are areas where mechanisms are understood it is relatively easy to argue that covariate shift is not occuring and that results will be transferable. The mechanism is known but the function may be complex. 
+For image recognition, we do not particularly care about building a strong model for exactly how the thing that was photographed translates to the image we see. In fact this is because we already have one. We can be confident that the process will not change. If we develop a discriminative model that is hightly accurate at classifying cats from dogs, we do not care a lot about its internal workings (provided we have strong grounds to believe that the situations in which we will be using our model will match those under which it was trained). Covariate shift clearly comes in here. Because there are areas where mechanisms are understood it is relatively easy to argue that covariate shift is not occuring and that results will be transferable. The mechanism is known but the function may be complex. 
 
 \subsubsection*{What aspects of a problem determine if causal inference is required?}
 (When is pure prediction useful?)
@@ -209,6 +230,7 @@ The two cultures \cite{Breiman2001}
 \item Any decision we take does not significanly impact the system from which the data was drawn to make it (for repeat decision making)
 \item Does acting on the result of the prediction change the predictive distribution p(y|x)? Ie change people's behaviour.
 \item Ethics - ... People's viewpoint on if its ok...
+
 \end{itemize}
 
 
@@ -265,23 +287,23 @@ This means it is straightforward to take the best elements of work done in any o
 SWIGs \cite{Richardson2013}
 \cite{Dawid2000} Causal inference without counterfactuals
 
-%Determinisim inherent in counterfactuals and SEMs.
-%
-%
-%Suppose the counterfactuals $Y_t$ and $Y_c$ are jointly normal (with equal variance),
-%\eq{
-%P(Y_t,Y_c) \sim N()
-%}
-%
-%then their difference is also normal,
-%
-%\eq{
-%P(\tau) = N(\mu_t - \mu_c,2\sigma^{2}(1-\rho))
-%}
-%
-%\includegraphics[scale=.6]{figures/counterfactual_nonidentify.pdf}
-%
-%The variance of $\tau$ is not identifiable, even from experimental data. But it seems on the face of it relevent to our decision making. If the example above, if $\rho = 1$ then almost everyone benifits slightly from the treatment. However if $\rho=0$, there is a wide range, with some people benifiting a lot and others suffering significant harm.  
+Determinisim inherent in counterfactuals and SEMs.
+
+
+Suppose the counterfactuals $Y_t$ and $Y_c$ are jointly normal (with equal variance),
+\eq{
+P(Y_t,Y_c) \sim N()
+}
+
+then their difference is also normal,
+
+\eq{
+P(\tau) = N(\mu_t - \mu_c,2\sigma^{2}(1-\rho))
+}
+
+\includegraphics[scale=.6]{figures/counterfactual_nonidentify.pdf}
+
+The variance of $\tau$ is not identifiable, even from experimental data. But it seems on the face of it relevent to our decision making. If the example above, if $\rho = 1$ then almost everyone benifits slightly from the treatment. However if $\rho=0$, there is a wide range, with some people benifiting a lot and others suffering significant harm.  
 
 \subsection*{What does a causal model give us? Resolving Simpson's paradox}
 
@@ -333,76 +355,41 @@ If variables are (conditionally) independent they are unlikely to be directly ca
 
 \chapter*{The interventionalist viewpoint (5000 words)}
 
-The previous sections all focus on aspects of the question; how can we estimate the effect of an intervention in a system from data collected prior to taking it. There is an obvious alternative. Instead of trying to infer the outcome of an intervention from passive observations we could just do it and see what happens. There are two key differences between observing a system and explicitly intervening in it. Firstly, when we intervene, we can choose which actions to take and thus get some control over which distributions we learn about. Secondly, if we are explicitly choosing interventions, we have a perfect model of the probability that we select each action given any context, allowing us to control confounding bias. 
+Instead of trying to infer the outcome of an intervention in a system from passive observations we could just try the intervention and see what happens.
 
-\subsection*{The role of randomization}
+Randomization is not a requirement. -> control over treatment assignment is.
 
-\paragraph*{The interventionalist viewpoint has devloped from the starting point of randomized controlled experiment}
-
-What is the role of randomization? How do bandits algorithms work despite being only partially randomized? 
-What else can you do to improve randomized studies (variance reduction, lower regret).
-
-Figure showing how randomization breaking any confounding links
-
-Randomization does not ensure target and control group are exactly alike. The more features or variables you include, the more likely that there will be a significant difference across at least one variable. But the within group variance also increases, the net effect is that it becomes harder to draw a conclusion but not more biased.
-
-\paragraph*{Limitations of randomization} 
-
-\subsection*{Limitations of experimentation} 
-
-Failure to generalize. Transportability, imperfect compliance. Too many contexts.
-
+Experiments, bandits, reinforcement learning
 
 \paragraph*{internal validity} Are differences in treatment and control groups down to intervention or the result of bias? 
 
 \paragraph*{external validity} Are the results of the study applicable to the broader population of interest.
 
-
-\section*{Multi armed bandits}
-\paragraph*{Definition} 
-
-\paragraph*{What limitations of randomized experiment does the bandit view address}
-
-\paragraph*{The exploration/exploitation trade-off}
-
-\subsection*{Regret} How do we measure the performance of a bandit algorithm?
-
-%$\simpleregret = \mu^* - \E{\mu_{\hat a^*_T}}.$ 
-
-Regret
-\eqn{
-R_T(\pi) = \E{max_{i \in [k]} \sum_{t=1}^T{X_{t,i}}} - \E{\sum_{t=1}^T{X_{t,A(t)}}}
-}
-
-Psuedo-Regret
-\eqn{
-R_T(\pi) &= max_{i \in [k]}\E{\sum_{t=1}^T{X_{t,i}}} - \E{\sum_{t=1}^T{X_{t,A(t)}}} \\
-&= n\mu_{i^*} - \E{\sum_{t=1}^T{X_{t,A(t)}}}
-}
-
-Simple Regret
-\eqn{
-\mu_{i^*} - \E{\mu_{\hat i^*}}.
-}
-
-\subsection*{Adversarial Bandits}
-What problem do they solve?
+\paragraph*{Fundamental role of randomization}
 
 
-\subsection*{Key approaches and results}
-\paragraph*{optimisim in the face of uncertainty}
-
-\subsection*{The need to add structure}
-\paragraph*{The regret for a bandit problem grows linearly with the number of (sub-optimal) actions.} This makes problems with large or infinite actions spaces intractible.
-
-
-\subsection*{Key extensions}
-
-\subsubsection*{Contexual bandits}
 \paragraph*{Feature selection} Is it even more important here? How do algorithms degrade as irrelevent features are added? In the supervised vs the RL setting? What would be a fair comparison?
 
-\subsubsection*{Markov decision processes}
-\subsubsection*{Dynamic Systems}
+Image of randomization breaking any confounding links
+
+Randomization does not ensure target and control group are exactly alike. The more features or variables you include, the more likely that there will be a significant difference across at least one variable. But the within group variance also increases, the net effect is that it becomes harder to draw a conclusion but not more biased. 
+
+\paragraph*{Practical limitations of experimentation} Failure to generalize. Transportability, imperfect compliance. Too many contexts.
+
+What is the role of randomization? How do bandits algorithms work despite being only partially randomized? 
+What else can you do to improve randomized studies (variance reduction, lower regret).
+
+\section*{Multi armed bandits}
+\paragraph*{Motivation} Why we need to extend from simple randomized experiment.
+
+\subsection*{Regret}
+\paragraph*{Relationship to Markov decision processes}
+\subsection*{The exploration/exploitation trade-off}
+
+\subsection*{Contexual bandits}
+
+
+\subsection*{Dynamic Systems}
 \begin{itemize}
 \item An explicit model of actions in a partially known system (eg HMM)
 \item Feynman-Kac Lemma; Solving a PDE can be converted to a stochastic process
@@ -410,27 +397,89 @@ What problem do they solve?
 
 
 \chapter*{Causal Bandits: Unifying the approaches (5000 words)}
-\paragraph*{Extend from my NIPS paper}
-
-\section*{The framework}
-
-\paragraph*{Connecting the machinary of causal inference to the bandit problem}
-
-\paragraph*{For which problem does causal inference help?}
-
-\section*{Causal bandits with post action feedback}
-
-\subsection*{The parallel bandit problem}
-
-\subsection*{General graphs}
-
-\subsection*{Experiments}
-
-\subsection*{Discussion \& Future work}
-
-\section*{Related work}
 
 \subsection*{Learning from log data}
+
+
+
+\chapter*{Causal Inference \& Machine Learning (5000 words)}
+A more detailed discussion on where causal inference sits within machine learning and what it can offer.
+
+
+
+\section*{Different approaches}
+\paragraph{The two cultures}
+
+
+\subsubsection*{Translating terminology}
+Economist -> ML
+
+\section*{Challenges for the Machine learning approach}
+\subsection*{No cross validation}
+\paragraph*{The challenge of model selection}
+\paragraph*{Does predictive accuracy indicate a good causal model?}
+\subsection*{Less large, real world datasets}
+\paragraph*{The dearth of experimental data}
+\subsubsection*{Data for testing causal models}
+Simulators. Open competitions. Converting other data sets. Existing data sets.
+
+\paragraph*{Are models that predict better more likely to be the correct model?}
+For polynomials, if you know the data was generated by a higher order polynomial, you may still be better of predicting it with a lower order one.
+
+\section*{Relation to other areas of ML}
+\subsection*{Covariate shift}
+\subsection*{Generalizability}
+\paragraph*{Invariants}
+\paragraph{more stable} Variables causally directly causally related to the outcome (either causes or effects) should be more stable predictors over time. The assumption is there are less places for change to come in. 
+
+\paragraph{change input distribution}If a feature is a cause of an outcome then changing the input distribution over that feature won't break the model. If its an effect it could.
+
+\paragraph{feature selection} The direct causes (and effects) of a variable of interest make up a sufficient set for prediction (is this true)? This may be a reason for using structure learning type algorithms even if you are simply doing prediction.
+\subsection*{Interpretabilty}
+\paragraph*{Interpretable models as proxies for causal models} Let the human do the work. If we know the training and test data will be sampled from different distributions, knowing what the features that the model is looking at are, allows people use their background understanding of the world to evaluate whether or not those features are likely to be transferable to the test domain. 
+
+\paragraph*{Causal models are more interpretable?}
+
+A desire for interpretability indicates that something has been left out of the loss function. 
+
+One form of interpretability gives people insight into what the features are that the model is relying on.
+
+Specifically, people can
+\begin{itemize}
+\item rule out many possible features as highly unlikely to be relevent to a problem
+\end{itemize}
+
+People have access to a lot of detailed prior knowledge.  
+
+http://www.news.com.au/finance/money/costs/insurance-companies-secrets-spilt/news-story/f6ef17ae73e3a5636343845666532b91 insurance decisions voodoo because of lack of transparancy and absense of obvious causal link. Claim: People are more comfortable with desicion making on the basis of factors they believe to be causally relevet.
+
+\subsection*{Transfer Learning}
+find a feature representation in which $P(Y|X)$ is the same in many different domains (or stable over time). Causal models predict the outcome of actions. We could directly take these actions and learn $P(Y|a,X)$ for every $(a,X)$ but, in reality, no two situations (or actions) are exactly alike. So we have to make representations such that things are stable. 
+
+This is tightly related to generalizability. If we take a person undergoing a medical test, we might describe the situation by the year and location, the person's age, gender, heart rate, medical condition and test results. We don't include , the color of the doctors shirt, the size of the room, ...
+
+For example, in the advertising setting, we want to know how our on expenditure on paid search ads is linked to sales. However, this relationship may be very unstable over time because the ad slots are sold at auction. The amount we have to pay to obtain a given position for keyword depends crucially on the amount our competitors are bidding for that keyword. However, the relationship between displaying the ad at a particular position and the probability that someone clicks it an then makes a purchase may be much more consistent. 
+
+\subsection*{Fair Machine Learning}
+\paragraph*{Exchangeability of people} Is there any connection to the concept of imagining you could be born in any position and designing ethics from there?
+\begin{itemize}
+\item what determines what attributes we deam worthy of protection (eg race, gender, sexuality)
+\item what do we protect (and what exceptions do we give)?
+\item Do we think it is bad to select on the basis of protected attributes not directly related to desired outcome?
+\item Do we think it is bad to select in a way that has a disparate impact on a minority/disadvantaged group.
+\end{itemize}
+
+
+\subsection*{Causal inference with Bayesian Graphical models}
+
+\subsubsection*{The likelyhood principle}
+Look at some examples from the stan book.
+
+Both frequentist and bayesian methods can be used to approach problems of infering the outcome of an intervention. However, Bayesian modelling allows you to very naturally encode aditional assumptions and causal prior knowledge. This seems especially critical for problems that are not non-parametrically identifiable. 
+
+In the same way that regression may be either causal or non causal, depending on what interpretation and assumptions the researcher places on the equations relating the variables, Bayesian models may or may not be interpretable causally.  
+
+Is setting certain priors equivelent to conditioning? How must the model be set up to ensure unbiased causal estimates (in what way are the assumptions different to if you are using bayesian estimation techniques for prediction?)
 
 \chapter*{Conclusions (1000 words)}
 

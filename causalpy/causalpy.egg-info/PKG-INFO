@@ -1,0 +1,22 @@
+Metadata-Version: 1.1
+Name: causalpy
+Version: 0.0.1
+Summary: A python library for causal inference
+Home-page: https://github.com/
+Author: Finnian Lattimore
+Author-email: finnlattimore@gmail.com
+License: MIT
+Description: A library containing some utilities for causal modelling in Python
+        =======================
+        
+        
+        
+        
+        
+Keywords: sample setuptools development
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Statistics :: Causality
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 2.7
