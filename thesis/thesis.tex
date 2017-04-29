@@ -120,12 +120,27 @@
 
 \renewcommand{\P}[1]{\operatorname{P}\left\{#1\right\}}
 
+%\theoremstyle{plain} 
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+%\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\let\temp\epsilon
+\let\epsilon\varepsilon
 
 
 \author{Finnian Lattimore}
 \title{Learning how to act: making good decisions with machine learning}
 
 \begin{document}
+
 \def\ci{\perp\!\!\!\perp} % from Wikipedia
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{definition}{Definition}[section]

@@ -289,6 +289,7 @@ SWIGs \cite{Richardson2013}
 
 Determinisim inherent in counterfactuals and SEMs.
 
+Key issue is that we can't observe the joint distribution over $Y_t$ and $Y_c$ even with randomized experiment. 
 
 Suppose the counterfactuals $Y_t$ and $Y_c$ are jointly normal (with equal variance),
 \eq{
@@ -305,7 +306,19 @@ P(\tau) = N(\mu_t - \mu_c,2\sigma^{2}(1-\rho))
 
 The variance of $\tau$ is not identifiable, even from experimental data. But it seems on the face of it relevent to our decision making. If the example above, if $\rho = 1$ then almost everyone benifits slightly from the treatment. However if $\rho=0$, there is a wide range, with some people benifiting a lot and others suffering significant harm.  
 
+Note that we can bound this counterfactual distribution based on the variance of the observed interventional distributions. 
+
+Can these issues be resolved by considering personalized causal effects as random variables and avoiding counterfactuals?
+
+Counterfactuals make a natural way to talk about causal effects in natural language. They could be seen as a short hand for projecting the world forward, holding everything else constant. An (impresise) way of expressing that we wish to consider the effect of only a single change. 
+
+What assumptions are required for the kind of counterfactual analysis like X would have been higher had B ...?
+
 \subsection*{What does a causal model give us? Resolving Simpson's paradox}
+
+Simpsons paradox
+
+
 
 \subsubsection{A translator from graphical independence to counter factual statements}
 \subsection*{Defining causal effects} Summarising the difference between two distributions. There is no one answer. \cite{Janzing2013}
