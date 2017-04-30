@@ -964,26 +964,89 @@ Is identifiablity a good question to ask? It seems natural to see if a problem c
 How do we tackle a problem that is not identifiable. We could look for bounds or we could make additional assumptions (or both). 
 
 \subsection*{Estimation}
-\subsection*{Defining causal effects} Summarising the difference between two distributions. There is no one answer. \cite{Janzing2013}
+\subsubsection*{Defining causal effects} 
+So far we have described causal effect estimation in term of idenfitifying the interventional distribution $\P{Y|do(X)}$ from observational data. 
 
-\cite{Imbens2004} Review of non-parametric estimation
-\cite{causal estimation is covariate shift}
-\paragraph*{How well do we actually do with finite datasets?}
+From a decision making process, is it the right thing to do to just pick the X that maximises the expectation of $Y$ (assuming that higher $Y$ is better. If it is not we can just add in another variable that is a deterministic function of $Y$ to relect the loss function.)
 
+Typically however we are often interested in estimating some function of the difference between $P{Y|do(X)}$ for various values of $X$. For example, the average causal effect (ATE) is defined for discrete binary treatment $T$ by:
+
+\eqn{
+ATE = \E{Y|do(T = 1)} - \E{Y|do(T=0)}
+}
+
+If the variables are continouous the average casual effect is 
+
+\todo{insert equation for continous case}
+
+The individual causal effect as defined in section XXX cannot be stated in terms of the do notation as it is not with respect to a distribution over anything. However, we can define a very similar concept with respect some observed context which I will refer to as the personalized causal effect. 
+
+\todo{insert equation for personalised causal effect}
+
+However, the difference in expectation is not the only way of summarizing the difference between two (or more) distributions. \citep{Janzing2013} show that there is no single way of summarising the collection of distributions represented by $\P{Y|do(X)}$ that satistifies a number of reasonable axioms. 
+
+An obvious alternative to subtracting the expections would be to consider ratio. Is there any reason that we don't do this that relates to the arguament in Dawid? What about the smoothness of any uncertainties?
+
+\subsubsection*{Estimating the difference when the back door critera is met}
+
+A very substantial number of practial studies fall into the cateogy of causal inference via the backdoor theorem. A study is done. It is assumed that it is ignoreable. That is that we have a a set of variables satifying the back door adjustment criteia. The goal is to estimate the average causal effect. Since we have assumed the backdoor criteia is met, the query is identifiable. Problem solved. Except we have finite data ...
+
+What are the approaches for doing so? 
+
+There are multiple ways of doing the adjustment. 
+
+In order to block the path of spurious information it is sufficient to (perfectly) model either the treatment selection process $\P{T|Z}$ or the response function $\P{Y|T,Z}$. 
+
+\paragraph*{matching}
+
+\paragraph*{regression}
 \paragraph*{When is regression causal?}
 A regression equation is causal if, when we represent the equations as a bayesian causal model or structural equation model, we claim the arrows are causal AND if the variables we include in the regression form a valid back door adjustment set. 
 
+
+\paragraph*{propensity scores}
+
+They have advantages and disadvantes depending on the setting. Methods like regression typically impose a parametric model of some description onto the treatment assignment or response function. 
+
+- Connection of neighest matching to neighest neighbour. 
+
+Once we have made the assumptions required to define the causal graph and identify a valid adjsutment set, is there any difference between the causal effect estimation problem and standard supervised machine learning. 
+
+\cite{causal estimation is covariate shift}
+
+However, there is a critial remaining complication. In supervised learning we can split our data into training and validation data sets or apply cross validation to select models and model parameters. In the causal estimation case we cannot. We lack samples from the counterfactual. 
+
+The siginificance to this should not be underestimated. Cross-validation has allowed applied machine learning to proceed with very atheoretical approach on the basis that we can identify when a model is sucessful. With causal effect estimation there is no guarantee that a model which performs well at prediction (even out of sample) will accuratly esitmate the outcome of an intervention. 
+
+GIVE A CONCRETE EXAMPLE here. One would be a model which looks at a post-treatment variable in order to make predictions. But what about if we assume the model structure is correct and known.  Can we fit parameters that do better on prediction but worse on casual effect estimation?
+
+\cite{Imbens2004} Review of non-parametric estimation
+
+Discuss the recent competition on this question and the results
+
+Discuss the role that the models used to simulate the data may have in determining which models perform the best. 
+
 \subsection*{Non identifiable queries}
+In many cases the query of interest will not be identifiable. In this setting we are left with a choice between making additional assumptions (for example that variables are linearly related) or aiming to obtain bounds rather than point estimates for the causal effect of interest. Or we may do both. One of the most widely used methods in this category is the instrumental variable. 
 
-\subsubsection*{Parametric assumptions}
-eg linearity
+Instrumental variables are often conceptualised as natrual experiments. The goal is to find a variable that substantially influences the treatment but that is conditionally independent of the remaining variables in the network. 
 
-\subsubsection*{Bounds}
-\paragraph{Instrumental variables are an example}
+For example, we might want to compare the results for juvenile offenders depending on wheter they spent their time awaiting trial in a custom facility for young offenders as opposed to a unit within an adult jail. The process by which children are assinged to different facilities may well be non-random. However, it might be that in many cases the decison was based purely on the fact that the juvenile facilty was full. We could then use the number of places remaining in the juvenile facility as an instrumental variable. 
 
-Put in the picture of an instrumental variable.
+The causal network for an ideal instrumental variable is shown in figure XXX. It is not identifiable (non-parametrically) because. If we assume linearity it ? \todo{what exact guarentees do we get for instrumental variables}. Without a linearity assumption we would want the instrumental variable to be highly predictive of the treatement assignment so as to obtain reasonalble bounds. But if we make the assumption that everthing is linear then it would seem that even a weak instrumental variable should (in theory) surfise. 
 
-Instrumental variables are one of the key approaches used to estimate causal effects within economics and the social sciences. However, the setting they are associated with is non-identifiable. How is it that they are so useful nonetheless? Tight bounds may be just as good as what could be achieved in the identifiable setting, given finite data. 
+In some cases we might have a choise between adjuting for causal effects via the backdoor theorem or utilizing an instrumental variable to obtain bounds. It is not the case that the former method is always superior even though it has better asymtpoptic results. For example 
+
+DEMONSTRATE a specific example where instrumental variables obtain better estimates than adjustment even when all the criteria for adjustment have been met. Start with a case were the adjustment is very high dimensional and the instrumetal variable is strong. (the effect of the varibles on the treatment assingment will have to be week (otherwise the instrument is not strong). 
+
+
+\subsection*{How successful overal is causal effect estimation}
+Really know one knows.
+
+There are relatively few studies that have compared the observational study results with those obtained by randomized experiments. One of the key examples is the XX job network study. Initial analysis suggested that a range of causal estimation technquies all ...
+
+\paragraph*{How can we construct datasets on which to test casual effect estimation techniques}
+One can start from a randomized experiment and deliberately drop some of the data. Draw up the graphical model for this process and the assumptions inherent in it. 
 
 \section*{Causal Discovery}
 We now move to the much more general problem of learning a causal graph from observational data. In this setting we make much broader assumptions about the structure of the graph. For example, that it is acyclic or that we have no unmeasured confounding variables. We do not assume the existance or directions of any links between the variables. Amazingly, it is possible to infer some aspects of causal structure with such general assumptions. The set of conditional independences in a non-experimental data set indicates some causal structures are more likely than others. In addition, there can be subtle asymmetries in the relationship between the joint distribution of cause and effect and the distributions of cause given effect and effect given cause. These clues are the key to causal discovery algorithms.
@@ -1229,8 +1292,9 @@ The algorithms we have considered so far return a Markov equivalence class. They
 
 Let us focus only on the two variable case $X \rightarrow Y$ or $Y \rightarrow X$. What possible clues could there be in the distribution $P(X,Y)$ that could indicate which causal model it was generated from. Recall the functional definition of causality (section \ref{sec:SEM}). There are a number of assumptions about the form of the functions that can allow us to identify the causal direction: non-invertible functions, additive noise \cite{Hoyer2009}, post-non-linear additive noise \cite{Zhang2008a}, linear models with non-gaussian noise \cite{Hoyer2012}
 
+There is a connection between casual discovery and semi-supervised learning.\cite{causal anti causal}. Suppose we are trying to learn $\P{Y|X}$. The goal of semi-supervised learning is to improve our estimate of $\P{Y|X}$ by leveraging additional data sampled from $\P{X}$. However, if the true causal model is $X \rightarrow Y$ then their is some function mapping values of $X$ to $Y$ which should be invariant to any changes in the input distribution $\P{X}$. Therefor $\P{X}$ should be indepdend of $\P{Y|X}$ and semi-supervised learning should not perform any better than standard supervised learning. However if the true causal model is $Y \rightarrow X$ then variations in the $P{X}$ can result from both the input distribution over $Y$ and the mapping from $X$ to $Y$ and semi-supervised learning could help.
 
-causal anti-causal, 
+ONE POINT I'M NOT CERTAIN ON HERE. might not knowledge of $\P{X}$ help define which regoin of the mapping we need to be most accurate on in order to miniize the loss (ie ananalgous to the covariate shift probelelm). \todo {open question}
 
 %If X → Y, what is the relationship between P(X) and P(Y|X)? 
 What about P(Y) and P(X|Y)?
@@ -1246,10 +1310,7 @@ Indepdendence of input and mechanism. Daniusis et al 2012
 Independence of function and input: If $X \rightarrow Y$ and we have a functional causal model $y = f(x,e)$ then the input
 distribution $P(X)$ and function $f$ represent independent mechanisms. We do not expect a change in the input distribution to modify the function. 
 
-learning what causality looks like.
-Lopez-Paz et al 2014. 
 
- 
 Instead of positing a functional restriction on the relationship between variables and then developing theory to exploit that assumption, \citep{LopezPaz2014} propose learning what the causal relationship looks like from data. They assume there will be a difference between the relationship of $\P{X}$, $\P{Y}$ and $\P{X|Y}$ between $X \rightarrow Y$ versus $Y \rightarrow X$. Their algorithm requires a data set in which each row is itself a data set consisting of paris of varibles $(x_i,y_i)$ with a label indicating the direction of causality between $X$ and $Y$. They use a keneral mean embedding to represent the distributions $\P{X}$, $\P{Y}$ and $\P{X|Y}$ as features for each individual sub-dataset and train an algorithm to learn the direction of causality. Unfortunately we do not have a large collection of datasets where the causal direction is known to train such a model. \citep{LopezPaz2014} instead use a simulated dataset so thier model will nessesarily be base on the assumptions they make when generating the data. Nonetheless this approach makes it possible to rapidly construct a model from a wide range of possible assumptions, without doing a lot of theory to design a specific algorithm optimised to that setting. Their approach performed well in the causal effect pairs challange, correctly identifing the causal direction in ?? percent of cases (against a benchmark of 50\% from random guessing)\ref{XXX}.
 
 
@@ -1316,8 +1377,6 @@ The benifit provided by randomization in breaking the link between the treatment
 \end{enumerate}
 
 
-
-
 \begin{figure}[h]
 \begin{center}
 \caption{Experiments are not always ethical}
@@ -1325,16 +1384,15 @@ The benifit provided by randomization in breaking the link between the treatment
 \end{center}
 \end{figure}
 
-
-
 \section*{Multi armed bandits}
 \todo{is there a way in latex to have a command for refering to each type of thing like figure, subsection, etc such that it can be updated programatically?}
 
-Multi-armed bandits were originally introduce by XXXX to address problem that it is sub-optimal to fix a probability of treatment in advance as we discussed in subsection \ref{subsec:limitations_of_experiment}. The problem can be formally stated as follows:
-
+Multi-armed bandits were originally introduce by XXXX to address the problem that it is sub-optimal to fix a probability of treatment in advance as we discussed in subsection \ref{subsec:limitations_of_experiment}. The problem can be formally stated as follows:
 
 \paragraph*{Definition} 
+In its classic formulation \cite{Robbins1952} the (stochastic) K-armed bandit describes a sequential decision making problem, with $K$ possible actions or arms. Each arm $i$ is associated with a fixed but unknown reward distribution $\nu_i$. In order to obtain regret bounds, some assumptions are required on the distributions $\nu_i$. It sufficient to assume they are sub-gaussian.  For each timestep $t$ upto a horizon $T$ the learner selects an action $I_t \in \set{1...K}$ and receives a reward, $g_{I_t,t}$, sampled i.i.d from $\nu_i$. The goal of the learner is to maximize the total reward they receive. This problem introduces the fundamental exploration-exploitation trade-off. The learner must balance playing arms that have yielded good results previously with exploring arms about which they are uncertain. 
 
+The performance of bandit algorithms is generally described by the (pseudo) regret, $R(T)$. This is the difference between the expected reward obtained by the algorithm and the expected reward of selecting the best action in every timestep. 
 
 \subsection*{Regret} How do we measure the performance of a bandit algorithm?
 
@@ -1356,22 +1414,48 @@ Simple Regret
 \mu_{i^*} - \E{\mu_{\hat i^*}}.
 }
 
+
+An algorithm is learning if it obtains regret that is sublinear in $T$. 
+
+Scholars in the 1940's found this problem so frustrating that they suggested it be dropped over Germany to distract the scientists there from the war effort.\cite{XXX}. 
+
+
+Another problem that has attracted a lot of recent attention \cite{Bubeck2009,Audibert2010,Gabillon2012,Karnin2013} within the multi-armed bandit framework is \textit{pure exploration} or \textit{best arm identification}. In this setting, the horizon $T$ represents a fixed budget for exploration after which the algorithm outputs a single best arm $i$. The performance of the algorithm is measured by the simple regret; the expected difference between the mean reward of the (truly) optimal arm and the mean reward of the arm selected by the algorithm, $R_s(T) = \mu^* - \E{\mu_i}$ . This problem arises naturally in applications where there is a testing or evaluation phase, during which regret is not incurred, followed by a commercialization or exploitation phase. For example, many strategies might be assessed via simulation prior to one being selected and deployed. The simple regret for a K-armed bandit is lower bounded by $\bigo{\sqrt{K/T}}$ \cite{Bubeck2009}.
+
 \todo{connect bandit regret to early stopping of experiment problem}
+The problem of when to stop an experiment early can also be phrased as a bandit problem and analysed with the same techniques. XXX et al showed that if use an experimental setup with early stopping, the regret you obtain will be at least twice that you could have achieved had you made each decision sequentially using a bandit approach. Of course this neglect any costs that might be associated with the complexity in implementation of the two approaches. 
 
-Scholars in the 1940's found this problem so frustrating that they suggested it be dropped over Germany to waste their time \cite{XXX}. 
-
-\paragraph*{The exploration/exploitation trade-off}
+\subsection*{The exploration/exploitation trade-off}
+A central aspect to bandit problem is the trade of between exploiting the information we have already obtained with exploring options about which we remain uncertain. Suppose you have sampled five of your local restuarants and found one which you really enjoyed. How often should you eat there versus exploring new options. The degree to which you should explore versus exploit depends on how many step remain to go in the game and what assumptions you make about the distributions from which the rewards are sampled. If this is your last meal you might as well just eat the food you enjoy most but if you hope to live for many meals to come then you stand to gain by sampling a wider range of options. In many cases, the total number of rounds that you will get to play in the game is unknown. If you cannot imagine that it would be possible for a meal to be substantially better than that which you obtain (in expectation) at your current favoriate then there is little point exploring further. 
 
 \subsection*{Key approaches and results}
-\paragraph*{optimisim in the face of uncertainty}
+
+The lower bound on the worst case regret for any algorithm (stochastic or adversarial) for the K-armed bandit problem is  $\bigomega{\sqrt{TK}}$ \cite{Auer1995}.
+
+A key algorithm for stochastic bandits, with tractable analysis and strong performance guarantees, is the UCB algorithm \cite{Auer2002}. They key to this algorithm is that it keeps track of an upper confidence bound (hence UCB) on the expected reward for each arm and selects the arm with the highest one. This balances exploration and exploitation as an arm with a high upper confidence bound must have either a high expected reward or large uncertainty on the expected reward. Assume for notational simplicity that $\mu_1 > \mu_2 > ... > \mu_K$, such that $\mu^* = \mu_1$, and let $\Delta_i = \mu_i - \mu^*$ be the sub-optimality for each arm. The (problem dependent) regret for UCB is bounded by: 
+
+\eqn {
+R^{ucb}(T) \in \bigo{\sum_{i=2}^K \frac{1}{\Delta_i}\log(T)}
+}
+
+This bound blows up as differences $\Delta_i \rightarrow 0$, however the regret itself does not - since although we may not be able to distinguish arms with very small $\Delta_i$ from the optimal arm, we also do not lose much by selecting them. In the worst case, $R^{ucb}(T) = \bigo{\sqrt{TK\log(T)}}$ \cite{Bubeck2012}. Subtle modifications to the UCB algorithm can eliminate the logarithmic term in this worst case regret bound. This yields $R^{ucb}(T) = \bigo{\sqrt{TK}}$ and closes the gap with the worst case lower bound \cite{Audibert2009,Lattimore2015}, whilst retaining a good problem dependent bound of the form achieved by UCB \cite{Lattimore2015}.
+
+
+One key principle that has motivated the design of a number \todo{ask Tor are there actually others aside from UCB?} of key bandit algorithms is the idea of \emph{optimism in the face of uncertainty}. An algorithm is trying to simultaneously obtain large rewards and extract as much information as possible. If an action has a high upper bound on the possible reward then either the expected reward must be high or the algorithm must be very uncertain about it. Choosing it should yeild either a good reward or useful information. This is the key idea begind the UCB algorithm \citep{xxx}. The remaining complexity lies in optimising how we compute confidence intervals to trade of exploration and exploitation as the game proceeds. Subtle variations in how the confidence intervals are defined lead to a number of algorithms, which are optimised to slightly different settings. SETTINGS NOT QUITE RIGHT WORD. \citep{xxx}.
+
 
 \subsection*{The need to add structure}
-\paragraph*{The regret for a bandit problem grows linearly with the number of (sub-optimal) actions.} This makes problems with large or infinite actions spaces intractible.
+The regret for a bandit problem grows linearly with the number of (sub-optimal) actions. This makes problems with large or infinite actions spaces intractible. REFERENCE equation showing linearity with arms. CHECK ITS TRUE. 
+
+The classic multi-armed bandit is a powerful tool for sequential decision making. However, the regret grows linearly with the number of (sub-optimal) actions and many real world problems have large or even infinite action spaces. This has led to the development of a wide range of models that assume some structure across the reward distributions for different arms, for example generalized linear bandits \cite{filippi2010parametric}, dependent bandits \cite{Pandey2007}, X-armed bandits \cite{Bubeck2010} and gaussian process bandits \cite{srinivas2009gaussian}, or that consider more complex feedback, for example the recent work on graph feedback \cite{Mannor2011,Lelarge2012,Alon2013,Buccapatnam2014,Kocak2014,Alon2015} and partial monitoring \cite{Piccolboni2001,Bartok2014}. 
+
 
 \subsection*{Key related settings}
 
 \subsubsection*{Adversarial Bandits}
 In the classical multi-armed bandit problem, the rewards for each arm are sampled stochastically from a fixed (but unknown) distribution. There is a large body of work analysing a more general formulation of the bandit problem that relaxes this stochastic assumption. 
+
+Adversarial bandits are an alternate, widely studied, setting that relaxes the assumption that rewards are generated stochastically. Instead, simultaneously with the learner selecting an action $I_t$, a potentially malicious adversary selects the reward vector $\boldsymbol{g}_t$. As in the stochastic setting, the learner then receives reward $g_{I_t,t}$. The seminal algorithm for adversarial bandits is Exp-3, which, like UCB, obtains regret $\bigo{\sqrt{TK\log(T)}}$ regret \cite{Auer1995}. Optimal algorithms, with $R(T) = \bigo{\sqrt{TK}}$, have also been demonstrated for the adversarial setting \cite{Audibert2009}.
 
 \paragraph*{Definition of the Adversarial bandit problem}
 \begin{itemize}
@@ -1380,9 +1464,41 @@ In the classical multi-armed bandit problem, the rewards for each arm are sample
 \end{itemize}
 
 \subsubsection*{Contexual bandits}
-\paragraph*{Feature selection} Is it even more important here? How do algorithms degrade as irrelevent features are added? In the supervised vs the RL setting? What would be a fair comparison?
+In the previous sections each decision was identical. If we were imaging treating patients, we assume that we have no additional information about each patient that is relevent to deciding how to treat them. However, in many key applications such as serving ads, etc, etc. we clearly do have additional information that we wish to take into account. In the contextual bandit setting the goal is to learn 
+
+\eq {
+\P{Y|a,x}
+} 
+
+As opposed to the standard bandit setting where we are attempting to estimate 
+
+\eq{
+\P{Y|a}
+}
+
+The formal defintion of a contextual bandit problem is
+
+The simplest way to generalise the standard bandit algorithms to the contextual case (where the context is discrete) is to simply have a seperate standard bandit instance for each possible setting of the context. Regretably this approach scales terribly with increasing complexity of the context. \todo{quantify this}. It cannot be applied at all if the context is continous. 
+
+The approach to solving this problem parallels those from supervised learning and continous armed bandits. We make assumptions about the smoothness of the problem. Values of context that are similar should lead to comparable rewards for a given action. 
+
+Regret bounds \todo {insert regret bounds for contextual bandits} 
+
+It should be noted that there is an important difference between the approaches we can apply to the contextul bandit versus the supervised learning setting. As for the casual effect estimation problem, we cannot utilize cross-validation offline to select model parameters. This makes contenxtual bandit algorithms degrade faster than supervised learning ones as we add irrelevent variables. \todo{ask Tor if he thinks this is correct}
+
+RUN A SIMULATION COMPARIGN HOW supervised learning and contextual bandits degrade as we add more features. What would be a fair comparison?
 
 \subsubsection*{Markov decision processes}
+In the bandit setting the reward distributions for each arm are assumed to be fixed. A much studied generalisation is the markov decision process or MDP. In an MDP we assume there the enviroment has some state. The reward an agent recieves depends on the state of the enviroment and the action the agent selects. The enviroment then evolves stochasitcally depending on the agents action. Multi-armed bandits can be considered a single state MDP, where no matter what action the agent selects, the enviroment returns to that state. 
+
+Insert a graphical representation of an MDP
+
+What assumptions are required to make MDPs tractable. 
+
+What is the basic algorithm (Q-learning)
+
+What are the key results.
+
 \subsubsection*{Dynamic Systems}
 \begin{itemize}
 \item An explicit model of actions in a partially known system (eg HMM)
@@ -1938,15 +2054,53 @@ Simultaneously learning a completely unknown causal model while estimating the r
 
 \subsection*{Proofs}
 
+\chapter*{List of software programs for causal inference}
+
+\begin{itemize}
+\item Pcalg. A library in R that implements ...
+\item Tetrad.
+\item There has to be a library for the bayesian trees thing
+\item Linear regression (you can do this anywhere)
+
+\end{itemize}
 
 \chapter*{Causality \& Fairness}
+
+As machine learning is incorporated into decision making systems that have fundamental impacts on people’s lives, such as in employment, criminal justice, health and financial services, there are increasing concerns over transparency and fairness. 
+
+The European Union’s General Data Protection Regulation \cite{XXXX}, due to come into effect in 2018, requires that people can obtain "meaningful information about the logic involved" in an automated decision process. It also stipulates that such decisions should not be based on special categories of personal data (related to ethnicity, political and religions affiliation or sexuality) unless there "suitable measures" to safeguard individual interests. A key concern is discrimination against disadvantaged groups. 
+
+Discrimination is frequently defined in terms of either ’disparate treatment’- treating otherwise similar individuals differently on the basis of a protected attribute such as race or gender, or ’disparate impact’ - a substantial difference in outcome between groups. We consider how the notions of disparate treatment and impact may be formalised and the implications of how this is done for machine learning. We examine the overlap between the motivations for interpretable and causal models, especially with respect to assessing fairness. We look at how causal models mitigate some of the trade-offs between transparency and predictive accuracy and we examine to
+what extent the causal relationship between an attribute, any protected attributes and the outcome of interest is relevant to assessing the impact on fairness of its inclusion in a machine learning model.
+
+
 \begin{itemize}
 \item There is an additional connction between causality and fairness, that arises when you know that there is a bias in the data and wish to correct for it. In causality, it may be due to selection bias or a confounding variable. In fairness, it may be due to historical disadvanage. In both cases we may have theory that tells us the direction or scale of an effect. Ie, we know that race itself has no inherent effect on outcomes such as criminality and education. If you have a dataset and a collection of such priors, where the data contradicts these priors due to data bias. How do you best make decisions based on that data? 
 \end{itemize}
 
 \chapter*{Causality in Marketing}
+Assessing the impact of marketing spend is becoming increasinly important to industly. Billions of dollars \cite{XXX} are spent each year and new marketing channels and oportunities are openening up at an unprecented rate. 
+
+There are three key approaches to assessing the impact of marketing in the liturature. 
+
+The first is to look for correlations across companies on metrics such as how much they spend on marketing \ref{}, how confident they are about their ability to market effectively \ref{} or how important the marketing team is percieved to be within the orgainisation with indicators of the health of the company such as sales, revenue or market capitalisation. Unfortuneatly is is very difficult to avoid potentail major confounders with this approach. Are businesses large and succesful because of their capable marketing teams or can they afford to hire capable marketers because they have sufficient profits available to do so. 
+
 \section*{Attribution}
+The second is attribution. The goal in this case is to attribute each sale to a specific (or set of specfic) advertisements that the customer was exposed to. This approach is the primary way of measuring the sucess of digital advertising strategies such as search, display, and online video ads. The most frequent model is last-click attribution. In which the last ad the customer was presented with before they made their purchase is assumed to have caused that sale. A central criticism of attribution is that it is not measuring incremental sales. Each sales is assumed to be a consequence of some form of advertising for those customers who saw (however briefly) some form of advertisicment. Of course in reality many of these customers may have made a purshcase regardless of the advertising material to which they were exposed. 
+
+System designed to optimsie metrics such as click through or conversion rate can do so either by learning how to change the consumers preferences (by serving them the perfect ad at the ideal time) or by learning who was most likely to buy anyway. It seems likley that much of the improvemt in click through rates due to the application of sophisticated machine learning algorithms is beign driven by the latter. Unfortuenatly, this does nothing for the bottom line of industry (except for those involved in servering ads). 
+
+
 \section*{Econometric Modelling}
+The final key plank businesses apply to estimate how effective thier marketing are econometric or mixed media models. These models
+
+In practise these models are typically timeseries regression models, fitting some measure of sales against marketing spend (by marketing channel, ie TV, radio, search, digitial display etc) and other key variables such as pricing, competitor spend and pricing and indicators of the health of the economy and demand for the product in question.
+
+The models may also include non-linear transformation of the marketing inputs to represent saturation and decay of time of effects. They may also consider the interaction between media chanels and other business levers such as pricing.  
+
+The objective of these models is to obtain results that are comparable across channels such that the optimal mix of media can be selected. 
+
+The key
 
 \chapter*{Conclusions (1000 words)}
 
