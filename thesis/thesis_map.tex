@@ -18,7 +18,7 @@
 \usetikzlibrary{arrows,positioning} 
 \usepackage{subcaption}
 \usepackage[colorinlistoftodos]{todonotes}
-\usepackage{natbib}
+\usepackage[numbers]{natbib}
 \usepackage{wrapfig}
 
 \graphicspath{ {figures/} }
@@ -26,10 +26,45 @@
 
 \DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
 \DeclareUnicodeCharacter{00A0}{ }
+
+%\tikzset{
+%    %Define standard arrow tip
+%    >=stealth',
+%    %Define style for boxes
+%    punkt/.style={
+%           circle,
+%           rounded corners,
+%           draw=black, thick,
+%           text width=1em,
+%           minimum height=1em,
+%           text centered},
+%    punktrect/.style={
+%    rectangle, 
+%    rounded corners, 
+%    % fill=black!10,
+%    draw=black, thick,
+%    minimum height=1em, 
+%    text centered},
+%    % Define arrow style
+%    pil/.style={
+%           o->,
+%           thick,
+%           shorten <=2pt,
+%           shorten >=2pt,}
+%}
+
+
 \tikzset{
     %Define standard arrow tip
     >=stealth',
     %Define style for boxes
+    punkt/.style={
+           circle,
+           rounded corners,
+           draw=black, thick,
+           text width=1em,
+           minimum height=1em,
+           text centered},
     observed/.style={
            circle,
            rounded corners,
@@ -188,6 +223,61 @@ That what we chanced, was what we meant, to do.}{Alexander Pope}
 
 \chapter*{Random notes}
 
+There is a connection here to the degree to which the model is invariant. A model that is invariant to more things is more explainitory. We could look at levels of hierachy. There is causal graphical models, which are invarient to interventions on variables. Can I tie this to a physical system and give more indepth examples of the nested tier of hieriachies?
+
+I do not see the distinction between explaination and (causal) prediction. Explaination is all about the ability to compress and to generalize. The more a model can do this, the more we view as providing an understanding of the why. 
+
+
+Sometimes the causal component is obvious. 
+
+Relationship to generalization. Variables causally directly causally related to the outcome (either causes or effects) should be more stable predictors over time. The assumption is there are less places for change to come in. 
+
+If a feature is a cause of an outcome then changing the input distribution over that feature won't break the model. If its an effect it could.
+
+The direct causes (and effects) of a variable of interest make up a sufficient set for prediction (is this true)? This may be a reason for using structure learning type algorithms even if you are simply doing prediction.
+
+\subsubsection*{The role of assumptions in causal inference}
+
+Fundamental challenges. How do you cross-validate or compare causal inference models? Lack of real world data on which to compare algorithms. 
+
+Does predictive accuracy indicate a good causal model?
+
+Assumptions must be recognised. Without assumptions - only description is possible. Recognising the assumption (and associated risk) means that we understand we should still attempt to experiment.
+
+Generalizing the results of one experiment to another (for example, dropping rocks to dropping people - with reference to the cross over trial for parashutes.) (This I think is the long term key to successful causal inference, learning from experimental data with representations that generalize). (and given sufficient generalizability, it may not matter if there is an underlying confounder - as this confounder is clearly not changing much)
+
+Is causal inference possible (are the conclusions ever valid)?
+
+Only from randomized experiment ... if people can do it without recource to constant randomized experiment then an algorithm exits.
+
+The challenges and limitations of infering causal effects from observation data are numerous. However, there are problems we need to solve. The questions is are these problems so serious as to warrent discregarding all non-experimental data. I think answer is a clear no. Need ongoing validation, with assumptions. We can't validate the assumptions using the observational data alone (otherwise we would not have been forced to make them).
+
+
+\subsection*{Relationship to interpretability}
+
+A desire for interpretability indicates that something has been left out of the loss function. 
+
+Are causal/interpretable models more reliable or more likely to generalize well? 
+
+One form of interpretability gives people insight into what the features are that the model is relying on. 
+
+If we know the training and test data will be sampled from different distributions, knowing what the features that the model is looking at are, allows people use their background understanding of the world to evaluate whether or not those features are likely to be transferable to the test domain. 
+
+Specifically, people can
+\begin{itemize}
+\item rule out many possible features as highly unlikely to be relevent to a problem
+\end{itemize}
+
+People have access to a lot of detailed prior knowledge. 
+
+\subsection*{Relationship to transfer learning}
+
+find a feature representation in which $P(Y|X)$ is the same in many different domains (or stable over time). Causal models predict the outcome of actions. We could directly take these actions and learn $P(Y|a,X)$ for every $(a,X)$ but, in reality, no two situations (or actions) are exactly alike. So we have to make representations such that things are stable. 
+
+This is tightly related to generalizability. If we take a person undergoing a medical test, we might describe the situation by the year and location, the person's age, gender, heart rate, medical condition and test results. We don't include , the color of the doctors shirt, the size of the room, ...
+
+For example, in the advertising setting, we want to know how our on expenditure on paid search ads is linked to sales. However, this relationship may be very unstable over time because the ad slots are sold at auction. The amount we have to pay to obtain a given position for keyword depends crucially on the amount our competitors are bidding for that keyword. However, the relationship between displaying the ad at a particular position and the probability that someone clicks it an then makes a purchase may be much more consistent. 
+
 Bandit feedback. The learner observes only the reward for the action they select. Not every possible option as in supervised learning.
 
 \chapter*{Introduction (3500 words)}
@@ -220,6 +310,8 @@ However, despite the huge advances in specific areas of machine learning (in par
 To explain or to predict \cite{Shmueli2010}
 The two cultures \cite{Breiman2001}
 
+\paragraph*{There are two reasons why correlation is not causation}. The first is related to variance and over-fitting. Obversations are noisy. With a finite dataset with enough variables we will be able to find some that are completely unrelated but correlate purely by chance. \ref{figure - search for random correlation}. The second arises from bias, typically introced by an un-observed confounding variable. In this case, variables are correlated not by chance. We would expect the relationship to hold if we sampled more data. However, they are not causally related in that intervening to set one would not likely effect the other. EXAMPLE WITH FIGURE. 
+
 \subsection*{Defining causality}
 \begin{itemize}
 \item widely debated in science and philosophy (REFERENCES)
@@ -232,6 +324,8 @@ The two cultures \cite{Breiman2001}
 \subsection*{Identifying when we have a causal problem}
 
 \subsubsection*{Examples of typical machine learning probems. Are they causal?}
+
+Consider the following problems, which span a wide range of the types of questions machine learning is currently being applied to. Which of them require casual inference? How can we identify characterists of a prolem that make causal modeling important?
 
 \begin{itemize}
 \item Speech recognition (for systems like Siri or Google)
@@ -253,17 +347,45 @@ The two cultures \cite{Breiman2001}
 \item Pricing insurance
 \end{itemize}
 
-%For image recognition, we do not particularly care about building a strong model for exactly how the thing that was photographed translates to the image we see. In fact this is because we already have one. We can be confident that the process will not change. If we develop a discriminative model that is hightly accurate at classifying cats from dogs, we do not care a lot about its internal workings (provided we have strong grounds to believe that the situations in which we will be using our model will match those under which it was trained). Covariate shift clearly comes in here. Because there are areas where mechanisms are understood it is relatively easy to argue that covariate shift is not occuring and that results will be transferable. The mechanism is known but the function may be complex. 
+The above problems are not posed with enough detail to know if causality is an important consideration. In particular, I failed to specify what actions the might be taken in response to model.
 
-\subsubsection*{What aspects of a problem determine if causal inference is required?}
-(When is pure prediction useful?)
+Consider speech recognition. You say something, which causes to sound waves, which are converted to a digital signal which Siri maps to words. Whatever action Siri takes is unlikely to change the distribution of words you use, and even less likely to change the function that maps sound waves to text (unless she sends you a dvd on elocution). A similar arguament could be made for many applications of machine translation and image classification. 
+
+In image recognition, we do not particularly care about building a strong model for exactly how the thing that was photographed translates to the image we see. We can be fairly confident that the process will not change. If we develop a discriminative model that is hightly accurate at classifying cats from dogs, we do not care a lot about its internal workings (provided we have strong grounds to believe that the situations in which we will be using our model will match those under which it was trained).
+
+What about forecasting the weather? If you are using a short term forecast to decide whether to pack an umbrella it's clear causality can be ignored - your decicion will not effect if it actually rains. However, longer term climate forecasts might (theoretically) lead us to take action on emissions which would then change the weather system. For this we need a (causal) model that allows us to predict the outcome under various different interventions.
+
+Identifing spam and automated essay marking systems are similar. The decision made by the algorithm is likely to change the relationship between the features used by the algorithm and the true label. Spammers and students will modify their writing in order to optimise thier results. The standard machine learning approach can only work if the resulting change is sufficiently gradual and fresh ground truth (probably human labelled) training data is provided. (What would the nature of the features have to be such that change did not occur? - they would have to be causes of the label). 
+
+What about predicting the risk of death in patients with pnumonia? Suppose we wish to use the model to decide who should be treated in hospital and who can be sent home with antibiotics. If we assume that in hospital treatment is more effective this seems like a straighforward prediction problem. It is not. Depending on how the decision to admit was previously made and what features are included (or ommited) in the model, the relationship between those features and the outcome may change if we start using the model to decide whome to admit. (xxx et al) found exactly this effect. Their model learnt that (among other things) people suffering asthma were \emph{less} likely to die from pnemonia. They realised this was because doctors were treating such patints very agressively, thus acutally lowering their risk. There is no problem with this model if you want to predict who would be likely to die whilst maintaining the original addmition and treatment protocols. However, using it to decide on what basis to admit people could kill. The key is understanding exactly what question you are asking. In this case we are care about what happens to patients with characteristics X if we treat them according to decision rule Z.   
+
+Predicting which customers will leave or who will re-offend if granted parole also fit within the category of problems where you wish to identify a group for which a problem will occur and target some treatment to them (loyalty reward, deny parole or more support whilst on parole, etc). For all these problems the assumptions required to treat them as pure prediction problems are;
+\begin{enumerate}
+\item The treatment is assumed to be effective (at least better than nothing)
+\item Deciding who to treat on the based of the model predictions won't change the relationship between features and outcome 
+\end{enumerate}
+
+Demand prediction seems relatively straightforward. These models use features such as location, pricing, marketing, time of year, weather, etc to forecast the demand for a product. It seems unlikely that using the model to ensure stock is available will itself change demand. However there is a potential data sensoring issue. If demand is modelled by the number of sales, then if a product is out of stock demand will appear to be zero. Changing availability does then change demand.
+   
+Playing Go (and other games) is another case with some subleties. At every turn, the AI agent has a number of actions available. The board state following each action is deterministic and given by the rules of the game. The agent can apply supervised machine learning based on millions of previous games to estimate the probability that each of these board states will lead to a win. ... this is interesting maybe come back to it ... an alternate approach would be to try to forecast the probability of a win given each action given the current board state as context ... One approach to causal inference is indeed to learn about actions from taking actions (or observing the actions that other have taken). When can we learn from the actions others have taken? When there is no confounding. And does this hold with Go? Probably because the board state encapsulates everything that should determine what move is played. Learning directly from actions and trying to generalize (can in some instances reduce the problem to standard ML)
+
+Having considered these examples we can now identify some general aspects of the problem that determine wheter or not we require a causal model.
+
 \begin{itemize}
+\item Does acting on the predictions of the model change the mapping from features to target? (at least if the decision process is open to scrutiny). In general, if we believe that humans are generally trying to optimise to various goals of their own then for any system interacting with them the answer to this will be yes.
+\item 
+
+ Covariate shift clearly comes in here. Because there are areas where mechanisms are understood it is relatively easy to argue that covariate shift is not occuring and that results will be transferable. The mechanism is known but the function may be complex. Can we write down something that causal models are invariant to in terms of shift that is not the case for non-causal models? Yes, if the way in which features get their values changes, then causal models will be invarient to that in a way that non-causal ones are not. 
+ 
 \item To decide between actions we only need to rank them (not estimate their actual effect). 
 \item The predicted outcome in the absence of an intervention provides a single point. We can use this to find which problems are most serious if left alone - and priortise those for modelling changes. 
 \item Any decision we take does not significanly impact the system from which the data was drawn to make it (for repeat decision making)
 \item Does acting on the result of the prediction change the predictive distribution p(y|x)? Ie change people's behaviour.
 \item Ethics - ... People's viewpoint on if its ok...
 \end{itemize}
+
+I hope these examples gave you a feel for the richness and subtlties of causal inference. We will return to some of them in more detail once we have established some more concrete language and tools to approach them with.
+
 
 
 \section*{Approaches to causality (1000 words)}
@@ -343,27 +465,27 @@ P(X_{1},X_{2},X_{3},...)=P(X_{1})P(X_{2}|X_{1})P(X_{3}|X_{1},X_{2})...
 \end{equation}
 
 We can represent this graphically by drawing a network with a node for each variable and adding links from the variables on the right hand side to the variable on the left for each conditional probability distribution (figure~\ref{fig:bayesnet}). If there are conditional independencies between variables the factorization simplifies, which is reflected by missing edges in the corresponding network. 
-%
-%\begin{figure}[h]
-%\centering
-%\caption{General Bayesian network over 3 variables}
-%\label{fig:bayesnet}
-%\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
-%  thick,main node/]
-%
-% %nodes
-%\node[main node](1){$X_{1}$};
-%\node[main node, below left=of 1](2){$X_{2}$};
-%\node[main node, below right=of 1](3){$X_{3}$};
-%
-%
-% \path[every node/.style={font=\sffamily\small}]
-%    (1) edge node {} (2)
-%    	edge node {} (3)
-%    (2) edge node {} (3);
-%	
-%\end{tikzpicture}
-%\end{figure}
+
+\begin{figure}[h]
+\centering
+\caption{General Bayesian network over 3 variables}
+\label{fig:bayesnet}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={punkt}]
+
+ %nodes
+\node[main node](1){$X_{1}$};
+\node[main node, below left=of 1](2){$X_{2}$};
+\node[main node, below right=of 1](3){$X_{3}$};
+
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (2) edge node {} (3);
+	
+\end{tikzpicture}
+\end{figure}
 
 The statement that a given graph $G$ is a Bayesian network for a distribution $P$ tells us that the distribution can be factorized over the nodes and edges in the graph. There can be no missing edges in $G$ that do not correspond to conditional independencies in $P$ (the converse is not true $G$ can have extra edges). If we let $parents_{X_{i}}$ represent the set of variables that are parents of the variable $X_{i}$ in $G$ then we can write the joint distribution as; 
 
@@ -408,27 +530,21 @@ A causal bayesian network encodes all possible interventions that can be represe
 \todo {state positivity assumption}
 
 
-A causal network represents much more information than a bayesian network with identical structure. GIVE EXAMPLE IN SOMETHING QUANTIFIABLE LIKE BITS. This may be surprising since their conditional probability distributions are estiated from data in the same way. It is only possible due to the additional assumptions inherent in a causal network. 
+A causal network represents much more information than a bayesian network with identical structure. GIVE EXAMPLE IN SOMETHING QUANTIFIABLE LIKE BITS. TAKE THE GRAPH IN WITH THREE NODES. ASSUME EVERYTHING IS BINARY AND. FIGURE OUT HOW MANY VARIABLES ARE NEEDED TO DESCRIBE ALL POSSIBLE INTERVENTIONS VS THE BAYESIAN NETWORK. This may be surprising since their conditional probability distributions are estiated from data in the same way. It is only possible due to the additional assumptions inherent in a causal network. 
 
 Causal bayesian networks are bayesian networks so results that apply to bayesian networks carry directly across;the local markov property states that variables are independent of their non-effects given their direct causes. Similarly the global markov property and d-separation also hold in causal networks. 
 
 \subsubsection*{Limitations of causal bayesian networks}
-A number of critisims have been leveled at this way of modelling causality.
- 
-A complaint leveled against this view point of causality is that the 'surgery' is too precise and that, in the real world, any intervention will effect many variables (eg Cartwright 2007). However, 
+A number of critisims have been leveled at this way of modelling causality. One is that the definition of an intervention only in terms of setting the value of one or more variables is too precise and that any real world intervention will effect many variables in complex and non-determinisitic ways \ref{causality in complex interventions,Cartwright 2007}. However, the deterministic $do()$ opperater turns out to be surprisingly effective at modelling more complex interventions. One simply has to add additional variables to the graph that model how our interventions may actually take effect. For example, our drug treatment case assumed we set the drug that each person recieves. But what if some people in fact fail to take the prescribed treatment. How can we model this within the framework of deterministic interventions? We simply add a node representing what we prescribed to them (which we intervene on), which probabilistically influences what treatment they actually recieve. See figure XXXX
+
+Insert figure of randomized treatment with imperfect compliance here. 
 
 What questions can't be phrased using this terminology
 - certain counterfactual queries
 - cyclic/dynamics
-
-Although seemingly simplistic, the notion of hard interventions is surprisingly powerful. 
-
-- add variables for soft interventions
 - unroll to deal with cycles
 
 \subsection*{Structural Equation models}
-
-There is a problem with the term non-parametric. It is used in machine learning in a slightly different way to pearl
 
 \subsubsection*{Definition}
 Structural equation models (SEMs) describe a deterministic world, where some underlying mechanism or function determines the output of any process for a given input. The mechanism (but not the output) is assumed to be independent of what is fed into it. Uncertainties are not inherent but arise from unmeasured variables. Linear structural equation models have a long history for causal estimation \cite {Wright1921,Haavelmo1943}. More recently, they have been formalized, generalized to the non-linear setting and connected to developments in graphical models to provide a powerful causal framework \cite{Pearl2000}.
@@ -629,9 +745,11 @@ It seems that drug A is performing better. However, having read the latest litur
 
 \todo{innsert table}
 
-Once the data is broken down by gender, it appears that treament B is better for both men \emph{and} women. This is the paradox. If the doctor were unaware of the gender, it seems that she should advise treatment A. But as soon as the patient walks though the door  then she should offer treatment B, regardless of which gender the patient turns out to be. How does causaul modelling reslove this paradox? Let's represent the treatment presribed by the variable $T$, the gender of the patient by $Z$ and wheter or not the treatment was successful by $Y$. The key to resolving the paradox is that the doctor really cares about the interventional distribution $P{Y|do(T)}$, not the standard conditional distributions $P{Y|T}$. The results from table XXX shows that $\P{Y|T=A}$ is higher than $\P{Y|T=B}$. If she has to suggest a treatment for a patient without knowing their gender, she should choose the treatment for which $P{Y|do(T)}$ is highest not $P{Y|T}$. If she knows thier gender then she should otimise to $P{Y|do(T),Z}$. 
+Once the data is broken down by gender, it appears that treament B is better for both men \emph{and} women. This is the paradox. If the doctor were unaware of the gender, it seems that she should advise treatment A. But as soon as the patient walks though the door  then she should offer treatment B, regardless of which gender the patient turns out to be. 
 
-The causal network for this problem is shown below. In this example, women are more likely to choose treatment $A$ and also more likely to recover regardless of what treatment they recive than men. This is what makes treatment $A$ appear better if you look at the conditional distribution. The fact that a patient took treatment $A$ tells you that they are more likely to be female. In the terminology defined in section \ref{}, gender is a confounding variable and we must adjust for it to obtain unbiased estimates of the causal effect of the treatment. As we saw from the examples in chapter \ref{XXX}. Determining when you really care about the interventional as opposed to the conditional distribution is a sublte but very important question that is frequently overlooked. 
+How does causaul modelling reslove this paradox? Let's represent the treatment presribed by the variable $T$, the gender of the patient by $Z$ and wheter or not the treatment was successful by $Y$. The key to resolving the paradox is that the doctor really cares about the interventional distribution $P{Y|do(T)}$, not the standard conditional distributions $P{Y|T}$. The results from table XXX shows that $\P{Y|T=A}$ is higher than $\P{Y|T=B}$. If she has to suggest a treatment for a patient without knowing their gender, she should choose the treatment for which $P{Y|do(T)}$ is highest not $P{Y|T}$. If she knows thier gender then she should otimise to $P{Y|do(T),Z}$. 
+
+The causal network for this problem is shown in figure XXX. In this example, women are more likely to choose treatment $A$ and also more likely to recover regardless of what treatment they recive than men. This is what makes treatment $A$ appear better if you look at the conditional distribution. The fact that a patient took treatment $A$ tells you that they are more likely to be female. In the terminology defined in section \ref{}, gender is a confounding variable and we must adjust for it to obtain unbiased estimates of the causal effect of the treatment. As we saw from the examples in chapter \ref{XXX}. Determining when you really care about the interventional as opposed to the conditional distribution is a sublte but very important question that is frequently overlooked. 
 
 
 \chapter*{Two key questions (5000 words)}
@@ -649,16 +767,180 @@ Causal effect estimation addresses the problem where we assume the key structure
 \item any variables which act to confound two or more of the variables we have included.
 \end{itemize}
 
-Some of these variables my be latent or unobserved, in that we do not have measurements for them in the available data. However, their position in the network is assumed to be known. For example if we were trying to estimate ...
+Some of these variables my be latent or unobserved, in that we do not have measurements for them in the available data. However, their position in the network is assumed to be known. For example if we were interested in the effect of years of schooling on wages, we might expect that some measure of inherent ability could influence both the number of years of schooling people chose to pursue and the wages they subsequently obtaine on graduating. Even if we have no data to directly measure peoples inherent ability, becuase it influences two of the variables were are modelling, we must include it in the graph.
 
 Causal effect estimation is one of the most frequently applied methodolgoies within applied sciences. It implicit in millions of studies accross medicine, business, economics and social sciences. Almost everytime someone runs a regression model the key quantity of interest is a causal effect. Given how it underlies so much of our scientific progress, there is a enormous potential in properly understanding when we can draw causal conclusions, exactly what assumptions are required to do so and how we can best levereage those assumptions to infere as much information as we can from our data. 
 
-\subsection*{The do calculus}
-Once we have drawn the causal network for our problem, how can we use that to map information from the observational setting? 
+\subsection*{Mapping from observational to interventional distributions}
+Once we have drawn the causal network for our problem, how can we use that to map information from the observational setting to the interventional one. Recall that a bayesian network is a way of representing the joint distribution over its variables in a way which highlights the any conditional idependencies between them. 
 
-The do calculus arises from d-seperation. 
+\begin{theorem}
+\textbf{(Local markov condition)} Given a bayesian network $G$ with nodes $X_{1}...X_{N}$, each variable $X_{i}$ is independent of its non-decendents given its parents in $G$ for all distributions $P(X_{1}...X_{N})$ that are compatible with $G$.
+\end{theorem}
 
-How do we take our causal frameworks and use them to map information from the observational to interventional settings?
+The set of conditional independence relations given by the local markov condition can enforce additional independences that also hold in all distributions that are compatible with $G$. D-separation is an algorithm that extends the local markov property to find these additional independences. It provides us with a simple way of reading from a network if a given conditional independence statement is true in all distributions compatible with that network.
+
+By leveraging conditional independencies we can effectivly localize the effect of an intervention to a specific part of a larger graph. This gives rise to the do-calculus \cite{Pearl2000}. The do calculus consists of three rules. They derive from the causal information encoded in a causal network and the properties of d-separation and do not require any addition assumptions other than that of specifying the causal network. 
+
+\subsubsection*{Rule 1}
+This rule describes which variables, on which we have not intervened, effect the distribution of the outcome given some intervention. The intervention $do(\boldsymbol{X}=\boldsymbol{x})$ changes a causal network, $G$, in a simple way. Variables in $\boldsymbol{X}$ are no longer determined by their parents but instead take on fixed values specified by $\boldsymbol{x}$. This corresponds to deleting the edges with arrows into variables in $\boldsymbol{X}$  (see figure \ref{fig:mutilatednet}). The resulting 'mutilated' network $G_{\overline{\boldsymbol{X}}}$ remains a causal network and d-separation still applies. 
+
+If $(\boldsymbol{Y} \ci \boldsymbol{W} | \boldsymbol{Z},\boldsymbol{X})$ in $G_{\overline{\boldsymbol{X}}}$:
+\begin{equation}
+\label{eq:Do1}
+ P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{Z}=\boldsymbol{z},\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{Z}=\boldsymbol{z}) 
+\end{equation}
+
+$\implies$ if $(\boldsymbol{Y} \ci \boldsymbol{W} | \boldsymbol{X})$ in $G_{\overline{\boldsymbol{X}}}$:
+\begin{equation}
+\label{eq:Do12}
+ P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x})) 
+\end{equation}
+
+This stems directly from the fact that the relationship between d-separation in a network and independence in the corresponding probability distribution still holds in the mutilated network. 
+
+\begin{figure}[h]
+\centering
+\caption{Intervention in a causal bayesian network}
+\label{fig:mutilatednet}
+\begin{subfigure}[t]{0.3\textwidth}
+\centering
+\caption{original network, $G$}
+\label{fig:mutilatedOriginal}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={punkt}]
+
+ %nodes
+\node[main node](1){$U$};
+\node[main node, below left=of 1](2){$X$};
+\node[main node, below right=of 1](3){$Y$};
+\node[main node, above left=of 2](4){$W$};
+
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (2) edge node {} (3)
+    (4) edge node {} (2);
+	
+\end{tikzpicture} 
+\end{subfigure}
+\begin{subfigure}[t]{0.5\textwidth}
+\centering
+\caption{network after the intervention $do(X=x)$, $G_{\overline{X}}$}
+\label{fig:mutilatedAfter}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={punkt}]
+
+ %nodes
+\node[main node](1){$U$};
+\node[main node, below left=of 1](2){$x$};
+\node[main node, below right=of 1](3){$Y$};
+\node[main node, above left=of 2](4){$W$};
+
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (3)
+    (2) edge node {} (3);
+    
+\end{tikzpicture}
+\end{subfigure}
+\end{figure}
+
+\subsubsection*{Rule 2}
+Rule 2 states when conditioning on $\boldsymbol{X} = \boldsymbol{x}$ and intervening  $do(\boldsymbol{X}=\boldsymbol{x})$ have the same effect on the distribution of the outcome $\boldsymbol{Y}$. You can think of this as when correlation is causation. It is easiest to understand by explicitly including the intervention process in the graphical model. We can depict the possibility of intervention by adding a new decision node $\hat{X}$ as a parent of each $X$ in the set of nodes we are intervening on (figure \ref{fig:augmentedNetwork}). Let $\epsilon$ be some arbitrary value not in the set of possible values for $X$. If $X = \epsilon$ the distribution of $X$ is what it was without intervention. Otherwise, if $X=x$, $X$ deterministically takes the value $x$ and is independent of its previous parents, representing the intervention $do(X=x)$. We use the notation $G^{\dagger}$ to represent $G$ augmented with these decision nodes. 
+
+if $(\boldsymbol{Y} \ci \boldsymbol{\hat{X}}|\boldsymbol{X},\boldsymbol{Z},\boldsymbol{W})$ in $G^{\dagger}_{\boldsymbol{\overline{Z}}}$:
+
+\begin{equation}
+\label{eq:Do2}
+P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),\boldsymbol{X}=\boldsymbol{x},\boldsymbol{W}=\boldsymbol{w})
+\end{equation}
+
+$\implies$ if  $(\boldsymbol{Y} \ci \boldsymbol{\hat{X}}|\boldsymbol{X})$ in $G^{\dagger}$:
+\begin{equation}
+\label{eq:Do22}
+P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x})) = P(\boldsymbol{Y}|\boldsymbol{X}=\boldsymbol{x})
+\end{equation}
+
+If the outcome does not depend on how the decision to assign the interventional variables was made, then the interventional distribution equals the observational one. 
+
+\begin{figure}[h]
+\centering
+\caption{Augmentated causal network with intervention}
+\label{fig:augmentedNetwork}
+\begin{subfigure}[t]{0.4\textwidth}
+\centering
+\caption{original network, $G$}
+\label{fig:augmentedOriginal}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={punkt}]
+ %nodes
+\node[main node](1){$Z$};
+\node[main node, below left=of 1](2){$X$};
+\node[main node, below right=of 1](3){$Y$};
+\node[main node, above left = of 1](4){$U_{1}$};
+\node[main node, above right = of 1](5){$U_{2}$};
+
+
+ \path[every node/.style={font=\sffamily\small}]
+ 	(2) edge node {} (3)
+ 	(4) edge node {} (2)
+ 		edge node {} (1)
+ 	(5) edge node {} (3)
+ 		edge node {} (1)
+ 	(1) edge node {} (2)
+ 		edge node {} (3);
+    
+	
+\end{tikzpicture} 
+\end{subfigure}
+\begin{subfigure}[t]{0.4\textwidth}
+\centering
+\caption{augmented network after the intervention $do(Z=z)$, $G^{\dagger}_{\overline{Z}}$}
+\label{fig:augmentedAfter}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.3cm,
+  thick,main node/.style={punkt}]
+
+\node[main node](1){$z$};
+\node[below left=of 1](2){};
+\node[below right=of 1](3){};
+\node[main node, below left=of 2](4){$X$};
+\node[main node, below right=of 3](5){$Y$};
+\node[above right=of 1](6){};
+\node[above left=of 1](7){};
+\node[main node, above left=of 7](8){$U_{1}$};
+\node[main node, above right=of 6](9){$U_{2}$};
+\node[main node, above left=of 4](10){$\hat{X}$};
+
+
+ \path[every node/.style={font=\sffamily\small}]
+ 	(4) edge node {} (5)
+ 	(10) edge node {} (4)
+ 	(8) edge node {} (4)
+ 	(9) edge node {} (5)
+ 	(1) edge node {} (4)
+ 		edge node {} (5);
+ 	
+    
+\end{tikzpicture}
+\end{subfigure}
+\end{figure}
+
+\subsubsection*{Rule 3}
+This rule describes cases where the intervention $do(\boldsymbol{X}=\boldsymbol{x})$ has no effect on the distribution of the outcome $\boldsymbol{Y}$. 
+
+if $(\boldsymbol{Y} \ci \boldsymbol{\hat{X}} |\boldsymbol{Z},\boldsymbol{W})$ in $G^{\dagger}_{\boldsymbol{\overline{Z}}}$:
+\begin{equation}
+\label{eq:Do3}
+P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),do(\boldsymbol{X}=\boldsymbol{x}),\boldsymbol{W}=\boldsymbol{w}) = P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),\boldsymbol{W}=\boldsymbol{w})
+\end{equation}
+$\implies$ if  $(\boldsymbol{Y} \ci \boldsymbol{\hat{X}})$ in $G^{\dagger}$:
+\begin{equation}
+\label{eq:Do32}
+P(\boldsymbol{Y}|do(\boldsymbol{X}=\boldsymbol{x})) = P(\boldsymbol{Y})
+\end{equation}
+The statement that $\boldsymbol{Y} \ci \boldsymbol{\hat{X}}$ without conditioning on $\boldsymbol{X}$ implies that there is no unblocked path from $\boldsymbol{X}$ to $\boldsymbol{Y}$ which starts on an arrow leaving $\boldsymbol{X}$. This means there is no causal effect of $\boldsymbol{X}$ on $\boldsymbol{Y}$ and the intervention $do(\boldsymbol{X}=\boldsymbol{x})$ does not alter the distribution of $P(\boldsymbol{Y})$.
 
 \subsection*{Identifiability}
 A natural question to ask is, given the level of assumptions we have made about the graph, is it possible to estimate a causal effect from observational data? This is the identifiablity problem. Identifiability is an asymptopic property of the graph. It asks if we can obtain an unbiased point estimate for the causal effect of interest in the infinite data limit. A problem is non-parametrically identifaible if it is identifiable without any additional assumptions on the functional form of the dependencies between variables in the graph. 
@@ -667,11 +949,13 @@ The question of non-parametric identifiability is solved! The do calculus is com
 
 There is an algorithm \cite{Shpitser2012} based on these properties that, for a given network and interventional (do-type) query, can:
 
-a) determine if the query can be translated into an expression involving only distributions over observed variables. In other words, determine if the query is identifiable given the assumptions encoded by the network
-
-b) if it is identiable, return the required expression  
+\begin{enumerate}
+\item determine if the query can be translated into an expression involving only distributions over observed variables. In other words, determine if the query is identifiable given the assumptions encoded by the network
+\item if it is identiable, return the required expression 
+\end{enumerate}
 
 \todo{insert link to working javascript version}
+\todo{figure with typical examples}
 
 There are many interesting questions relating to identifiability that remain open. What is the minimal (by some metric) additional information that would be required to make a non-identifiable qurey identifiable? What if we assume various restrictions on the functional form of the relationships between the variables? Clearly  . A complete algorithm for the problem of linear identifiability is yet to be found, despite a rich body of work going back to at least ??? \ref{}
 
@@ -702,37 +986,18 @@ Put in the picture of an instrumental variable.
 Instrumental variables are one of the key approaches used to estimate causal effects within economics and the social sciences. However, the setting they are associated with is non-identifiable. How is it that they are so useful nonetheless? Tight bounds may be just as good as what could be achieved in the identifiable setting, given finite data. 
 
 \section*{Causal Discovery}
-We now move to the much more general problem of learning a causal graph from observational data. Amazingly, it is possible to infer some aspects of causal structure with very general assumptions. The set of conditional independences in a non-experimental data set indicates some causal structures are more likely than others. In addition, there are subtle asymmetries in the relationship between the joint distribution of cause and effect and the distributions of cause given effect and effect given cause. These clues are the key to causal discovery algorithms, which attempt to learn causal structure from non-experimental data. 
+We now move to the much more general problem of learning a causal graph from observational data. In this setting we make much broader assumptions about the structure of the graph. For example, that it is acyclic or that we have no unmeasured confounding variables. We do not assume the existance or directions of any links between the variables. Amazingly, it is possible to infer some aspects of causal structure with such general assumptions. The set of conditional independences in a non-experimental data set indicates some causal structures are more likely than others. In addition, there can be subtle asymmetries in the relationship between the joint distribution of cause and effect and the distributions of cause given effect and effect given cause. These clues are the key to causal discovery algorithms.
 
- 
+There is also work on infering causal structure from experiental data \ref{}. We discuss this further in section XXX.
 
+Causal discovery is a much grander goal than causal effect estimation given a known causal network. Arguably, if acheived, it would equate to the automation of scientific discovery. We need simply supply our algorithm with a vast collection of variables (regardless of their relevence to the problem) and it would learn the causal structure and from that allow us to estimate the effects of any intervention we cared to make. Unfortunately, causal disovery is very hard. Even with the assumption that the causal graph is acyclic and there are no latent variables, the number of possible graphs grows XXX exponentially (or super-exponentially)? with the number of variables. - some intuition here about the strength of the signal we get from causal disovery. Small initial errors in greedy approaches can cascade leading to unstable inference and large losses \ref{sprites?}. Talk about the numerical as well as the statisitcal issues here. 
 
+In the next sections we briefly survey the key approaches to causal discovery. We roughly divide the methods into those based on those that exploit the connection between the conditional indpendences in a joint distribution and the structure of a causal model and those that leverage assumptions about the functional form of the relationships between cause and effect. This is not the only way we could have grouped them. There is also a seperation between constraint based algorithms, that XXXX and those that search and score multiple graph structures before selecting the best. There are also hybrid methods \ref{}  
 
-\paragraph*{You want to learn the graph}
-In the causal discovery problem we make much much broader assumptions about the structure of the graph. Ie that it is acyclic. and may or may not have latent variables. We do not assume the existance or directions of any links between the variables.
+\subsection*{Conditional independence based methods}
+One general approach is to look for clues about the structure of the network in the conditional independence relations in the distribution. For any bayesian network, $G$, (causal or not) we can read of conditional independencies in the joint distribution from the structure of the network. If a set of variables $Z$ d-separates $X$ and $Y$ in $G$ then $(X \ci Y|Z)$ in the distribution $P$. However, we want to work in the other direction, from conditional independence in the distribution to the structure of the network. This requires that we assume the reverse condition: $(X \ci Y|Z)$ in $P$ must imply $Z$ d-separates $X$ and $Y$ in $G$. This assumption, commonly referred to as  \textbf{\textit{faithfulness}} \ref{}, says there are no additional independence relations that are satisfied in $P$ but not in all distributions $\boldsymbol{P'}$ that are compatible with $G$. Stating that $P$ is faithful to $G$ is equivalent to $G$ is a \textbf{\textit{perfect map}} \cite{Kollner} for $P$.
 
-What's more, we wish to do this from non-experimental data (although there is also work on infering causal structure from experimental data) REFERENCES and it would be natural to connect the two (ANY REFERENCES THERE?).
-
-This is a much grander goal than causal inference and arguably, if acheived would equate to the automation of scientific discovery. 
-\paragraph*{Equates to the aim of automating scientific discovery}
-\paragraph*{Increadibly hard}
-It it is amazing that anything can be done here.
-\paragraph*{Methods can also be divided into contraint based and search and score}
-\subsection*{Discovery with Conditional independence}
-If variables are (conditionally) independent they are unlikely to be directly causally linked. 
-\subsection*{Discovery with Functional Models}
-\subsection*{Granger causality}
-
-In previous sections we discussed when assumptions about the structure of the variables in a specific problem is sufficient to identify a causal effect. This approach relies on having enough prior knowledge or theory about the problem to allow you to, at least partially, specify the causal network. In this section, we consider the much harder problem of causal inference where you need to learn the network. Causal inference might seem impossible without specific assumptions about the structure of the variables involved but, amazingly, some aspects of causal structure can be determined from much more general assumptions.  
-
-In this section we consider variants of the following problem: Assume there is some acyclic causal network $G$ that generated the distribution $P(\boldsymbol{V})$ from which our data has been sampled. Our goal is to recover the network from this data. 
-
-What can we look for in the distribution that could give us clues as to the structure of the network? 
-
-\subsection{Causal discovery with conditional independence tests}
-One general approach is to look for clues about the structure of the network in the conditional independence relations in the distribution. We know, (section \ref{sec:dsep}), if $Z$ d-separates $X$ and $Y$ in $G$ then $(X \ci Y|Z)$ in $P$ . However, we want to work in the other direction, from conditional independence in the distribution to the structure of the network. This requires that we assume the reverse condition:$(X \ci Y|Z)$ in $P$ must imply $Z$ d-separates $X$ and $Y$ in $G$. This assumption, commonly referred to as  \textbf{\textit{faithfulness}}, says there are no additional independence relations that are satisfied in $P$ but not in all distributions $\boldsymbol{P'}$ that are compatible with $G$. Stating that $P$ is faithful to $G$ is equivalent to $G$ is a \textbf{\textit{perfect map}} for $P$.
-
-Faithfulness is an assumption. It does not always hold and we cannot verify it from the observational data we wish to use for causal inference. However, most distributions generated by a causal bayesian network will be faithful to that network. For faithfulness to be violated, different causal effects must exactly balance one-another out. For example, consider a simple binary variable model of chocolate consumption, income and obesity (figure). If the coefficients in the conditional probability tables are just right then the direct effect of chocolate on obesity will exactly balance the indirect effect through income and obesity will appear independent of chocolate consumption. However, this independence is not stable. It would disappear under a small perturbation to any of the parameters.  
+Faithfulness is an assumption. It does not always hold and we cannot verify it from the observational data we wish to use for causal inference. However, most distributions generated by a causal bayesian network will be faithful to that network. For faithfulness to be violated, different causal effects must exactly balance one-another out. For example, consider a simple binary variable model of chocolate consumption, income and obesity (figure). If the coefficients in the conditional probability tables are just right then the direct effect of chocolate on obesity will exactly balance the indirect effect through income and obesity will appear independent of chocolate consumption. However, this independence is not stable. It would disappear under a small perturbation to any of the parameters. \todo{point out violations are solutions to polynomial equations and thus measure 0 \ref{XX}}  
 
 Given the faithfulness assumption, our causal discovery problem reduces to finding the set of bayesian networks that have exactly the dependency structure as we observe in $P$. This set can also be referred to as the markov equivalence class compatible with $P$.
 
@@ -764,8 +1029,7 @@ We will begin with a brute force algorithm (described as the SGS algorithm in \c
 \end{tabularx}
 \end{table}
 
-The SGS algorithm utilizes the fact that a collider structure (f
-igure \ref{fig:dseptripple4}) induces a distinct conditional independence relation. Assuming you have a consistent conditional independence test, it converges to return a partially directed network that represents the Markov equivalence class for the generating causal model. Unfortunately the number of conditional independence tests required for step \ref{alg:SGSexponential} grows exponentially (in the worst case) with the number of variables. Not only that, but for each edge that is in the true network, the algorithm will always tests all other possible subsets of variables. If the assumption that there are no hidden common causes or that the distribution is faithful are violated, step \ref{alg:SGScolliders} of the SGS algorithm can produce double headed arrows.
+The SGS algorithm utilizes the fact that a collider structure (figure \ref{fig:dseptripple4}) induces a distinct conditional independence relation. Assuming you have a consistent conditional independence test, it converges to return a partially directed network that represents the Markov equivalence class for the generating causal model. Unfortunately the number of conditional independence tests required for step \ref{alg:SGSexponential} grows exponentially (in the worst case) with the number of variables. Not only that, but for each edge that is in the true network, the algorithm will always tests all other possible subsets of variables. If the assumption that there are no hidden common causes or that the distribution is faithful are violated, step \ref{alg:SGScolliders} of the SGS algorithm can produce double headed arrows.
 
 The PC algorithm \cite{Sprites} modifies step \ref{alg:SGSexponential} of the SGS algorithm to utilize the fact that if two variables $(a,b)$ are conditionally independent given some set, they will also be conditionally independent given a set that contains only variables adjacent to $a$ or $b$. It also checks for low order conditional independence relations before higher order ones. This allows it to exploit any sparsity in the true network, leading to much better average case performance  \cite{Sprites} (although the worst case, where the true network is complete, is still exponential). With finite data, the order in which the links are considered can change the output (unlike for SGS). The effect of wrongly removing a link early on flows through to later conditional independence tests by changing which nodes are considered adjacent.
 
@@ -805,30 +1069,31 @@ The PC algorithm \cite{Sprites} modifies step \ref{alg:SGSexponential} of the SG
 
 The PC algorithm also returns a set of Markov equivalent networks consistent with the distribution. Since we have assumed there are no hidden variables, for any single graph in this set we can calculate causal effects with equation \ref{eq:allvarsobserved}. We can then bound the true causal effect by combining the results for the all the networks. This procedure is the IDA algorithm \cite{Maathuis2009} and has been found to outperform standard regularization techniques at finding causal effects in a high-dimensional yeast gene expression data set \cite{Maathuis2010}. An implementation is available in the R package \cite{Kalisch2012} 
 
+\todo{mention failed replication - if published}
 
 \subsubsection{With hidden variables}
-There are an number of difficulties in extending the approach of the last section to deal with the case where there are latent variables. With an unknown number of hidden variables there are an infinity many possible structures to search over. In addition, the space of causal networks is not closed under marginalization. If we have a distribution that $P'(\boldsymbol{O},\boldsymbol{U})$ generated by and is faithful to a network $G$ the distribution $P(\boldsymbol{O})$, that results from marginalizing over $\boldsymbol{U}$, may not be faithful to any bayesian network (see figure \ref{fig:DAGSnotclosed}).
+There are an number of difficulties in extending the approach of the last section to deal with the case where there are latent variables. With an unknown number of hidden variables there are infinity many possible structures to search over. In addition, the space of causal networks is not closed under marginalization. If we have a distribution that $P'(\boldsymbol{O},\boldsymbol{U})$ generated by and is faithful to a network $G$ the distribution $P(\boldsymbol{O})$, that results from marginalizing over $\boldsymbol{U}$, may not be faithful to any bayesian network (see figure \ref{fig:DAGSnotclosed}).
 
-%\begin{figure}
-%\centering
-%\caption{A distribution faithful to this DAG is not faithful to any DAG over the variables $\{A,B,C,D\}$ after marginalizing over $U$. }
-%\label{fig:DAGSnotclosed}
-% \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,  thick,main node/.style={punkt}]
-% %nodes
-%\node[main node](1){U}; 
-%\node[main node, below left = of 1](2){B};
-%\node[main node, below right = of 1](3){C};
-%\node[main node, above left= of 2](4){A};
-%\node[main node, above right = of 3](5){D};
-%
-% \path[every node/.style={font=\sffamily\small}]
-%    (1) edge node {} (2)
-%    	edge node {} (3)
-%    (4) edge node {} (2)
-%    (5) edge node {} (3);
-%    	
-%\end{tikzpicture}
-%\end{figure}
+\begin{figure}
+\centering
+\caption{A distribution faithful to this DAG is not faithful to any DAG over the variables $\{A,B,C,D\}$ after marginalizing over $U$. }
+\label{fig:DAGSnotclosed}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,  thick,main node/.style={punkt}]
+ %nodes
+\node[main node](1){U}; 
+\node[main node, below left = of 1](2){B};
+\node[main node, below right = of 1](3){C};
+\node[main node, above left= of 2](4){A};
+\node[main node, above right = of 3](5){D};
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (4) edge node {} (2)
+    (5) edge node {} (3);
+    	
+\end{tikzpicture}
+\end{figure}
  
 
 The key to constraining the space of possible models is that many latent structures are equivalent (under transforms of the hidden variables). See example figure XXX.
@@ -839,7 +1104,7 @@ The key to constraining the space of possible models is that many latent structu
 
 Since we only care about the causal relationships between observed variables, it is sufficient to search over networks where any hidden variables have no parents and directly cause two of the observed variables. Instead of representing hidden variables explicitly we can capture the necessary independence relations with a more general graphical model that supports bi-directed edges that play the role of a hidden confounding variable. These models, referred to as maximal ancestral graphs (MAGs) are closed under marginalization and conditioning. 
 
-For any DAG with latent (and selection) variables there is a unique MAG \cite{Richardson2002}. This makes it possible to extend the PC algorithm to latent structures, resulting in the FCI algorithm \cite{Sprites}. The logic is very similar. Certain structures are ruled out by being inconstant with the observed conditional independence relations. The output is an equivalence class of MAGs, which can be represented graphically as a partial ancestral graph PAG. Assuming there are no selection variables (see \cite xxx), the PAG can contain four types of link:
+For any DAG with latent (and selection) variables there is a unique MAG \cite{Richardson2002}. This makes it possible to extend the PC algorithm to latent structures, resulting in the FCI algorithm \cite{Sprites}. The logic behind the algorithm is very similar. Certain structures are ruled out as a consequence of being inconstant with the observed conditional independence relations. The output is an equivalence class of MAGs, which can be represented graphically as a partial ancestral graph PAG. Assuming there are no selection variables (see \cite xxx), the PAG can contain four types of link:
 
 \begin{enumerate}
 \item $X \rightarrow Y$, meaning $X$ causes $Y$
@@ -850,74 +1115,77 @@ For any DAG with latent (and selection) variables there is a unique MAG \cite{Ri
 
 The circles indicate where it is ambiguous if there should be an arrowhead (ie where there is one in some MAGs and not in others in the equivalence class). Counter-intuitively it is sometimes possible to  rule out or confirm the existence of a confounding variable and fully determine the causal type of a link (see examples in figure \ref{fig:FCIExamples}). 
 
-%\begin{figure}
-%\centering
-%\caption{A distribution faithful to this DAG is not faithful to any DAG over the variables $\{A,B,C,D\}$ after marginalizing over $U$. }
-%\label{fig:FCIExamples}
-% \begin{subfigure}[t]{0.8\textwidth}
-% \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.7cm,  thick,main node/.style={punkt}]
-% %nodes
-%\node[main node](1){U}; 
-%\node[main node, below left = of 1](2){B};
-%\node[main node, below right = of 1](3){C};
-%\node[main node, above left= of 2](4){A};
-%\node[main node, above right = of 3](5){D};
-%
-% \path[every node/.style={font=\sffamily\small}]
-%    (1) edge node {} (2)
-%    	edge node {} (3)
-%    (4) edge node {} (2)
-%    (5) edge node {} (3);
-%    	
-%\end{tikzpicture}
-% \end{subfigure}
-% \begin{subfigure}[t]{0.8\textwidth}
-% \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.7cm,  thick,main node/.style={punkt}]
-% %nodes
-%
-%\node[main node](1){A};
-%\node[main node, below right=of 1](2){B};
-%\node[main node, right=of 2](3){C};
-%\node[main node, above right=of 3](4){D};
-%
-% \path[every node/.style={font=\sffamily\small}]
-%    (1) edge[pil] node {} (2)
-%    (2) edge node {} (3)
-%    (3) edge node {} (2)
-%    (4) edge [pil] node {} (3);    	
-%\end{tikzpicture}
-%\end{subfigure}
-% \begin{subfigure}[t]{0.4\textwidth}
-% \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.7cm,  thick,main node/.style={punkt}]
-% %nodes
-%
-%\node[main node](1){C};
-%\node[main node, above left=of 1](2){A};
-%\node[main node, above right=of 1](3){B};
-%\node[main node, below=of 1](4){D};
-%
-% \path[every node/.style={font=\sffamily\small}]
-%    (1) edge node {} (4)
-%    (2) edge node {} (1)
-%    (3) edge node {} (1);    	
-%\end{tikzpicture}
-%\end{subfigure}
-% \begin{subfigure}[t]{0.4\textwidth}
-% \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.7cm,  thick,main node/.style={punkt}]
-% %nodes
-%
-%\node[main node](1){C};
-%\node[main node, above left=of 1](2){A};
-%\node[main node, above right=of 1](3){B};
-%\node[main node, below=of 1](4){D};
-%
-% \path[every node/.style={font=\sffamily\small}]
-% 	(1) edge node {} (4)
-%    (2) edge [pil] node {} (1)
-%    (3) edge [pil] node {} (1);    	
-%\end{tikzpicture}
-%\end{subfigure}
-%\end{figure} 
+
+\todo{put these figures in a table with true graph input on left and fci output on right}
+\todo{uniform styles used for nodes accross thesis}
+\begin{figure}
+\centering
+\caption{FCI examples: true graph and fci output}
+\label{fig:FCIExamples}
+ \begin{subfigure}[t]{0.8\textwidth}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.7cm,  thick,main node/.style={punkt}]
+ %nodes
+\node[main node](1){U}; 
+\node[main node, below left = of 1](2){B};
+\node[main node, below right = of 1](3){C};
+\node[main node, above left= of 2](4){A};
+\node[main node, above right = of 3](5){D};
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (4) edge node {} (2)
+    (5) edge node {} (3);
+    	
+\end{tikzpicture}
+ \end{subfigure}
+ \begin{subfigure}[t]{0.8\textwidth}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.7cm,  thick,main node/.style={punkt}]
+ %nodes
+
+\node[main node](1){A};
+\node[main node, below right=of 1](2){B};
+\node[main node, right=of 2](3){C};
+\node[main node, above right=of 3](4){D};
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge[pil] node {} (2)
+    (2) edge node {} (3)
+    (3) edge node {} (2)
+    (4) edge [pil] node {} (3);    	
+\end{tikzpicture}
+\end{subfigure}
+ \begin{subfigure}[t]{0.4\textwidth}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.7cm,  thick,main node/.style={punkt}]
+ %nodes
+
+\node[main node](1){C};
+\node[main node, above left=of 1](2){A};
+\node[main node, above right=of 1](3){B};
+\node[main node, below=of 1](4){D};
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (4)
+    (2) edge node {} (1)
+    (3) edge node {} (1);    	
+\end{tikzpicture}
+\end{subfigure}
+ \begin{subfigure}[t]{0.4\textwidth}
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=0.7cm,  thick,main node/.style={punkt}]
+ %nodes
+
+\node[main node](1){C};
+\node[main node, above left=of 1](2){A};
+\node[main node, above right=of 1](3){B};
+\node[main node, below=of 1](4){D};
+
+ \path[every node/.style={font=\sffamily\small}]
+ 	(1) edge node {} (4)
+    (2) edge [pil] node {} (1)
+    (3) edge [pil] node {} (1);    	
+\end{tikzpicture}
+\end{subfigure}
+\end{figure} 
 
 The FCI algorithm can be made complete such that it discovers all aspects of the true causal structure that are identifiable from the conditional independence relations of a distribution over observed variables and the faithfulness assumption \cite{Zhang2008}. More recently \cite{Colombo2012} have proposed the RFCI algorithm, which in some cases returns more ambiguous links than FCI but is substantially faster. \cite{Claassen2013} point out that the problem of learning sparse causal networks from data is not NP-hard and propose the FCI+ algorithm, that requires $O(N^{2(k+2)})$ conditional independence tests, where $k$ is the maximum node degree over the observed variables. 
 
@@ -948,46 +1216,54 @@ A comparison of algorithms
 \end{tabular}
 
 \subsubsection{Doing conditional independence tests}
-The off-diagonal elements of the standardized inverse of the correlation
-matrix are the negatives of the partial correlation coefficients between the corresponding
-variables given the remaining variables (see e.g. Whittaker, 1990). Hence in the linear case, the
-independence graph can be efficiently constructed by placing an edge between A and B if and
-only if the entry in the standardized inverse correlation matrix is non-zero. In the discrete case,
-Fung and Crawford (1990) have recently proposed a fast algorithm for constructing an
-independence graph from discrete data. We have not tested their procedure as a preprocessor for
-the PC algorithm. (COPIED FROM SPRITES)
 
-\cite{Zhang2012} Kernel independence tests
+All the algorithms we have discussed in the previous section rely on being able to perform conditional independence tests. This is non-trivial with high dimensional data. If the functional relationship between the variables is linear with gaussian noise then the network represents a multivaitae normal distribution and a pair of variables $A$ and $B$ are conditionally independent if and only if the corresponding entry in the inverse correlation matrix is non-zero. Where the functions are non-linear 
 
-HSIC \cite{Gretton2008}
+\begin{itemize}
+\item \cite{Zhang2012} Kernel independence tests
+\item HSIC \cite{Gretton2008}
+\end{itemize}
 
-\subsection{Discovery with functional models}
-All of the algorithms we have considered so far return a Markov equivalence class. They cannot distinguish between two models that result in the same set of conditional independence relations. Consider the very simple case where we have only two variables and the only possible causal structures are $X \rightarrow Y$ or $Y \rightarrow X$. These models have the same dependency structure but in one case $P(Y|do(X)) = P(Y|X)$ and in the other $P(Y|do(X)) = P(Y)$. No algorithm relying purely on conditional independence relations can separate these two cases. 
+\subsection*{Discovery with functional models}
+The algorithms we have considered so far return a Markov equivalence class. They cannot distinguish between two models that result in the same set of conditional independence relations. Consider the very simple case where we have only two variables and the only possible causal structures are $X \rightarrow Y$ or $Y \rightarrow X$. These models have the same dependency structure but in one case $P(Y|do(X)) = P(Y|X)$ and in the other $P(Y|do(X)) = P(Y)$. No algorithm relying purely on conditional independence relations can separate these two cases. 
 
-Let us focus only on the two variable case $X \rightarrow Y$ or $Y \rightarrow X$. What possible clues could there be in the distribution $P(X,Y)$ that could indicate which causal model it was generated from. Recall the functional definition of causality (section \ref{sec:SEM}). There are a number of assumptions about the form of the functions that can allow us to identify the causal direction: non-invertible functions, additive noise \ref{}, post-non-linear additive noise 
+Let us focus only on the two variable case $X \rightarrow Y$ or $Y \rightarrow X$. What possible clues could there be in the distribution $P(X,Y)$ that could indicate which causal model it was generated from. Recall the functional definition of causality (section \ref{sec:SEM}). There are a number of assumptions about the form of the functions that can allow us to identify the causal direction: non-invertible functions, additive noise \cite{Hoyer2009}, post-non-linear additive noise \cite{Zhang2008a}, linear models with non-gaussian noise \cite{Hoyer2012}
 
-
-Linear models with non-gaussian noise \cite{Hoyer2012}
-
-Allow us to make assumptions about the form of the relationships between variables.
-With just two variables:
-
-Additive noise, \cite{Hoyer2009}
-
-post-non-linear additive noise \cite{Zhang2008a}, 
 
 causal anti-causal, 
+
+%If X → Y, what is the relationship between P(X) and P(Y|X)? 
+What about P(Y) and P(X|Y)?
+
+%In semi supervised learning we are given training points from P(X,Y) and additional points sampled from P(X). The goal is to learn P(Y|X). The extra points from P(X) will not help if X → Y.
 
 deterministic functions,
 
 IGCI \cite{Janzing2012a}
 
+Indepdendence of input and mechanism. Daniusis et al 2012
+
+Independence of function and input: If $X \rightarrow Y$ and we have a functional causal model $y = f(x,e)$ then the input
+distribution $P(X)$ and function $f$ represent independent mechanisms. We do not expect a change in the input distribution to modify the function. 
+
 learning what causality looks like.
+Lopez-Paz et al 2014. 
 
-If we have a method to solve this case we can solve the more general case (with no hidden variables) Putting things together to learn the full network. 
+ 
+Instead of positing a functional restriction on the relationship between variables and then developing theory to exploit that assumption, \citep{LopezPaz2014} propose learning what the causal relationship looks like from data. They assume there will be a difference between the relationship of $\P{X}$, $\P{Y}$ and $\P{X|Y}$ between $X \rightarrow Y$ versus $Y \rightarrow X$. Their algorithm requires a data set in which each row is itself a data set consisting of paris of varibles $(x_i,y_i)$ with a label indicating the direction of causality between $X$ and $Y$. They use a keneral mean embedding to represent the distributions $\P{X}$, $\P{Y}$ and $\P{X|Y}$ as features for each individual sub-dataset and train an algorithm to learn the direction of causality. Unfortunately we do not have a large collection of datasets where the causal direction is known to train such a model. \citep{LopezPaz2014} instead use a simulated dataset so thier model will nessesarily be base on the assumptions they make when generating the data. Nonetheless this approach makes it possible to rapidly construct a model from a wide range of possible assumptions, without doing a lot of theory to design a specific algorithm optimised to that setting. Their approach performed well in the causal effect pairs challange, correctly identifing the causal direction in ?? percent of cases (against a benchmark of 50\% from random guessing)\ref{XXX}.
 
 
-\subsection{Scoring}
+\citep{Peters2014} have extended results from the bivariate case to the multivariate setting (with no hidden variables)?. They show that if we can come up with a condition that guarantees identifiability for the bi-variate case, we can extend that result to get the conditions under which the multivariate case is identifiable. The build on this to develop an algorithm that allows the construction of causal graphs based on the additive assumption??
+
+\subsection*{Granger causality}
+
+Granger causality was developed within economics and is not typically discussed within the causal discovery liturature.  
+
+Although it does differ from the previous approaches in the types of assumption it relies upon it none-the-less tackles the same goal 
+
+so we shall include it here. 
+
+Granger causalty essentially assumes that the future cannot cause the past. This may seem an entirely waterproof assumption. However it can be tripped up by unmeasured confounding variables. The cock crows before the sun rises - so does it cause the sun to rise? No. 
 
 
 
@@ -996,34 +1272,69 @@ If we have a method to solve this case we can solve the more general case (with 
 The previous sections all focus on aspects of the question; how can we estimate the effect of an intervention in a system from data collected prior to taking it. There is an obvious alternative. Instead of trying to infer the outcome of an intervention from passive observations we could just do it and see what happens. There are two key differences between observing a system and explicitly intervening in it. Firstly, when we intervene, we can choose which actions to take and thus get some control over which distributions we learn about. Secondly, if we are explicitly choosing interventions, we have a perfect model of the probability that we select each action given any context, allowing us to control confounding bias. 
 
 \subsection*{The role of randomization}
+Randomized controlled trials are often presented as the gold standard for determining causal effects in many areas of social sciences and economics \ref{XXX}. What is it about randomization that makes it so important when it comes to causality? The graphical model for a randomized controlled experiment is shown in figure \ref{fig:random_experiment_network}. If we assume perfect compliance (everyone takes the treatment that we select for them) then we have a perfect model for the treatment assignment process. Since treatment is assigned randomly, there can be no other variables that influence it and thus no confounding variables that effect both treatment and outcome. 
 
-\paragraph*{The interventionalist viewpoint has devloped from the starting point of randomized controlled experiment}
+\begin{figure}[h]
+\caption{causal network for a randomized experiment}
+\label{fig:random_experiment_network}
+\centering
+\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=3em,thick, node/.style={observedrect}, lt/.style={latent}]
+\node[node](1){Treatment};
+\node[node, above left=of 1](2){Randomiser};
+\node[node, right=of 1](3){Outcome};
+\node[lt, above left=of 3](4){U};
+\path[]
+	(2) edge (1)
+	(1) edge (3)
+	(4) edge (3);
+\end{tikzpicture}
+\end{figure} 
 
-What is the role of randomization? How do bandits algorithms work despite being only partially randomized? 
-What else can you do to improve randomized studies (variance reduction, lower regret).
+\todo {turn this into something}
+This would be a natural place to discuss what happens with finite datasets where there are many other variables that influence the outcome. We expect that across at least some of these variables, the target and control group will not be balanced. Does this not inject bias into the causal estimates? The anser is no, (I think - a better more general proof would be nice). The more such attibutes there are, the higher is the variance in the outcome within the target and control group. When we perform a confidence test to ascertain whether or not there is a difference ... what happens.
 
-Figure showing how randomization breaking any confounding links
+Randomization does not ensure target and control group are exactly alike. The more other features (observed or latent) influence the outcome, the more likely it is that there will be a significant difference in the joint distribution of these variables in a between the target and control groups in a finite data sample. However, the variance in the outcome within both the target and control groups also increases. The net result is increased variance (but not bias) in  the estimate of causal effects. 
 
-Randomization does not ensure target and control group are exactly alike. The more features or variables you include, the more likely that there will be a significant difference across at least one variable. But the within group variance also increases, the net effect is that it becomes harder to draw a conclusion but not more biased.
+DISCUSS STRATIFIED RANDOM EXPERIMENT
 
-\paragraph*{Limitations of randomization} 
+What is the role of randomization? How do bandits algorithms work despite being only partially randomized? What else can you do to improve randomized studies (variance reduction, lower regret).
 
-\subsection*{Limitations of experimentation} 
+The benifit provided by randomization in breaking the link between the treatment variable and any confounders should not be understated. The possibility of confounders cannot be empirically ruled out from observational data \citep{Pearl2000} (test for confounding). This means causal estimates from non-experimental data are always subjec to the criticism that an important confounder may have been overlooked or not properly adjusted for. However, randomized experimentation does have some limitiations. 
 
-Failure to generalize. Transportability, imperfect compliance. Too many contexts.
+\subsubsection*{Limiations of randomized experiments}
+\label{subsec:limitations_of_experiment}
+\begin{enumerate}
+
+\item The probability that an individual is treated is set in advance and fixed over the course of the experiment. As the experiment proceeds we may start to see evidence that one treatment is much more effective than another. However (in a pure randomized experiment) we don't use this information to update the treatment that later patients recive. The result is that some will unessearily be given a sub-optimal treatment. 
+\item Experiments are expensive and difficult to conduct. This means experimental datasets are often much smaller than observational ones, limiting the complexity of models we can explore.
+
+\item Experiments are often conducted on a convinient but unreprasentaive sample of the broader population of interest (for example first year collage students at research universities). This can result in estimates with high \emph{internal validity} \citep{Campbell1963} in that they should replicate well in a similar population, but very low \emph{external validity}. The results may not carry over to the general population of interest. The question of whether an experiment conducted on one population can be mapped to another is refered to as the transportability problem \citep{Bareinboim2013} \todo{check ref} and relies on very similar assumtions and arguments to causal inference and the do-calculus. 
+
+\item The idealized notion of an experiement represented by figure \ref{fig:random_experiment_network} does not capture the complexities of randomized experiments in practice. There may be imperfect compliance: the treatment selected by the randomizer is not always followed. Or output censoring: the experimenter is not able to observe the outcome for all units (for example if people drop out). If complience or attrition is not random but associated with (potentailly latent) variables that also effect the outcome then the problem of confounding bias returns. See figure XXX for a the graphical model of a randomized experiment with imperfect compliance and outcome censoring. 
+
+\item It is not always possible or ethical to conduct a randomized experiment \cite{parashutes} \ref{Parachute use to prevent death and major trauma related to gravitational challenge: systematic review of randomised controlled trials}. 
+\end{enumerate}
 
 
-\paragraph*{internal validity} Are differences in treatment and control groups down to intervention or the result of bias? 
 
-\paragraph*{external validity} Are the results of the study applicable to the broader population of interest.
+
+\begin{figure}[h]
+\begin{center}
+\caption{Experiments are not always ethical}
+\includegraphics[scale=.4]{double_blind_parashute_trial_cartoon.png}
+\end{center}
+\end{figure}
+
 
 
 \section*{Multi armed bandits}
+\todo{is there a way in latex to have a command for refering to each type of thing like figure, subsection, etc such that it can be updated programatically?}
+
+Multi-armed bandits were originally introduce by XXXX to address problem that it is sub-optimal to fix a probability of treatment in advance as we discussed in subsection \ref{subsec:limitations_of_experiment}. The problem can be formally stated as follows:
+
+
 \paragraph*{Definition} 
 
-\paragraph*{What limitations of randomized experiment does the bandit view address}
-
-\paragraph*{The exploration/exploitation trade-off}
 
 \subsection*{Regret} How do we measure the performance of a bandit algorithm?
 
@@ -1045,9 +1356,11 @@ Simple Regret
 \mu_{i^*} - \E{\mu_{\hat i^*}}.
 }
 
-\subsection*{Adversarial Bandits}
-What problem do they solve?
+\todo{connect bandit regret to early stopping of experiment problem}
 
+Scholars in the 1940's found this problem so frustrating that they suggested it be dropped over Germany to waste their time \cite{XXX}. 
+
+\paragraph*{The exploration/exploitation trade-off}
 
 \subsection*{Key approaches and results}
 \paragraph*{optimisim in the face of uncertainty}
@@ -1055,8 +1368,16 @@ What problem do they solve?
 \subsection*{The need to add structure}
 \paragraph*{The regret for a bandit problem grows linearly with the number of (sub-optimal) actions.} This makes problems with large or infinite actions spaces intractible.
 
+\subsection*{Key related settings}
 
-\subsection*{Key extensions}
+\subsubsection*{Adversarial Bandits}
+In the classical multi-armed bandit problem, the rewards for each arm are sampled stochastically from a fixed (but unknown) distribution. There is a large body of work analysing a more general formulation of the bandit problem that relaxes this stochastic assumption. 
+
+\paragraph*{Definition of the Adversarial bandit problem}
+\begin{itemize}
+\item Different notation of regret
+\item Adversarial bandits are not imume to issues of feedback cycles or drift in the reward distribution because a constancy is implicit in the definition of regret. 
+\end{itemize}
 
 \subsubsection*{Contexual bandits}
 \paragraph*{Feature selection} Is it even more important here? How do algorithms degrade as irrelevent features are added? In the supervised vs the RL setting? What would be a fair comparison?
@@ -1615,8 +1936,13 @@ Work on the problem of selecting experiments to discover the correct causal grap
 In particular, \citet{Hu2014b} show that only $\bigo{\log \log n}$ multi-variable interventions are required on average to recover a causal graph over $n$ variables once purely observational data is used to recover the ``essential graph''.
 Simultaneously learning a completely unknown causal model while estimating the rewards of interventions without a large observational dataset would be much more challenging.
 
+\subsection*{Proofs}
 
 
+\chapter*{Causality \& Fairness}
+\begin{itemize}
+\item There is an additional connction between causality and fairness, that arises when you know that there is a bias in the data and wish to correct for it. In causality, it may be due to selection bias or a confounding variable. In fairness, it may be due to historical disadvanage. In both cases we may have theory that tells us the direction or scale of an effect. Ie, we know that race itself has no inherent effect on outcomes such as criminality and education. If you have a dataset and a collection of such priors, where the data contradicts these priors due to data bias. How do you best make decisions based on that data? 
+\end{itemize}
 
 \chapter*{Causality in Marketing}
 \section*{Attribution}
@@ -1628,6 +1954,11 @@ Simultaneously learning a completely unknown causal model while estimating the r
 \paragraph{Cycles} - a huge issue. Not covered by Pearl,Rubin etc. 
 
 Places to look, statistical control theory, etc. any interesting papers along these lines?
+
+In the discrete case,
+Fung and Crawford (1990) have recently proposed a fast algorithm for constructing an
+independence graph from discrete data. We have not tested their procedure as a preprocessor for
+the PC algorithm. (COPIED FROM SPRITES)
 
 
 \bibliographystyle{apalike}% Select the citation style e.g. ieeetr
