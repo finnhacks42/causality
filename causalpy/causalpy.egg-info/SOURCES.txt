@@ -1,10 +1,11 @@
 README.rst
 causalpy/__init__.py
-causalpy/checks.py
-causalpy/directional_regression.py
-causalpy/models.py
 causalpy.egg-info/PKG-INFO
 causalpy.egg-info/SOURCES.txt
 causalpy.egg-info/dependency_links.txt
 causalpy.egg-info/requires.txt
 causalpy.egg-info/top_level.txt
+causalpy/bandits/__init__.py
+causalpy/bayesian_networks/__init__.py
+causalpy/bayesian_networks/checks.py
+causalpy/bayesian_networks/models.py

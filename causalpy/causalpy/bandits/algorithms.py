@@ -7,7 +7,7 @@ Created on Tue Sep 13 11:15:43 2016
 
 import numpy as np
 from math import sqrt, log
-from models import Parallel,ScaleableParallelConfounded
+from enviroments import Parallel
 
 
 def argmax_rand(x):
@@ -128,38 +128,6 @@ class UCB(object):
         self.best_action = argmax_rand(mu)
         return max(model.expected_rewards) - model.expected_rewards[self.best_action]
         
-class LilUCB(UCB):
-    """ 
-    Implementation based on lil’UCB : An Optimal Exploration Algorithm for Multi-Armed Bandits
-    Jamieson et al, COLT 2014.
-    
-    To convert the algorithm from fixed confidence to fixed budget, we use the halving trick.
-    """
-    label = "LilUCB"
-    def __init__(self,epsilon,gamma,beta,delta,sigma = .5):
-        
-        self.e = epsilon
-        self.g = gamma
-        self.b = beta
-        self.d = delta
-        self.c1 = (1+beta)*(1+sqrt(epsilon))
-        self.c2 = 2*(sigma**2)*(1+epsilon)
-        
-    @classmethod
-    def theoretical(cls):
-        """ Returns LilUCB with parameters supported by theory (from Jameison et al) """
-        
-        return cls(epsilon = .01,gamma = 9.0,beta = 1.0)
-    
-    @classmethod
-    def heuristic(cls):
-        """ Returns LilUCB with parameters heuristically shown to perform well (from Jamieson et al)"""
-        
-    def upper_bound(self,t):
-        mu = np.true_divide(self.success,self.trials)
-        ratio = np.true_divide(self.c2*np.log(np.log((1+self.e)*self.trials)/self.delta),self.trials)
-        interval = self.c1*np.sqrt(ratio)
-        return mu+interval
         
 
 class AlphaUCB(UCB):
@@ -256,39 +224,3 @@ class RandomArm(object):
     def run(self,T,model):
         self.best_action = np.random.randint(0,model.K)
         return max(model.expected_rewards) - model.expected_rewards[self.best_action] 
-
-if __name__ == "__main__":  
-    
-    
-    
-    N =5
-    N1 = 1
-    pz = .1
-    pz = .2
-    q = (.1,.9,.2,.8)
-    pY = np.asarray([[.4,.4],[.7,.7]])
-    epsilon=.1
-    model = ScaleableParallelConfounded(q,pz,pY,N1,N-N1)
-    alg = ThompsonSampling()
-    alg2 = AlphaUCB(2)
-    import time
-    start = time.time()
-    alg.run(1000,model)
-    end = time.time()
-    print end - start
-        
-    
-    
-    #model = ParallelConfoundedNoZAction.create(N,N1,pz,q,epsilon)
-    #model.make_ith_arm_epsilon_best(epsilon,0)
-    
-    #alg.run(200,model)
-  
-    
-#    sims = 1000
-#    pulls = np.zeros(model.K,dtype=int)
-#    regret = np.zeros(sims)
-#    for s in range(1000):
-#        regret[s] = alg.run(200,model)
-#        pulls[alg.best_action] +=1
-#    print regret.mean()

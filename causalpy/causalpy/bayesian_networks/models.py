@@ -1,5 +1,156 @@
 import numpy as np
 from sympy import Symbol, Matrix
+from itertools import product
+
+def set_difference(lst1,lst2):
+    """ returns the elements and indicies of elements in lst1 that are not in lst2"""
+    elements = []
+    indicies = []
+    for indx,item in enumerate(lst1):
+        if item not in lst2:
+            elements.append(item)
+            indicies.append(indx)
+    return elements,indicies
+    
+def to_symbolic(lst):
+    all_numeric = True
+    result = []
+    for item in lst:
+        try:
+            result.append(Symbol(item))
+            all_numeric=False
+        except TypeError:
+            result.append(item)
+    return result,all_numeric
+    
+
+class DiscreteFactor(object):
+    def __init__(self,variables,card,data):
+        """
+        variables: name of variables in factor
+        card: cardinality of variables (in same order as variables list)
+        data: data for the factor
+        """
+        if len(variables) != len(card):
+            raise ValueError("variables and card must have the same length")
+        expected_len_data = np.prod(card)
+        if len(data) != expected_len_data:
+            raise ValueError("length of data array inconsistent with cardinality, should be {0}".format(expected_len_data))
+        self.variables = variables
+        self.card = card
+        self.data,_ = to_symbolic(data)
+        assignments = product(*[range(c) for c in card])
+        var_assignments = [sorted(zip(variables,a),key=lambda x:x[0]) for a in assignments]
+        keys = ["".join([s[0]+str(s[1]) for s in assignment]) for assignment in var_assignments]
+        self.key2index = dict(zip(keys,range(len(data))))
+        
+    def __str__(self):
+        return self.data.__str__()
+
+    def probability_of(self,assignment):
+        """
+        assignment: list of tuples (variable, value)
+        return the probability of this assignment
+        """
+        key = "".join([s[0]+str(s[1]) for s in sorted(assignment,key=lambda x:x[0])])
+        indx = self.key2index[key]
+        return self.data[indx]
+        
+    def multiply(self,other):
+        # TODO check cardinality of matching vars is the same
+        new_vars,indices = set_difference(other.variables,self.variables)
+        new_card = [other.card[i] for i in indices]
+        result_vars = self.variables+new_vars
+        result_card = self.card+new_card
+        l = len(self.variables)
+        other_var_indicies = [i for i,var in enumerate(result_vars) if var in other.variables] 
+        assignments = product(*[range(c) for c in result_card])
+              
+        result_data = []
+        for a in assignments:
+
+            assignment1 = zip(self.variables,a[0:l])
+            assignment2 = zip(other.variables,[a[i] for i in other_var_indicies])
+            p1 = self.probability_of(assignment1) 
+            p2 = other.probability_of(assignment2)
+            result_data.append(p1*p2)
+        return DiscreteFactor(result_vars,result_card,result_data)
+    
+    def condition(self,variables,values):
+        return 1
+
+d1 = DiscreteFactor(['X','Y'],[2,2],['a','b','c','d'])
+d2 = DiscreteFactor(['Y'],[2],['e','f'])
+d3 = d1.multiply(d2)
+print d3.data
+
+
+
+class DiscreteBN(object):
+    def __init__(self):
+        self._variables = []
+        self._parents = {}
+        self._card = {}
+        self._conditionals = []
+        self.joint = None
+        
+        
+         
+    def add_var(self,variable,cardinality,parents=None,prob_table = None):
+        """
+        variable: name of variable
+        cardinality: the number of values this variable can take
+        parents: A list of the names of the parents of this variable
+        prob_table: A table for the conditional probability of this variable given its parents (in order listed)
+        
+        """
+        if parents is None:
+            parents = []
+        for p in parents:
+            if p not in self._variables:
+                raise ValueError("Parent {p} is not a variable in the network".format(p = p))
+        
+        card = [cardinality]+[self._card[parent] for parent in parents]
+        variables = [variable]+parents
+        prob_table_length = np.prod(card) # product of cardinality of parents
+        
+        if prob_table is None:
+            assignments = product(*[range(c) for c in card])
+            prob_table = [self._p_symbol(variable,a) for a in assignments]
+        
+        if len(prob_table) != prob_table_length:
+            raise ValueError("The probability table has length {0}, but should have length {1}".format(len(prob_table),prob_table_length))
+        
+        conditional = DiscreteFactor(variables,card,prob_table)
+        self._variables.append(variable)
+        self._parents[variable] = parents
+        self._card[variable] = cardinality
+        self._conditionals.append(conditional)
+        if self.joint is None:
+            self.joint = conditional
+        else:
+            self.joint = self.joint.multiply(conditional)
+        
+    def probability(self,left,right = None):
+        """ returns the (conditional probablity) of the variables on the left given the variables on the right """
+        return 1
+        
+    def _p_symbol(self,variable,assignment):
+        return Symbol("P"+variable+"_"+"".join([str(a) for a in assignment]))
+        
+   
+        
+        
+        
+bn = DiscreteBN()
+bn.add_var('Z',2,prob_table=[.1,.9])
+bn.add_var('X',2,['Z'])
+bn.add_var('Y',2,['X'])  
+for c in bn._conditionals:
+    print "c",c
+print bn.joint    
+
+    
 
 class LinearGaussianBN(object):
     """
@@ -39,7 +190,7 @@ class LinearGaussianBN(object):
             return Symbol("w_"+variable+parent)
         return Symbol("w_"+variable+"0")
 
-    def add_var(self,variable,parents = None, weights = None, variance = None): #TODO allow specifying weights here  - eg may want to set some to 0.
+    def add_var(self,variable,parents = None, weights = None, variance = None): 
         """
         Add a variable to the network.
         - variable: a string representing the variable

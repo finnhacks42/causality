@@ -39,7 +39,7 @@ def prod_all_but_j(vector):
 
     joint = np.prod(vector)
     return np.true_divide(joint,vector)
-
+    
 class BasicBernoulliModel(object):
     """ A model for generating data for standard bandits without side information """
     
@@ -48,19 +48,24 @@ class BasicBernoulliModel(object):
         expected_rewards: an array of length K containing the expected rewards for each arm.
         """
         self.expected_rewards = expected_rewards
+        self.K = len(self.expected_rewards)
                 
     @classmethod
-    def create_worst_case(cls,K,T):
-        epsilon = np.sqrt(K/(4.0*T))
+    def create_epsilon_best(cls,K,epsilon):
+        """ creates a bandit where all arms have reward .5 except the last, which has .5 + epsilon """
         expected_rewards = np.full(K,.5)
         expected_rewards[-1] = .5 + epsilon # reward of one arm is just better than the others.
         return cls(expected_rewards)
+    
+    @classmethod
+    def create_worst_case(cls,K,T):
+        epsilon = np.sqrt(K/(4.0*T))
+        return cls.create_epsilon_best(K,epsilon)
         
     
     def sample_multiple(self,actions,n):
         """ draws n samples from the reward distributions of the specified actions. """
         return binomial(n,self.expected_rewards[actions])
-             
 
 class Model(object):
                  
@@ -722,8 +727,6 @@ class ScaleableParallelConfoundedNoZAction(ScaleableParallelConfounded):
         return result
 
 
-from itertools import chain
-
 def estimate_px_and_y_from_samples(model,samples):
         expected_y = np.zeros(model.K,dtype=float)
         shape = list(chain([model.K],[2]*model.N))
@@ -740,166 +743,3 @@ def estimate_px_and_y_from_samples(model,samples):
         xcounts = xcounts/samples
         return xcounts,expected_y
         
-if __name__ == "__main__":  
-    import numpy.testing as np_test
-    import time
-    from pgmpy_model import GeneralModel
-    
-    N = 5
-    N1 = 2
-    N2 = N-N1
-    q = (.1,.3,.4,.7)
-    q10,q11,q20,q21 = q
-    pZ = .2
-    pY = np.asanyarray([[.2,.8],[.3,.9]])
-    
-    model = ParallelConfounded.create(N,N1,pZ,pY,q)
-    model2 = ScaleableParallelConfounded(q,pZ,pY,N1,N2)
-    
-    model3 = ParallelConfoundedNoZAction.create(N,N1,pZ,pY,q)
-    model4 = ScaleableParallelConfoundedNoZAction(q,pZ,pY,N1,N2)
-#    xcounts,y = estimate_px_and_y_from_samples(model,10000)
-#    
-#    
-#    for x in model.get_parent_assignments():
-#        p_in_sample = [xcounts[tuple(chain([a],x))] for a in range(model.K)]
-#        np_test.assert_almost_equal(model.P(x),p_in_sample,decimal=2)
-    
-#    model1 = ParallelConfoundedNoZAction.create(N,N1,pZ,pY,q,.1)
-#    model2 = ScaleableParallelConfounded(q,pZ,pY,N1,N2)
-#    model3 = ScaleableParallelConfoundedNoZAction(q,pZ,pY,N1,N2)
-    
-   
-       
-        
-    
-    
-#    start = time.time()
-#      
-#    for i in xrange(100):
-#        eta = np.random.random(7)
-#        eta = eta/eta.sum()
-#        model2.V_short(eta)
-#    
-#    end = time.time()
-    
-#    print end - start
-    
-    #eta = model1.expand_eta(model1.random_eta_short())
-    
-    #eta = np.zeros(7)
-    #eta[1] = .5
-    
-#    for i in range(5):
-#        eta_short = model1.random_eta_short()
-#        eta = model1.expand_eta(eta_short)#model1.random_eta()
-#        print model1.V(eta)
-#        print model2.expand(model2.V_short(eta_short))
-#        print "\n"
-    
-    #eta = model1.expand_eta(eta)
-    #v1 =  model2.V(eta)
-    #v2 =  model1.V(eta) 
-    #print v1
-    #print v2
-    
-#    #print model1.V(eta)
-#    #print model2.V(eta)
-#    
-#    totals0 = np.zeros(model2.K)
-#    totals1 = np.zeros(model2.K)    
-#    for x in Model.generate_binary_assignments(N):
-#        totals0 += model2.P0(x)
-#        totals1 += model2.P1(x)
-#    print "t",totals0
-#    print "t",totals1
-##    
-##    
-#    totals = np.zeros(model2.K)
-#    for x in Model.generate_binary_assignments(N):
-#        totals+=m.P1(x)
-#    print "t",totals
-    
-    
-    
-#    totals = np.zeros(model2.K)
-#    for x in Model.generate_binary_assignments(N):
-#        totals+=m.P0(x)
-#        print m.P0(x)
-#        print m.P02(x)
-#        print "\n"
-#        np_test.assert_almost_equal(m.P0(x),m.P02(x))
-#    print totals
-#    
-    
-    
-   
-
-    
-    
-    
-    #eta = np.zeros(model1.K)
-    #eta[0:N1] = 1.0/2*N1
-    #eta[-1] = 1.0/2
-    
-    
-    
-    
-    
-    
-
-#        
-#    for n1,n2 in product(range(model2.N1+1),range(model2.N2+1)):
-#        print (n1,n2),model2.p_of_count_given_action(n1,n2)[1]
-#        
-#    print "\n"
-#        
-#    for x in model1.get_parent_assignments():
-#        print x,model2.P(x)[1]
-   
-    
-#    x = np.asarray([0,0,1],dtype=int)
-#    n1,n2 = x[0:N1].sum(),x[N1:].sum()
-#    p = model1.P(x)
-#    p1 = model2.contract(p)
-#    p2 = model2.P_counts(n1,n2)
-#    
-#    print x
-#    print n1,n2
-#    print p,"\n"
-#    
-#    print p1
-#    print p2
-#    
-    
-   
-           
-    
-
-        
-    
-    
-  
-    
-   
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
