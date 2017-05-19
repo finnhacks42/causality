@@ -1,0 +1,205 @@
+However we can also pose causal queries that are not interventional and cannot be phrased in terms of the do-notation. The patients in our drug treatment example could be broken down into four groups. \todo{point out objections to doing this}. The first group will recover whether or not they receive treatment, the second group will recover if treated but not on the placebo, the third group will recover on the placebo and not if treated, and the last group will not recover on treatment or placebo. Unfortunately, we don't know which group each person belongs to. Drawing this up as a table:
+
+\begin{tabular}{c|c|c|c}
+group & placebo & treatment & probability of group\\
+\hline
+1 & die & die & $\alpha=P(Y^{0}=0,Y^{1}=0)$\\
+2 & die & recover & $\beta=P(Y^{0}=0,Y^{1}=1)$\\
+3 & recover & die & $\gamma=P(Y^{0}=1,Y^{1}=0)$\\
+4 & recover & recover & $\delta=P(Y^{0}=1,Y^{1}=1)$\\
+\end{tabular}
+
+The queries we have been asking thus far are about $P(Y^{0}=1) = \gamma + \delta$ and $P(Y^{1}=1) = \beta + \delta$, but suppose we asked the question; what is the probability that this patient, who was not treated and died, would have recovered if they had been treated? We know they are in either group 1 or 2 since they died without treatment, so the answer is $\frac{\beta}{\alpha+\beta}$. Can we estimate the $\alpha, \beta, \gamma, \delta$ or in other words, identify the joint distribution over the counterfactuals $P(Y^{0},Y^{1})$ given the interventional distributions, $P(Y^{0})$ and $P(Y^{1})$? The answer is no, putting our constraints and unknowns in matrix form:
+
+\begin{equation}
+\left(
+\begin{array}{cccc}
+0&0&1&1\\
+1&1&0&0\\
+0&1&0&1\\
+1&0&1&0\\
+1&1&1&1\\
+\end{array}
+\right)
+\left(
+\begin{array}{c}
+\alpha\\
+\beta\\
+\gamma\\
+\delta\\
+\end{array}
+\right)= 
+\left(
+\begin{array}{c}
+P(Y^{0})\\
+1-P(Y^{0})\\
+P(Y^{1})\\
+1-P(Y^{1})\\
+1\\
+\end{array}
+\right)
+\implies
+\left(
+\begin{array}{c}
+\alpha\\
+\beta\\
+\gamma\\
+\delta\\
+\end{array}
+\right)=
+\left(
+\begin{array}{c}
+1-P(Y^{0})-P(Y^{1})+\delta\\
+P(Y^{1})-\delta\\
+P(Y^{0})-\delta\\
+\delta\\
+\end{array}
+\right)
+\end{equation}
+The value of $\delta$ is not determined so the query is not identifiable. However we do get bounds on the terms. Since probabilities cannot be negative, $P(Y{1})-P(Y^{0})-1 \leq \delta \leq min(P(Y^{1}),P(Y^{0})$. Note, if we made the additional assumption $\gamma=0$; that the drug did not cause anyone to die who would otherwise have survived, then we can determine the joint distribution over counterfactuals. Alternatively, if we could assume that after treatment people returned to their initial state after some period of time, (say we were testing a drug for acne) then we could run a crossover study to determine the joint distribution. In a crossover study, the participants are randomly assigned to treatment and placebo, results are measured and then the groups are swapped. The scientific and philosophical validity of counterfactual queries remains under question \cite{Dawid2000,Dawid2014}, however they are nonetheless widely posed in the form of attribution of causal effects to different pathways and mediation \cite{Pearl2014,Imai2010a,VanderWeele2011}. 
+
+\subsubsection{A translator from graphical independence to counter factual statements}
+
+\subsubsection{More terminology}
+With the graphical framework in place, it is useful to define some key terminology used in describing causal models in terms of the graph structure they refer to.
+
+\begin{enumerate}
+\item confounding
+\item exogenous
+\item endogenous
+\item nuisance variables
+\end{enumerate} 
+
+\section{Clarifying some confusing definitions}
+
+With a causal framework in place, we are now in a position to clarify some confusing concepts that are very prevelent in economics and social sciences.
+
+Confounding
+Exogenous
+Endogenous
+Selection bias
+...
+
+\chapter*{Random notes}
+
+
+\begin{figure}[h]
+\centering
+\caption{Causal inference without a framework}
+\label{fig:mutilatednet}
+\begin{subfigure}[t]{0.3\textwidth}
+\centering
+\caption{original network, $G$}
+\label{fig:mutilatedOriginal}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={punkt}]
+
+ %nodes
+\node[main node](1){$U$};
+\node[main node, below left=of 1](2){$X$};
+\node[main node, below right=of 1](3){$Y$};
+
+
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (2)
+    	edge node {} (3)
+    (2) edge node {} (3);
+	
+\end{tikzpicture} 
+\end{subfigure}
+\begin{subfigure}[t]{0.5\textwidth}
+\centering
+\caption{network after an intervention $G^*$}
+\label{fig:mutilatedAfter}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={punkt}]
+
+ %nodes
+\node[main node](1){$U$};
+\node[main node, below left=of 1](2){$x$};
+\node[main node, below right=of 1](3){$Y$};
+
+
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge node {} (3)
+    (2) edge node {} (3);
+    
+\end{tikzpicture}
+\end{subfigure}
+\end{figure}
+
+
+\begin{figure}[h]
+\caption{}
+\label{fig:causal_inference_without_do}
+\centering
+\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
+\node[node](2){Treatment};
+\node[node, right=of 2](3){Outcome};
+\node[lt, above=of 3](4){U};
+\path[]
+	(2) edge (3)
+	(4) edge (3);
+	
+\end{tikzpicture}
+\end{figure}
+
+
+There is a connection here to the degree to which the model is invariant. A model that is invariant to more things is more explanatory. We could look at levels of hierarchy. There is causal graphical models, which are invariant to interventions on variables. Can I tie this to a physical system and give more in depth examples of the nested tier of hierarchies?
+
+I do not see the distinction between explanation and (causal) prediction. Explanation is all about the ability to compress and to generalise. The more a model can do this, the more we view as providing an understanding of the why. 
+
+
+Sometimes the causal component is obvious. 
+
+Relationship to generalisation. Variables causally directly causally related to the outcome (either causes or effects) should be more stable predictors over time. The assumption is there are less places for change to come in. 
+
+If a feature is a cause of an outcome then changing the input distribution over that feature won't break the model. If its an effect it could.
+
+The direct causes (and effects) of a variable of interest make up a sufficient set for prediction (is this true)? This may be a reason for using structure learning type algorithms even if you are simply doing prediction.
+
+\subsubsection*{The role of assumptions in causal inference}
+
+Fundamental challenges. How do you cross-validate or compare causal inference models? Lack of real world data on which to compare algorithms. 
+
+Does predictive accuracy indicate a good causal model?
+
+Assumptions must be recognised. Without assumptions - only description is possible. Recognising the assumption (and associated risk) means that we understand we should still attempt to experiment.
+
+Generalising the results of one experiment to another (for example, dropping rocks to dropping people - with reference to the cross over trial for parachutes.) (This I think is the long term key to successful causal inference, learning from experimental data with representations that generalise). (and given sufficient generalisability, it may not matter if there is an underlying confounder - as this confounder is clearly not changing much)
+
+Is causal inference possible (are the conclusions ever valid)?
+
+Only from randomised experiment ... if people can do it without recourse to constant randomised experiment then an algorithm exits.
+
+The challenges and limitations of inferring causal effects from observation data are numerous. However, there are problems we need to solve. The questions is are these problems so serious as to warrant disregarding all non-experimental data. I think answer is a clear no. Need ongoing validation, with assumptions. We can't validate the assumptions using the observational data alone (otherwise we would not have been forced to make them).
+
+
+\subsection*{Relationship to interpretability}
+
+A desire for interpretability indicates that something has been left out of the loss function. 
+
+Are causal/interpretable models more reliable or more likely to generalise well? 
+
+One form of interpretability gives people insight into what the features are that the model is relying on. 
+
+If we know the training and test data will be sampled from different distributions, knowing what the features that the model is looking at are, allows people use their background understanding of the world to evaluate whether or not those features are likely to be transferable to the test domain. 
+
+Specifically, people can
+\begin{itemize}
+\item rule out many possible features as highly unlikely to be relevant to a problem
+\end{itemize}
+
+People have access to a lot of detailed prior knowledge. 
+
+\subsection*{Relationship to transfer learning}
+
+find a feature representation in which $P(Y|X)$ is the same in many different domains (or stable over time). Causal models predict the outcome of actions. We could directly take these actions and learn $P(Y|a,X)$ for every $(a,X)$ but, in reality, no two situations (or actions) are exactly alike. So we have to make representations such that things are stable. 
+
+This is tightly related to generalisability. If we take a person undergoing a medical test, we might describe the situation by the year and location, the person's age, gender, heart rate, medical condition and test results. We don't include , the color of the doctors shirt, the size of the room, ...
+
+For example, in the advertising setting, we want to know how our on expenditure on paid search ads is linked to sales. However, this relationship may be very unstable over time because the ad slots are sold at auction. The amount we have to pay to obtain a given position for keyword depends crucially on the amount our competitors are bidding for that keyword. However, the relationship between displaying the ad at a particular position and the probability that someone clicks it an then makes a purchase may be much more consistent. 
+
+Bandit feedback. The learner observes only the reward for the action they select. Not every possible option as in supervised learning.

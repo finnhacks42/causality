@@ -22,6 +22,7 @@
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[numbers]{natbib}
 \usepackage{wrapfig}
+\usepackage{centernot}
 
 % this is included to get tables with colored rows to not draw over hlines and vlines
 \usepackage{etoolbox}
@@ -193,7 +194,7 @@
 \newcommand{\bigomega}[1]{\Omega\left( #1 \right)}
 
 \renewcommand{\P}[1]{\operatorname{P}\left\{#1\right\}}
-\newcommand{\cf}[2]{{#1}_{#2}}
+\newcommand{\cf}[2]{{#1}^{#2}}
 \newcommand{\bernoulli}{\operatorname{Bernoulli}}
 \newcommand{\dirac}{\operatorname{Dirac}}
 \newcommand{\parents}[1]{\operatorname{\mathcal{P}a}_{#1}}
@@ -213,6 +214,8 @@
 \let\temp\epsilon
 \let\epsilon\varepsilon
 
+\newcommand{\ci}{\mathrel{\perp\mspace{-10mu}\perp}}
+\newcommand{\nci}{\centernot{\ci}}
 
 
 \author{Finnian Lattimore}
@@ -220,7 +223,8 @@
 
 \begin{document}
 \todo{figure out theoremstle is undefined}
-\def\ci{\perp\!\!\!\perp} % from Wikipedia
+%\def\ci{\perp\!\!\!\perp} % from Wikipedia
+
 
 \maketitle
 
@@ -229,132 +233,10 @@ Would from the apparent what conclude the why,
 Infer the Motive from the Deed, and show
 That what we chanced, was what we meant, to do.}{Alexander Pope}
 
-3100 words at the start of boot camp.
-
-
-\chapter*{Random notes}
-
-
-\begin{figure}[h]
-\centering
-\caption{Causal inference without a framework}
-\label{fig:mutilatednet}
-\begin{subfigure}[t]{0.3\textwidth}
-\centering
-\caption{original network, $G$}
-\label{fig:mutilatedOriginal}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
-  thick,main node/.style={punkt}]
-
- %nodes
-\node[main node](1){$U$};
-\node[main node, below left=of 1](2){$X$};
-\node[main node, below right=of 1](3){$Y$};
+\tableofcontents
 
 
 
- \path[every node/.style={font=\sffamily\small}]
-    (1) edge node {} (2)
-    	edge node {} (3)
-    (2) edge node {} (3);
-	
-\end{tikzpicture} 
-\end{subfigure}
-\begin{subfigure}[t]{0.5\textwidth}
-\centering
-\caption{network after an intervention $G^*$}
-\label{fig:mutilatedAfter}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
-  thick,main node/.style={punkt}]
-
- %nodes
-\node[main node](1){$U$};
-\node[main node, below left=of 1](2){$x$};
-\node[main node, below right=of 1](3){$Y$};
-
-
-
- \path[every node/.style={font=\sffamily\small}]
-    (1) edge node {} (3)
-    (2) edge node {} (3);
-    
-\end{tikzpicture}
-\end{subfigure}
-\end{figure}
-
-
-\begin{figure}[h]
-\caption{}
-\label{fig:causal_inference_without_do}
-\centering
-\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
-\node[node](2){Treatment};
-\node[node, right=of 2](3){Outcome};
-\node[lt, above=of 3](4){U};
-\path[]
-	(2) edge (3)
-	(4) edge (3);
-	
-\end{tikzpicture}
-\end{figure}
-
-
-There is a connection here to the degree to which the model is invariant. A model that is invariant to more things is more explanatory. We could look at levels of hierarchy. There is causal graphical models, which are invariant to interventions on variables. Can I tie this to a physical system and give more in depth examples of the nested tier of hierarchies?
-
-I do not see the distinction between explanation and (causal) prediction. Explanation is all about the ability to compress and to generalise. The more a model can do this, the more we view as providing an understanding of the why. 
-
-
-Sometimes the causal component is obvious. 
-
-Relationship to generalisation. Variables causally directly causally related to the outcome (either causes or effects) should be more stable predictors over time. The assumption is there are less places for change to come in. 
-
-If a feature is a cause of an outcome then changing the input distribution over that feature won't break the model. If its an effect it could.
-
-The direct causes (and effects) of a variable of interest make up a sufficient set for prediction (is this true)? This may be a reason for using structure learning type algorithms even if you are simply doing prediction.
-
-\subsubsection*{The role of assumptions in causal inference}
-
-Fundamental challenges. How do you cross-validate or compare causal inference models? Lack of real world data on which to compare algorithms. 
-
-Does predictive accuracy indicate a good causal model?
-
-Assumptions must be recognised. Without assumptions - only description is possible. Recognising the assumption (and associated risk) means that we understand we should still attempt to experiment.
-
-Generalising the results of one experiment to another (for example, dropping rocks to dropping people - with reference to the cross over trial for parachutes.) (This I think is the long term key to successful causal inference, learning from experimental data with representations that generalise). (and given sufficient generalisability, it may not matter if there is an underlying confounder - as this confounder is clearly not changing much)
-
-Is causal inference possible (are the conclusions ever valid)?
-
-Only from randomised experiment ... if people can do it without recourse to constant randomised experiment then an algorithm exits.
-
-The challenges and limitations of inferring causal effects from observation data are numerous. However, there are problems we need to solve. The questions is are these problems so serious as to warrant disregarding all non-experimental data. I think answer is a clear no. Need ongoing validation, with assumptions. We can't validate the assumptions using the observational data alone (otherwise we would not have been forced to make them).
-
-
-\subsection*{Relationship to interpretability}
-
-A desire for interpretability indicates that something has been left out of the loss function. 
-
-Are causal/interpretable models more reliable or more likely to generalise well? 
-
-One form of interpretability gives people insight into what the features are that the model is relying on. 
-
-If we know the training and test data will be sampled from different distributions, knowing what the features that the model is looking at are, allows people use their background understanding of the world to evaluate whether or not those features are likely to be transferable to the test domain. 
-
-Specifically, people can
-\begin{itemize}
-\item rule out many possible features as highly unlikely to be relevant to a problem
-\end{itemize}
-
-People have access to a lot of detailed prior knowledge. 
-
-\subsection*{Relationship to transfer learning}
-
-find a feature representation in which $P(Y|X)$ is the same in many different domains (or stable over time). Causal models predict the outcome of actions. We could directly take these actions and learn $P(Y|a,X)$ for every $(a,X)$ but, in reality, no two situations (or actions) are exactly alike. So we have to make representations such that things are stable. 
-
-This is tightly related to generalisability. If we take a person undergoing a medical test, we might describe the situation by the year and location, the person's age, gender, heart rate, medical condition and test results. We don't include , the color of the doctors shirt, the size of the room, ...
-
-For example, in the advertising setting, we want to know how our on expenditure on paid search ads is linked to sales. However, this relationship may be very unstable over time because the ad slots are sold at auction. The amount we have to pay to obtain a given position for keyword depends crucially on the amount our competitors are bidding for that keyword. However, the relationship between displaying the ad at a particular position and the probability that someone clicks it an then makes a purchase may be much more consistent. 
-
-Bandit feedback. The learner observes only the reward for the action they select. Not every possible option as in supervised learning.
 
 \chapter{Introduction}
 
@@ -383,7 +265,7 @@ The rise of big data sets and powerful computers has seen an explosion in the ap
 However, despite the huge advances in specific areas of machine learning (in particular deep learning), machine learning algorithms are effective only within very narrow problem settings. Getting them to generalise to even slightly different problems or data sets remains very challenging. Deciding how we should act or what policies we should implement requires us to be able to predict how a system will behave if we change it. The correlations detected by standard machine learning algorithms do not enable us to do this, no matter how many petabytes of data they are based on. As machine learning algorithms are incorporated into more and more of the decision making processes that shape the world we live it, it is critical to ensure that we understand the distinction between causality and prediction and that we develop techniques for learning how to act that are as effective as those we have for pattern recognition.
 
 
-\section{What is causality and why do we care? (2000 words)}
+\section{What is causality and why do we care? }
 
 The notion of causality has been widely debated in science and philosophy \cite{} but is still widely viewed as poorly defined \cite{}. This has led to a reluctance among applied researchers in many fields to refer to cauality in their work, leading them instead to report that variables are \textit{related}, \textit{correlated} or \textit{associated}. However, the magnitude, direction and even existance of an association depends on what other variables we adjust for (or include in a regression). Avoiding formalising causation, the real question of interest, leaves it up to the reader to determine via common sense if the association reported is the \emph{right one}. 
 
@@ -411,7 +293,7 @@ The two cultures \cite{Breiman2001}
 \item I do not see the distinction between explanation and (causal) prediction. Explanation is all about the ability to compress and to generalise. The more a model can do this, the more we view as providing an understanding of the why. 
 \item mediation?
 \end{itemize}
-\subsection{Overview of this thesis}
+
 \subsection{Identifying when we have a causal problem}
 
 \subsubsection{Examples of typical machine learning problems. Are they causal?}
@@ -479,7 +361,7 @@ I hope these examples gave you a feel for the richness and subtitles of causal i
 
 
 
-\section{Approaches to causality (1000 words)}
+\section{Approaches to causality}
 
 There are two broad approaches to deciding how to act. Reinforcement learning and causal inference. In reinforcement learning we estimate the effect of actions by taking them. We assume there is an agent capable of intervening in the system and try to find policies for the agent to follow in selecting actions so as to maximise some kind of reward. This is a very powerful and general framework (REFERENCES TO GENERAL AI). However, POINT OUT SOME OF THE DIFFICULTIES WITH REINFORCEMENT LEARNING. We are frequently presented with large bodies of data that have been collected from a system in which we did not have any control over what actions were taken. 
 
@@ -557,7 +439,7 @@ Suppose we have developed a new drug for some illness and wish to determine how 
 \vspace*{.3cm}
 \begin{example}
 \label{exm:adjusting}
-Suppose we wish to estimate what would happen to high school graduation rates if we made pre-school available and compulsory for all 4 year olds. We have a large cross-secional dataset on a group of 20 year olds that records if they attended pre-school, if they graduated high school and their parents socio-economic status (SES). We will let $X\in \set{0,1}$ indicate if an individual attended pre-school, $Y \in \set{0,1}$ indicate if they graduated high school and $Z \in \set{0,1}$ represent if they are from a low or high SES background respectively.  
+Suppose we wish to estimate what would happen to high school graduation rates if we made pre-school available and compulsory for all 4 year olds. We have a large cross-secional dataset on a group of 20 year olds that records if they attended pre-school, if they graduated high school and their parents socio-economic status (SES). We will let $X\in \set{0,1}$ indicate if an individual attended pre-school, $Y \in \set{0,1}$ indicate if they graduated high school and $Z \in \set{0,1}$ represent if they are from a low or high SES background respectively.\footnote{There has been substantial empirical work on the effectivness of early childhood education including the landmark randomised trial, the Perry Preschool project \citep{weikart1970longitudinal}}
 \end{example}
 
 
@@ -713,7 +595,12 @@ Returning to example \ref{exm:ranomized_experiment}, and phrasing our query in t
 
 
 
-In example \ref{exm:adjusting} we are interested $\P{Y|do(X=1)}$, the expected high-school graduation rate if we introduce universal preschool. We could compare it to outlawing pre-school $\P{Y|do(X=0)}$ or the current status quo $\P{Y}$. It seems reasonalble to assume that attending could pre-school effect the likelyhood of graduating from high school and that your parents socio-economic status effects both pre-school attendance and high-school graduation. If we assume that socio-economic status is the only such variable (nothing else effects both attendance \emph{and} graduation), we can represent this problem with the causal bayesian network in figure \ref{exm:adjusting}. In this case, the interventional distribution is not equivelent to the observational one. If better off parents are more likely to send their children to pre-school these children more likely to graduate high school regardless, then simply comparing the high school graduation rates of those who attended preschool with those who did not will overstate the benifit of preschool. To obtain the interventional distribution we have to estimate the benifit of preschool for each socio-economic level seperately and then weight the results by the proportion of the population in that group, $\P{Y|do(X=1)} = \sum_{z \in Z}\P{Y|X=1,Z}\P{Z}$. 
+In example \ref{exm:adjusting} we are interested $\P{Y|do(X=1)}$, the expected high-school graduation rate if we introduce universal preschool. We could compare it to outlawing pre-school $\P{Y|do(X=0)}$ or the current status quo $\P{Y}$. It seems reasonalble to assume that attending could pre-school effect the likelyhood of graduating from high school and that your parents socio-economic status effects both pre-school attendance and high-school graduation. If we assume that socio-economic status is the only such variable (nothing else effects both attendance \emph{and} graduation), we can represent this problem with the causal bayesian network in figure \ref{exm:adjusting}. In this case, the interventional distribution is not equivelent to the observational one. If better off parents are more likely to send their children to pre-school these children more likely to graduate high school regardless, then simply comparing the high school graduation rates of those who attended preschool with those who did not will overstate the benifit of preschool. To obtain the interventional distribution we have to estimate the benifit of preschool for each socio-economic level seperately and then weight the results by the proportion of the population in that group,
+
+\eqn{
+\label{eqn:backdoor_example}
+\P{Y|do(X=1)} = \sum_{z \in Z}\P{Y|X=1,Z}\P{Z}
+} 
 
 We have seen from these two examples that the expression to estimate the causal effect of an intervention depends on the structure of the causal graph. There is a very powerful and general set of rules that specify how we can transform observational distributions into intervetional ones for a given graph structure. These rules are referred to as the Do-calculus \cite{Pearl2000}. We discuss them further in section \ref{}. 
 
@@ -800,13 +687,20 @@ Another key issue with causal bayesian networks is that they cannot handle cycli
 
 The Neyman-Rubin model \cite{Rubin1974,Rubin1978,Rosenbaum1983, Rubin2005,Rubin2008} defines causality in terms of potential outcomes, or counterfactuals. Counterfactuals are statements about imagined or alternate realities, are prevalent in everyday language and may play a role in the development of causal reasoning in humans \cite{Weisberg2013}. Causal effects are differences in counterfactual variables; what is the difference between what would happen if we did one thing versus what would happen if we did something else. 
 
-In our example, the causal effect of the drug relative to placebo for person $i$ is the difference between what would happen if they were given the drug, denoted $y_{i}^{1}$ versus what would happen if they got the placebo, $y_{i}^{0}$. The fundamental problem of causal inference is that we can only observe one of these two outcomes, since a given person can only be treated or not treated. The problem can be resolved if, instead of people, you have units you can assume are identical or that will revert exactly to their initial state some time after treatment. This type of assumption often holds to a good approximation in the natural sciences and explains why researchers in these fields are less concerned with causal theory. 
+In example \ref{exm:ranomized_experiment}, the causal effect of the drug relative to placebo for person $i$ is the difference between what would happen if they were given the drug, denoted $\cf{y_{i}}{1}$ versus what would happen if they got the placebo, $\cf{y_{i}}{0}$. The fundamental problem of causal inference is that we can only observe one of these two outcomes, since a given person can only be treated or not treated. The problem can be resolved if, instead of people, you have units you can assume are identical or that will revert exactly to their initial state some time after treatment. This type of assumption often holds to a good approximation in the natural sciences and explains why researchers in these fields are less concerned with causal theory. 
 
-Instead of trying to estimate individual effects, lets see if we can learn something about the distributions under treatment or placebo.  Let $\cf{Y}{1}$ be a random variable representing the potential outcome if treated. The distribution of $\cf{Y}{1}$ is the distribution we would see of $Y$ if everyone was treated. Similarly $Y^{0}$ represents the potential outcome for the placebo. We want to know the difference between the probability of recovery, across the population if everyone was treated, and the probability of recovery given placebo  $\P{\cf{Y}{1}}-\P{\cf{Y}{0}}$. We can estimate, from an experimental or observational study, the probability that people recover if treated $P(Y|X=1)$ and the probability that they recover if not treated $P(Y|X=0)$. Now if $X=0$ then $Y = \cf{Y}{0}$. Equivalently stated:
+Instead of trying to estimate individual effects, lets see if we can learn something about the distributions under treatment or placebo.  Let $\cf{Y}{1}$ be a random variable representing the potential outcome if treated. The distribution of $\cf{Y}{1}$ is the distribution we would see of $Y$ if everyone was treated. Similarly $Y^{0}$ represents the potential outcome for the placebo. We want to know the difference between the probability of recovery, across the population if everyone was treated, and the probability of recovery given placebo  $\P{\cf{Y}{1}}-\P{\cf{Y}{0}}$. We can estimate, (from an experimental or observational study);
+
+\eq{
+\P{Y|X=1}& \text{, the probability that those who took the treatment will recover}\\
+\P{Y|X=0}& \text {, the probability that those who were not treated will recover}
+}
+
+Now, for those who took the treatment, the outcome \emph{had} they taken the treatment $\cf{Y}{1}$ is the same as the observed outcome. For those who did not take the treatment, the observed outcome is the sames as the outcome \emph{had} they not taken the treatment. Equivalently stated:
 
 \eq{
 \P{Y^{0}|X=0}&= \P{Y|X=0}\\
-\P{Y^{1}|X=1}&=P{Y|X=1}
+\P{Y^{1}|X=1}&=\P{Y|X=1}
 }
 
 If we assume $X \ci Y^{0}$ and $X \ci Y^{1}$:
@@ -820,92 +714,143 @@ If we assume $X \ci Y^{0}$ and $X \ci Y^{1}$:
 \implies \P{Y^{1}}-\P{Y^{0}} = \P{Y|X=1} - \P{Y|X=0}
 }
 
-The assumptions $X \ci Y^{1}$ and $X \ci Y^{0}$  are referred to as ignore-ability assumptions \cite{Rosenbaum1983}. They state that the treatment a each person receives is independent of whether they would recover if treated and if they would recover if not treated. Again this is justified in our example due to the randomisation of treatment assignment. In general these assumption do not hold. If people were deciding whether or not to buy the treatment, rather than it being randomly assigned, there could be a variable, for example income,D-separation still applies in the augmented model. that influenced both the decision to get treatment and the likelihood of recovery given treatment or placebo.
+The assumptions $X \ci Y^{1}$ and $X \ci Y^{0}$  are referred to as ignore-ability assumptions \cite{Rosenbaum1983}. They state that the treatment a each person receives is independent of whether they would recover if treated and if they would recover if not treated. This is justified in example \ref{exm:ranomized_experiment} due to the randomisation of treatment assignment. In general the treatment assignment will not be independent of the potential outcomes. In example \ref{exm:adjusting}, the children who attended preschool may be more likely to have graduated highschool had they in fact not attended than the children who actually did not attend, $X \nci \cf{Y}{0}$. Similarly, had the poorer children who did not attend pre-school attended they might not have done as well as the children who did in fact attend, $X \nci \cf{Y}{1}$. A more general form of the ignore-ability assumption is to identify a set of variables $Z$ such that $X \ci Y^{1}|Z$ and $X \ci Y^{0}|Z$. 
 
-\todo{SUTVA assumption}
+\vspace*{.3cm}
+\begin{theorem}[Ignore-ability] If $X \ci Y^{1}|Z$ and $X \ci Y^{0}|Z$,
 
-There are some complex philosophical objections to counter factuals arising from the way they describe alternate universes that were never realised and are not empirically testable \ref{XXXXX}. This can result in some concrete problems. Consider the following example based on  \ref{Dawid2000}.
+\eqn{
+\label{eqn:counterfactual1}
+\P{\cf{Y}{1}} &= \sum_{z \in Z}\P{Y|X=1,Z}\P{Z}  \\
+\label{eqn:counterfactual2}
+\P{\cf{Y}{0}} &= \sum_{z \in Z}\P{Y|X=0,Z}\P{Z}
+}
+\end{theorem}
 
-Again we have a drug, where the outcome for an individual if treated is represented by the counterfactual variable $\cf{Y}{1}$ and the outcome if not treated is $\cf{Y}{0}$. Suppose these counterfactual variables $\cf{Y}{1}$ and $\cf{Y}{0}$ are jointly normal. We will assume equal variance for simplicity.
+If we assume that within each socio-economic status level, attendence at pre-school is independent to the likelyhood of graduating high-school had you attended then we can compute the average rate of high-school graduation given a universal pre-school program from equation \ref{eqn:counterfactual1}. Note, that this agrees with the weighted adjustment formula in equation \ref{eqn:backdoor_example}. 
+
+Another assumption introduced within the Neyman-Rubin causal framework is the Stable Unit Treatment Value Assumption (SUTVA) \cite{Rubin1978}. This is the assumption that the potential outcome for one individual (or unit) does not depend on the treatment assigned to another individual. As an example of a SUTVA violation, suppose disadvantaged four year olds were randomly assigned to attend pre-school. The later school results of children in the control group, who did not attend, could be boosted by the improved behaviour of those did and who now share the classroom with them. SUTVA violations would manifest as a form of model misspecification in causal Bayesian networks. 
+
+
+There are complex philosophical objections to counterfactuals arising from the way they describe alternate universes that were never realised. This makes it quite easy to (accidentally) make statements with counterfactuals that can not be tested with empirical data. Consider the following example based on \citet{Dawid2000}. Again we have a drug, where the outcome for an individual if treated is represented by the counterfactual variable $\cf{Y}{1}$ and the outcome if not treated is $\cf{Y}{0}$. Suppose these counterfactual variables $\cf{Y}{1}$ and $\cf{Y}{0}$ are jointly normal with equal variance (for simplicity).
 
 % vector with mean mu_t,mu_c and a covariance matrix
-\eq{
-P(Y_t,Y_c) \sim N()
+\eqn{
+P(\cf{Y}{1},\cf{Y}{0}) \sim N( 
+         \begin{bmatrix}
+           \mu_{1} \\
+           \mu_2 \\
+         \end{bmatrix},
+         \begin{bmatrix}
+           \sigma^2 & \rho \sigma^2 \\
+           \rho \sigma^2 & \sigma^2 \\
+         \end{bmatrix}
+         )
 }
 
-then their difference is also normal,
+Their difference is also normal. Let $\tau = \cf{Y}{1} - \cf{Y}{0}$,
 
-\eq{
-P(\tau) = N(\mu_t - \mu_c,2\sigma^{2}(1-\rho))
+\eqn{
+P(\tau) = N(\mu_1 - \mu_0,2\sigma^{2}(1-\rho))
 }
 
-\includegraphics[scale=.6]{figures/counterfactual_nonidentify.pdf}
 
-Key issue is that we can never observe the joint distribution over $Y_t$ and $Y_c$. As a result, the variance of $\tau$ is not identifiable, even from experimental data. It seems on the face of it that $\tau$ is relevant to our decision making. If the example above, if $\rho = 1$ then almost everyone benefits slightly from the treatment. However if $\rho=0$, there is a wide range, with some people benefiting a lot and others suffering significant harm.  
+\begin{figure}[h]
+\captionsetup[subfigure]{position=b}
+\centering
+\caption{The distribution of individual treatment effects is not identifiable, even from a randomized controlled trial.}
+\label{fig:metaphysical_distribution_difference}
+\subcaptionbox{Marginal distributions over the potential outcomes $\cf{Y}{1}$ and $\cf{Y}{0}$ for $\mu_1=1$, $\mu_0=0$ and $\sigma = 1$. The blue curve shows the distribution of $Y$ if everyone were to be treated and the blue curve the distribution if no-one was treated. \label{fig:metaphys_a}}{\includegraphics[width=.45\linewidth]{figures/counterfactual_nonidentify_a.pdf}}
+\hspace{0.02\textwidth}
+\subcaptionbox{Two very different distributions of individual causal effects consistent with the potential outcome distributions. \label{fig:metaphys_b}}
+{\includegraphics[width=.45\linewidth]{figures/counterfactual_nonidentify_b.pdf}}
+\end{figure}
 
-Can these issues be resolved? If so, how? 
+From a (large) randomized controlled trial we can estimate the marginal distributions over the counterfactual variables, see figure \ref{fig:metaphys_a}. These represent the distributions we would expect over the outcome $Y$ if everyone were treated or not treated retrospectively. However, the distribution over the individual causal effects depends on $\rho$, see figure \ref{fig:metaphys_b}. The key problem is that we can never observe the joint distribution over $\cf{Y}{1}$ and $\cf{Y}{0}$. As a result, $\rho$ and thus the variance of $\tau$ is not identifiable, even from experimental data. \citet{Dawid} argues that we should avoid using counterfactuals as they are defined in terms of (metaphysical) individual causal effects. He further points out that the interventional distributions in figure \ref{fig:metaphys_a}, along with a loss function, contain all the information required to decide how to treat a new patient.  
 
-- note that we can bound this counterfactual distribution based on the variance of the observed interventional distributions. If the variance of XXX is small then this may not be an issue. 
+This result is unintuative. It seems on the face of it that the distribution of individual causal effects is relevant to our decision making. If $\rho = 1$ then almost everyone benefits slightly from the treatment whilst if $\rho=0$, there is a wide range, with some people benefiting a lot and others suffering significant harm. This confusion can be resolved by thinking about personalised rather than individual causal effects. It is entirely possible that potentialy observable characteristics (such as gender, age, genetics, etc) effect how people will respond to the treatment. We can partition people into sub-populations on the basis of these characteristics and measure different \emph{personalised} causal effects for each group. The variance of the potential outcome distributions $f(\cf{Y}{1})$ and $f(\cf{Y}{0})$ provides bounds on how much we stand to gain from further personalisation. The metaphysical nature of individual causal effects only arises when we are at the point where the only remaining variation is due to inherent randomness (or variables that we could not even in principle measure). 
 
-- does it actually make sense to make a decision on the basis of this counterfactual that is a function of something we could never observe. I
-
-- part of the problem may be due to the deterministic way we have phrased individual treatment effects. 
-
-Can these issues be resolved by considering personalised causal effects as random variables and avoiding counterfactuals?
-
-A range of similar issues can arise in counterfactuals \ref{XXXX}. 
-- What assumptions are required for the kind of counterfactual analysis like X would have been higher had B ...?
-- briefly discuss the different flavours of counterfactual questions here. 
-
-One way of looking at counterfactuals is as a natural language short hand for describing highly specific interventions like those denoted by the do-notation. Rather than taking about the distribution of Y given we intervene to set $X=x$ and hold everything else about the system constant we just say what would the distribution of $Y$ be had $X$ been $X$. This is certainly convenient, if rather impressive. 
+One way of looking at counterfactuals is as a natural language short hand for describing highly specific interventions like those denoted by the do-notation. Rather than taking about the distribution of $Y$ given we intervene to set $X=x$ and hold everything else about the system constant we just say what would the distribution of $Y$ be had $X$ been $x$. This is certainly convenient, if rather imprecise. However, the ease with which we can make statements with counterfactuals that cannot be tested with empirical data warrents careful attention. We should always be clear what assumptions we are making and have in mind if it is possible (at least in theory) to validate those assumptions.  
 
 \section{Structural Equation models}
 \label{sec:SEM}
 
 Structural equation models (SEMs) describe a deterministic world, where some underlying mechanism or function determines the output of any process for a given input. The mechanism (but not the output) is assumed to be independent of what is fed into it. Uncertainties are not inherent but arise from unmeasured variables. Linear structural equation models have a long history for causal estimation \cite {Wright1921,Haavelmo1943}. More recently, they have been formalised, generalised to the non-linear setting and connected to developments in graphical models to provide a powerful causal framework \cite{Pearl2000}.
 
-Mathematically, each variable is a deterministic function of its direct causes and a noise term that captures unmeasured variables. The noise terms are required to be mutually independent. If there is the possibility that an unmeasured variable influences more than one variable of interest in a study, it must be modelled explicitly as a latent (unobserved) variable. Structural equation models can be represented visually as a network. Each variable is a node and arrows are drawn from causes to their effects. For example \ref{exm:ranomized_experiment} the SEM is:
-
+Mathematically, each variable is a deterministic function of its direct causes and a noise term that captures unmeasured variables. The noise terms are required to be mutually independent. If there is the possibility that an unmeasured variable influences more than one variable of interest in a study, it must be modelled explicitly as a latent (unobserved) variable. Structural equation models can be represented visually as a network. Each variable is a node and arrows are drawn from causes to their effects. Figure \ref{fig:sem_randomized_treatment} illustrates the SEM for example \ref{exm:ranomized_experiment}.
 
 \begin{figure}[h]
-\caption{SEM for examples \ref{exm:ranomized_experiment}}
-\label{fig:causal_network_example2}
+\caption{SEM for example \ref{exm:ranomized_experiment}}
+\label{fig:sem_randomized_treatment}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
-\node[node](2){$X = x$};
-\node[node, right=of 2](3){$Y = f(X,\epsilon_y)$};
+\node[node](2){$X = f_x(\epsilon_x)$};
+\node[node, right=of 2](3){$Y = f_y(X,\epsilon_y)$};
 \node[lt, above=of 3](4){$\epsilon_y$};
+\node[lt, above=of 2](5){$\epsilon_x$};
 \path[]
 	(2) edge (3)
-	(4) edge (3);
+	(4) edge (3)
+	(5) edge (2);
 \end{tikzpicture}
 \end{figure}
 
-This model encodes the assumption that the outcome $y_{i}$ for an individual $i$ is caused solely by the treatment $x_{i}$ they receive and other factors $\epsilon_{y_{i}}$ that are independent of $X$. This is justifiable on the grounds that $X$ is random. The outcome of a coin flip for each patient should not be related to any of their characteristics (hidden or otherwise). Note that the causal graph in figure \ref{fig:causal_network_example2} is identical to that the bayesian network for the same problem, figure \ref{fig:causal_network_example}. The latent variable $\epsilon_y$ was not explicitly drawn in figure \ref{fig:causal_network_example} as the noise can be captured within the probabilistic node, however adding it would not change the model. 
- 
+This model encodes the assumption that the outcome $y_{i}$ for an individual $i$ is caused solely by the treatment $x_{i}$ they receive and other factors $\epsilon_{y_{i}}$ that are independent of $X$. This is justifiable on the grounds that $X$ is random. The outcome of a coin flip for each patient should not be related to any of their characteristics (hidden or otherwise). Note that the causal graph in figure \ref{fig:causal_network_example2} is identical to that the bayesian network for the same problem, figure \ref{fig:causal_network_example}. The latent variables $\epsilon_x$ and $\epsilon_y$ are not explicitly drawn in figure \ref{fig:causal_network_example} as are captured by the probabilistic nature of the nodes in a Bayesian network, however adding them would not change the model. 
 
-We want to estimate the causal effect of treatment; what is the probability of recovery if we \textbf{take the action} 'treat' versus the \textbf{action} 'placebo'? Taking the action 'treat'  corresponds to replacing the equation $X = \epsilon_{x}$ with $X=1$. The probability distribution over $Y$ given we set $X=1$ is then $P(Y = y|do(X=1)) = P(f(1,\epsilon_{y})=y)$, where we have introduced the $do$ notation to distinguish setting a variable from observing it \cite{Pearl1995}. However, for this model,  The probability of observing $Y$ given $X=1$, $P(Y = y|X = 1)$ is also given by $P(f(1,\epsilon_{y})=y)$ because $\epsilon_{y} \ci \epsilon{x}$. The causal effect is exactly the difference in observed outcomes, as we would intuitively expect for a randomised experiment. In this case, due to the assumption that $X \rightarrow Y$ and that there is no hidden common cause, correlation is causation.  
+Taking the \emph{action} $X=1$ corresponds to replacing the equation $X=f_x(\epsilon_x)$ with $X=1$. The function $f_y$ and distribution over $\epsilon_y$ does not change. This results in the interventional distribution \footnote{We have assumed the variables are discrete only for notational convinience},
 
-For a model with $N$ variables, a structural equation model looks like a set of $N$ simultaneous equations, with each variable playing the role of the dependent (left hand side) variable in one equation. However a SEM is, by definition, more than a set of simultaneous equations. By declaring it to be structural we are saying that it represents assumptions about the relationships between variables. When we visualise the model as a network the absence of an arrow between two variables encodes the assumption that one does not cause the other.
+\eqn {
+\P{Y=y|do(X=1)} = \sum_{\epsilon_y}\P{\epsilon_y}\ind{f_y(1,\epsilon_y)=y}
+}
+
+The observational distribution of $Y$ given $X$ is,
+
+\eqn{
+\P{Y=y|X=1} &= \sum_{\epsilon_x}\sum_{\epsilon_y}\P{\epsilon_x|X=1}\P{\epsilon_y|\epsilon_x}\ind{f_y(1,\epsilon_y)=y} \\
+& = \sum_{\epsilon_y}\P{\epsilon_y}\ind{f_y(1,\epsilon_y)=y} \text{, as } \epsilon_x \ci \epsilon_y
+}
+
+The interventional distribution is the same as the observational one. The same arguament applies to the intervention $do(X=0)$ and so the causal effect is just the difference in observed outcomes as we found via the causal Bayesian network and counterfactual approaches. 
+
+The SEM for example \ref{exm:adjusting} is shown in figure \ref{fig:sem:preschool}. Intervening to send all children to pre-school replaces the equation $X = f_x(Z,\epsilon_x)$ with $X=1$, leaving all the other functions and distributions in the model unchanged. 
+
+\eqn{
+\P{Y=y|do(X=1)} &= \sum_{z}\sum_{\epsilon_y}\P{z}\P{\epsilon_y}\ind{f_y(1,z,\epsilon_y)=y} \\
+\label{eqn:sem:adjusting}
+&=\sum_{z}\P{z}\underbrace{\sum_{\epsilon_y}\P{\epsilon_y}\ind{f_y(1,z,\epsilon_y)=y}}_{\P{Y=y|X=1,Z=z}}
+}
+Equation \ref{eqn:sem:adjusting} corresponds to equations \ref{eqn:backdoor_example} and \ref{eqn:counterfactual1}. It is not equivelent to the observational distribution, given by;
+
+\eqn{
+\P{Y=y|X=1} = \sum_{z}\sum_{\epsilon_y}\P{z|X=1}\P{\epsilon_y}\ind{f_y(1,z,\epsilon_y)=y}
+}
 
 
-Limitations \& Criticisms 
-- can express some non-measurable things
-	- example of that
+\begin{figure}[h]
+\caption{SEM for example \ref{exm:adjusting}}
+\label{fig:sem:preschool}
+\centering
+\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
+\node[node](2){$X = f_x(Z,\epsilon_x)$};
+\node[node,above right=of 2](6){$Z = f_z(\epsilon_z)$};
+\node[lt, above=of 6](7){$\epsilon_z$};
+\node[node, below right=of 6](3){$Y = f_y(X,Z,\epsilon_y)$};
+\node[lt, above=of 3](4){$\epsilon_y$};
+\node[lt, above=of 2](5){$\epsilon_x$};
+\path[]
+	(2) edge (3)
+	(4) edge (3)
+	(5) edge (2)
+	(7) edge (6)
+	(6) edge (2) edge (3);
+\end{tikzpicture}
+\end{figure}
 
-- confusion may occur as to whether interpretation is causal
-
-- can they handle cycles?
-
-
-
-
+Structural equation models are generally applied with strong constraints on the functional form of the relationship between the variables and noise is typically assumed to be additive, $X_i = f_i(\cdot)+\epsilon_i$. A structural equation model with $N$ variables looks like a set of $N$ simultaneous equations, with each variable playing the role of the dependent (left hand side) variable in one equation. However a SEM is, by definition, more than a set of simultaneous equations. By declaring it to be structural we are saying that it represents assumptions about the relationships between variables. When we visualise the model as a network the absence of an arrow between two variables encodes the assumption that one does not cause the other. The similarity between the notation used to describe and analyse structural equation models and simultaneuos equations, combined with a reluncatnce to make explicit statements about causality has led to some confusion in the interpretation of SEMs \citep{heckman2015causal,Pearl2000}. 
 
 \section{Comparing and unifying the models}
 
-Remarkably for models developed relatively independently in fields with very different approaches and problems, the models we have discussed can be nicely unified for interventional queries (those that can be expressed with the do-notation). This makes it straightforward to combine key results and algorithms developed within any of these frameworks. For example, draw a graphical network to determine if a problem is identifiable and which variables should be adjusted for to obtain an unbiased causal estimate. Then use propensity scores \ref{} estimate the effect. If non-parametric assumptions are insufficient for identification or lead to overly large uncertainties, you can specify additional assumptions by phrasing your model in terms of structural equations. 
-
-If the network for a structural equation model is acyclic, that is if starting from any node and following edges in the direction of the arrows you cannot return to the starting point, then it implies a recursive factorisation of the joint distribution over its variables. In other words, the network is a causal Bayesian network. All of the results that apply to causal Bayesian networks also apply to acyclic structural equation models.  Taking an action that sets a variable to a specific value equates to replacing the equation for that variable with a constant. This corresponds to dropping a term in the factorisation and the truncated product formula (equation \ref{eq:truncatedproduct}). Thus, the interventional query $P(Y|do(X))$ is identical in these two frameworks. We can also connect this to counterfactuals via:
+Remarkably for models developed relatively independently in fields with very different approaches and problems, the models we have discussed can be nicely unified for interventional queries (those that can be expressed with the do-notation). If the network for a structural equation model is acyclic, that is if starting from any node and following edges in the direction of the arrows you cannot return to the starting point, then it implies a recursive factorisation of the joint distribution over its variables. In other words, the network is a causal Bayesian network. All of the results that apply to causal Bayesian networks also apply to acyclic structural equation models.  Taking an action that sets a variable to a specific value equates to replacing the equation for that variable with a constant. This corresponds to dropping a term in the factorisation and the truncated product formula (equation \ref{eq:truncatedproduct}). Thus, the interventional query $P(Y|do(X))$ is identical in these two frameworks. We can also connect this to counterfactuals via:
 
 \begin{equation}
 \begin{aligned}
@@ -921,97 +866,17 @@ The assumption $\epsilon_{X} \ci \epsilon_{Y}$, stated for our structural equati
 X \ci Y^{0} \text{ and } X \ci Y^{1}
 \end{equation}
 
-It is possible to relax the independence of errors assumption we made for SEMs slightly to correspond exactly the form of equation (\ref{eq:weakignore}) without losing any of the power provided by d-separation and graphical identification rules \cite{Richardson2013}. To determine if and how an interventional query can be non-parametrically identified, it is equivalent to specify assumptions graphically in terms of functional models or bayesian networks or as conditional independence statements involving counterfactual variables (ignorability assumptions). By non-parametrically, I mean that we are not making any assumptions about the form of the relationships between variables. Models that are not non-parametrically identifiable can still be identified given assumptions about the distributions of variables and the functional relationship between them, for example, that the functions are linear or that the noise is additive \cite{Peters2014}. This form of assumption fits extremely naturally into the structural equation framework. 
+It is possible to relax the independence of errors assumption we made for SEMs slightly to correspond exactly the form of equation (\ref{eq:weakignore}) without losing any of the power provided by d-separation and graphical identification rules \cite{Richardson2013}. This correspondence between the models for interventional queries (those that can be phrased using the do-notation) makes it straightforward to combine key results and algorithms developed within any of these frameworks. For example, you can draw a causal graphical network to determine if a problem is identifiable and which variables should be adjusted for to obtain an unbiased causal estimate. Then use propensity scores\cite{Rosenbaum1983} to estimate the effect. If non-parametric assumptions are insufficient for identification or lead to overly large uncertainties, you can specify additional assumptions by phrasing your model in terms of structural equations. The frameworks do differ when it comes to causal queries that involve joint or nested counterfactuals and cannot be expressed with the do-notation. These types of queries arise in the study of mediation \citep{Pearl2014,Imai2010a,VanderWeele2011} and legal discrimination \citep{Pearl2000}. 
 
-
-However we can also pose causal queries that are not interventional and cannot be phrased in terms of the do-notation. The patients in our drug treatment example could be broken down into four groups. \todo{point out objections to doing this}. The first group will recover whether or not they receive treatment, the second group will recover if treated but not on the placebo, the third group will recover on the placebo and not if treated, and the last group will not recover on treatment or placebo. Unfortunately, we don't know which group each person belongs to. Drawing this up as a table:
-
-\begin{tabular}{c|c|c|c}
-group & placebo & treatment & probability of group\\
-\hline
-1 & die & die & $\alpha=P(Y^{0}=0,Y^{1}=0)$\\
-2 & die & recover & $\beta=P(Y^{0}=0,Y^{1}=1)$\\
-3 & recover & die & $\gamma=P(Y^{0}=1,Y^{1}=0)$\\
-4 & recover & recover & $\delta=P(Y^{0}=1,Y^{1}=1)$\\
-\end{tabular}
-
-The queries we have been asking thus far are about $P(Y^{0}=1) = \gamma + \delta$ and $P(Y^{1}=1) = \beta + \delta$, but suppose we asked the question; what is the probability that this patient, who was not treated and died, would have recovered if they had been treated? We know they are in either group 1 or 2 since they died without treatment, so the answer is $\frac{\beta}{\alpha+\beta}$. Can we estimate the $\alpha, \beta, \gamma, \delta$ or in other words, identify the joint distribution over the counterfactuals $P(Y^{0},Y^{1})$ given the interventional distributions, $P(Y^{0})$ and $P(Y^{1})$? The answer is no, putting our constraints and unknowns in matrix form:
-
-\begin{equation}
-\left(
-\begin{array}{cccc}
-0&0&1&1\\
-1&1&0&0\\
-0&1&0&1\\
-1&0&1&0\\
-1&1&1&1\\
-\end{array}
-\right)
-\left(
-\begin{array}{c}
-\alpha\\
-\beta\\
-\gamma\\
-\delta\\
-\end{array}
-\right)= 
-\left(
-\begin{array}{c}
-P(Y^{0})\\
-1-P(Y^{0})\\
-P(Y^{1})\\
-1-P(Y^{1})\\
-1\\
-\end{array}
-\right)
-\implies
-\left(
-\begin{array}{c}
-\alpha\\
-\beta\\
-\gamma\\
-\delta\\
-\end{array}
-\right)=
-\left(
-\begin{array}{c}
-1-P(Y^{0})-P(Y^{1})+\delta\\
-P(Y^{1})-\delta\\
-P(Y^{0})-\delta\\
-\delta\\
-\end{array}
-\right)
-\end{equation}
-The value of $\delta$ is not determined so the query is not identifiable. However we do get bounds on the terms. Since probabilities cannot be negative, $P(Y{1})-P(Y^{0})-1 \leq \delta \leq min(P(Y^{1}),P(Y^{0})$. Note, if we made the additional assumption $\gamma=0$; that the drug did not cause anyone to die who would otherwise have survived, then we can determine the joint distribution over counterfactuals. Alternatively, if we could assume that after treatment people returned to their initial state after some period of time, (say we were testing a drug for acne) then we could run a crossover study to determine the joint distribution. In a crossover study, the participants are randomly assigned to treatment and placebo, results are measured and then the groups are swapped. The scientific and philosophical validity of counterfactual queries remains under question \cite{Dawid2000,Dawid2014}, however they are nonetheless widely posed in the form of attribution of causal effects to different pathways and mediation \cite{Pearl2014,Imai2010a,VanderWeele2011}. 
-
-There are differences between the models we have considered when it comes to counterfactual queries. Counterfactuals are not defined in causal Bayesian networks, as they only encode information on the interventional distribution over variables.  Counterfactuals can be defined in terms of structural equation models \cite{Pearl2000} but there are subtle differences depending on the form of assumptions made. Structural equation models with independent errors allows the identification of quantities in mediation studies, which are not identifiable with the weak ignorability assumptions and cannot be tested experimentally \cite{Richardson2013}.  
-
-In practice, differences in focus and approach across different fields eclipse these actual differences in the models. The work on causal graphical models \cite{Pearl2000,Sprites} focuses on non-parametric estimation in the population limit and rigorous theoretical foundations. The Neyman-Rubin framework builds on our understanding of randomised experiment and generalises to quasi-experimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimating average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \cite{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data so as to support policy decisions is central to the field. Economists are often interested in broader measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \cite{Heckman2008}. In addition, the parametric structural equation models favoured in economics can be extended to analyse cyclic (otherwise referred to as non-recursive) models. 
-
-
-\subsubsection{A translator from graphical independence to counter factual statements}
-
-\subsubsection{More terminology}
-With the graphical framework in place, it is useful to define some key terminology used in describing causal models in terms of the graph structure they refer to.
-
-\begin{enumerate}
-\item confounding
-\item exogenous
-\item endogenous
-\item nuisance variables
-\end{enumerate} 
+In practice, differences in focus and approach between the fields in which each model dominates eclipse the actual differences in the frameworks. The work on causal graphical models \cite{Pearl2000,Sprites} focuses on asymptopic, non-parametric estimation and rigorous theoretical foundations. The Neyman-Rubin framework builds on our understanding of randomised experiment and generalises to quasi-experimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimating average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \cite{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data so as to support policy decisions is central to the field. Economists are often interested in broader measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \cite{Heckman2008}. In addition, the parametric structural equation models favoured in economics can be extended to analyse cyclic (otherwise referred to as non-recursive) models. 
 
 \section{What does a causal model give us? Resolving Simpson's paradox}
 
-We will now demonstrate how we can use our new notation and frameworks for causal inference to resolve a fascinating paradox.  \todo{ insert some history of Simpson's paradox here.}
-
-\cite{simpson1951interpretation}
-
-Suppose a doctor has two treatments, A and B, which she offers to patients to prevent heart disease. She keeps track of which medication her patients choose and whether or not the treatment is successful. She obtains the results in table \ref{tab:simpson1}.
+We will now demonstrate how we can apply our new notation and frameworks for causal inference to resolve a fascinating paradox, noted by \citet{yule1903notes}, demonstrated in real data by \citet{Cohen1934} and popularised by \citet{simpson1951interpretation}. The following example is adapted from \citet{Pearl2000}. Suppose a doctor has two treatments, A and B, which she offers to patients to prevent heart disease. She keeps track of which medication her patients choose and whether or not the treatment is successful. She obtains the results in table \ref{tab:simpson1}.
 
 \begin{table}[h]
-\label{tab:simpson1}
 \caption{Treatment results}
+\label{tab:simpson1}
 \center
 \begin{tabular}{c c c c c}
 Treatment & Success & Fail & Total & Success Rate\\
@@ -1026,8 +891,8 @@ A &  87 & 13 & 100 & 87\%\\
 It looks like drug A is performing better. However, having read the latest literature on how medications effect men and women differently, she decides to break down her results by gender to see how well the drugs perform for each group and obtains the data in table \ref{tab:simpson2}.
 
 \begin{table}[h]
-\label{tab:simpson2}
 \caption{Treatment results by gender}
+\label{tab:simpson2}
 \center
 \begin{tabular}{c c c c c c}
 Gender & Treatment & Success & Fail & Total & Success Rate\\
@@ -1044,8 +909,7 @@ F & B & 19 & 1 & 20 & 95\%\\
 
 Much to her surprise, once the data is broken down by gender, Treatment B looks better for both men \emph{and} women. Suppose the doctor must choose only one drug to prescribe to all her patients in future (perhaps she must reccomend which to subsidise under a national health scheme). Should she choose A or B? The ambiguity in this question lies at the heart of Simpson's paradox. How does causal modelling resolve the paradox? The key is that the doctor is trying to choose between \emph{interventions}. She wants to know what the success rate will be if she changes her practise to give all the patients one drug, rather than allowing them to choose as currently occurs. 
 
-Let's represent the treatment by the variable $T$, the gender of the patient by $Z$ and whether or not the treatment was successful by $Y$. The doctor cares about $\P{Y|do(T)}$, not the standard conditional distributions $\P{Y|T}$. Unfortunately, the data in tables tables \ref{tab:simpson1} and \ref{tab:simpson2} is insufficient to enable us to estimate the interventional distribution $\P{Y|do(T)}$ or determine if $do(T=A)$ is better or worse than $do(T=B)$. We require some assumptions about the causal relationships between the variables. In this example, it seems reasonable to conclude that gender may effect the treatment chosen and the outcome. If we assume there are no other such confounding variables (for example income) then we obtain the causal network in figure \ref{fig:simpsons_paradox}.
-
+Let's represent the treatment by the variable $T$, the gender of the patient by $Z$ and whether or not the treatment was successful by $Y$. The doctor cares about $\P{Y|do(T)}$, not the standard conditional distributions $\P{Y|T}$. Unfortunately, the data in tables \ref{tab:simpson1} and \ref{tab:simpson2} is insufficient to enable us to estimate the interventional distribution $\P{Y|do(T)}$ or determine if $do(T=A)$ is better or worse than $do(T=B)$. We require some assumptions about the causal relationships between the variables. In this example, it seems reasonable to conclude that gender may effect the treatment chosen and the outcome. If we assume there are no other such confounding variables (for example income) then we obtain the causal network in figure \ref{fig:simpsons_paradox}.
 
 \begin{figure}[h]
 \caption{An example of Simpson's Paradox}
@@ -1084,16 +948,26 @@ Is the solution to Simson's paradox to always to break down the data by as many 
 \end{tikzpicture}
 \end{figure}
 
-Note that we have not changed the data itself, only the story we tell around it. This illustrates that the resolution to Simpson's paradox lies fundamentally not in the data itself but in what assumptions we are willing to make. From a purely statisitcal viewpoint there is no paradox. The reversal is just a case of INSERT VECTOR ARGUAMENT HERE. The 'paradox' only arises when we need to use the data to select an intervention. 
+Note that we have not changed the data itself, only the description of the variables that it is associated with. This illustrates that the resolution to Simpson's paradox lies fundamentally not in the data but in what assumptions we are willing to make. From a purely statisitcal viewpoint there is no paradox. The reversal just stems from the mathematical property of ratios expressed in equation \ref{eqn:simpsons_paradox} and represented graphically in figure \ref{fig:simpsons_vector}. The paradox only arises when we attempt to use the data to select an intervention and is resolved when we apply a causal approach to do so.
 
-I should also point out that there are many other plausible causal graphs for both scenarios above. Perhaps income effects drug choice as well as gender, or gender could effect treatment choice and blood preassure control given treatment, etc. Causal modeling provides us with a powerful 
+\eqn{
+\label{eqn:simpsons_paradox}
+\exists \set{N_1,...N_4, N_1'...N_4'} \in \mathbb{N} : \; 
+\textcolor{green}{\frac{N_1}{N_2}< \frac{N_1'}{N_2'}}, \;\; 
+\textcolor{blue}{ \frac{N_3}{N_4}<\frac{N_3'}{N_4'}}
+ \text{ and } \frac{N_1+N_3}{N_2+N_4} > \frac{N_1'+N_3'}{N_2'+N_4'}
+}
 
+\begin{figure}
+\centering
+\caption{Simpson's reversal visualized. The ratios involving $N_i'$ are steeper than than those involving $N_i$ for both the blue and green vectors. However, when we sum them, the ratio is steeper for the un-primed variables.}
+\label{fig:simpsons_vector}
+\includegraphics[scale=.4]{figures/simpson_vector}
+\end{figure}
 
+ 
 
-Human in the loop ML. Why would you need the human?
-
-\todo{mention relationship to ecological fallacy}
-
+There are many other plausible causal graphs for both scenarios above. Perhaps income effects drug choice as well as gender, or gender could effect treatment choice and blood preassure control given treatment, etc. Causal modeling provides us with a powerful tool to specify such assumptions and determine how to estimate causal effects for a given model see section \ref{sec:causal effect estimation}.
 
 \chapter{Two key questions}
 
@@ -1101,6 +975,7 @@ We can roughly categorise the problems studied within causal inference into two 
 
  
 \section{Causal effect estimation} 
+\label{sec:causal effect estimation}
 
 Causal effect estimation addresses the problem where we assume the key structure of the graph is known. That is, we assume that we have at a minimum:
 
