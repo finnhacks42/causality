@@ -203,3 +203,46 @@ This is tightly related to generalisability. If we take a person undergoing a me
 For example, in the advertising setting, we want to know how our on expenditure on paid search ads is linked to sales. However, this relationship may be very unstable over time because the ad slots are sold at auction. The amount we have to pay to obtain a given position for keyword depends crucially on the amount our competitors are bidding for that keyword. However, the relationship between displaying the ad at a particular position and the probability that someone clicks it an then makes a purchase may be much more consistent. 
 
 Bandit feedback. The learner observes only the reward for the action they select. Not every possible option as in supervised learning.
+
+Note that the consistency of the estimator in this case does not guarantee that it is optimal for a finite dataset. For example, the expected generalisation error may be reduced by adding a regularizer that reduces the variance at a cost of introducing some bias. 
+
+
+Point out that in some cases we are only considering the treatment for a particular group - in which case we should focus attention on good estimates for the causal effect within that group. Causal effect of treatment on the treated is a special case of that. 
+
+\eqn{
+ACE = \Esub{z\sim \P{\vb{Z}}}{\E{Y|1,\vb{z}}-\E{Y|0,\vb{z}}}
+} 
+
+
+\eqn{
+\hat{\mu}_{do(x)} = \left(\frac{\sum_{i=1}^n \ind{x_i = x,\vb{z_i} = \vb{z}}y_i}{\sum_{i=1}^n \ind{x_i = x,\vb{z_i} = \vb{z}}}\right)
+}
+
+What about research into efficient estimators for identifiable queries where the back door criterion is not satisfied. - eg front door criterion (probably little research). 
+
+%\subsection{Non identifiable queries}
+In many cases the query of interest will not be identifiable. In this setting we are left with a choice between making additional assumptions (for example that variables are linearly related) or aiming to obtain bounds rather than point estimates for the causal effect of interest. Or we may do both. One of the most widely used methods in this category is the instrumental variable. 
+
+Instrumental variables are often conceptualised as natural experiments. The goal is to find a variable that substantially influences the treatment but that is conditionally independent of the remaining variables in the network. 
+
+For example, we might want to compare the results for juvenile offenders depending on whether they spent their time awaiting trial in a custom facility for young offenders as opposed to a unit within an adult jail. The process by which children are assigned to different facilities may well be non-random. However, it might be that in many cases the decision was based purely on the fact that the juvenile facility was full. We could then use the number of places remaining in the juvenile facility as an instrumental variable. 
+
+The causal network for an ideal instrumental variable is shown in figure XXX. It is not identifiable (non-parametrically) because. If we assume linearity it ? \todo{what exact guarantees do we get for instrumental variables}. Without a linearity assumption we would want the instrumental variable to be highly predictive of the treatment assignment so as to obtain reasonable bounds. But if we make the assumption that everything is linear then it would seem that even a weak instrumental variable should (in theory) suffice. 
+
+In some cases we might have a choice between adjusting for causal effects via the backdoor theorem or utilising an instrumental variable to obtain bounds. It is not the case that the former method is always superior even though it has better asymptotic results. For example 
+
+DEMONSTRATE a specific example where instrumental variables obtain better estimates than adjustment even when all the criteria for adjustment have been met. Start with a case were the adjustment is very high dimensional and the instrumental variable is strong. (the effect of the variables on the treatment assignment will have to be week (otherwise the instrument is not strong). 
+
+
+\subsection{Does causal effect estimation work}
+Really know one knows.
+
+There are relatively few studies that have compared the observational study results with those obtained by randomised experiments. One of the key examples is the XX job network study. Initial analysis suggested that a range of causal estimation techniques all ...
+
+A Cochrane meta-analysis of studies comparing observational with experimental results found ... \citep{Anglemyer2014}.
+
+\paragraph*{How can we construct data sets on which to test casual effect estimation techniques}
+One can start from a randomised experiment and deliberately drop some of the data. Draw up the graphical model for this process and the assumptions inherent in it. 
+
+Modelling a problem as a causal graph only makes sense when rewards are generated stochastically - since causal graphs fundamentally model probability distributions over variables. Thus the connection is to stochastic bandit problems (although adversarial bandits algorithms may be applied to stochastic problems).
+

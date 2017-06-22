@@ -2003,7 +2003,7 @@ Instead of positing a functional restriction on the relationship between variabl
 The previous sections all focus on aspects of the question; how can we estimate the effect of an intervention in a system from data collected prior to taking it. There is an obvious alternative. Instead of trying to infer the outcome of an intervention from passive observations one can intervene and see what happens. There are three key differences between observing a system and explicitly intervening in it. Firstly, when we intervene we choose which actions to take and thus have control over which data points we obtain to learn from. Selecting data points optimally for learning is the focus of the optimal experimental design liturature within statistics \citep{pukelsheim2006optimal} and the active learning liturature in machine learning \citep{settles2010active}. Secondly, explicitly choosing interventions yields a perfect model of the probability with which each action is selected, given any context, allowing control over confounding bias. Finally, when we are intervening in a system we typically care about the impact of our actions on the system in addition to optimising learning. For example, in a drug trial , assigning people a sub-optimal treatment has real world costs. This leads to a trade-off between exploiting the best known action so far and exploring alternative actions about which we are less certain. This exploration-exploitation trade-off lies at the heart of the field of reinforcement learning \citep{sutton1998reinforcement}. 
 
 \section{Randomised experiments}
-Randomised controlled trials are often presented as the gold standard for determining causal effects. What is it about randomisation that makes it so important when it comes to causality? The graphical model for a randomised controlled experiment is shown in figure \ref{fig:random_experiment_network}. If we assume perfect compliance (everyone takes the treatment that we select for them) then we have a perfect model for the treatment assignment process. Since treatment is assigned randomly, there can be no other variables that influence it and thus no confounding variables that effect both treatment and outcome. 
+Randomised controlled trials are often presented as the gold standard for determining causal effects in many areas of social sciences and economics. What is it about randomisation that makes it so important when it comes to causality? The graphical model for a randomised controlled experiment is shown in figure \ref{fig:random_experiment_network}. If we assume perfect compliance (everyone takes the treatment that we select for them) then we have a perfect model for the treatment assignment process. Since treatment is assigned randomly, there can be no other variables that influence it and thus no confounding variables that effect both treatment and outcome. 
 
 \begin{figure}
 \caption{causal network for a randomised experiment}
@@ -2044,49 +2044,39 @@ Stratified randomised experiments address the issue of variance due to covariate
 \end{tikzpicture}
 \end{figure} 
 
-The benefit provided by randomisation in breaking the link between the treatment variable and any latent confounders should not be understated. The possibility of unobserved confounders cannot be empirically ruled out from observational data \citep{Pearl2000} (there is no test for confounding). This means causal estimates from non-experimental data are always subject to the criticism that an important confounder may have been overlooked or not properly adjusted for. However, randomised experiments do have some limitations. 
+The benefit provided by randomisation in breaking the link between the treatment variable and any latent confounders should not be understated. The possibility of unobserved confounders cannot be empirically ruled out from observational data \citep{Pearl2000} (there is no test for confounding). This means causal estimates from non-experimental data are always subject to the criticism that an important confounder may have been overlooked or not properly adjusted for. However, randomised experimentation does have some limitations. 
 
 \subsection{Limitations of randomised experiments}
 \label{subsec:limitations_of_experiment}
+\begin{enumerate}
 
-The idealised notion of an experiment represented by figure \ref{fig:random_experiment_network} does not capture the complexities of randomised experiments in practice. There may be imperfect compliance, the treatment selected by the randomiser is not always followed, or output censoring, the experimenter is not able to observe the outcome for all units (for example if people drop out). If compliance or attrition is not random but associated with (potentially latent) variables that also effect the outcome then the problem of confounding bias returns.\footnote{Non-compliance is a problem if the goal is to estimate the causal effect of the treatment on the outcome but not if the goal is to estimate the causal effect of prescribing the treatment. The latter makes sense in a context where the process by which people decide whether or not to take the treatment they have been prescribed is likely to be the same if the treatment were made available more generally beyond experimental trial.} See figure \ref{fig:random_experiment_network_imperfect_compliance} for a the graphical model of a randomised experiment with imperfect compliance.
+\item The probability that an individual is treated is set in advance and fixed over the course of the experiment. As the experiment proceeds we may start to see evidence that one treatment is much more effective than another. However (in a pure randomised experiment) we don't use this information to update the treatment that later patients revive. The result is that some will unessential be given a sub-optimal treatment. 
+\item Experiments are expensive and difficult to conduct. This means experimental data sets are often much smaller than observational ones, limiting the complexity of models we can explore.
 
-\begin{figure}
-\caption{causal network for a randomised experiment with imperfect compliance}
-\label{fig:random_experiment_network_imperfect_compliance}
-\centering
-\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=3em,thick, node/.style={observedrect}, lt/.style={latent}]
-\node[node](1){Actual Treatment};
-\node[node,above left=of 1](5){Assigned Treatment};
-\node[node, above =of 5](2){Randomiser};
-\node[node, right=of 1](3){Outcome};
-\node[lt, above left=of 3](4){U};
-\path[]
-	(2) edge (5)
-	(5) edge (1)
-	(1) edge (3)
-	(4) edge (3) edge (1);
-\end{tikzpicture}
-\end{figure} 
+\item Experiments are often conducted on a convenient but unrepresentative sample of the broader population of interest (for example first year collage students at research universities). This can result in estimates with high \emph{internal validity} \citep{Campbell1963} in that they should replicate well in a similar population, but very low \emph{external validity}. The results may not carry over to the general population of interest. The question of whether an experiment conducted on one population can be mapped to another is referred to as the transportability problem \citep{Bareinboim2013} \todo{check ref} and relies on very similar assumptions and arguments to causal inference and the do-calculus. 
 
-It is not always possible or ethical to conduct a randomized controlled trial as is beautifully demonstrated by the paper of \citet{smith2003parachute} on randomised cross-over trials of parashute use for the reduction of the mortality and morbity associated with falls from large hights \ref{fig:parashute}. When experimentation is possible, it is frequently difficult or expensive. This means experimental data sets are often much smaller than observational ones, limiting the complexity of models we can explore. In addition, they are often conducted on a convenient but unrepresentative sample of the broader population of interest (for example first year students at research universities). This can result in estimates with high \emph{internal validity} \citep{Campbell1963} in that they should replicate well in a similar population, but very low \emph{external validity}; the results may not carry over to the general population of interest. The question of whether an experiment conducted on one population can be mapped to another is referred to as the transportability problem \citep{Bareinboim2013} and relies on very similar assumptions and arguments to causal inference and the do-calculus. 
+\item The idealised notion of an experiment represented by figure \ref{fig:random_experiment_network} does not capture the complexities of randomised experiments in practice. There may be imperfect compliance: the treatment selected by the randomiser is not always followed. Or output censoring: the experimenter is not able to observe the outcome for all units (for example if people drop out). If compliance or attrition is not random but associated with (potentially latent) variables that also effect the outcome then the problem of confounding bias returns. See figure XXX for a the graphical model of a randomised experiment with imperfect compliance and outcome censoring. 
 
-\begin{figure}
+\item It is not always possible or ethical to conduct a randomised experiment \cite{parachutes} \ref{Parachute use to prevent death and major trauma related to gravitational challenge: systematic review of randomised controlled trials}. 
+\end{enumerate}
+
+
+\begin{figure}[h]
 \begin{center}
 \caption{Experiments are not always ethical}
-\label{fig:parashute}
 \includegraphics[scale=.4]{double_blind_parashute_trial_cartoon.png}
 \end{center}
 \end{figure}
 
-Finally, non-adaptive randomised experiments are not optimal from either an active or reinforcement learning perspective. As an experiment proceeds information is obtained about the expectation and variance of each intervention (or treatment). Fixed experimental designs cannot make use of this information to select which intervention to try next. This results in both poorer estimates for a fixed number of experimental samples and more sub-optimal actions during the course of the experiment.
-
 \section{Multi armed bandits}
-\label{sec:multi-armed-bandits}
+\todo{is there a way in latex to have a command for referring to each type of thing like figure, subsection, etc such that it can be updated programmatically?}
 
-Multi-armed bandits address the problem of desiging experiments that can adapt as samples are observed. In its classic formulation \cite{Robbins1952} the (stochastic) K-armed bandit describes a sequential decision making problem, with $K$ possible actions or arms. Each arm $i$ is associated with a fixed but unknown reward distribution $\nu_i$. \footnote{In order to obtain regret bounds, some assumptions are required on the distributions $\nu_i$. It sufficient to assume they are sub-Gaussian.} For each time step $t$ up to a horizon $T$ the learner selects an action $I_t \in \set{1...K}$ and receives a reward, $g_{I_t,t}$, sampled i.i.d from $\nu_i$. The goal of the learner is to maximise the total reward they receive. This problem captures the exploration-exploitation trade-off. The learner must balance playing arms that have yielded good results previously with exploring arms about which they are uncertain. The total reward a bandit algorithm can expect to acheive depends on the distributions from which the rewards for each action are sampled. To account for this the performance of a bandit algorithm is generally described by the the difference between the expected reward obtained by the algorithm and the expected reward of selecting the best action in every time step. This difference is known as the regret. 
+Multi-armed bandits were originally introduce by XXXX to address the problem that it is sub-optimal to fix a probability of treatment in advance as we discussed in subsection \ref{subsec:limitations_of_experiment}. The problem can be formally stated as follows:
 
-\todo{clarify pseudo vs expected regret}
+\paragraph*{Definition} 
+In its classic formulation \cite{Robbins1952} the (stochastic) K-armed bandit describes a sequential decision making problem, with $K$ possible actions or arms. Each arm $i$ is associated with a fixed but unknown reward distribution $\nu_i$. In order to obtain regret bounds, some assumptions are required on the distributions $\nu_i$. It sufficient to assume they are sub-Gaussian.  For each time step $t$ up to a horizon $T$ the learner selects an action $I_t \in \set{1...K}$ and receives a reward, $g_{I_t,t}$, sampled i.i.d from $\nu_i$. The goal of the learner is to maximise the total reward they receive. This problem introduces the fundamental exploration-exploitation trade-off. The learner must balance playing arms that have yielded good results previously with exploring arms about which they are uncertain. 
+
+The performance of bandit algorithms is generally described by the (pseudo) regret, $R(T)$. This is the difference between the expected reward obtained by the algorithm and the expected reward of selecting the best action in every time step. 
 
 \subsection{Regret} How do we measure the performance of a bandit algorithm?
 
@@ -2103,8 +2093,6 @@ Pseudo-Regret
 R_T(\pi) &= max_{i \in [k]}\E{\sum_{t=1}^T{X_{t,i}}} - \E{\sum_{t=1}^T{X_{t,A(t)}}} \\
 &= n\mu_{i^*} - \E{\sum_{t=1}^T{X_{t,A(t)}}}
 }
-
-
 
 Simple Regret
 \eqn{
