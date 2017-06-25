@@ -246,3 +246,34 @@ One can start from a randomised experiment and deliberately drop some of the dat
 
 Modelling a problem as a causal graph only makes sense when rewards are generated stochastically - since causal graphs fundamentally model probability distributions over variables. Thus the connection is to stochastic bandit problems (although adversarial bandits algorithms may be applied to stochastic problems).
 
+\subsection{The exploration/exploitation trade-off}
+A central aspect to bandit problem is the trade of between exploiting the information we have already obtained with exploring options about which we remain uncertain. Suppose you have sampled five of your local restaurants and found one which you really enjoyed. How often should you eat there versus exploring new options. The degree to which you should explore versus exploit depends on how many step remain to go in the game and what assumptions you make about the distributions from which the rewards are sampled. If this is your last meal you might as well just eat the food you enjoy most but if you hope to live for many meals to come then you stand to gain by sampling a wider range of options. In many cases, the total number of rounds that you will get to play in the game is unknown. If you cannot imagine that it would be possible for a meal to be substantially better than that which you obtain (in expectation) at your current favourite then there is little point exploring further. 
+
+\eqn{
+\rawregret = \max_{i=1,...,k} \left(\sum_{t=1}^T Y_{t,i} \right) - \sum_{t=1}^T Y_{t,a_t}
+}
+
+To account for this, the performance of bandit algorithms is quantified by the the difference between the reward obtained by the algorithm and the reward that would have been obtained by selecting, in every time-step, the the single arm that yields the best reward in hindsight.
+
+
+The term regret is heavily overloaded in the bandit liturature. In addition to the quanity in equation \ref{eqn:raw_regret} it may refer to the difference between the reward obtained by the algorithm and the reward that would have been obtained by selecting, in every time-step, the the single arm that yields the best reward in hindsight \citep{} or too the expectation .
+
+\vspace{0.5cm}
+\begin{definition}[Expected Regret]
+\eqn{
+\label{eqn:expected_regret_definition}
+\expectedregret(\pi) = \E{max_{i \in [k]} \sum_{t=1}^T{Y_{t,i}}} - \E{\sum_{t=1}^T{Y_{t,a_t}}}
+}
+\end{definition}
+
+\vspace{0.5cm}
+\begin{definition}[Stochasitic k-armed bandit problem]
+The multi-armed bandit problem proceeds over $T$ rounds. In each round $t$, 
+\begin{enumerate}
+\item the learner selects an action $a_{t} \in \set{1,...,k}$, based on the actions and rewards from previous time-steps and a (potentially stochastic) \emph{policy} $\pi$
+\item the world stochasitcally generates rewards for each action $i \in {1,...,k}$, $Y_{t,i} \sim \Pns{i}{y}$
+\item the learner observes and recieves (only) the reward for the selected action $Y_{t,a_t}$ 
+\end{enumerate}
+At the end of the game the total reward obtained by the learner is $\sum_{t=1}^T Y_{t,a_t}$. We denote the expected reward for the action $i$, $\E{ \Pns{i}{y}}$, by $\mu_i$ and the action with the highest expected reward by $i^*$. 
+\end{definition} 
+
