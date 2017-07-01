@@ -94,13 +94,18 @@ class ThompsonSampling(object):
     def run(self,T,model):
         self.trials = np.full(model.K,2,dtype=int)
         self.success = np.full(model.K,1,dtype=int)
+        self.rewards = np.zeros(T)
+        self.arms = np.zeros(T)
         
         for t in xrange(T):
             fails = self.trials - self.success
             theta = np.random.beta(self.success,fails)
             arm = argmax_rand(theta)
             self.trials[arm] +=1
-            self.success[arm]+= model.sample_multiple(arm,1)
+            reward = model.sample_multiple(arm,1)
+            self.success[arm]+= reward
+            self.rewards[t] = reward
+            self.arms[t] = arm
         
         mu = np.true_divide(self.success,self.trials)
         self.best_action = argmax_rand(mu)
@@ -113,25 +118,45 @@ class UCB(object):
     def run(self,T,model):
         if T <= model.K: # result is not defined if the horizon is shorter than the number of actions
             self.best_action = None
+            self.rewards = None
             return np.nan
+            
+        self.rewards = np.zeros(T)
+        self.arms = np.zeros(T)
         
         actions = range(0,model.K)
         self.trials = np.ones(model.K)
         self.success = model.sample_multiple(actions,1)
+        self.arms[0:model.K] = np.asarray(actions)
+        self.rewards[0:model.K] = self.success
         
+        best_reward = max(model.expected_rewards)
+       
         for t in range(model.K,T):
             arm = argmax_rand(self.upper_bound(t))
             self.trials[arm] += 1
-            self.success[arm] +=model.sample_multiple(arm,1)
+            reward = model.sample_multiple(arm,1)
+            self.success[arm] += reward
+            self.arms[t] = arm
+            self.rewards[t] = reward
+            #self.regret[t] = best_reward - model.expected_rewards[arm]
         
         mu = np.true_divide(self.success,self.trials)
         self.best_action = argmax_rand(mu)
-        return max(model.expected_rewards) - model.expected_rewards[self.best_action]
+        return best_reward - model.expected_rewards[self.best_action]
+    
+    
+        
+    
+        
         
         
 
 class AlphaUCB(UCB):
-    """ Implementation based on ... """
+    """ 
+    Implementation based on ... 
+    UCB-1 corresponds to setting alpha = 4
+    """
     label = "UCB"
     
     def __init__(self,alpha):

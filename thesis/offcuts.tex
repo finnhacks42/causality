@@ -82,6 +82,15 @@ Selection bias
 
 \chapter*{Random notes}
 
+\section*{Causality and marketing}
+\begin{itemize}
+\item If your sales are entirely online, can you attribute all sales to marketing because; start with 0 sales. Spend some dollars on marketing, which leads to customers. Additional sales can occur because of customer experience, word of mouth or new advertising, but regardless these additional sales are a consequence of the advertising spend at time 0. (what about natural search)? 
+\item Do we have any idea how people found out about us (when they purchase our brands?), ie from search, from a friend, etc
+\item The previous arguament doesn't apply when there are physical stores - since people may find out about the product without any advertising in that case. 
+\item Does buying visits through paid search increase the ranking one acheives in natural search. 
+\item would be interesting to analyse natural search position as a function of market share. 
+\end{itemize}
+
 
 \begin{figure}[h]
 \centering
@@ -277,3 +286,15 @@ The multi-armed bandit problem proceeds over $T$ rounds. In each round $t$,
 At the end of the game the total reward obtained by the learner is $\sum_{t=1}^T Y_{t,a_t}$. We denote the expected reward for the action $i$, $\E{ \Pns{i}{y}}$, by $\mu_i$ and the action with the highest expected reward by $i^*$. 
 \end{definition} 
 
+\todo{connect bandit regret to early stopping of experiment problem}
+The problem of when to stop an experiment early can also be phrased as a bandit problem and analysed with the same techniques. XXX et al showed that if use an experimental setup with early stopping, the regret you obtain will be at least twice that you could have achieved had you made each decision sequentially using a bandit approach. Of course this neglect any costs that might be associated with the complexity in implementation of the two approaches.
+
+The bandit learning algorithm is sometimes compared to the standard supervised learning in terms of the feedback recieved. One way of viewing the standard supervised learning setting is that the label for each instance corresponds to the correct or optimal choice for that setting. However, this does not have to be the case. In the bandit setting the algorithm observes only the reward for the selected action. How are standard supervised learning problems translated to bandit problems for testing algorithms? (is it contextual bandit problems?)
+
+Bandit algorithms that require the horizon $T$ to be known in advance are refered to as \emph{fixed horizon} algorithms, as opposed to \emph{anytime} algorithms that do not rely on knowing the horizon. A fixed horizon algorithm may be converted to an anytime algorithm via the so called "doubling trick" \citep{}. The algorithm starts with some fixed horizon and increases it at a fixed rate everytime the current horizon is reached until the problem terminates. \todo{what can be said about the optimality of this?}
+
+In the classical multi-armed bandit problem, the rewards for each arm are sampled stochastically from a fixed (but unknown) distribution. There is a large body of work analysing a more general formulation of the bandit problem that relaxes this stochastic assumption. 
+
+This lower bound says that for any algorithm for the k-armed bandit problem, there exists a set of reward distributions such that the expected is $\bigomega{\sqrt{kT}}$.
+
+The expectation is with respect the random sequence of actions. 

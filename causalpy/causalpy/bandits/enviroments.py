@@ -40,6 +40,27 @@ def prod_all_but_j(vector):
     joint = np.prod(vector)
     return np.true_divide(joint,vector)
     
+class TimeVaryingBernoulliModel(object):
+    """ 
+    A model that shifts the rewards for each arm linearly,
+    as a function of the time-step".
+    """
+    def __init__(self,initial_expected_rewards,final_expected_rewards,T):
+        self.K = len(initial_expected_rewards)
+        self.t = 0
+        self.slope = (final_expected_rewards - initial_expected_rewards)/float(T)
+        self.intercept = initial_expected_rewards
+        self.expected_rewards = self.expected_rewards_t(0)
+    
+    def expected_rewards_t(self,t):
+        return self.intercept + self.slope*t
+        
+    def sample_multiple(self,actions,n):
+        p = self.expected_rewards[actions]
+        self.t += 1
+        self.expected_rewards = self.expected_rewards_t(self.t)
+        return binomial(n,p)
+    
 class BasicBernoulliModel(object):
     """ A model for generating data for standard bandits without side information """
     
@@ -47,7 +68,7 @@ class BasicBernoulliModel(object):
         """
         expected_rewards: an array of length K containing the expected rewards for each arm.
         """
-        self.expected_rewards = expected_rewards
+        self.expected_rewards = np.asarray(expected_rewards)
         self.K = len(self.expected_rewards)
                 
     @classmethod
