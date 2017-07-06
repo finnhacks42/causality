@@ -245,14 +245,14 @@ That what we chanced, was what we meant, to do.}{Alexander Pope}
 
 \tableofcontents
 
-\chapter*{Todo}
+\chapter*{To-do}
 \begin{enumerate}
 \item Add something about Granger causality - does this belong in chapter 2 or chapter 3?
-\item Sell my PhD as two key contribution. 1) A technical one, the other educational and unifying (accross viewpoints)
+\item Sell my PhD as two key contribution. 1) A technical one, the other educational and unifying (across viewpoints)
 \item Add a chapter in 'PhD prose' making some statement about the intersection of prediction and causality. When is a problem causal, what bounds does predictive accuracy give on causal models? To what degree is predictive accuracy a metric on which causal models can be judged? 
 \item Benchmark estimation algorithms
-\item clarify causal interpretation of dirichlet models
-\item Empirical evaluation of bandit algorithms (updated to include latest suggestions). Maybe a proper software benchmarking solution?
+\item clarify causal interpretation of Dirichlet models
+\item Empirical evaluation of bandit algorithms (updated to include latest suggestions). Maybe a proper software bench-marking solution?
 \item If comparing bandit performance, it would be interesting to include some that violate the stochastic bandit assumption. For example, if the rewards change slowly over time or jump suddenly a limited number of times, or with some small probability. 
 \end{enumerate}
 
@@ -724,13 +724,13 @@ If we assume $X \ci Y^{0}$ and $X \ci Y^{1}$:
 \P{Y^{0}} &= \P{Y^{0}|X=0} = \P{Y|X=0}
 }
 
-This implies the counterfactual distributions are equivelent to the corresponding conditional distributions and, for a binary outcome $Y$, the causal effect is,
+This implies the counterfactual distributions are equivalent to the corresponding conditional distributions and, for a binary outcome $Y$, the causal effect is,
 
 \eq{
 \P{Y^{1}}-\P{Y^{0}} = \P{Y|X=1} - \P{Y|X=0}
 }
 
-The assumptions $X \ci Y^{1}$ and $X \ci Y^{0}$  are referred to as ignorebility assumptions \citep{Rosenbaum1983}. They state that the treatment each person receives is independent of whether they would recover if treated and if they would recover if not treated. This is justified in example \ref{exm:ranomized_experiment} due to the randomisation of treatment assignment. In general the treatment assignment will not be independent of the potential outcomes. In example \ref{exm:adjusting}, the children who attended preschool may be more likely to have graduated high school had they in fact not attended than the children who actually did not attend, $X \nci \cf{Y}{0}$. Similarly, had the poorer children who did not attend pre-school attended they might not have done as well as the children who did in fact attend, $X \nci \cf{Y}{1}$. A more general form of the ignorebility assumption is to identify a set of variables $Z$ such that $X \ci Y^{1}|Z$ and $X \ci Y^{0}|Z$. 
+The assumptions $X \ci Y^{1}$ and $X \ci Y^{0}$  are referred to as ignorability assumptions \citep{Rosenbaum1983}. They state that the treatment each person receives is independent of whether they would recover if treated and if they would recover if not treated. This is justified in example \ref{exm:ranomized_experiment} due to the randomisation of treatment assignment. In general the treatment assignment will not be independent of the potential outcomes. In example \ref{exm:adjusting}, the children who attended preschool may be more likely to have graduated high school had they in fact not attended than the children who actually did not attend, $X \nci \cf{Y}{0}$. Similarly, had the poorer children who did not attend pre-school attended they might not have done as well as the children who did in fact attend, $X \nci \cf{Y}{1}$. A more general form of the ignorability assumption is to identify a set of variables $Z$ such that $X \ci Y^{1}|Z$ and $X \ci Y^{0}|Z$. 
 
 \vspace*{.3cm}
 \begin{theorem}[Ignorability] If $X \ci Y^{1}|Z$ and $X \ci Y^{0}|Z$,
@@ -1699,7 +1699,7 @@ If the parametric model is miss-specified then the parameter that minimises the 
 \begin{figure}[h]
 \centering
 \caption{
-Parametric regression may yeild poor estimates of causal effects if the model is miss-specified, even if the model fits well over the domain of the training data. In this example, $\P{Z|X=0} \sim N(\mu_0,\sigma_0^2)$ and $\P{Z|X=1} \sim N(\mu_1,\sigma_1^2)$ with little overlap in the densities. If $X=0$ then $Y \sim N(f_1(x)=sin(x),\sigma_y^2)$ and if $X=1$ then $Y \sim N(f_0(x) = \frac{1}{x+1},\sigma_y^2)$. We estimate $f_1(z)$ from the sample in which $X=1$ (green points) and $f_0(z)$ from the sample for which $X=0$ (blue points). In both cases the linear model is a good fit to the data. However, the resulting estimate of the causal effect is very poor for the lower values of $z$. } 
+Parametric regression may yield poor estimates of causal effects if the model is miss-specified, even if the model fits well over the domain of the training data. In this example, $\P{Z|X=0} \sim N(\mu_0,\sigma_0^2)$ and $\P{Z|X=1} \sim N(\mu_1,\sigma_1^2)$ with little overlap in the densities. If $X=0$ then $Y \sim N(f_1(x)=sin(x),\sigma_y^2)$ and if $X=1$ then $Y \sim N(f_0(x) = \frac{1}{x+1},\sigma_y^2)$. We estimate $f_1(z)$ from the sample in which $X=1$ (green points) and $f_0(z)$ from the sample for which $X=0$ (blue points). In both cases the linear model is a good fit to the data. However, the resulting estimate of the causal effect is very poor for the lower values of $z$. } 
 \label{fig:covariate_shift_adjust}
 \includegraphics[scale=.55]{covariate_shift_estimation.pdf}
 \end{figure}
@@ -1726,7 +1726,7 @@ e(\vb{z})\equiv \P{x=1|\vb{z}}
 
 The estimator in equation \ref{eqn:importance_weighted_erm} is an example of a doubly robust estimator \citep{scharfstein1999adjusting,}. Doubly robust methods are asymptotically unbiased as long as either the regression model $h$ or propensity score $e$ are correctly specified \citep{robins1995semiparametric}. 
 
-The propensity score can be used to estimate the average causal effect without specifying a regression model for $\E{Y|X,\vb{Z}}$. \citet{Rosenbaum1983} demonstrated that if the ignorability assumption is satisfied by conditioning on $\vb{Z}$, then it is also satisfied by conditioning on $e(\vb{z})$. This allows for estimators based on stratifying, matching or regression on the propensity score rather than the covariates $\vb{Z}$. Inverse propensity weighting can also be combined with empirical estimation of $\E{Y|X,Z}$ yielding the simple, albeit inefficient, estimator in equation \ref{eqn:simple_inverse_propensity} \citep{Imbens2004}. In some settings, such as stratified randomised trials \citep{imbens2015causal} or learning from logged bandit feedback \citep{Bottou2013} the propensity score may be known. However in general, it must be estimated from data. Frequently this is done with a simple parametric model such as logistic regression, but a wide range of standard machine learning algorithms including bagging and boosting, random forests and nueral networks can also be applied   \citep{Austin2011}. \citet{Lunceford2004} review the theoretical properties of key propensity score based estimators, including stratification and inverse propensity weighting. 
+The propensity score can be used to estimate the average causal effect without specifying a regression model for $\E{Y|X,\vb{Z}}$. \citet{Rosenbaum1983} demonstrated that if the ignorability assumption is satisfied by conditioning on $\vb{Z}$, then it is also satisfied by conditioning on $e(\vb{z})$. This allows for estimators based on stratifying, matching or regression on the propensity score rather than the covariates $\vb{Z}$. Inverse propensity weighting can also be combined with empirical estimation of $\E{Y|X,Z}$ yielding the simple, albeit inefficient, estimator in equation \ref{eqn:simple_inverse_propensity} \citep{Imbens2004}. In some settings, such as stratified randomised trials \citep{imbens2015causal} or learning from logged bandit feedback \citep{Bottou2013} the propensity score may be known. However in general, it must be estimated from data. Frequently this is done with a simple parametric model such as logistic regression, but a wide range of standard machine learning algorithms including bagging and boosting, random forests and neural networks can also be applied   \citep{Austin2011}. \citet{Lunceford2004} review the theoretical properties of key propensity score based estimators, including stratification and inverse propensity weighting. 
 
 \eqn{
 \E{Y|do(X=x)} = \Esub{z\sim \P{\vb{Z}}}{\E{Y|x,\vb{z}}} = \Esub{z\sim \P{\vb{Z|x}}}{\E{Y|x,\vb{z}}\frac{1}{e(\vb{z})}}
@@ -1758,7 +1758,7 @@ The practical performance of the estimation approaches discussed in this section
 
 The significance of this should not be underestimated. Cross-validation has allowed applied machine learning to succeed with a very atheoretical approach on the basis that we can identify when a model is successful. With causal effect estimation there is no guarantee that a model that performs well at prediction (even out of sample) will accurately estimate the outcome of an intervention. \citet{Sugiyama2007} propose inverse propensity weighted cross validation for the covariate shift problem. There is relatively little theory on model selection for estimating the propensity score. To achieve asymptotically unbiased estimates, the covariates should satisfy the backdoor criterion. It is also known that conditioning on instrumental variables, which directly influence $X$ but not $Y$, increases variance without any reduction in bias and can increase bias if there are unmeasured confounding variables \citep{Wooldridge2009,Bhattacharya2012,Pearl2012b,Myers2011}. With doubly robust estimators, one could apply an iterative approach, fitting a propensity score model, using the results for inverse propensity weighted cross-validation of the regression model and then selecting covariates for the propensity model on the assumption the estimated regression function was correct. I have found no examples of such an approach.
 
-The performance of methods for causal effect estimation can be tested on simulated data \citep{Frolich2001,zhao2004using,Hill2011,Dorie2016} or by comparing estimates from observational studies with the results from corresponding exeriments \citep{lalonde1986evaluating,Fraker1987,heckman1997matching,heckman1998characterizing,dehejia1999causal,Smith2001,Anglemyer2014}. Unfortunately there are a relatively small number of examples where comparable observational and experimental data are available. The results are mixed with later studies finding generally better alignment of results but it is hard to ascertain if this is due to improved methodological approaches or over-fitting to the available data-sets.  
+The performance of methods for causal effect estimation can be tested on simulated data \citep{Frolich2001,zhao2004using,Hill2011,Dorie2016} or by comparing estimates from observational studies with the results from corresponding experiments \citep{lalonde1986evaluating,Fraker1987,heckman1997matching,heckman1998characterizing,dehejia1999causal,Smith2001,Anglemyer2014}. Unfortunately there are a relatively small number of examples where comparable observational and experimental data are available. The results are mixed with later studies finding generally better alignment of results but it is hard to ascertain if this is due to improved methodological approaches or over-fitting to the available data-sets.  
 
 
 \section{Causal Discovery}
@@ -2011,7 +2011,7 @@ Instead of positing a functional restriction on the relationship between variabl
 
 \chapter{The interventionist viewpoint}
 
-The previous sections all focus on aspects of the question; how can we estimate the effect of an intervention in a system from data collected prior to taking it. There is an obvious alternative. Instead of trying to infer the outcome of an intervention from passive observations one can intervene and see what happens. There are three key differences between observing a system and explicitly intervening in it. Firstly, when we intervene we choose which actions to take and thus have control over which data points we obtain to learn from. Selecting data points optimally for learning is the focus of the optimal experimental design liturature within statistics \citep{pukelsheim2006optimal} and the active learning liturature in machine learning \citep{settles2010active}. Secondly, explicitly choosing interventions yields a perfect model of the probability with which each action is selected, given any context, allowing control over confounding bias. Finally, when we are intervening in a system we typically care about the impact of our actions on the system in addition to optimising learning. For example, in a drug trial , assigning people a sub-optimal treatment has real world costs. This leads to a trade-off between exploiting the best known action so far and exploring alternative actions about which we are less certain. This exploration-exploitation trade-off lies at the heart of the field of reinforcement learning \citep{sutton1998reinforcement}. 
+The previous sections all focus on aspects of the question; how can we estimate the effect of an intervention in a system from data collected prior to taking it. There is an obvious alternative. Instead of trying to infer the outcome of an intervention from passive observations one can intervene and see what happens. There are three key differences between observing a system and explicitly intervening in it. Firstly, when we intervene we choose which actions to take and thus have control over which data points we obtain to learn from. Selecting data points optimally for learning is the focus of the optimal experimental design literature within statistics \citep{pukelsheim2006optimal} and the active learning literature in machine learning \citep{settles2010active}. Secondly, explicitly choosing interventions yields a perfect model of the probability with which each action is selected, given any context, allowing control over confounding bias. Finally, when we are intervening in a system we typically care about the impact of our actions on the system in addition to optimising learning. For example, in a drug trial , assigning people a sub-optimal treatment has real world costs. This leads to a trade-off between exploiting the best known action so far and exploring alternative actions about which we are less certain. This exploration-exploitation trade-off lies at the heart of the field of reinforcement learning \citep{sutton1998reinforcement}. 
 
 \section{Randomised experiments}
 Randomised controlled trials are often presented as the gold standard for determining causal effects. What is it about randomisation that makes it so important when it comes to causality? The graphical model for a randomised controlled experiment is shown in figure \ref{fig:random_experiment_network}. If we assume perfect compliance (everyone takes the treatment that we select for them) then we have a perfect model for the treatment assignment process. Since treatment is assigned randomly, there can be no other variables that influence it and thus no confounding variables that effect both treatment and outcome. 
@@ -2034,7 +2034,10 @@ Randomised controlled trials are often presented as the gold standard for determ
 
 Randomisation does not ensure target and control group are exactly alike. The more other features (observed or latent) influence the outcome, the more likely it is that there will be a significant difference in the joint distribution of these variables in a between the target and control groups in a finite data sample. However, the variance in the outcome within both the target and control groups also increases. The net result is increased variance (but not bias) in  the estimate of causal effects. 
 
-Stratified randomised experiments address the issue of variance due to covariate imbalance by randomly allocating treatment conditional on covariates belived to influence the outcome of interest. This introduces a backdoor path from treatment to outcome via the covariates on which treatment is stratified, see figure \ref{fig:random_experiment_network_stratified}, nessessitating that one condition on these covariates in computing the average casual effect in the same way as for estimating causal effects under under ignorability \S\ref{sec:causal_effect_under_ignorability}. The key difference is that the propensity score is known, as it is designed by the experimenter, and there are guaranteed (rather than assumed) to be no latent confounding variables (that influence both treatment and outcome). See \citet{imbens2015causal} for a discussion of the trade-offs between statified versus completely random experiments. 
+Stratified randomised experiments address the issue of variance due to covariate imbalance by randomly allocating treatment conditional on covariates believed to influence the outcome of interest. This introduces a backdoor path from treatment to outcome via the covariates on which treatment is stratified, see figure \ref{fig:random_experiment_network_stratified}, necessitating that one condition on these covariates in computing the average casual effect in the same way as for estimating causal effects under under ignorability \S\ref{sec:causal_effect_under_ignorability}. The key difference is that the propensity score is known, as it is designed by the experimenter, and there are guaranteed (rather than assumed) to be no latent confounding variables (that influence both treatment and outcome). See \citet{imbens2015causal} for a discussion of the trade-offs between stratified versus completely random experiments. 
+
+IF THE PROPENSITY SCORE IS THE SAME FOR ALL COVARIATES IT DOESN'T SEEM ONE MUST ADJUST.
+\todo{double check}
 
 \begin{figure}
 \caption{causal network for a stratified randomised experiment}
@@ -2080,11 +2083,11 @@ The idealised notion of an experiment represented by figure \ref{fig:random_expe
 \end{tikzpicture}
 \end{figure} 
 
-It is not always possible or ethical to conduct a randomized controlled trial as is beautifully demonstrated by the paper of \citet{smith2003parachute} on randomised cross-over trials of parashute use for the reduction of the mortality and morbity associated with falls from large hights \ref{fig:parashute}. When experimentation is possible, it is frequently difficult or expensive. This means experimental data sets are often much smaller than observational ones, limiting the complexity of models we can explore. In addition, they are often conducted on a convenient but unrepresentative sample of the broader population of interest (for example first year students at research universities). This can result in estimates with high \emph{internal validity} \citep{Campbell1963} in that they should replicate well in a similar population, but very low \emph{external validity}; the results may not carry over to the general population of interest. The question of whether an experiment conducted on one population can be mapped to another is referred to as the transportability problem \citep{Bareinboim2013} and relies on very similar assumptions and arguments to causal inference and the do-calculus. 
+It is not always possible or ethical to conduct a randomised controlled trial as is beautifully demonstrated by the paper of \citet{smith2003parachute} on randomised cross-over trials of parachute use for the reduction of the mortality and morbidity associated with falls from large heights \ref{fig:parashute}. When experimentation is possible, it is frequently difficult or expensive. This means experimental data sets are often much smaller than observational ones, limiting the complexity of models we can explore. In addition, they are often conducted on a convenient but unrepresentative sample of the broader population of interest (for example first year students at research universities). This can result in estimates with high \emph{internal validity} \citep{Campbell1963} in that they should replicate well in a similar population, but very low \emph{external validity}; the results may not carry over to the general population of interest. The question of whether an experiment conducted on one population can be mapped to another is referred to as the transportability problem \citep{Bareinboim2013} and relies on very similar assumptions and arguments to causal inference and the do-calculus. 
 
 \begin{figure}
 \begin{center}
-\caption{Experiments are not always ethical; an illustration of a randomised cross-over trial of parashutes for the prevention of morbitity and mortality associated with falls from large heights.}
+\caption{Experiments are not always ethical; an illustration of a randomised cross-over trial of parachutes for the prevention of morbidity and mortality associated with falls from large heights.}
 \label{fig:parashute}
 \includegraphics[scale=.4]{double_blind_parashute_trial_cartoon.png}
 \end{center}
@@ -2095,7 +2098,7 @@ Finally, non-adaptive randomised experiments are not optimal from either an acti
 \section{Multi armed bandits}
 \label{sec:multi-armed-bandits}
 
-Multi-armed bandits address the problem of desiging experiments that can adapt as samples are observed. Their introduction is generally attributed to \citet{Thompson1993}. In its classic formulation \cite{Robbins1952,Lai1985} the (stochastic) k-armed bandit describes a sequential decision making problem, with $k$ possible actions or arms. Each arm $i$ is associated with a fixed but unknown reward distribution. \footnote{In order to quantify the performance of bandit algorithms, some assumptions are required on the distributions from which the rewards are generated. It sufficient (but not nessessary) to assume they are sub-Gaussian.} For each time step up to some horizon $T$ the learner selects an action and receives a reward, sampled i.i.d from the marginal distribution corresponding to that action. The goal of the learner is to maximise the total reward they receive. This problem captures the exploration-exploitation trade-off, the learner must balance playing arms that have yielded good results previously with exploring arms about which they are uncertain.
+Multi-armed bandits address the problem of designing experiments that can adapt as samples are observed. Their introduction is generally attributed to \citet{Thompson1993}. In its classic formulation \cite{Robbins1952,Lai1985} the (stochastic) k-armed bandit describes a sequential decision making problem, with $k$ possible actions or arms. Each arm $i$ is associated with a fixed but unknown reward distribution. \footnote{In order to quantify the performance of bandit algorithms, some assumptions are required on the distributions from which the rewards are generated. It sufficient (but not necessary) to assume they are sub-Gaussian.} For each time step up to some horizon $T$ the learner selects an action and receives a reward, sampled i.i.d from the marginal distribution corresponding to that action. The goal of the learner is to maximise the total reward they receive. This problem captures the exploration-exploitation trade-off, the learner must balance playing arms that have yielded good results previously with exploring arms about which they are uncertain.
 
 \vspace{0.5cm}
 \begin{definition}[Stochasitic k-armed bandit problem]
@@ -2103,18 +2106,18 @@ Let $\actionspace = \set{1,...k}$ be the set of available actions (or bandit arm
 \begin{enumerate}
 \item the learner selects an action $a_{t} \in \set{1,...,k}$, based on the actions and rewards from previous time-steps and a (potentially stochastic) \emph{policy} $\pi$
 \item the world stochastically generates the rewards for each action, $[Y_{t,1},...,Y_{t,k}] \sim \P{\vec{Y}}$
-\item the learner observes and recieves (only) the reward for the selected action $Y_{t,a_t}$ 
+\item the learner observes and receives (only) the reward for the selected action $Y_{t,a_t}$ 
 \end{enumerate}
 At the end of the game the total reward obtained by the learner is $\sum_{t=1}^T Y_{t,a_t}$. We denote the expected reward for the action $i$, $\E{ \P{Y_i}}$, by $\mu_i$ and the action with the highest expected reward by $i^*$. 
 \end{definition} 
 
-The total reward a bandit algorithm/policy can expect to acheive depends on the distributions from which the rewards for each action are sampled. To account for this, the performance of bandit algorithms is quantified by the the difference between the reward obtained by the algorithm and the reward that would have been obtained by an oracle that selects the arm with the highest expected reward at every time step. This difference is known as the (cummulative) regret \footnote{The term regret is somewhat overloaded in the reinforcement learning liturature. There are alternative definitions that arise in the related problems of adversarial bandits and learning from expert advice. In addition, researches often refer to the expected regret as \quotes{the regret}.},
+The total reward a bandit algorithm/policy can expect to achieve depends on the distributions from which the rewards for each action are sampled. To account for this, the performance of bandit algorithms is quantified by the the difference between the reward obtained by the algorithm and the reward that would have been obtained by an oracle that selects the arm with the highest expected reward at every time step. This difference is known as the (cumulative) regret \footnote{The term regret is somewhat overloaded in the reinforcement learning literature. There are alternative definitions that arise in the related problems of adversarial bandits and learning from expert advice. In addition, researches often refer to the expected regret as \quotes{the regret}.}.
 \eqn{
 \label{eqn:raw_regret}
 \rawregret = \sum_{t=1}^T Y_{t,i^*} - \sum_{t=1}^T Y_{t,a_t}
 }
 
-Both the rewards and the actions selected by the algorithm are random variables. The majority of work in the bandit liturature focuses on analysing and optimising some form of the expected regret, however there has been some work that also considers the concentration of the regret \citep{Auer1995,Audibert2007,Audibert2009exploration}. The expectation of the regret, as defined by equation \ref{eqn:raw_regret}, is refered to as the pseudo-regret \citep{Bubeck2012} and is given by equation \ref{eqn:pseudo_regret}. A stochastic bandit algorithm is learning if it obtains psuedo-regret that is sub-linear in $T$. 
+Both the rewards and the actions selected by the algorithm are random variables. The majority of work in the bandit literature focuses on analysing and optimising some form of the expected regret, however there has been some work that also considers the concentration of the regret \citep{Auer1995,Audibert2007,Audibert2009exploration}. The expectation of the regret, as defined by equation \ref{eqn:raw_regret}, is referred to as the pseudo-regret \citep{Bubeck2012} and is given by equation \ref{eqn:pseudo_regret}. A stochastic bandit algorithm is learning if it obtains pseudo-regret that is sub-linear in $T$. 
 
 \vspace{0.5cm}
 \begin{definition}[Pseudo-Regret]
@@ -2125,24 +2128,25 @@ Both the rewards and the actions selected by the algorithm are random variables.
 }
 \end{definition}
 
-The regret is invariant to adding a constant to the expected rewards for all actions. However, it still depends on key characteristics of the reward distributions for each action. Bandit algorithms are designed given assumptions about the form of the distributions, such as that they come from a given family (i.e bernoulli bandits, gaussian bandits) or that the rewards are bounded in some range. Given these assumptions, the performance of the algorithm is characterised in two ways; by the \emph{problem dependent regret}, which typically depends on how far each arm is from optimal and by the \emph{worst case regret}, which is the maximum regret over all possible configurations of the reward distributions (for a given horizon $T$ and number of arms $k$).
+The regret is invariant to adding a constant to the expected rewards for all actions. However, it still depends on key characteristics of the reward distributions for each action. Bandit algorithms are designed given assumptions about the form of the distributions, such as that they come from a given family (i.e Bernoulli bandits, Gaussian bandits) or that the rewards are bounded in some range. Given these assumptions, the performance of the algorithm is characterised in two ways; by the \emph{problem dependent regret}, which typically depends on how far each arm is from optimal and by the \emph{worst case regret}, which is the maximum regret over all possible configurations of the reward distributions (for a given horizon $T$ and number of arms $k$).
 
-\todo{consider mentioning Thompson sampling and Bayesian bandits} 
 
 \subsection{Stochastic bandits: Approaches and results}
 
-The adaptive nature of multi-armed bandit algorithms complicates the design and analyse of estimators. The action selected by an algorithm at a given timestep can depend on the history of previous actions and rewards. As a result, the probability that each action is selected evolves over time, the actions are not sampled i.i.d from a fixed distribution and the number of times each action is selected is a random variable. The expectation and variance guarentees of standard estimators do not hold in this setting, see figure \ref{fig:early_stopping} for a concrete example. This makes it very difficult to  obtain an analytical expression for the expected regret for a given algorithm and problem. Instead, the focus is on computing bounds on the expected regret. 
+The adaptive nature of multi-armed bandit algorithms complicates the design and analyse of estimators. The action selected by an algorithm at a given time-step can depend on the history of previous actions and rewards. As a result, the probability that each action is selected evolves over time, the actions are not sampled i.i.d from a fixed distribution and the number of times each action is selected is a random variable. The expectation and variance guarantees of standard estimators do not hold in this setting, see figure \ref{fig:early_stopping} for a concrete example. This makes it very difficult to  obtain an analytical expression for the expected regret for a given algorithm and problem. Instead, the focus is on computing bounds on the expected regret. 
 
 \begin{figure}[h]
 \centering
-\caption{Standard empirical estimators can be biased if the number of samples, $n$, is not fixed in advance, but is a random variable that depends on the values of previous samples. This example plots the distribution (over $10^6$ simulations) of $\hat{\mu} = \frac{1}{n}\sum_{i=1}^n X_i$, where $X_i \sim bernoulli(0.2)$. In each simulation, we stop taking samples if the average value of $X_i$ up to that point exceeds a threshold of $0.3$ or $n$ reaches $100$. $\E{\hat{\mu}} = 0.439$. The estimator is substantially biased above $\E{X_i} = 0.2$ by the early stopping. Note that excluding experiments that were stopped early creates a bias in the opposite direction, $\E{\hat{\mu}|n=100} = 0.185$, as trials that obtained positive results early are excluded. This has some interesting potential real world implications. Early stopping of clinical trials is controversial. A researcher conducting a meta-analysis who wished to avoid (rather than bound) bias due to early stopping would have to exclude not only those trials which were stopped early but those which \emph{could} have been stopped early.}
+\caption{Standard empirical estimators can be biased if the number of samples, $n$, is not fixed in advance, but is a random variable that depends on the values of previous samples. This example plots the distribution (over $10^6$ simulations) of $\hat{\mu} = \frac{1}{n}\sum_{i=1}^n X_i$, where $X_i \sim Bernoulli(0.2)$. In each simulation, we stop taking samples if the average value of $X_i$ up to that point exceeds a threshold of $0.3$ or $n$ reaches $100$. $\E{\hat{\mu}} = 0.439$. The estimator is substantially biased above $\E{X_i} = 0.2$ by the early stopping. Note that excluding experiments that were stopped early creates a bias in the opposite direction, $\E{\hat{\mu}|n=100} = 0.185$, as trials that obtained positive results early are excluded. This has some interesting potential real world implications. Early stopping of clinical trials is controversial. A researcher conducting a meta-analysis who wished to avoid (rather than bound) bias due to early stopping would have to exclude not only those trials which were stopped early but those which \emph{could} have been stopped early.}
 \label{fig:early_stopping}
 \includegraphics[scale=1]{extreme_early_stopping}
 \end{figure}
 
-There are a few key hueristic principles that are used to guide the development of bandit algorithms. The first is \emph{optimism in the face of uncertainty}. Applied to stochastic bandits, the optimism in the face of uncertainty princple suggests computing a plausible upper-bound for the expected reward of each arm, and selecting the arm with the highest upper bound. The optimism principle encourages exploitation and exploration because a high upper bound on the expected reward for an action implies either the expected reward or the uncertainty about the reward for that action is high. Thus selecting it yields either a good reward or useful information. 
+There are a few key principles that are used to guide the development of bandit algorithms. The simplest is to explicitly separate exploration from exploitation and base estimation of the expected rewards of each arm only on the data generated during exploration steps. A common example in practice is uniform exploration (or A/B testing) for some fixed period followed by selecting the action found to be best during the exploration phase. This results in simpler analysis, particularly if the number of exploration steps is fixed in advance, however it is sub-optimal, even if the exploration period is adaptive \citep{NIPS2016_6179}. 
 
-\citet{Lai1985} leveraged the optimism in the face of uncertainty principle to develop an algorithm for specific families of reward distributions, including the expontial family. They showed that, for a given bandit problem, the pseudo-regret increased with $\bigo{log(T)}$ asymptopically and proved this is asymptopically efficient. However, their algorithm is complex and memory intensive to compute as, at each timestep, it relies on the entire sequence of rewards for each arm. \citet{Agrawal1995} developed a simpler algorithm that computed upper bounds based only on the mean of previous samples for each arm, whist retaining the logarithmic dependence on $T$. Finally, \citet{Auer2002} developed the UCB-1 algorithm, see algorithm \ref{alg:ucb-1}, which requires only that the reward distributions are bounded, and proved finite-time regret bounds. We now assume the rewards are bounded in $[0,1]$. The algorithm and regret bounds can be generalised to subgaussian reward distributions, see \citet{Bubeck2012}.
+Another key approach is \emph{optimism in the face of uncertainty}. Applied to stochastic bandits, the optimism in the face of uncertainty principle suggests computing a plausible upper-bound for the expected reward of each arm, and selecting the arm with the highest upper bound. The optimism principle encourages exploitation and exploration because a high upper bound on the expected reward for an action implies either the expected reward or the uncertainty about the reward for that action is high. Thus selecting it yields either a good reward or useful information. 
+
+\citet{Lai1985} leveraged the optimism in the face of uncertainty principle to develop an algorithm for specific families of reward distributions, including the exponential family. They showed that, for a given bandit problem, the pseudo-regret increased with $\bigo{log(T)}$ asymptotically and proved this is asymptotically efficient. However, their algorithm is complex and memory intensive to compute as, at each time-step, it relies on the entire sequence of rewards for each arm. \citet{Agrawal1995} developed a simpler algorithm that computed upper bounds based only on the mean of previous samples for each arm, whist retaining the logarithmic dependence on $T$. Finally, \citet{Auer2002} developed the UCB-1 algorithm, see algorithm \ref{alg:ucb-1}, which requires only that the reward distributions are bounded, and proved finite-time regret bounds. We now assume the rewards are bounded in $[0,1]$. The algorithm and regret bounds can be generalised to subgaussian reward distributions, see \citet{Bubeck2012}.
 
 \begin{algorithm}[H]
 \caption{UCB-1}\label{alg:ucb-1}
@@ -2157,14 +2161,14 @@ There are a few key hueristic principles that are used to guide the development 
 \end{algorithmic}
 \end{algorithm}
  
-Let $\Delta_i = \mu_i - \mu^*$ be degree to which each arm is sub-optimal. The problem dependent psuedo-regret for UCB-1 is bounded by equation \ref{eqn:ucb_problem_dependent_regret} \citep{Bubeck2012},
+Let $\Delta_i = \mu_i - \mu^*$ be degree to which each arm is sub-optimal. The problem dependent pseudo-regret for UCB-1 is bounded by equation \ref{eqn:ucb_problem_dependent_regret} \citep{Bubeck2012},
 
 \eqn {
 \label{eqn:ucb_problem_dependent_regret}
 \regret \leq & \sum_{i:\Delta_i > 0}\left(\frac{8\log(T)}{\Delta_i}+2 \right)
 }
 
-Somewhat unintuitively, the regret increases as the value of the arms gets closer together. This is because it becomes harder for the algorithm to identify the optimal arm. As the differences $\Delta_i \rightarrow 0$, the regret bound in \ref{eqn:ucb_problem_dependent_regret} blows up, however the regret itself does not - since although we may not be able to distinguish arms with very small $\Delta_i$ from the optimal arm, we also do not lose much by selecting them. The worst case occurs if all arms have the same expected reward $\mu$ except for the optimal arm which has reward $\mu^*=\mu+\Delta$, where $\Delta$ is just too small for the algorithm to learn to identify which arm is optimal given the horizon $T$. The regret cannot exceed what would be obtained by selecting the a sub-optimal arm in every timestep, $T\Delta$, so the worst case regret is bounded by the minimum of equation \ref{eqn:ucb_problem_dependent_regret} and $T\Delta$ which ia maximised when they are equal, see figure \ref{fig:ucb_regret_vs_delta}. By solving this equality for $\Delta$ one can show the worst case regret is bounded by equation \ref{eqn:ucb_worst_case_regret}, see \citet{Bubeck2012}.
+Somewhat unintuitively, the regret increases as the value of the arms gets closer together. This is because it becomes harder for the algorithm to identify the optimal arm. As the differences $\Delta_i \rightarrow 0$, the regret bound in \ref{eqn:ucb_problem_dependent_regret} blows up, however the regret itself does not - since although we may not be able to distinguish arms with very small $\Delta_i$ from the optimal arm, we also do not lose much by selecting them. The worst case occurs if all arms have the same expected reward $\mu$ except for the optimal arm which has reward $\mu^*=\mu+\Delta$, where $\Delta$ is just too small for the algorithm to learn to identify which arm is optimal given the horizon $T$. The regret cannot exceed what would be obtained by selecting the a sub-optimal arm in every time-step, $T\Delta$, so the worst case regret is bounded by the minimum of equation \ref{eqn:ucb_problem_dependent_regret} and $T\Delta$ which ia maximised when they are equal, see figure \ref{fig:ucb_regret_vs_delta}. By solving this equality for $\Delta$ one can show the worst case regret is bounded by equation \ref{eqn:ucb_worst_case_regret}, see \citet{Bubeck2012}.
 
 \eqn{
 \label{eqn:ucb_worst_case_regret}
@@ -2172,7 +2176,7 @@ Somewhat unintuitively, the regret increases as the value of the arms gets close
 }  
 
 \begin{figure}
-\caption{The regret bound in equation \ref{eqn:ucb_problem_dependent_regret} grows as the differences between the expected rewards for each arm shrink. The solid curve shows the mean (cummulative) regret, over a 1000 simulations for a 2-armed, bernoulli bandit with fixed horizon, $T = 500$, as a function of the difference in the expected reward for the arms $\Delta$. The dashed curves show the corresponding upper bounds; $T\Delta$ and equation \ref{eqn:ucb_problem_dependent_regret}}
+\caption{The regret bound in equation \ref{eqn:ucb_problem_dependent_regret} grows as the differences between the expected rewards for each arm shrink. The solid curve shows the mean (cumulative) regret, over a 1000 simulations for a 2-armed, Bernoulli bandit with fixed horizon, $T = 500$, as a function of the difference in the expected reward for the arms $\Delta$. The dashed curves show the corresponding upper bounds; $T\Delta$ and equation \ref{eqn:ucb_problem_dependent_regret}}
 \label{fig:ucb_regret_vs_delta}
 \includegraphics[scale=1]{ucb_regret_vs_delta}
 \end{figure}
@@ -2184,13 +2188,15 @@ The form of the dependence on the number of arms $k$ and horizon $T$ differs bet
 \regret \in \bigomega{\sqrt{kT}}
 }
 
-Subtle modifications to the UCB algorithm can eliminate the logarithmic term equation \ref{eqn:ucb_worst_case_regret}. This yeilds regret $ \bigo{\sqrt{TK}}$ and closes the gap with the worst case lower bound \cite{Audibert2009,Lattimore2015}, whilst retaining a good problem dependent bound of the form achieved by UCB \cite{Lattimore2015}.
+Subtle modifications to the UCB algorithm can eliminate the logarithmic term equation \ref{eqn:ucb_worst_case_regret}. This yields regret $ \bigo{\sqrt{TK}}$ and closes the gap with the worst case lower bound \cite{Audibert2009,Lattimore2015}, whilst retaining a good problem dependent bound of the form achieved by UCB \cite{Lattimore2015}.
 
 \begin{figure}
 \caption{The actual performance of the UCB algorithm can be substantially better than suggested by the upper bound, particularly for small $T$. The solid curve shows the mean expected regret associated with the sequence of arms chosen by UCB-1 with $k=2$ arms and the rewards sampled from $bernoulli([.3,.7])$ over 1000 simulations. The dashed curve shows the corresponding upper bound given by the minimum of $T\Delta_{max}$ and equation\ref{eqn:ucb_problem_dependent_regret}.}
 \label{fig:ucb_upperbound_vs_actual_performance}
 \includegraphics[scale=1]{upper_bound_vs_actual_average_regret}
 \end{figure}
+
+Finally, there is the heuristic principle of playing each arm with probability proportional to the likelyhood that it is optimal. This approach is generally called Thompson sampling as it was the method proposed in the original bandit paper by \citet{Thompson1993}. Thompson sampling has strong empirical performance, \citep{chapelle2011empirical}. However, it is complex to analyse, \citet{kaufmann2012thompson} demonstrate that it obtains optimal problem dependent bounds, \citet{agrawal2013further} show that it obtains worst case regret of $\bigo{\sqrt{kT\log(T)}}$, equivalent to UCB. 
 
 \subsection{Pure-exploration problems}
 Another problem that has attracted a lot of recent attention \cite{Bubeck2009,Audibert2010,Gabillon2012,Karnin2013} within the stochastic multi-armed bandit framework is \textit{pure exploration} or \textit{best arm identification}. In this setting, the horizon $T$ represents a fixed budget for exploration after which the algorithm outputs a single best arm $i$. The performance of the algorithm is measured by the simple regret; the expected difference between the mean reward of the (truly) optimal arm and the mean reward of the arm selected by the algorithm.
@@ -2211,25 +2217,26 @@ The best arm identification problem arises naturally in applications where there
 }
 
 
-\todo{discuss the key ways in which the simple regret problem differs from cummulative regret}
+\todo{discuss the key ways in which the simple regret problem differs from cumulative regret}
 
 Pure-exploration does not mean simply playing the arm with the widest uncertainty bounds. The goal is to be sure the arm we believe is optimal is in fact optimal at the end of the exploration period. 
 
 \subsection{Adversarial Bandits}
 
-Adversarial bandits are an alternate, widely studied, setting that relaxes the assumption that rewards are generated stochastically. Instead, simultaneously with the learner selecting an action $a_t$, a potentially malicious adversary selects the reward vector $\boldsymbol{Y}_t$. As in the stochastic setting, the learner then receives reward only for the selected action. 
+Adversarial bandits, described by \citet{Auer1995}, are an alternate, widely studied, setting that relaxes the assumption that rewards are generated stochastically. Instead, simultaneously with the learner selecting an action $a_t$, a potentially malicious adversary selects the reward vector $\boldsymbol{Y}_t$. As in the stochastic setting, the learner then receives reward only for the selected action. 
 
 \vspace{0.5cm}
 \begin{definition}[Adversarial k-armed bandit problem]
+\label{def:adversarial-k-armed-bandit}
 Let $\actionspace = \set{1,...k}$ be the set of available actions.  In each round $t \in 1,...,T$, 
 \begin{enumerate}
 \item the world (or adversary) generates, but does not reveal, a vector or rewards $\vec{Y_t}=[Y_{t,1},...,Y_{t,k}]$. 
 \item the learner selects an action $a_{t} \in \set{1,...,k}$, based on the actions and rewards from previous time-steps and a (potentially stochastic) \emph{policy} $\pi$
-\item the learner observes and recieves (only) the reward for the selected action $Y_{t,a_t}$ 
+\item the learner observes and receives (only) the reward for the selected action $Y_{t,a_t}$ 
 \end{enumerate} 
 \end{definition}
 
-Adversaries that generate rewards independently of the sequence of actions selected by the learner in previous time steps are referred to as \emph{oblivous}, as opposed to \emph{non-oblivous} adversaries, which can generate rewards as a function of the history of the game. In the case of oblivous adversaries, we can also define the adversarial bandit problem by assuming the adversary generates the entire sequence of reward vectors before the game commences. 
+Adversaries that generate rewards independently of the sequence of actions selected by the learner in previous time steps are referred to as \emph{oblivious}, as opposed to \emph{non-oblivious} adversaries, which can generate rewards as a function of the history of the game. In the case of oblivious adversaries, we can also define the adversarial bandit problem by assuming the adversary generates the entire sequence of reward vectors before the game commences. 
 
 The pseudo-regret for adversarial bandits is defined, in the same way as for stochastic bandits, as the difference between the reward obtained by playing the single arm with the highest expected reward in every round and the expected reward obtained by the algorithm.
 
@@ -2239,14 +2246,14 @@ The pseudo-regret for adversarial bandits is defined, in the same way as for sto
 \regret(\pi) &= \max_{i \in \set{1,...,k}}\E{\sum_{t=1}^T{Y_{t,i}}} - \E{\sum_{t=1}^T{Y_{t,a_t}}}
 }
 
-The policy (or algorithm) used by the learner is avaiable to the adversary before the game begins, and there are no limitations placed on the amount of computation the adversary can perform in selecting the reward sequences. This implies the adversary can ensure that any learner with a deterministic policy suffers regret $\bigo{T}$ by forecasting their entire sequence of actions. For example, if the learner will play $a_1 = 1$ in the first round, then the adversary sets the reward $\vec{Y_1} = [0,1,1,...1]$, forcasts what action the learner will play in round 2, given they recieved a reward of 0 in round 1, and again generates the reward vector such that the action the learner will select obtains no reward, and all other actions obtain the maximum reward. This implies adversarial bandit policies must be sufficiently random to avoid such exploitation \footnote{The UCB algorithm, defined by algorithm \ref{alg:ucb-1}, is deterministic if the order in which arms are played during the first $k$ rounds is fixed and the method for selecting which arm to play when multiple-arms have the same upper-confidence bound is not-random (for example, select the arm one with the lowest index $i$).}
+The policy (or algorithm) used by the learner is available to the adversary before the game begins, and there are no limitations placed on the amount of computation the adversary can perform in selecting the reward sequences. This implies the adversary can ensure that any learner with a deterministic policy suffers regret $\bigo{T}$ by forecasting their entire sequence of actions. For example, if the learner will play $a_1 = 1$ in the first round, then the adversary sets the reward $\vec{Y_1} = [0,1,1,...1]$, forecasts what action the learner will play in round 2, given they received a reward of 0 in round 1, and again generates the reward vector such that the action the learner will select obtains no reward, and all other actions obtain the maximum reward. This implies adversarial bandit policies must be sufficiently random to avoid such exploitation \footnote{The UCB algorithm, defined by algorithm \ref{alg:ucb-1}, is deterministic if the order in which arms are played during the first $k$ rounds is fixed and the method for selecting which arm to play when multiple-arms have the same upper-confidence bound is not-random (for example, select the arm one with the lowest index $i$).}
 
-The seminal algorithm for adversarial bandits is Exp-3 \citep{Auer2002}, which, like UCB, obtains worst case psuedo-regret of $\bigo{\sqrt{TK\log(T)}}$  \cite{Auer1995}. Optimal algorithms, with $\regret = \bigo{\sqrt{TK}}$, have also been demonstrated for the oblivious adversarial setting \cite{Audibert2009}. The focus, for adversarial bandits, is on analysing the worst case regret because the problem dependent regret is not well defined without additional assumptions. However there has been recent work on developing algorithms that are optimised for both the adversarial and stochastic settings, in that they are sufficiently cautious to avoid linear regret in the adversarial setting but can nontheless obtain good problem dependent regret in more favourable enviroments \citep{bubeck2012bothworlds,Auer2016}. 
+The seminal algorithm for adversarial bandits is Exp-3 \citep{Auer2002}, which, like UCB, obtains worst case pseudo-regret of $\bigo{\sqrt{TK\log(T)}}$  \cite{Auer1995}. Optimal algorithms, with $\regret = \bigo{\sqrt{TK}}$, have also been demonstrated for the oblivious adversarial setting \cite{Audibert2009}. The focus, for adversarial bandits, is on analysing the worst case regret because the problem dependent regret is not well defined without additional assumptions. However there has been recent work on developing algorithms that are optimised for both the adversarial and stochastic settings, in that they are sufficiently cautious to avoid linear regret in the adversarial setting but can nonetheless obtain good problem dependent regret in more favourable environments \citep{bubeck2012bothworlds,Auer2016}. 
 
-Adversarial bandits appear to be more applicable to real world problems because they do not assume that the rewards associated with each arm are constant over time or independent of the previous actions of the learner. However, psuedo-regret, as defined in equation \ref{eqn:pseudo_regret-adversarial}, is not a good measure of an algorithms performance in such cases because it is defined with respect to playing the single arm with the best average return over the game. In settings were the rewards change over time, the pseudo-regret can be negative, see figure \ref{fig:non-stationary-bandit}, so upper bounds on the psuedo-regret do not reflect how sub-optimal the algorithm may be. Adversarial bandit algorithms may perform better in non-stationary settings than standard stochastic policies to the extend that they explore more (to avoid the adversary simulating their behaviour), however it is preferable to develop algorithms specifically for non-stationary settings (subject to assumptions about how rapidly or frequently rewards can change), see for example \citep{garivier2008upper,Garivier2011a,Besbes2014}. 
+Adversarial bandits appear to be more applicable to real world problems because they do not assume that the rewards associated with each arm are constant over time or independent of the previous actions of the learner. However, pseudo-regret, as defined in equation \ref{eqn:pseudo_regret-adversarial}, is not a good measure of an algorithms performance in such cases because it is defined with respect to playing the single arm with the best average return over the game. In settings were the rewards change over time, the pseudo-regret can be negative, see figure \ref{fig:non-stationary-bandit}, so upper bounds on the pseudo-regret do not reflect how sub-optimal the algorithm may be. Adversarial bandit algorithms may perform better in non-stationary settings than standard stochastic policies to the extend that they explore more (to avoid the adversary simulating their behaviour), however it is preferable to develop algorithms specifically for non-stationary settings (subject to assumptions about how rapidly or frequently rewards can change), see for example \citep{garivier2008upper,Garivier2011a,Besbes2014}. 
 
-\begin{figure}
-  \caption{The pseudo-regret can be negative if rewards are non-stationary. This example shows the results of 1000 simulations of running the UCB-1 algorithm on a 2-armed bernoulli bandit problem where the expected rewards change linearly over time, up to a horizon $T=10,000$. Figure (a) shows the expected rewards of each arm, and the proportion of time that arm-1 is played, as a function of time. The single best-arm is arm-1 as it has the highest expected reward (averaged over $t$). An oracle that selects arm-1 in every round obtains an expected reward of $5,000$. However, despite not being designed to do so, the UCB-algorithm can adapt to the changing reward distribution to obtain costistently higher rewards. The distribution of regret over the 1000 simulations is shown in figure (b).}\label{fig:non-stationary-bandit}
+\begin{figure}[h]
+  \caption{The pseudo-regret can be negative if rewards are non-stationary. This example shows the results of 1000 simulations of running the UCB-1 algorithm on a 2-armed Bernoulli bandit problem where the expected rewards change linearly over time, up to a horizon $T=10,000$. Figure (a) shows the expected rewards of each arm, and the proportion of time that arm-1 is played, as a function of time. The single best-arm is arm-1 as it has the highest expected reward (averaged over $t$). An oracle that selects arm-1 in every round obtains an expected reward of $5,000$. However, despite not being designed to do so, the UCB-algorithm can adapt to the changing reward distribution to obtain consistently higher rewards. The distribution of regret over the 1000 simulations is shown in figure (b).}\label{fig:non-stationary-bandit}
     \begin{subfigure}[t]{0.49\textwidth}
 	\centering   
 	 \caption{Behaviour over time}\label{fig:non-stationary-bandit-time} 
@@ -2254,54 +2261,132 @@ Adversarial bandits appear to be more applicable to real world problems because 
 \end{subfigure}
     \begin{subfigure}[t]{0.49\textwidth}
     \centering
-     \caption{Cummulative regret distribution}
+     \caption{Cumulative regret distribution}
         \label{fig:non-stationary-bandit-regret}
         \includegraphics[scale=.5]{non-stationary-bandit-regret}
     \end{subfigure}
 \end{figure}
 
 \subsection{Contextual bandits}
-Contextual bandits are a generalisation of multi-armed bandits. 
+\label{sec:contextual-bandits}
+
+In the standard multi-armed bandit setting, each decision is identical and the goal is to learn a single best action. However, in most real life (sequential) decision making processes, which action is optimal depends on some context.  The best treatment to offer an individual patient could depend on their age, gender, disease sub type or genetics and will not always align with the treatment that is best on average (or for the majority of people).  Similarly, decisions on which ad or content to display on a web page or which product to recommend can be \emph{personalised} based on the previous behaviour of the user. A movie recommender system that learned a single \quotes{best} movie for everyone would not be very useful. Contextual bandits are a generalisation of multi-armed bandits that make use of this additional contextual information. The term contextual bandit was coined by \citet{Langford2008}, however close variants of the underlying problem have also been posed under the names; \quotes{associative reinforcement learning} \citep{kaelbling1994associative}, \quotes{bandits with concomitant variables}\citep{woodroofe1979one} and  \quotes{bandit problems with side information} \citep{wang2005bandit}. 
 
 \vspace{0.5cm}
-\begin{definition}[Contextual bandit problem]
+\begin{definition}[Stochastic Contextual Bandit \footnote{Contextual bandits can also be defined in the adversarial setting analogously to definition \ref{def:adversarial-k-armed-bandit}}]
+\label{def:contextual-bandit-problem}
 Let $\P{\vec{Y},\vec{X}}$ be the joint distribution over the rewards for each action and some context $\vec{x} \sim \mathcal{X}$. In each round $t \in \set{1,...T}$, 
 \begin{enumerate}
 \item the world stochastically generates the vector of rewards for each action and the context, $([Y_{t,1},...,Y_{t,k}],\vec{x}_t) \sim \P{\vec{Y},\vec{X}}$ and reveals $\vec{x}_t$ to the learner
 \item the learner selects an action $a_{t} \in \set{1,...,k}$, based on the context as well as actions and rewards from previous time-steps.
-\item the learner observes and recieves (only) the reward for the selected action $Y_{t,a_t}$ 
+\item the learner observes and receives (only) the reward for the selected action $Y_{t,a_t}$ 
 \end{enumerate}
 \end{definition} 
 
-What are the reductions of contextual bandits to other problem (ie k armed-bandits?)
+Standard multi-armed bandits learn to select the action $a$ that, with high probability, maximises $\E{Y|a}$. Contextual bandits learn to select actions that maximise $\E{Y|\vec{x},a}$. The reward for contextual bandits should  be compared to an oracle that acts optimally based on the context. To achieve this, even when the context is continuous, the regret is defined with respect to a class of hypothesis that map from context to action, $h \in \mathcal{H}: \mathcal{X} \rightarrow \set{1,...,k}$. The pseudo-regret is the difference between the expected regret obtained by an oracle that selects actions based on the single best hypothesis or policy $h$ at each time-step, and the expected reward obtained by the algorithm. 
 
-In the previous sections each decision was identical. If we were imaging treating patients, we assume that we have no additional information about each patient that is relevant to deciding how to treat them. However, in many key applications such as serving ads, etc, etc. we clearly do have additional information that we wish to take into account. In the contextual bandit setting the goal is to learn 
-
-\eq {
-\P{Y|a,x}
-} 
-
-As opposed to the standard bandit setting where we are attempting to estimate 
-
-\eq{
-\P{Y|a}
+\eqn{
+\label{eqn:regret_contextual}
+\regret = \max_{h \in \mathcal{H}}\E{\sum_{t=1}^T{Y_{t,h(\vec{x}_t)}}} - \E{\sum_{t=1}^T{Y_{t,a_t}}}
 }
 
-The formal definition of a contextual bandit problem is
+If the context is discrete, $\mathcal{X} = \set{1,...,N}$, the contextual bandit problem can be reduced to the standard multi-armed bandit problem by creating a separate standard bandit instance for each value of the context. This approach results in a worst case regret of $\bigo{\sqrt{NkT}}$, with respect to the hypothesis class $\mathcal{H} = \mathcal{X} \times \actionspace$, consisting of all possible mappings from context to action\footnote{This follows from the fact that we have $N$ standard bandit instances, each suffering regret $\bigo{\sqrt{kT_c}}$, where $T_c$ is the number of times context $c$ occurred such that $\sum_{c=1}^N T_c = T$. The regret is maximised if $T_c = T/N$ resulting in total regret $\bigo{N\sqrt{kT/N}}$.}. This is optimal with respect to this class of hypothesis. However, as this reduction treats the problem of learning the correct action for each context completely independently, it cannot leverage any structure in the in the relationships between different contexts and actions. As in the supervised learning setting, the existence of some form of low-dimensional structure is key to learning in realistic problems, where the context is continuous or high-dimensional \footnote{Even if the context is genuinely discrete, $N$ grows exponentially with the number of variables. For example, with $n$ binary variables, $N = 2^n$}. We expect some form of smoothness; values of context that are similar should lead to comparable rewards for a given action. We need algorithms that can leverage such assumptions. 
 
-The simplest way to generalise the standard bandit algorithms to the contextual case (where the context is discrete) is to simply have a separate standard bandit instance for each possible setting of the context. Regrettably this approach scales terribly with increasing complexity of the context. \todo{quantify this}. It cannot be applied at all if the context is continuous. 
+An alternate reduction to the standard bandit problem, which allows us to constrain the hypothesis space to explore, is to treat each hypothesis $h$ as a bandit arm \citep{Langford2008}. At each time-step, we select $h \in \mathcal{H}$ based on the rewards previously observed for each hypothesis, take action $h(\vec{x})$ and observe the associated reward. Although this approach removes the explicit dependence on the size of the context, the regret  grows linearly with the size of the hypothesis class considered, limiting our ability to learn any complex mappings from context to actions. The key problem with this approach is each sample is used to update our knowledge about only one hypothesis, as opposed to the supervised learning setting, where each data point is (implicitly) used to compute the loss for every hypothesis simultaneously. 
 
-The approach to solving this problem parallels those from supervised learning and continuous armed bandits. We make assumptions about the smoothness of the problem. Values of context that are similar should lead to comparable rewards for a given action. 
+Suppose that, at each time-step $t$, after selecting an action, the learner received the reward for chosen action but observed the full vector of rewards $[Y_{t,1},...,Y_{t,k}]$. This is known as the full information setting. In this case, the learner can simulate running each hypothesis over the history to compute the reward it would have obtained and use the hypothesis with the best empirical reward to select the next action. This is the \emph{follow the leader} algorithm, which obtains optimal regret $\bigo{\sqrt{T log(\card{\mathcal{H}})}}$ for the full-information problem \citep{cesa2006prediction}. Unfortunately, in the contextual bandit problem, the (counterfactual) rewards associated with alternate action choices are not observed. As in causal effect estimation, we can view this as a missing data problem. However, the data is missing not at random because which component of the reward is observed depends on the action selected which in turn is a function of the previous history of actions and rewards. 
 
-Regret bounds \todo {insert regret bounds for contextual bandits} 
+The Epoch-greedy algorithm, \citep{Langford2008}, addresses these issues by transforming the contextual bandit problem into a data missing at random problem by explicitly separating exploration from exploitation. Epoch-greedy is an explore-exploit algorithm. It selects actions uniformly at random during an exploration phase and leverages this data to estimate the value of each hypothesis, using inverse propensity weighted estimators to \quotes{fill in} the missing data. The hypothesis with the highest empirical reward is then used to select actions for the remaining time-steps. The epsilon-greedy algorithm obtains worst case regret $\bigo{T^{\frac{2}{3}}(k \log{\card{\mathcal{H}}})^{\frac{1}{3}}}$, which has sub-optimal dependence on the horizon $T$.
 
-It should be noted that there is an important difference between the approaches we can apply to the contextual bandit versus the supervised learning setting. As for the casual effect estimation problem, we cannot utilise cross-validation offline to select model parameters. This makes contextual bandit algorithms degrade faster than supervised learning ones as we add irrelevant variables. \todo{ask Tor if he thinks this is correct}
+The Exp-4 algorithm, developed in the context of learning from expert advice (each $h \in \mathcal{H}$ can be viewed as an expert who recommends which action to take), achieves optimal worst case regret of $\bigo{\sqrt{kT log(\card{\mathcal{H}})}}$ in both the stochastic and adversarial settings \citep{Auer2002a}. However, it involves maintaining a list of weights for each hypothesis $h$ resulting in time and memory requirements that grow linearly with the size of the hypothesis space and, unlike the epoch-greedy algorithm, it cannot be generalised to infinite dimensional hypothesis spaces in a straightforward way. The ILOVECONBANDITS algorithm combines the best of both worlds to obtain a computationally efficient algorithm with (almost) optimal regret \citep{Agarwal2014}
 
-RUN A SIMULATION COMPARING HOW supervised learning and contextual bandits degrade as we add more features. What would be a fair comparison?
+Both Epoch-greedy and ILOVECONBANDITS involve solving problems of the form,
+
+\eqn{
+\argmax_{h \in \mathcal{H}} \sum_{t=1}^\tau Y_t \ind{h(\vec{x}_t) = a_t}
+}
+
+This expression equates to identifying the best empirical policy based on previous data. The algorithms assume the existence of an oracle that can solve this problem and report complexity in terms of the number of calls required to the oracle. The computational tractability of these algorithms on large (or infinite) hypothesis spaces stems from the fact that this problem (also known as the argmax-oracle), can be reduced to solving a cost sensitive classification problem \citep{Dudik2011a}. 
+
+Finally, if we have a parametric model for the relationship between context, action and reward that allows (efficient) computation of the posterior or confidence bounds on the reward for each arm given context, we can develop generalised versions of the UCB or Thompson sampling algorithms. For linear pay off models, both approaches yield algorithms with strong regret guarantees, Lin-UCB \citep{li2010contextual} and generalised Thompson sampling for linear pay-offs \citep{Agrawal2013}. 
+
+It is worth noting that definition \ref{def:contextual-bandit-problem} does not make any assumptions about the \emph{causal} relationship between the context $\vec{X}$ and the reward $\vec{Y}$, see figure \ref{fig:contextual-bandit-causal-graph}. \citet{Bareinboim2015} demonstrate that policies that incorporate observations of the action an agent would have taken were their action not set by the bandit policy can achieve lower regret than those that ignore this information. This is an example of the case represented in figure \ref{fig:context-graph-confounded}. However, the context should be relevant, such that $\P{\vec{Y}|\vec{X}} \neq \P{\vec{Y}}$, otherwise including it is the equivalent to adding irrelevant features to a supervised learning problem. 
+
+\begin{figure}[h]
+\centering
+\caption{Several potential causal graphical models for the contextual bandit problem (if actions are selected at random). $\vec{X}$ and $\vec{Y}$ represent the context and reward vectors respectively, and $Y = \vec{Y}_a$ is the reward received by the learner, which is a deterministic function of $\vec{Y}$ and $a$. Regardless of the causal structure, observing the context $\vec{X}$ provides information about the vector of rewards $\vec{Y}$. To represent a realistic (contextual) bandit problem, where actions are not selected at random, we would need to \quotes{unroll} the graphs, such that there was a copy for each time-step $t$ and allow the action $a_t$ to depend on the context $\vec{X}_t$ and the previous observations $(\vec{X},a,Y)_1^{t-1}$. }
+\label{fig:contextual-bandit-causal-graph}
+\begin{subfigure}[t]{0.29\textwidth}
+\centering
+\caption{$\vec{X}$ causes $\vec{Y}$}
+\label{fig:context-graph-causal}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed},lt/.style={latent}]
+ %nodes
+\node[lt](1){$\vec{Y}$};
+\node[main node, below=of 1](2){$Y$};
+\node[main node, above right=of 2](3){$a$};
+\node[main node, left=of 1](4){$\vec{X}$};
+ \path[every node/.style={font=\sffamily\small}]
+   (4) edge (1)
+   (3) edge (2)
+   (1) edge (2);
+\end{tikzpicture} 
+\end{subfigure}
+\begin{subfigure}[t]{0.29\textwidth}
+\centering
+\caption{$\vec{Y}$ causes $\vec{X}$}
+\label{fig:context-graph-anti-causal}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed},lt/.style={latent}]
+ %nodes
+\node[lt](1){$\vec{Y}$};
+\node[main node, below=of 1](2){$Y$};
+\node[main node, above right=of 2](3){$a$};
+\node[main node, left=of 1](4){$\vec{X}$};
+ \path[every node/.style={font=\sffamily\small}]
+   (1) edge (4)
+   (3) edge (2)
+   (1) edge (2);
+\end{tikzpicture} 
+\end{subfigure}
+\begin{subfigure}[t]{0.29\textwidth}
+\centering
+\caption{$\vec{X}$ and $\vec{Y}$ are confounded}
+\label{fig:context-graph-confounded}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed},lt/.style={latent}]
+ %nodes
+\node[lt](1){$\vec{Y}$};
+\node[main node, below=of 1](2){$Y$};
+\node[main node, above right=of 2](3){$a$};
+\node[main node, left=of 1](4){$\vec{X}$};
+\node[lt, below=of 4](5){$U$};
+ \path[every node/.style={font=\sffamily\small}]
+   (3) edge (2)
+   (1) edge (2)
+   (5) edge (4) edge (1);
+\end{tikzpicture}
+\end{subfigure}
+\end{figure}
 
 \subsubsection{Learning from logged bandit data}
+Another topic of interest within the contextual bandit community that is deeply related to causal effect estimation from observational data is learning from logged bandit feedback data \citep{}. 
+
+If no assumptions are made about the behaviour of the hypothesis that generated the data.... does it reduce to causal effect estimation?
+
+However, in the applications considered in these setting such as ad serving, the details of the hypothesis generating the data are often known.  
 
 \subsection{Markov decision processes}
+
+\subsubsection{Limitations of bandit problems}
+\begin{itemize}
+\item Reward needs to be observed immediately after action is taken (or at least before the next action must be selected).
+\item State assumed not to change
+
+\end{itemize}
+
+Reward known immediately. Action chosen for one individual does not effect reward for the next (SUTVA).
 
 
 
@@ -2309,7 +2394,7 @@ A key limitation of the bandit setting is that
 
 This is reasonable in settings where we have many similar but independent units or individuals and the goal is to identify which action is optimal (in a given context), as occurs in standard experimental settings as well. 
 
-Relation to SUTVA assumption, selecing a action for one 'unit' does not effect the reward distributions for other units. 
+Relation to SUTVA assumption, selecting a action for one 'unit' does not effect the reward distributions for other units. 
 
 The reward of an action is not immediately known. - a long sequence of steps. Delayed reward. 
 
@@ -2340,24 +2425,27 @@ What are the key results.
 \subsection{The need to add structure}
 The regret for a bandit problem grows linearly with the number of (sub-optimal) actions. This makes problems with large or infinite actions spaces intractable. REFERENCE equation showing linearity with arms. CHECK ITS TRUE. 
 
+causal bandits capture a very natural form of structure that can arise between different arms. 
+
 The classic multi-armed bandit is a powerful tool for sequential decision making. However, the regret grows linearly with the number of (sub-optimal) actions and many real world problems have large or even infinite action spaces. This has led to the development of a wide range of models that assume some structure across the reward distributions for different arms, for example generalised linear bandits \cite{filippi2010parametric}, dependent bandits \cite{Pandey2007}, X-armed bandits \cite{Bubeck2010} and Gaussian process bandits \cite{srinivas2009gaussian}, or that consider more complex feedback, for example the recent work on graph feedback \cite{Mannor2011,Lelarge2012,Alon2013,Buccapatnam2014,Kocak2014,Alon2015} and partial monitoring \cite{Piccolboni2001,Bartok2014}. 
 
 \section{Questions}
 \begin{enumerate}
-\item When does the expected regret make sense as the thing we actually would wish to optimise? Is optimising the expected regret any different to optimising the psuedo-regret? Who is the definition of regret down to? Does this definition of regret come from learning with expert advise?
+\item In the $\epsilon$-greedy approach, does one compute best action based only on exploration steps?
+\item Why does the naive reduction appear to get sub-optimal regret?
+\item When does the expected regret make sense as the thing we actually would wish to optimise? Is optimising the expected regret any different to optimising the pseudo-regret? Who is the definition of regret down to? Does this definition of regret come from learning with expert advise?
 \item Is there a reference for the doubling trick? Is it an automatic way of converting a fixed horizon algorithm to an anytime one?
-\item Why is the dependence on the number of arms $K$ in the problem dependent bounds but $\sqrt{K}$ in the worst case bounds?
-\item rewards in the multi-armed bandit setting can be sampled from some joint distribution?
 \item Is Learning from logged feedback data just covariate shift too?
 \item In contextual bandits, does it ever make sense that $Y$ causes $X$? If the reward is some function of the action taken and the context, then the full vector of counterfactual outcomes $Y$ is never instantiated. Are there any implications of this for inference?
 \item Why does anything solving a regression problem work in the anti-causal direction - it would seem to break the fundamental underlying assumption of additive noise?
 \item is there a benchmark library of implementations of key bandit algorithms?
-\item Bubeck 2012 states that if the adversary is oblivious, the psuedo-regret coincides with the standard regret, 'which is always the ultimate quantity of interest'. Why, they are not the same for stochastic bandits are they?
+\item Bubeck 2012 states that if the adversary is oblivious, the pseudo-regret coincides with the standard regret, 'which is always the ultimate quantity of interest'. Why, they are not the same for stochastic bandits are they?
 \item what is the worst-case regret of UCB in an adversarial setting?
 \item is there a concept of problem dependent regret for adversarial bandits? Has there been analysis of the problem dependent regret for key adversarial algorithms such as EXP-3?
 \item adversarial regret bounds for Thompson sampling, UCB with random arm selection from upper-bound set?
-\item do continuous armed bandits implie that there are arms with any arbitrary gap in reward (including worst case gap for that T) and thus you always end up with something like worst case regret?)
+\item do continuous armed bandits implies that there are arms with any arbitrary gap in reward (including worst case gap for that T) and thus you always end up with something like worst case regret?)
 \item in what real world setting do adversarial bandits potentially make sense?
+\item Does supervised learning really 'reveal the value of every action'.
 \end{enumerate}
 
 
@@ -2400,14 +2488,14 @@ $\actionspace$ = \begin{tabular}{|c|}
 \end{figure} 
 
 The type of problem we are concerned with is best illustrated with an example. Consider a farmer wishing to optimise the yield of her crop. She knows that crop yield is only affected by temperature, a particular soil nutrient, and moisture level but the precise effect of their combination is unknown. In each season the farmer has enough time and money to intervene and control at most one of these
-variables: deploying shade or heat lamps will set the temperature to be low or high; the nutrient can be added or removed through a choice of fertilizer; and irrigation or rain-proof covers will keep the soil wet or dry. When not intervened upon, the temperature, soil, and moisture vary naturally from season to season due to weather conditions and these are all observed along with the final crop yield at the end of each season. How might the farmer best experiment to identify the single, highest yielding intervention in a limited number of seasons?
+variables: deploying shade or heat lamps will set the temperature to be low or high; the nutrient can be added or removed through a choice of fertiliser; and irrigation or rain-proof covers will keep the soil wet or dry. When not intervened upon, the temperature, soil, and moisture vary naturally from season to season due to weather conditions and these are all observed along with the final crop yield at the end of each season. How might the farmer best experiment to identify the single, highest yielding intervention in a limited number of seasons?
 
 We will assume each variable only takes on a finite number of distinct values. (The path to relaxing this assumption would be through levering the work on continuous armed bandits). The \emph{parents} of a variable $X_i$, denoted $\parents{X_i}$, is the set of all variables $X_j$ such that there is an edge from $X_j$ to $X_i$ in $\mathcal{G}$. An \emph{intervention or action (of size $n$)}, denoted $do(\vec{X}=\vec{x})$, assigns the values $\vec{x}=\{x_1, \ldots, x_n\}$ to the corresponding variables $\vec{X}=\{X_1, \ldots, X_n\} \subset \mathcal{X}$ with the empty intervention (where no variable is set) denoted $do()$. We denote the expected reward for the action $a = do(\vec{X} = \vec{x})$ by $\mu_{a} := \E{Y | do(\vec{X} = \vec{x})}$ and 
 the optimal expected reward by $\mu^* := \max_{a\in\actions} \mu_{a}$. 
 
 \vspace*{.5cm}
 \begin{definition}[Causal bandit problem]
-A learner for a casual bandit problem is given the casual model’s graph $G$ over variables $\mathcal{X}$ and a set of allowed actions $\actionspace$. Each action $a \in \actionspace$ assings a value to a subset of the variables in $\mathcal{X}$. One variable $Y \in \mathcal{X}$ is designated as the \emph{reward variable} and takes on values in $\{0, 1\}$.
+A learner for a casual bandit problem is given the casual model’s graph $G$ over variables $\mathcal{X}$ and a set of allowed actions $\actionspace$. Each action $a \in \actionspace$ assigns a value to a subset of the variables in $\mathcal{X}$. One variable $Y \in \mathcal{X}$ is designated as the \emph{reward variable} and takes on values in $\{0, 1\}$.
 
 The causal bandit game proceeds over $T$ rounds. In each round $t$, the learner:
 \begin{enumerate}
@@ -2416,11 +2504,11 @@ The causal bandit game proceeds over $T$ rounds. In each round $t$, the learner:
 \item \emph{observes} sampled values for another subset of variables $\vec{X}^o_t$ drawn from $\P{\vec{X}^o_t | do(\vec{X}_t = \vec{x}_t)}$ including the \emph{reward} $Y_t \in \{0,1\}$.
 \end{enumerate} 
 
-We refer to the set of variables that can be observed prior to selecting an action $\vec{X}^c$ as contextual variables and the set of variables observed after the action is chosen, $\vec{X}^o$, as post-action feedback variables. Note that $\vec{X}^c$ and $\vec{X}^o$ need not be disjoint. A variable may be observed both prior to and after the agent selects an action, and the action may change its value. The objective of the learner is to minimise either the simple (equation \ref{}) or cummulative regret (equation \ref{}). 
+We refer to the set of variables that can be observed prior to selecting an action $\vec{X}^c$ as contextual variables and the set of variables observed after the action is chosen, $\vec{X}^o$, as post-action feedback variables. Note that $\vec{X}^c$ and $\vec{X}^o$ need not be disjoint. A variable may be observed both prior to and after the agent selects an action, and the action may change its value. The objective of the learner is to minimise either the simple (equation \ref{}) or cumulative regret (equation \ref{}). 
 
 \end{definition}
 
-The causal bandit problem takes on characteristics of different bandit settings depending on the actionspace $\actionspace$, which variables are observable prior to selecting an action and on which variables we recieve post-action feedback. If feedback is recieved only on the reward node $\vec{X}^o = \set{Y}$, as in the standard bandit setting, then the do-calculus can be applied to eliminate some actions immediately, before any experiments are performed and then a standard bandit algorithm can be run on the remaining actions, see figure \ref{fig:cholesterol_graph} as an example. If we recieve post-action feedback on additional nodes the problem can be more interesting. In addition to being able to eliminate some actions prior to sampling any data as in the previous case, taking one action may give us some information on actions that were not selected. Consider again the model in figure \ref{fig:unify_frameworks}. The causal structure implies: 
+The causal bandit problem takes on characteristics of different bandit settings depending on the action-space $\actionspace$, which variables are observable prior to selecting an action and on which variables we receive post-action feedback. If feedback is received only on the reward node $\vec{X}^o = \set{Y}$, as in the standard bandit setting, then the do-calculus can be applied to eliminate some actions immediately, before any experiments are performed and then a standard bandit algorithm can be run on the remaining actions, see figure \ref{fig:cholesterol_graph} as an example. If we receive post-action feedback on additional nodes the problem can be more interesting. In addition to being able to eliminate some actions prior to sampling any data as in the previous case, taking one action may give us some information on actions that were not selected. Consider again the model in figure \ref{fig:unify_frameworks}. The causal structure implies: 
 
 \eq{
 P(Y|do(W = 0)) &= P(Y|do(),W = 0) \\
@@ -2463,7 +2551,7 @@ A well-studied class of bandit problems with side information are ``contextual b
 However, a crucial difference is that in our model the extra observations are only revealed \emph{after} selecting an intervention and hence cannot be used as context. 
 
 There have been several proposals for bandit problems where extra feedback is received after an action is taken.
-Most recently, \citet{Alon2015}, \citet{Kocak2014} have considered very general models related to partial monitoring games~\citep{Bartok2014} where rewards on unplayed actions are revealed according to a feedback graph. As we discuss in \S\ref{sec:causal_bandit_discussion}, the parallel bandit problem can be captured in this framework, however the regret bounds are not optimal in our setting. They also focus on cumulative regret, which cannot be used to guarantee low simple regret~\citep{Bubeck2009a}. The partial monitoring approach taken by \cite{wu2015online} could be applied (up to modifications for the simple regret) to the parallel bandit, but the resulting strategy would need to know the likelihood of each factor in advance, while our strategy learns this online. \citet{Yu2009} utilize extra observations to detect changes in the reward distribution, whereas we assume fixed reward distributions and use extra observations to improve arm selection. \citet{Avner2012} analyse bandit problems where the choice of arm to pull and arm to receive feedback on are decoupled. The main difference from our present work is our focus on simple regret and the more complex information linking rewards for different arms via causal graphs. To the best of our knowledge, our paper is the first to analyse simple regret in bandit problems with extra post-action feedback.
+Most recently, \citet{Alon2015}, \citet{Kocak2014} have considered very general models related to partial monitoring games~\citep{Bartok2014} where rewards on un played actions are revealed according to a feedback graph. As we discuss in \S\ref{sec:causal_bandit_discussion}, the parallel bandit problem can be captured in this framework, however the regret bounds are not optimal in our setting. They also focus on cumulative regret, which cannot be used to guarantee low simple regret~\citep{Bubeck2009a}. The partial monitoring approach taken by \cite{wu2015online} could be applied (up to modifications for the simple regret) to the parallel bandit, but the resulting strategy would need to know the likelihood of each factor in advance, while our strategy learns this online. \citet{Yu2009} utilise extra observations to detect changes in the reward distribution, whereas we assume fixed reward distributions and use extra observations to improve arm selection. \citet{Avner2012} analyse bandit problems where the choice of arm to pull and arm to receive feedback on are decoupled. The main difference from our present work is our focus on simple regret and the more complex information linking rewards for different arms via causal graphs. To the best of our knowledge, our paper is the first to analyse simple regret in bandit problems with extra post-action feedback.
 
 
 %\citet{Yu2009} consider bandit problems where a learner chooses an arm to play as well as set of arms to observe rewards for in a stochastic setting where the reward distributions can change infrequently and the aim is to minimize cumulative regret. They use extra observations to detect changes whereas we assume fixed reward distributions and use extra observations to improve arm selection.
@@ -3211,7 +3299,7 @@ Therefore $m(\eta*) \leq m(\eta) \leq 2m(\boldsymbol{q})$ as required.
 \end{itemize}
 
 
-Notorious paper Automated Inferences of Criminality using Face Images. - What possible actions could we take? Ban people with most risky 'face types' from critical jobs? But dependent on causal structure, conditioning on the fact that people are in a position to apply for such jobs could reverse the dependency. Ones facial appearance is a readily observable characteristic and there is evidence that people implicity make assumptions on the basis of it. Consider trials where people with 'more criminal' faces got longer sentances for similar crimes. 
+Notorious paper Automated Inferences of Criminality using Face Images. - What possible actions could we take? Ban people with most risky 'face types' from critical jobs? But dependent on causal structure, conditioning on the fact that people are in a position to apply for such jobs could reverse the dependency. Ones facial appearance is a readily observable characteristic and there is evidence that people implicitly make assumptions on the basis of it. Consider trials where people with 'more criminal' faces got longer sentances for similar crimes. 
 %\chapter{Causality \& Interpretability}
 
 %\chapter{Causality \& Fairness}

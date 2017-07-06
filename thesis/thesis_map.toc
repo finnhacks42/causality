@@ -38,31 +38,32 @@
 \contentsline {subsection}{\numberline {4.2.1}Stochastic bandits: Approaches and results}{50}{subsection.4.2.1}
 \contentsline {subsection}{\numberline {4.2.2}Pure-exploration problems}{53}{subsection.4.2.2}
 \contentsline {subsection}{\numberline {4.2.3}Adversarial Bandits}{54}{subsection.4.2.3}
-\contentsline {subsection}{\numberline {4.2.4}Contextual bandits}{56}{subsection.4.2.4}
-\contentsline {subsubsection}{Learning from logged bandit data}{57}{section*.65}
-\contentsline {subsection}{\numberline {4.2.5}Markov decision processes}{57}{subsection.4.2.5}
-\contentsline {subsubsection}{Dynamic Systems}{57}{section*.66}
-\contentsline {subsection}{\numberline {4.2.6}The need to add structure}{57}{subsection.4.2.6}
-\contentsline {section}{\numberline {4.3}Questions}{57}{section.4.3}
-\contentsline {chapter}{\numberline {5}Causal Bandits: Unifying the approaches}{59}{chapter.5}
-\contentsline {section}{\numberline {5.1}The framework}{59}{section.5.1}
-\contentsline {section}{\numberline {5.2}Causal bandits with post action feedback}{61}{section.5.2}
-\contentsline {paragraph}{Related Work}{61}{section*.69}
-\contentsline {subsection}{\numberline {5.2.1}The parallel bandit problem}{62}{subsection.5.2.1}
-\contentsline {paragraph}{The Parallel Bandit Algorithm}{63}{section*.71}
-\contentsline {subsection}{\numberline {5.2.2}General graphs}{64}{subsection.5.2.2}
-\contentsline {paragraph}{Choosing the Sampling Distribution}{66}{section*.72}
-\contentsline {subsection}{\numberline {5.2.3}Experiments}{66}{subsection.5.2.3}
-\contentsline {subsection}{\numberline {5.2.4}Discussion \& Future work}{69}{subsection.5.2.4}
-\contentsline {paragraph}{Making Better Use of the Reward Signal}{69}{section*.76}
-\contentsline {paragraph}{Cumulative Regret}{69}{section*.77}
-\contentsline {paragraph}{Causal Models with Non-Observable Variables}{70}{section*.78}
-\contentsline {paragraph}{Partially or Completely Unknown Causal Graph}{70}{section*.79}
-\contentsline {subsection}{\numberline {5.2.5}Proofs}{70}{subsection.5.2.5}
-\contentsline {subsubsection}{Proof of Theorem \ref {thm:uq-simple}}{70}{section*.80}
-\contentsline {subsubsection}{Proof of Theorem \ref {thm:lower}}{72}{section*.81}
-\contentsline {subsubsection}{Proof of Theorem \ref {thm:general}}{73}{section*.82}
-\contentsline {subsubsection}{Relationship between $m(\eta )$ and $m(\boldsymbol {q})$}{74}{section*.83}
-\contentsline {chapter}{\numberline {6}More stuff}{76}{chapter.6}
-\contentsline {chapter}{\numberline {7}Conclusion}{81}{chapter.7}
-\contentsline {paragraph}{Cycles}{81}{section*.86}
+\contentsline {subsection}{\numberline {4.2.4}Contextual bandits}{55}{subsection.4.2.4}
+\contentsline {subsubsection}{Learning from logged bandit data}{59}{section*.63}
+\contentsline {subsection}{\numberline {4.2.5}Markov decision processes}{59}{subsection.4.2.5}
+\contentsline {subsubsection}{Limitations of bandit problems}{59}{section*.64}
+\contentsline {subsubsection}{Dynamic Systems}{59}{section*.65}
+\contentsline {subsection}{\numberline {4.2.6}The need to add structure}{60}{subsection.4.2.6}
+\contentsline {section}{\numberline {4.3}Questions}{60}{section.4.3}
+\contentsline {chapter}{\numberline {5}Causal Bandits: Unifying the approaches}{62}{chapter.5}
+\contentsline {section}{\numberline {5.1}The framework}{62}{section.5.1}
+\contentsline {section}{\numberline {5.2}Causal bandits with post action feedback}{64}{section.5.2}
+\contentsline {paragraph}{Related Work}{64}{section*.68}
+\contentsline {subsection}{\numberline {5.2.1}The parallel bandit problem}{65}{subsection.5.2.1}
+\contentsline {paragraph}{The Parallel Bandit Algorithm}{66}{section*.70}
+\contentsline {subsection}{\numberline {5.2.2}General graphs}{67}{subsection.5.2.2}
+\contentsline {paragraph}{Choosing the Sampling Distribution}{69}{section*.71}
+\contentsline {subsection}{\numberline {5.2.3}Experiments}{69}{subsection.5.2.3}
+\contentsline {subsection}{\numberline {5.2.4}Discussion \& Future work}{72}{subsection.5.2.4}
+\contentsline {paragraph}{Making Better Use of the Reward Signal}{72}{section*.75}
+\contentsline {paragraph}{Cumulative Regret}{72}{section*.76}
+\contentsline {paragraph}{Causal Models with Non-Observable Variables}{73}{section*.77}
+\contentsline {paragraph}{Partially or Completely Unknown Causal Graph}{73}{section*.78}
+\contentsline {subsection}{\numberline {5.2.5}Proofs}{73}{subsection.5.2.5}
+\contentsline {subsubsection}{Proof of Theorem \ref {thm:uq-simple}}{73}{section*.79}
+\contentsline {subsubsection}{Proof of Theorem \ref {thm:lower}}{75}{section*.80}
+\contentsline {subsubsection}{Proof of Theorem \ref {thm:general}}{76}{section*.81}
+\contentsline {subsubsection}{Relationship between $m(\eta )$ and $m(\boldsymbol {q})$}{77}{section*.82}
+\contentsline {chapter}{\numberline {6}More stuff}{79}{chapter.6}
+\contentsline {chapter}{\numberline {7}Conclusion}{84}{chapter.7}
+\contentsline {paragraph}{Cycles}{84}{section*.85}

@@ -298,3 +298,23 @@ In the classical multi-armed bandit problem, the rewards for each arm are sample
 This lower bound says that for any algorithm for the k-armed bandit problem, there exists a set of reward distributions such that the expected is $\bigomega{\sqrt{kT}}$.
 
 The expectation is with respect the random sequence of actions. 
+
+. Although, in this case, the contextual bandit algorithm should eventually converge to the selecting the same optimal arm as a standard multi-armed bandit algorithm that ignored the context the regret incured will be higher. 
+
+
+Note that we can't simply apply a (online) supervised learning algorithm because the samples we recieve depend on the choice of action. 
+
+The regret bounds how well we can do relative to the best hypothosis in the space. Increasing the size of the hypothosis space increases the upper bound on the regret, as the algorithm has a larger space to explore. Connected to the bias variance trade-off. 
+
+In a finite experiment, we can achieve lower 'regret' by allowing the algorithm to search only over a simpler hypothosis space. 
+
+
+
+The results we have stated only apply to finite hypthosis classes. However the XXX algorithms can be generalised to continuous hypothosis classes to obtain regret bounds in terms of VC-dimension \citep{}.
+
+
+It should be noted that there is an important difference between the approaches we can apply to the contextual bandit versus the supervised learning setting. As for the casual effect estimation problem, we cannot utilise cross-validation offline to select model parameters. This makes contextual bandit algorithms degrade faster than supervised learning ones as we add irrelevant variables. \todo{ask Tor if he thinks this is correct}
+
+RUN A SIMULATION COMPARING HOW supervised learning and contextual bandits degrade as we add more features. What would be a fair comparison?
+
+
