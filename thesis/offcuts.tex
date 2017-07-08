@@ -317,4 +317,75 @@ It should be noted that there is an important difference between the approaches 
 
 RUN A SIMULATION COMPARING HOW supervised learning and contextual bandits degrade as we add more features. What would be a fair comparison?
 
+\subsection{Markov decision processes}
+
+\subsubsection{Limitations of bandit problems}
+\begin{itemize}
+\item Reward needs to be observed immediately after action is taken (or at least before the next action must be selected).
+\item State assumed not to change
+
+\end{itemize}
+
+Reward known immediately. Action chosen for one individual does not effect reward for the next (SUTVA).
+
+
+
+A key limitation of the bandit setting is that 
+
+This is reasonable in settings where we have many similar but independent units or individuals and the goal is to identify which action is optimal (in a given context), as occurs in standard experimental settings as well. 
+
+Relation to SUTVA assumption, selecing a action for one 'unit' does not effect the reward distributions for other units. 
+
+The reward of an action is not immediately known. - a long sequence of steps. Delayed reward. 
+
+
+
+In the bandit setting the reward distributions for each arm are assumed to be fixed. A much studied generalisation is the Markov decision process or MDP. In an MDP we assume there the environment has some state. The reward an agent receives depends on the state of the environment and the action the agent selects. The environment then evolves stochastically depending on the agents action. Multi-armed bandits can be considered a single state MDP, where no matter what action the agent selects, the environment returns to that state. 
+
+Insert a graphical representation of an MDP
+
+What assumptions are required to make MDPs tractable. 
+
+What is the basic algorithm (Q-learning)
+
+What are the key results.
+
+\subsubsection{Dynamic Systems}
+\begin{itemize}
+\item An explicit model of actions in a partially known system (eg HMM)
+\item Feynman-Kac Lemma; Solving a PDE can be converted to a stochastic process
+\end{itemize}
+
+
+
+
+
+
+
+\subsection{The need to add structure}
+The regret for a bandit problem grows linearly with the number of (sub-optimal) actions. This makes problems with large or infinite actions spaces intractable. REFERENCE equation showing linearity with arms. CHECK ITS TRUE. 
+
+causal bandits capture a very natural form of structure that can arise between different arms. 
+
+The classic multi-armed bandit is a powerful tool for sequential decision making. However, the regret grows linearly with the number of (sub-optimal) actions and many real world problems have large or even infinite action spaces. This has led to the development of a wide range of models that assume some structure across the reward distributions for different arms, for example generalised linear bandits \cite{filippi2010parametric}, dependent bandits \cite{Pandey2007}, X-armed bandits \cite{Bubeck2010} and Gaussian process bandits \cite{srinivas2009gaussian}, or that consider more complex feedback, for example the recent work on graph feedback \cite{Mannor2011,Lelarge2012,Alon2013,Buccapatnam2014,Kocak2014,Alon2015} and partial monitoring \cite{Piccolboni2001,Bartok2014}. 
+
+\section{Questions}
+\begin{enumerate}
+\item In the $\epsilon$-greedy approach, does one compute best action based only on exploration steps?
+\item Why does the naive reduction appear to get sub-optimal regret?
+\item When does the expected regret make sense as the thing we actually would wish to optimise? Is optimising the expected regret any different to optimising the psuedo-regret? Who is the definition of regret down to? Does this definition of regret come from learning with expert advise?
+\item Is there a reference for the doubling trick? Is it an automatic way of converting a fixed horizon algorithm to an anytime one?
+\item Is Learning from logged feedback data just covariate shift too?
+\item In contextual bandits, does it ever make sense that $Y$ causes $X$? If the reward is some function of the action taken and the context, then the full vector of counterfactual outcomes $Y$ is never instantiated. Are there any implications of this for inference?
+\item Why does anything solving a regression problem work in the anti-causal direction - it would seem to break the fundamental underlying assumption of additive noise?
+\item is there a benchmark library of implementations of key bandit algorithms?
+\item Bubeck 2012 states that if the adversary is oblivious, the psuedo-regret coincides with the standard regret, 'which is always the ultimate quantity of interest'. Why, they are not the same for stochastic bandits are they?
+\item what is the worst-case regret of UCB in an adversarial setting?
+\item is there a concept of problem dependent regret for adversarial bandits? Has there been analysis of the problem dependent regret for key adversarial algorithms such as EXP-3?
+\item adversarial regret bounds for Thompson sampling, UCB with random arm selection from upper-bound set?
+\item do continuous armed bandits implie that there are arms with any arbitrary gap in reward (including worst case gap for that T) and thus you always end up with something like worst case regret?)
+\item in what real world setting do adversarial bandits potentially make sense?
+\item Does supervised learning really 'reveal the value of every action'.
+\end{enumerate}
+
 
