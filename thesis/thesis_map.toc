@@ -60,6 +60,3 @@
 \contentsline {subsubsection}{Proof of Theorem \ref {thm:lower}}{74}{section*.76}
 \contentsline {subsubsection}{Proof of Theorem \ref {thm:general}}{75}{section*.77}
 \contentsline {subsubsection}{Relationship between $m(\eta )$ and $m(\boldsymbol {q})$}{76}{section*.78}
-\contentsline {chapter}{\numberline {6}More stuff}{78}{chapter.6}
-\contentsline {chapter}{\numberline {7}Conclusion}{83}{chapter.7}
-\contentsline {paragraph}{Cycles}{83}{section*.81}

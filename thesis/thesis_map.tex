@@ -20,7 +20,7 @@
 \usetikzlibrary{arrows,fit,positioning}
 \usepackage{subcaption}
 \usepackage[colorinlistoftodos]{todonotes}
-\usepackage[numbers]{natbib}
+\usepackage[numbers]{natbib} %numbers
 \usepackage{wrapfig}
 \usepackage{centernot}
 
@@ -783,7 +783,7 @@ P(\tau) = N(\mu_1 - \mu_0,2\sigma^{2}(1-\rho))
 {\includegraphics[width=.45\linewidth]{figures/counterfactual_nonidentify_b.pdf}}
 \end{figure}
 
-From a (large) randomised controlled trial we can estimate the marginal distributions over the counterfactual variables, see figure \ref{fig:metaphys_a}. These represent the distributions we would expect over the outcome $Y$ if everyone were treated or not treated respectively. However, the distribution over the individual causal effects depends on $\rho$, see figure \ref{fig:metaphys_b}. The key problem is that we can never observe the joint distribution over $\cf{Y}{1}$ and $\cf{Y}{0}$. As a result, $\rho$ and thus the variance of $\tau$ is not identifiable, even from experimental data. \citet{Dawid} argues that we should avoid using counterfactuals as they are defined in terms of (metaphysical) individual causal effects. He further points out that the interventional distributions in figure \ref{fig:metaphys_a}, along with a loss function, contain all the information required to decide how to treat a new patient.  
+From a (large) randomised controlled trial we can estimate the marginal distributions over the counterfactual variables, see figure \ref{fig:metaphys_a}. These represent the distributions we would expect over the outcome $Y$ if everyone were treated or not treated respectively. However, the distribution over the individual causal effects depends on $\rho$, see figure \ref{fig:metaphys_b}. The key problem is that we can never observe the joint distribution over $\cf{Y}{1}$ and $\cf{Y}{0}$. As a result, $\rho$ and thus the variance of $\tau$ is not identifiable, even from experimental data. \citet{Dawid2000} argues that we should avoid using counterfactuals as they are defined in terms of (metaphysical) individual causal effects. He further points out that the interventional distributions in figure \ref{fig:metaphys_a}, along with a loss function, contain all the information required to decide how to treat a new patient.  
 
 This result is unintuitive. It seems on the face of it that the distribution of individual causal effects is relevant to our decision making. If $\rho = 1$ then almost everyone benefits slightly from the treatment whilst if $\rho=0$, there is a wide range, with some people benefiting a lot and others suffering significant harm. This confusion can be resolved by thinking about personalised rather than individual causal effects. It is entirely possible that potentially observable characteristics (such as gender, age, genetics, etc) affect how people will respond to the treatment. We can partition people into sub-populations on the basis of these characteristics and measure different \emph{personalised} causal effects for each group. The variance of the potential outcome distributions $f(\cf{Y}{1})$ and $f(\cf{Y}{0})$ provides bounds on how much can be gained from further personalisation. The metaphysical nature of individual causal effects only arises when we are at the point where the only remaining variation is due to inherent randomness (or variables that we could not even in principle measure). 
 
@@ -885,7 +885,7 @@ X \ci Y^{0} \text{ and } X \ci Y^{1}
 
 It is possible to relax the independence of errors assumption for SEMs to correspond exactly with the form of equation (\ref{eq:weakignore}) without losing any of the power provided by d-separation and graphical identification rules \citep{Richardson2013}. The correspondence between the models for interventional queries (those that can be phrased using the do-notation) makes it straightforward to combine key results and algorithms developed within any of these frameworks. For example, you can draw a causal graphical network to determine if a problem is identifiable and which variables should be adjusted for to obtain an unbiased causal estimate. Then use propensity scores \citep{Rosenbaum1983} to estimate the effect. If non-parametric assumptions are insufficient for identification or lead to overly large uncertainties, you can specify additional assumptions by phrasing your model in terms of structural equations. The frameworks do differ when it comes to causal queries that involve joint or nested counterfactuals and cannot be expressed with the do-notation. These types of queries arise in the study of mediation \citep{Pearl2014,Imai2010a,VanderWeele2011} and in legal decisions, particularly on issues such as discrimination \citep{Pearl2000}. 
 
-In practice, differences in focus and approach between the fields in which each model dominates eclipse the actual differences in the frameworks. The work on causal graphical models \citep{Pearl2000,Sprites} focuses on asymptotic, non-parametric estimation and rigorous theoretical foundations. The Neyman-Rubin framework builds on the understanding of randomised experiment and generalises to quasi-experimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimation of average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \citep{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data to support policy decisions is central to the field. Economists are often interested in more informative measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \citep{Heckman2008}. In addition, the parametric structural equation models favoured in economics can be extended to analyse cyclic (otherwise referred to as non-recursive) models. 
+In practice, differences in focus and approach between the fields in which each model dominates eclipse the actual differences in the frameworks. The work on causal graphical models \citep{Pearl2000,Sprites2000} focuses on asymptotic, non-parametric estimation and rigorous theoretical foundations. The Neyman-Rubin framework builds on the understanding of randomised experiment and generalises to quasi-experimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimation of average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \citep{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data to support policy decisions is central to the field. Economists are often interested in more informative measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \citep{Heckman2008}. In addition, the parametric structural equation models favoured in economics can be extended to analyse cyclic (otherwise referred to as non-recursive) models. 
 
 \section{What does a causal model give us? Resolving Simpson's paradox}
 
@@ -1753,7 +1753,7 @@ This formulation of the regression estimator highlights the missing data aspect 
 \hat{\tau}_{match} = \sum_{i=1}^n \left[\ind{x_i=1}\left(y_i - \frac{1}{k}\sum_{j \in J_k(i)}y_j\right) +\ind{x_i=0}\left(\frac{1}{k}\sum_{j \in J_k(i)}y_j - y_i \right)\right]
 }
 
-This estimator is equivalent to equation \ref{eqn:cef_regression_missing} with k nearest neighbour regression. There are many variants of matching estimators utilising different distance metrics, matching with or without replacement (and in the latter case, greedy or optimal matching) and with or without discarding matches beyond some threshold \citep{cochran1973controlling,rosenbaum1985constructing}. Although intuitive, matching estimators in general have poor large sample properties \citep{Abadie2006}. An exception is where the goal is to estimate the average treatment effect of treatment on the treated in settings where there is a large set of control instances (compared to treatment instances) \citep{Imbens2004}. 
+This estimator is equivalent to equation \ref{eqn:cef_regression_missing} with k nearest neighbour regression. There are many variants of matching estimators utilising different distance metrics, matching with or without replacement (and in the latter case, greedy or optimal matching) and with or without discarding matches beyond some threshold \citep{Cochran1973,rosenbaum1985constructing}. Although intuitive, matching estimators in general have poor large sample properties \citep{Abadie2006}. An exception is where the goal is to estimate the average treatment effect of treatment on the treated in settings where there is a large set of control instances (compared to treatment instances) \citep{Imbens2004}. 
 
 The practical performance of the estimation approaches discussed in this section will depend on the sample size, dimensionality of the covariates, the complexity of the treatment assignment mechanism and output function, and the degree of prior knowledge available about these functions. A key difference between standard machine learning problems and causal effect estimation is that when estimating causal effects we cannot directly apply cross-validation or a hold-out set for model selection because we lack samples from the counterfactual. 
 
@@ -1882,7 +1882,7 @@ There are an number of difficulties in extending the approach of the last sectio
 
 Since we only care about the causal relationships between observed variables, it is sufficient to search over networks where any hidden variables have no parents and directly cause two of the observed variables. Instead of representing hidden variables explicitly we can capture the necessary independence relations with a more general graphical model that supports bi-directed edges that play the role of a hidden confounding variable. These models, referred to as maximal ancestral graphs (MAGs) are closed under marginalisation and conditioning. 
 
-For any DAG with latent (and selection) variables there is a unique MAG \citep{Richardson2002}. This makes it possible to extend the PC algorithm to latent structures, resulting in the FCI algorithm \citep{Sprites}. The logic behind the algorithm is very similar. Certain structures are ruled out as a consequence of being inconstant with the observed conditional independence relations. The output is an equivalence class of MAGs, which can be represented graphically as a partial ancestral graph PAG \citep{Spirtes1995}. Assuming there are no selection variables, the PAG can contain four types of link:
+For any DAG with latent (and selection) variables there is a unique MAG \citep{Richardson2002}. This makes it possible to extend the PC algorithm to latent structures, resulting in the FCI algorithm \citep{Sprites2000}. The logic behind the algorithm is very similar. Certain structures are ruled out as a consequence of being inconstant with the observed conditional independence relations. The output is an equivalence class of MAGs, which can be represented graphically as a partial ancestral graph PAG \citep{Spirtes1995}. Assuming there are no selection variables, the PAG can contain four types of link:
 
 \begin{enumerate}
 \item $X \rightarrow Y$, meaning $X$ causes $Y$
@@ -2521,7 +2521,7 @@ the context is observed before the action is taken and cannot be controlled by t
  \citet{Ortega2014thompson} present an analysis and extension of Thompson sampling assuming actions are causal interventions. Their focus is on causal induction (\ie, learning an unknown causal model) instead of exploiting a known causal model. Combining their handling of  causal induction with our analysis is left as future work.
 % Key to Elias' paper is: observing the action an agent would take if it were allowed to make its natural choice can provide some information about hidden confounders that influence both the reward and the choice of action. Therefore, incorporating an agents natural choice as context may outperform a standard bandit that does not use that context. (Note: even in the presence of hidden confounders, including the agents natural choice as context only may improve the results. It is easy to come up with a counter example in which it does not).
 
-The truncated importance weighted estimators used in \S\ref{sec:simple-regret-general} have been studied before in a causal framework by \citet{Bottou2013a}, 
+The truncated importance weighted estimators used in \S\ref{sec:simple-regret-general} have been studied before in a causal framework by \citet{Bottou2013}, 
 where the focus is on learning from observational data, but not controlling the sampling process. They also briefly discuss some of the issues 
 encountered in sequential design, but do not give an algorithm or theoretical results for this case.
 
@@ -2760,13 +2760,13 @@ The second observation is that, in the parallel bandit setting, $m(\eta^*) \leq 
 The choice of $B_a$ given in Theorem \ref{thm:general} is not the only possibility. As we shall see in the experiments, it is 
 often possible to choose $B_a$ significantly
 larger when there is no heavy tail and this can drastically improve performance by eliminating the bias. This is especially true when the ratio $R_a$ is never too large
-and Bernstein's inequality could be used directly without the truncation. For another discussion see the article by \citet{Bottou2013a} who also use importance weighted estimators
+and Bernstein's inequality could be used directly without the truncation. For another discussion see the article by \citet{Bottou2013} who also use importance weighted estimators
 to learn from observational data.
 \end{remark}
 
 
 \subsection{Experiments}
-We compare Algorithms \ref{alg:simple} and \ref{alg:general} with the Successive Reject algorithm of \citet{audibert2010best}, Thompson Sampling and UCB under a variety of conditions. Thomson sampling and UCB are optimised to minimise cumulative regret. We apply them in the fixed horizon, best arm identification setting by running them up to horizon $T$ and then selecting the arm with the highest empirical mean. The importance weighted estimator used by Algorithm \ref{alg:general} is not truncated, which is justified in this setting by Remark \ref{rem:truncate}. 
+We compare Algorithms \ref{alg:simple} and \ref{alg:general} with the Successive Reject algorithm of \citet{Audibert2010}, Thompson Sampling and UCB under a variety of conditions. Thomson sampling and UCB are optimised to minimise cumulative regret. We apply them in the fixed horizon, best arm identification setting by running them up to horizon $T$ and then selecting the arm with the highest empirical mean. The importance weighted estimator used by Algorithm \ref{alg:general} is not truncated, which is justified in this setting by Remark \ref{rem:truncate}. 
 
 Throughout we use a model in which $Y$ depends only on a single variable $X_1$ (this is unknown to the algorithms). $Y_t \sim \bernoulli(\frac{1}{2}+\epsilon)$ if $X_1=1$ and $Y_t \sim \bernoulli(\frac{1}{2}-\epsilon')$ otherwise, where $\epsilon' = q_1\epsilon/(1-q_1)$. This leads to an expected reward of $\frac{1}{2}+\epsilon$ for $do(X_1=1)$, $\frac{1}{2}-\epsilon'$ for $do(X_1=0)$ and $\frac{1}{2}$ for all other actions. We set $q_i = 0$ for $i \leq m$ and $\frac{1}{2}$ otherwise. Note that changing $m$ and thus $\boldsymbol{q}$ has no effect on the reward distribution. For each experiment, we show the average regret over 10,000 simulations with error bars displaying three standard errors. The code is available from \url{<https://github.com/finnhacks42/causal_bandits>} 
 
@@ -2799,7 +2799,7 @@ In Figure \ref{fig:simple_vs_m} we fix the number of variables $N$ and the horiz
 Figure \ref{fig:simple_vs_T_vary_epsilon} demonstrates the performance of the algorithms in the worst case environment for standard bandits, where the gap between the optimal and sub-optimal arms, $\smash{\epsilon = \sqrt{N/(8T)}}$ , is just too small to be learned. This gap is learn-able by the causal algorithms, for which the worst case $\epsilon$ depends on $m \ll N$. In Figure \ref{fig:simple_vs_T} we fix $N$ and $\epsilon$ and observe that, for sufficiently large $T$, the regret decays exponentially. The decay constant is larger for the causal algorithms as they have observed a greater effective number of samples for a given $T$. 
 
 For the parallel bandit problem, the regression estimator used in the specific algorithm outperforms the truncated importance weighted estimator in the more general algorithm, despite the fact the specific algorithm must estimate $\boldsymbol{q}$ from the data. 
-This is an interesting phenomenon that has been noted before in off-policy evaluation where the regression (and not the importance weighted) estimator is known to be mini-max optimal asymptotically \citep{LMS14}.
+This is an interesting phenomenon that has been noted before in off-policy evaluation where the regression (and not the importance weighted) estimator is known to be mini-max optimal asymptotically \citep{li2014minimax}.
 
 
 \begin{figure}[H]
@@ -2937,7 +2937,7 @@ even an infinite amount of observational data. Even if all variables are observa
 \paragraph{Partially or Completely Unknown Causal Graph}
 A much more difficult generalisation would be to consider causal bandit problems where the causal graph is completely unknown or known to be a member of class of models.
 The latter case arises naturally if we assume free access to a large observational data set, from which the Markov equivalence class can be found via causal discovery techniques. 
-Work on the problem of selecting experiments to discover the correct causal graph from within a Markov equivalence class~\citep{Eberhardt2005,eberhardt2010causal,hauser2014two,Hu2014} could potentially be incorporated into a causal bandit algorithm.
+Work on the problem of selecting experiments to discover the correct causal graph from within a Markov equivalence class~\citep{eberhardt2005,eberhardt2010causal,hauser2014two,Hu2014} could potentially be incorporated into a causal bandit algorithm.
 In particular, \citet{Hu2014} show that only $\bigo{\log \log n}$ multi-variable interventions are required on average to recover a causal graph over $n$ variables once purely observational data is used to recover the ``essential graph''.
 Simultaneously learning a completely unknown causal model while estimating the rewards of interventions without a large observational data set would be much more challenging.
 
@@ -2958,7 +2958,7 @@ Let $i \in \set{1,\ldots, N}$ and $\delta > 0$. Then
 \end{lemma}
 
 \begin{proof}
-By definition, $\hat{q}_i = \frac{2}{T}\sum_{t=1}^{T/2}X_{t,i}$, where $X_{t,i} \sim Bernoulli(q_i)$. Therefore from the Chernoff bound (see equation 6 in \citet{hagerup1990guided}),
+By definition, $\hat{q}_i = \frac{2}{T}\sum_{t=1}^{T/2}X_{t,i}$, where $X_{t,i} \sim Bernoulli(q_i)$. Therefore from the Chernoff bound (see equation 6 in \citet{Hagerup1990}),
 
 \eq{
 \P{\left|\hat q_i - q_i\right| \geq \epsilon} \leq 2e^{-\frac{T\epsilon^2}{6q_i}}
@@ -3241,193 +3241,10 @@ Therefore $m(\eta*) \leq m(\eta) \leq 2m(\boldsymbol{q})$ as required.
 %It is then easy to check that $m(\eta) \leq 2m$ using an argument like that for Proposition~\ref{pro:m-bound}.
 
 
-\chapter{More stuff}
-%\chapter{List of software programs for causal inference}
-
-\begin{itemize}
-\item Pcalg. A library in R that implements ...
-\item Tetrad.
-\item There has to be a library for the Bayesian trees thing
-\item Linear regression (you can do this anywhere)
-
-\end{itemize}
-
-
-Notorious paper Automated Inferences of Criminality using Face Images. - What possible actions could we take? Ban people with most risky 'face types' from critical jobs? But dependent on causal structure, conditioning on the fact that people are in a position to apply for such jobs could reverse the dependency. Ones facial appearance is a readily observable characteristic and there is evidence that people implicitly make assumptions on the basis of it. Consider trials where people with 'more criminal' faces got longer sentences for similar crimes. 
-%\chapter{Causality \& Interpretability}
-
-%\chapter{Causality \& Fairness}
-
-Generalisation error weights towards regions where density of x is high (it does not care about minorities). 
-
-As machine learning is incorporated into decision making systems that have fundamental impacts on people’s lives, such as in employment, criminal justice, health and financial services, there are increasing concerns over transparency and fairness \citep{WMD, etc}. Realisation that machine learning algorithms can be inherit biases from the data we feed into them and the choices those building them make about what variables to include, etc. 
-
-The European Union’s General Data Protection Regulation \citep{Goodman2016}\todo{check}, due to come into effect in 2018, requires that people can obtain "meaningful information about the logic involved" in an automated decision process . It also stipulates that such decisions should not be based on special categories of personal data (related to ethnicity, political and religions affiliation or sexuality) unless there "suitable measures" to safeguard individual interests. A key concern is discrimination against disadvantaged groups. 
-
-Discrimination is frequently defined in terms of either disparate treatment- treating otherwise similar individuals differently on the basis of a protected attribute such as race or gender, or disparate impact - a process that yields a significant difference in outcome between groups. We consider how the notions of disparate treatment and impact may be formalised and the implications of how this is done for machine learning. We examine the overlap between the motivations for interpretable and causal models, especially with respect to assessing fairness. We look at how causal models mitigate some of the trade-offs between transparency and predictive accuracy and we examine to what extent the causal relationship between an attribute, any protected attributes and the outcome of interest is relevant to assessing the impact on fairness of its inclusion in a machine learning model.
-
-The lack of part-time work in tech could be argued to constitute indirect discrimination against women. 
-A fear that advertising themselves as supporting flexible working options would attract candidates who lacked drive and ambition.
-Cultural bias that favours those driven by monetary ambition against those 
-
-
-Stability - a non causal model can't tell us about a simple do type operation on  a single variable. 
-
-More broadly, we could draw a model representing the system now that could tell us the result of an intervention on a particular variable (such as setting gender), but the system itself could change (for example with customer preferences). There is a notion that a true causal model should be invariant for all time.
-
-Connection to Simpson's paradox. But what should we condition on? \citep{Romie2010} argue that looking at the department level is the correct viewpoint, since this the point at which hiring decisions were made. However, it could be argued that if one department was attracting a large number of higher quality candidates, the overall size of that department should be higher and that the results seen at Berkeley reflected a bias in favour of male dominated fields. 
-
-Different measures of discrimination - is there a difference between groups (after conditioning on xxx)
-
-To understand how we measure and penalise discrimination, we need to take a step back and ask what are the underlying motivations for fairness?
-
-These differences in underlying cause suggest differences in the approach we should take to remedy them.  
-
-%\section{How does discrimination arise in ML models}
-\begin{itemize}
-\item bias in historical decisions fed in as training data
-\item selection bias in input data, due to deliberate or implicit discrimination such as stop and search
-\item deliberate manipulation on the part of the person building the model.
-\item The hardest case is historical disadvantage, creating genuine differences between relevant attributes of groups.
-\item in bias in the label - what happens if you hire minorities but then your staff treat them badly and as a result they under-perform or leave.  
-\end{itemize}
-
-%\section{Defining Descrimination}
-
-Define discrimination in terms of causal effect of protected variable in decision making process. 
-
-\citep{Romei2012} note the relevance of causal inference on discrimination analysis.
-
-“the central question in any employment- discrimination case is whether the employer would have taken the same action had the employee been of 7A recurring problem known as the omitted-variable bias.
-A multidisciplinary survey on discrimination analysis 9
-a different race (age, sex, religion, national origin etc.) and everything else had been the same” (Carson v. Bethlehem)
-
-
-Let us mathematically define disparate treatment and disparate impact with respect to a statistical model. We will focus on discrete variables for notational simplicity. Assume we have an outcome of interest $Y$, protected attributes $X$, other covariates $Z$ and a (potentially stochastic) model $f$ that maps $\{x, z\}$ to $y_f \in Y$. For a given model $f$, we have a distribution over the predicted outputs given the inputs, $\P{Y_f|X,Z}$
-\vspace{.2cm}
-\begin{definition}{Disparate Impact}: A model, $f$, that produces a predictive distribution $\P{Y_f|X,Z}$ has disparate impact if the marginal distribution over the predicted outcome, $Y_f$, depends on a protected attribute.
-\eqn{
-\exists \set{x_1,x_2} \subset X: \sum_z{\P{Y_f|Z,x_1}\P{Z|x_1}} \neq \sum_z{\P{Y_f|Z,x_2}\P{Z|x_2}}
-}
-\end{definition}
-
-\begin{definition}{Disparate Treatment}: A model yields disparate treatment if people with identical attributes (excluding protected attributes) are treated differently. 
-\eqn{
-\P{Y_f|Z,X} \neq \P{Y_f|Z}
-}
-\end{definition}
-
-Avoiding treating people differently purely on the basis of attributes such as ethnicity and gender and avoiding large differences in important outcomes such as education and income between such groupings both seem like desirable goals. Unfortunately, in general, they conflict with one another, see theorem \ref{thm:disparate_conflict}. Any variable we might wish to avoid discriminating on will be correlated to some other measurable covariate $Z$, making it impossible to avoid both disparate treatment and disparate impact. 
-\vspace{.2cm}
-\begin{theorem} 
-\label{thm:disparate_conflict}
-Disparate impact and disparate treatment conflict. Given covariates $Z$ and protected attributes $X$, a model, $f$, cannot be fair with respect to both disparate impact and disparate treatment unless $\P{Z|X} = \P{Z}$.
-\begin{proof} Assume $f$ yields no different treatment, then $\P{Y_f|Z,X} = \P{Y_f|Z}$. If we additionally assume no disparate impact, $\sum_z{\P{Y_f|Z}\P{Z|x_1}} = \sum_z{\P{Y_f|Z}\P{Z|x_2}} \;\; \forall \set{x_1,x_2}\subset X$. This holds if and only if $\P{Z|x_1} = \P{Z|x_2} \;\; \forall \set{x_1,x_2} \implies \P{Z|X} = \P{Z}$
-\end{proof} 
-\end{theorem}  
-
-Further issues.
-
-
-Disparate treatment, with respect to an observed set of variables $Z$, can be trivially avoided by excluding protected attributes from the training data. 
-
-Problems:
-\begin{itemize}
-\item Disparate impact and disparate treatment conflict
-\item 
-\end{itemize}
-
-
-
-%\section{Addressing discrimination}
-
-Omitting the protected attribute from the model can increase disparate impact, even if the protected attribute is negatively correlated with the outcome. 
-
-
-\textit{Disparate treatment} can be trivially avoided by excluding the protected variable from the model. However, this is deeply unsatisfying given the presence of proxy variables and can increase bias (figure \ref{fig:recidivism})
-
-Avoiding \textit{disparate impact} may be be expensive in terms of predictive accuracy and/or require \textit{disparate treatment}. 
-
-\begin{figure}[H]
-\caption{Proxies}
-\label{fig:recidivism}
-	\centering    
-          \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.7cm,
-  thick,main node/.style={observedrect}, lt/.style={latentrect} , hidden/.style={empty},background rectangle/.style={fill=olive!45}]
- %nodes
-\node[lt](1){Actual priors};
-\node[main node, below left=of 1](2){Recorded Priors};
-\node[main node, below right=of 1](3){Re-offend};
-\node[lt, above left=of 2](4){Stop and Search};
-\node[main node, above=of 4](5){Race};
-\node[main node, above=of 1](6){Education};
- \path[every node/.style={font=\tiny}]
-    (1) edge (2) edge (3)
-    (4) edge (2)
-    (5) edge (4) edge (6)
-    (6) edge (1);
-\end{tikzpicture}
-\end{figure}
-
-
-\begin{itemize}
-\item There is an additional connection between causality and fairness, that arises when you know that there is a bias in the data and wish to correct for it. In causality, it may be due to selection bias or a confounding variable. In fairness, it may be due to historical disadvantage. In both cases we may have theory that tells us the direction or scale of an effect. IE, we know that race itself has no inherent effect on outcomes such as criminality and education. If you have a data set and a collection of such priors, where the data contradicts these priors due to data bias. How do you best make decisions based on that data? 
-\end{itemize}
-
-
-human decision making can evolve. 
-
-The vagueness inherent in writing laws in natural language allows for them to be re-interpreted. 
-
-There is a lack of diversity in models. (although randomness is in fact inherent in many) - could one leverage this? - you would need an estimate of the probability the model would have assigned each instance to a particular group. 
-
-Only humans can provide the ethics
-
-%\chapter*{Random Questions}
-\begin{itemize}
-\item Why not use ratios instead of differences in defining causal effects (is it anything to do with statement in Dawid? What about sensitivity of uncertainty in estimators.
-\end{itemize}
-
-
-%\chapter{Causality in Marketing}
-Assessing the impact of marketing spend is becoming increasingly important to industry. Billions of dollars \citep{XXX} are spent each year and new marketing channels and opportunities are opening up at an unprecedented rate. 
-
-There are three key approaches to assessing the impact of marketing in the literature. 
-
-The first is to look for correlations across companies on metrics such as how much they spend on marketing \ref{}, how confident they are about their ability to market effectively \ref{} or how important the marketing team is perceived to be within the organisation with indicators of the health of the company such as sales, revenue or market capitalisation. Unfortunately is is very difficult to avoid potential major confounders with this approach. Are businesses large and successful because of their capable marketing teams or can they afford to hire capable marketers because they have sufficient profits available to do so. 
-
-%\section{Attribution}
-The second is attribution. The goal in this case is to attribute each sale to a specific (or set of specific) advertisements that the customer was exposed to. This approach is the primary way of measuring the success of digital advertising strategies such as search, display, and online video ads. The most frequent model is last-click attribution. In which the last ad the customer was presented with before they made their purchase is assumed to have caused that sale. A central criticism of attribution is that it is not measuring incremental sales. Each sales is assumed to be a consequence of some form of advertising for those customers who saw (however briefly) some form of advertisement. Of course in reality many of these customers may have made a purchaser regardless of the advertising material to which they were exposed. 
-
-System designed to optimise metrics such as click through or conversion rate can do so either by learning how to change the consumers preferences (by serving them the perfect ad at the ideal time) or by learning who was most likely to buy anyway. It seems likely that much of the improve mt in click through rates due to the application of sophisticated machine learning algorithms is being driven by the latter. Unfortunately, this does nothing for the bottom line of industry (except for those involved in serving ads). 
-
-
-%\section{Econometric Modelling}
-The final key plank businesses apply to estimate how effective their marketing are econometric or mixed media models. These models
-
-In practise these models are typically time series regression models, fitting some measure of sales against marketing spend (by marketing channel, IE TV, radio, search, digital display etc) and other key variables such as pricing, competitor spend and pricing and indicators of the health of the economy and demand for the product in question.
-
-The models may also include non-linear transformation of the marketing inputs to represent saturation and decay of time of effects. They may also consider the interaction between media channels and other business levers such as pricing.  
-
-The objective of these models is to obtain results that are comparable across channels such that the optimal mix of media can be selected. 
-
-The key
-
-\chapter{Conclusion}
-
-%\section{Open questions}
-\paragraph{Cycles} - a huge issue. Not covered by Pearl,Rubin etc. 
-
-Places to look, statistical control theory, etc. any interesting papers along these lines?
-
-In the discrete case,
-Fung and Crawford (1990) have recently proposed a fast algorithm for constructing an
-independence graph from discrete data. We have not tested their procedure as a processor for
-the PC algorithm. (COPIED FROM SPRITES)
 
 
 \bibliographystyle{apalike}% Select the citation style e.g. ieeetr
-\bibliography{library}% write the directory to the .bib file
+\bibliography{library2}% write the directory to the .bib file
 \end{document}
 
 

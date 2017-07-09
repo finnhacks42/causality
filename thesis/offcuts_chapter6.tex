@@ -1,0 +1,183 @@
+\chapter{More stuff}
+%\chapter{List of software programs for causal inference}
+
+\begin{itemize}
+\item Pcalg. A library in R that implements ...
+\item Tetrad.
+\item There has to be a library for the Bayesian trees thing
+\item Linear regression (you can do this anywhere)
+
+\end{itemize}
+
+
+Notorious paper Automated Inferences of Criminality using Face Images. - What possible actions could we take? Ban people with most risky 'face types' from critical jobs? But dependent on causal structure, conditioning on the fact that people are in a position to apply for such jobs could reverse the dependency. Ones facial appearance is a readily observable characteristic and there is evidence that people implicitly make assumptions on the basis of it. Consider trials where people with 'more criminal' faces got longer sentences for similar crimes. 
+%\chapter{Causality \& Interpretability}
+
+%\chapter{Causality \& Fairness}
+
+Generalisation error weights towards regions where density of x is high (it does not care about minorities). 
+
+As machine learning is incorporated into decision making systems that have fundamental impacts on people’s lives, such as in employment, criminal justice, health and financial services, there are increasing concerns over transparency and fairness \citep{WMD, etc}. Realisation that machine learning algorithms can be inherit biases from the data we feed into them and the choices those building them make about what variables to include, etc. 
+
+The European Union’s General Data Protection Regulation \citep{Goodman2016}\todo{check}, due to come into effect in 2018, requires that people can obtain "meaningful information about the logic involved" in an automated decision process . It also stipulates that such decisions should not be based on special categories of personal data (related to ethnicity, political and religions affiliation or sexuality) unless there "suitable measures" to safeguard individual interests. A key concern is discrimination against disadvantaged groups. 
+
+Discrimination is frequently defined in terms of either disparate treatment- treating otherwise similar individuals differently on the basis of a protected attribute such as race or gender, or disparate impact - a process that yields a significant difference in outcome between groups. We consider how the notions of disparate treatment and impact may be formalised and the implications of how this is done for machine learning. We examine the overlap between the motivations for interpretable and causal models, especially with respect to assessing fairness. We look at how causal models mitigate some of the trade-offs between transparency and predictive accuracy and we examine to what extent the causal relationship between an attribute, any protected attributes and the outcome of interest is relevant to assessing the impact on fairness of its inclusion in a machine learning model.
+
+The lack of part-time work in tech could be argued to constitute indirect discrimination against women. 
+A fear that advertising themselves as supporting flexible working options would attract candidates who lacked drive and ambition.
+Cultural bias that favours those driven by monetary ambition against those 
+
+
+Stability - a non causal model can't tell us about a simple do type operation on  a single variable. 
+
+More broadly, we could draw a model representing the system now that could tell us the result of an intervention on a particular variable (such as setting gender), but the system itself could change (for example with customer preferences). There is a notion that a true causal model should be invariant for all time.
+
+Connection to Simpson's paradox. But what should we condition on? \citep{Romie2010} argue that looking at the department level is the correct viewpoint, since this the point at which hiring decisions were made. However, it could be argued that if one department was attracting a large number of higher quality candidates, the overall size of that department should be higher and that the results seen at Berkeley reflected a bias in favour of male dominated fields. 
+
+Different measures of discrimination - is there a difference between groups (after conditioning on xxx)
+
+To understand how we measure and penalise discrimination, we need to take a step back and ask what are the underlying motivations for fairness?
+
+These differences in underlying cause suggest differences in the approach we should take to remedy them.  
+
+%\section{How does discrimination arise in ML models}
+\begin{itemize}
+\item bias in historical decisions fed in as training data
+\item selection bias in input data, due to deliberate or implicit discrimination such as stop and search
+\item deliberate manipulation on the part of the person building the model.
+\item The hardest case is historical disadvantage, creating genuine differences between relevant attributes of groups.
+\item in bias in the label - what happens if you hire minorities but then your staff treat them badly and as a result they under-perform or leave.  
+\end{itemize}
+
+%\section{Defining Descrimination}
+
+Define discrimination in terms of causal effect of protected variable in decision making process. 
+
+\citep{Romei2012} note the relevance of causal inference on discrimination analysis.
+
+“the central question in any employment- discrimination case is whether the employer would have taken the same action had the employee been of 7A recurring problem known as the omitted-variable bias.
+A multidisciplinary survey on discrimination analysis 9
+a different race (age, sex, religion, national origin etc.) and everything else had been the same” (Carson v. Bethlehem)
+
+
+Let us mathematically define disparate treatment and disparate impact with respect to a statistical model. We will focus on discrete variables for notational simplicity. Assume we have an outcome of interest $Y$, protected attributes $X$, other covariates $Z$ and a (potentially stochastic) model $f$ that maps $\{x, z\}$ to $y_f \in Y$. For a given model $f$, we have a distribution over the predicted outputs given the inputs, $\P{Y_f|X,Z}$
+\vspace{.2cm}
+\begin{definition}{Disparate Impact}: A model, $f$, that produces a predictive distribution $\P{Y_f|X,Z}$ has disparate impact if the marginal distribution over the predicted outcome, $Y_f$, depends on a protected attribute.
+\eqn{
+\exists \set{x_1,x_2} \subset X: \sum_z{\P{Y_f|Z,x_1}\P{Z|x_1}} \neq \sum_z{\P{Y_f|Z,x_2}\P{Z|x_2}}
+}
+\end{definition}
+
+\begin{definition}{Disparate Treatment}: A model yields disparate treatment if people with identical attributes (excluding protected attributes) are treated differently. 
+\eqn{
+\P{Y_f|Z,X} \neq \P{Y_f|Z}
+}
+\end{definition}
+
+Avoiding treating people differently purely on the basis of attributes such as ethnicity and gender and avoiding large differences in important outcomes such as education and income between such groupings both seem like desirable goals. Unfortunately, in general, they conflict with one another, see theorem \ref{thm:disparate_conflict}. Any variable we might wish to avoid discriminating on will be correlated to some other measurable covariate $Z$, making it impossible to avoid both disparate treatment and disparate impact. 
+\vspace{.2cm}
+\begin{theorem} 
+\label{thm:disparate_conflict}
+Disparate impact and disparate treatment conflict. Given covariates $Z$ and protected attributes $X$, a model, $f$, cannot be fair with respect to both disparate impact and disparate treatment unless $\P{Z|X} = \P{Z}$.
+\begin{proof} Assume $f$ yields no different treatment, then $\P{Y_f|Z,X} = \P{Y_f|Z}$. If we additionally assume no disparate impact, $\sum_z{\P{Y_f|Z}\P{Z|x_1}} = \sum_z{\P{Y_f|Z}\P{Z|x_2}} \;\; \forall \set{x_1,x_2}\subset X$. This holds if and only if $\P{Z|x_1} = \P{Z|x_2} \;\; \forall \set{x_1,x_2} \implies \P{Z|X} = \P{Z}$
+\end{proof} 
+\end{theorem}  
+
+Further issues.
+
+
+Disparate treatment, with respect to an observed set of variables $Z$, can be trivially avoided by excluding protected attributes from the training data. 
+
+Problems:
+\begin{itemize}
+\item Disparate impact and disparate treatment conflict
+\item 
+\end{itemize}
+
+
+
+%\section{Addressing discrimination}
+
+Omitting the protected attribute from the model can increase disparate impact, even if the protected attribute is negatively correlated with the outcome. 
+
+
+\textit{Disparate treatment} can be trivially avoided by excluding the protected variable from the model. However, this is deeply unsatisfying given the presence of proxy variables and can increase bias (figure \ref{fig:recidivism})
+
+Avoiding \textit{disparate impact} may be be expensive in terms of predictive accuracy and/or require \textit{disparate treatment}. 
+
+\begin{figure}[H]
+\caption{Proxies}
+\label{fig:recidivism}
+	\centering    
+          \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.7cm,
+  thick,main node/.style={observedrect}, lt/.style={latentrect} , hidden/.style={empty},background rectangle/.style={fill=olive!45}]
+ %nodes
+\node[lt](1){Actual priors};
+\node[main node, below left=of 1](2){Recorded Priors};
+\node[main node, below right=of 1](3){Re-offend};
+\node[lt, above left=of 2](4){Stop and Search};
+\node[main node, above=of 4](5){Race};
+\node[main node, above=of 1](6){Education};
+ \path[every node/.style={font=\tiny}]
+    (1) edge (2) edge (3)
+    (4) edge (2)
+    (5) edge (4) edge (6)
+    (6) edge (1);
+\end{tikzpicture}
+\end{figure}
+
+
+\begin{itemize}
+\item There is an additional connection between causality and fairness, that arises when you know that there is a bias in the data and wish to correct for it. In causality, it may be due to selection bias or a confounding variable. In fairness, it may be due to historical disadvantage. In both cases we may have theory that tells us the direction or scale of an effect. IE, we know that race itself has no inherent effect on outcomes such as criminality and education. If you have a data set and a collection of such priors, where the data contradicts these priors due to data bias. How do you best make decisions based on that data? 
+\end{itemize}
+
+
+human decision making can evolve. 
+
+The vagueness inherent in writing laws in natural language allows for them to be re-interpreted. 
+
+There is a lack of diversity in models. (although randomness is in fact inherent in many) - could one leverage this? - you would need an estimate of the probability the model would have assigned each instance to a particular group. 
+
+Only humans can provide the ethics
+
+%\chapter*{Random Questions}
+\begin{itemize}
+\item Why not use ratios instead of differences in defining causal effects (is it anything to do with statement in Dawid? What about sensitivity of uncertainty in estimators.
+\end{itemize}
+
+
+%\chapter{Causality in Marketing}
+Assessing the impact of marketing spend is becoming increasingly important to industry. Billions of dollars \citep{XXX} are spent each year and new marketing channels and opportunities are opening up at an unprecedented rate. 
+
+There are three key approaches to assessing the impact of marketing in the literature. 
+
+The first is to look for correlations across companies on metrics such as how much they spend on marketing \ref{}, how confident they are about their ability to market effectively \ref{} or how important the marketing team is perceived to be within the organisation with indicators of the health of the company such as sales, revenue or market capitalisation. Unfortunately is is very difficult to avoid potential major confounders with this approach. Are businesses large and successful because of their capable marketing teams or can they afford to hire capable marketers because they have sufficient profits available to do so. 
+
+%\section{Attribution}
+The second is attribution. The goal in this case is to attribute each sale to a specific (or set of specific) advertisements that the customer was exposed to. This approach is the primary way of measuring the success of digital advertising strategies such as search, display, and online video ads. The most frequent model is last-click attribution. In which the last ad the customer was presented with before they made their purchase is assumed to have caused that sale. A central criticism of attribution is that it is not measuring incremental sales. Each sales is assumed to be a consequence of some form of advertising for those customers who saw (however briefly) some form of advertisement. Of course in reality many of these customers may have made a purchaser regardless of the advertising material to which they were exposed. 
+
+System designed to optimise metrics such as click through or conversion rate can do so either by learning how to change the consumers preferences (by serving them the perfect ad at the ideal time) or by learning who was most likely to buy anyway. It seems likely that much of the improve mt in click through rates due to the application of sophisticated machine learning algorithms is being driven by the latter. Unfortunately, this does nothing for the bottom line of industry (except for those involved in serving ads). 
+
+
+%\section{Econometric Modelling}
+The final key plank businesses apply to estimate how effective their marketing are econometric or mixed media models. These models
+
+In practise these models are typically time series regression models, fitting some measure of sales against marketing spend (by marketing channel, IE TV, radio, search, digital display etc) and other key variables such as pricing, competitor spend and pricing and indicators of the health of the economy and demand for the product in question.
+
+The models may also include non-linear transformation of the marketing inputs to represent saturation and decay of time of effects. They may also consider the interaction between media channels and other business levers such as pricing.  
+
+The objective of these models is to obtain results that are comparable across channels such that the optimal mix of media can be selected. 
+
+The key
+
+\chapter{Conclusion}
+
+%\section{Open questions}
+\paragraph{Cycles} - a huge issue. Not covered by Pearl,Rubin etc. 
+
+Places to look, statistical control theory, etc. any interesting papers along these lines?
+
+In the discrete case,
+Fung and Crawford (1990) have recently proposed a fast algorithm for constructing an
+independence graph from discrete data. We have not tested their procedure as a processor for
+the PC algorithm. (COPIED FROM SPRITES)
