@@ -2035,13 +2035,10 @@ Randomised controlled trials are often presented as the gold standard for determ
 
 Randomisation does not ensure target and control group are exactly alike. The more other features (observed or latent) influence the outcome, the more likely it is that there will be a significant difference in the joint distribution of these variables in a between the target and control groups in a finite data sample. However, the variance in the outcome within both the target and control groups also increases. The net result is increased variance (but not bias) in  the estimate of causal effects. 
 
-Stratified randomised experiments address the issue of variance due to covariate imbalance by randomly allocating treatment conditional on covariates belived to influence the outcome of interest. This introduces a backdoor path from treatment to outcome via the covariates on which treatment is stratified, see figure \ref{fig:random_experiment_network_stratified}, nessessitating that one condition on these covariates in computing the average casual effect in the same way as for estimating causal effects under under ignorability \S\ref{sec:causal_effect_under_ignorability}. The key difference is that the propensity score is known, as it is designed by the experimenter, and there are guaranteed (rather than assumed) to be no latent confounding variables (that influence both treatment and outcome). See \citet{imbens2015causal} for a discussion of the trade-offs between statified versus completely random experiments. 
-
-IF THE PROPENSITY SCORE IS THE SAME FOR ALL COVARIATES IT DOESN'T SEEM ONE MUST ADJUST.
-\todo{double check}
+Stratified randomised experiments address the issue of variance due to covariate imbalance by randomly allocating treatment conditional on covariates belived to influence the outcome of interest. If we stratify in such a way that the probability an instance recieves a given treatement is indepdenent of its covariates, the causal graphical model in figure \ref{fig:random_experiment_network} still holds and we can still estiamte the average causal effects directly from the differences in outcome accross treatments. However, more complex stratification strategies can introduce a backdoor path from treatment to outcome via the covariates on which treatment is stratified, see figure \ref{fig:random_experiment_network_stratified}, nessessitating that one condition on these covariates in computing the average casual effect in the same way as for estimating causal effects under under ignorability \S\ref{sec:causal_effect_under_ignorability}. The key difference is that the propensity score is known, as it is designed by the experimenter, and there are guaranteed (rather than assumed) to be no latent confounding variables (that influence both treatment and outcome). See \citet{imbens2015causal} for a discussion of the trade-offs between statified versus completely random experiments. 
 
 \begin{figure}
-\caption{causal network for a stratified randomised experiment}
+\caption{causal network for a stratified randomised experiment if the probability an individual is assigned a given treatment depends on some covariates.}
 \label{fig:random_experiment_network_stratified}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=3em,thick, node/.style={observedrect}, lt/.style={latent}]
@@ -2213,7 +2210,7 @@ The best arm identification problem arises naturally in applications where there
 }
 
 
-\todo{discuss the key ways in which the simple regret problem differs from cummulative regret}
+%\todo{discuss the key ways in which the simple regret problem differs from cummulative regret}
 
 Pure-exploration does not mean simply playing the arm with the widest uncertainty bounds. The goal is to be sure the arm we believe is optimal is in fact optimal at the end of the exploration period. 
 
@@ -2307,7 +2304,7 @@ This expression equates to identifying the best emprical policy based on previou
 
 Finally, if we have a parametric model for the relationship between context, action and reward that allows (efficient) computation of the posterior or confidence bounds on the reward for each arm given context, we can develop generalized versions of the UCB or Thompson sampling algorithms. For linear pay-off models, both approaches yield algorithms with strong regret guarantees, \emph{Lin-UCB} \citep{li2010contextual} and \emph{Generalised Thompson Sampling} \citep{Agrawal2013}. 
 
-It is worth noting that definition \ref{def:contextual-bandit-problem} does not make any assumptions about the \emph{causal} relationship between the context $\vec{X}$ and the reward $\vec{Y}$, see figure \ref{fig:contextual-bandit-causal-graph}. \citet{Bareinboim2015} demonstrate that policies that incorporate observations of the action an agent would have taken were their action not set by the bandit policy can acheive lower regret than those that ignore this information. This is an example of the case represented in figure \ref{fig:context-graph-confounded}. However, the context should be relevent, such that $\P{\vec{y}|\vec{x}} \neq \P{\vec{y}}$, otherwise including it is the equivelent to adding irrelevent featurs to a supervised learning problem. 
+It is worth noting that definition \ref{def:contextual-bandit-problem} does not make any assumptions about the \emph{causal} relationship between the context $\vec{X}$ and the reward $\vec{Y}$, see figure \ref{fig:contextual-bandit-causal-graph}. However, the context should be relevent, such that $\P{\vec{y}|\vec{x}} \neq \P{\vec{y}}$, otherwise including it is the equivelent to adding irrelevent featurs to a supervised learning problem. \citet{Bareinboim2015} demonstrate that, in some cases, policies that incorporate observations of the action an agent would have taken were their action not set by the bandit policy can acheive lower regret than those that ignore this information. This is an example of the case represented in figure \ref{fig:context-graph-confounded}.  
 
 \begin{figure}[h]
 \centering
@@ -2367,8 +2364,8 @@ It is worth noting that definition \ref{def:contextual-bandit-problem} does not 
 \end{subfigure}
 \end{figure}
 
-\subsubsection{Learning from logged bandit data}
-Another topic of interest within the contextual bandit community, which is deeply connected to causal effect estimation from observational data, is learning from logged bandit feedback data or off-policy evaluation\citep{Langford2008a,strehl2010learning,Li2010,Dudik2011,Bottou2013,Swaminathan2015}. In this setting, the learner has a data set $S = \set{(\vec{X}_t,A_t,\cfb{Y}{A_t})}_{t=1}^T$, which is assumed to have been generated by a stochastic contextual bandit enviroment interacting with some unknown, potentially stochastic, policy $\pi(\vec{x}_t,h_t)$, where $h_t$ is the sequence of observed data up to time $t$. The goal of the learner is to evaluate the value of an alternate policy, $\pi'$, for selecting actions, often with the underlying motivation of identifying an optimal policy within some space of policies $\Pi$. 
+\subsection{Learning from logged bandit data}
+Another topic of interest within the bandit community, which is deeply connected to causal effect estimation from observational data, is learning from logged bandit feedback data or off-policy evaluation\citep{Langford2008a,strehl2010learning,Li2010,Dudik2011,Bottou2013,Swaminathan2015}. In this setting, the learner has a data set $S = \set{(\vec{X}_t,A_t,\cfb{Y}{A_t})}_{t=1}^T$, which is assumed to have been generated by a stochastic contextual bandit enviroment interacting with some unknown, potentially stochastic, policy $\pi(\vec{x}_t,h_t)$, where $h_t$ is the sequence of observed data up to time $t$. The goal of the learner is to evaluate the value of an alternate policy, $\pi'$, for selecting actions, often with the underlying motivation of identifying an optimal policy within some space of policies $\Pi$. 
 
 This problem differs from the contextual bandit problem in that the learner is not interacting with the enviroment. As a result, there is no exploration-exploitation trade-off to be made. However, the problem does not reduce to supervised learning, because the label, $y$ is not the desired . In addition, if $\pi$ is allowed to depend $h$ then the samples are not i.i.d. The majority of the liturature considers the case where the original policy $\pi$ was stationary ($\pi(\vec{x}_t,h_t) = \pi(\vec{x})$). \citet{Langford2008a} do allow the original policy to be adaptive and prove a high probability bound on the accuracy of their estimator for $\pi'$, albeit with the strong assumption that the original estimator $\pi$ did not depend on $\vec{X}$. 
 
@@ -2399,7 +2396,11 @@ As in estimating average causal effects under ignorability, we have a covariate 
 
 \citet{Swaminathan2015} point out that the problem of identifying the optimal policy (subject to some risk minimisation goal) is not as simple as estimating the expected reward associated with each policy in some space and selecting the emprical best because the variance of the estimators for some policies may be much higher than for others.
 
+\subsection{Adding structure to actions}
 
+The classic multi-armed bandit is a powerful tool for sequential decision making. However, the regret grows linearly with the number of (sub-optimal) actions and many real world problems have large or even infinite action spaces. This has led to the development of a wide range of models that assume some structure across the reward distributions for different arms, for example generalised linear bandits \citep{filippi2010parametric}, dependent bandits \citep{Pandey2007}, X-armed bandits \citep{Bubeck2010} and Gaussian process bandits \citep{srinivas2009gaussian}, or that consider more complex feedback, for example the recent work on graph feedback\citep{Mannor2011,Lelarge2012,Alon2013,Buccapatnam2014,Kocak2014,Alon2015} and partial monitoring \citep{Piccolboni2001,Bartok2014}.
+
+In the next chapter, I propose a very natural connection between causal graphs and bandit problems and show it induces a novel form of additional feedback and structure between arms that cannot be can exploited by any of these previous approaches. 
 
 
 \chapter{Causal Bandits: Unifying the approaches}
@@ -2500,7 +2501,7 @@ We now focus on causal bandit problems with post-action feedback, in which the v
 
 \paragraph{Related Work} As alluded to above, causal bandit problems can be treated as classical multi-armed bandit problems by simply ignoring the causal model and extra observations and applying an existing best-arm identification algorithm with well understood simple regret guarantees \citep{Jamieson2013}. However, as we show in \S\ref{sec:simple-regret}, ignoring the extra information available in the non-intervened variables yields sub-optimal performance.
 
-A well-studied class of bandit problems with side information are ``contextual bandits''~\cite{Langford2008,Agarwal2014}. Our framework bears a superficial similarity to contextual bandit problems since the extra observations on non-intervened variables might be viewed as context for selecting an intervention. 
+Our framework bears a superficial similarity to contextual bandit problems, \S\ref{sec:contextual-bandits}, since the extra observations on non-intervened variables might be viewed as context for selecting an intervention. 
 However, a crucial difference is that in our model the extra observations are only revealed \emph{after} selecting an intervention and hence cannot be used as context. 
 
 There have been several proposals for bandit problems where extra feedback is received after an action is taken.
