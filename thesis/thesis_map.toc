@@ -1,10 +1,11 @@
 \contentsline {chapter}{\numberline {1}Introduction}{5}{chapter.1}
 \contentsline {section}{\numberline {1.1}Motivation}{5}{section.1.1}
 \contentsline {section}{\numberline {1.2}What is causality and why do we care? }{6}{section.1.2}
-\contentsline {subsection}{\numberline {1.2.1}Defining causality}{7}{subsection.1.2.1}
-\contentsline {section}{\numberline {1.3}Identifying when we have a causal problem}{7}{section.1.3}
-\contentsline {subsubsection}{Examples of typical machine learning problems. Are they causal?}{7}{section*.8}
-\contentsline {section}{\numberline {1.4}Approaches to causality}{10}{section.1.4}
+\contentsline {subsection}{\numberline {1.2.1}Defining causality}{6}{subsection.1.2.1}
+\contentsline {section}{\numberline {1.3}What problems require causal inference?}{7}{section.1.3}
+\contentsline {subsubsection}{Examples of typical machine learning problems. Are they causal?}{7}{section*.5}
+\contentsline {section}{\numberline {1.4}An overview of this thesis and its contributions}{9}{section.1.4}
+\contentsline {section}{\numberline {1.5}Approaches to causality}{10}{section.1.5}
 \contentsline {chapter}{\numberline {2}Causal models}{12}{chapter.2}
 \contentsline {section}{\numberline {2.1}Causal Bayesian networks}{12}{section.2.1}
 \contentsline {subsubsection}{Limitations of causal Bayesian networks}{16}{section*.22}
@@ -60,3 +61,4 @@
 \contentsline {subsubsection}{Proof of Theorem \ref {thm:lower}}{74}{section*.76}
 \contentsline {subsubsection}{Proof of Theorem \ref {thm:general}}{75}{section*.77}
 \contentsline {subsubsection}{Relationship between $m(\eta )$ and $m(\boldsymbol {q})$}{76}{section*.78}
+\contentsline {chapter}{\numberline {6}Conclusion}{78}{chapter.6}
