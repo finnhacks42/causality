@@ -256,6 +256,7 @@ That what we chanced, was what we meant, to do.}{Alexander Pope}
 \item clarify causal interpretation of Dirichlet models
 \item Empirical evaluation of bandit algorithms (updated to include latest suggestions). Maybe a proper software bench marking solution?
 \item If comparing bandit performance, it would be interesting to include some that violate the stochastic bandit assumption. For example, if the rewards change slowly over time or jump suddenly a limited number of times, or with some small probability. 
+\item Does defining causality in term of the truncated product formula ensure that a causal Bayesian network is unique? It would seem no, one can ad links (although this is hardly useful) - seems like there is no reverse condition. 
 \end{enumerate}
 
 \chapter{Introduction}
@@ -341,7 +342,7 @@ This example also highlights a connection between causal models and transparancy
 
 What about predicting the risk of death in patients with pneumonia? Suppose the goal is to build a model to decide who should be treated in hospital and who can be sent home with antibiotics. If we assume that in hospital treatment is more effective for serious cases, this seems like a straightforward prediction problem. It is not. Depending on how the decision to admit was previously made and what features are included (or omitted) in the model, the relationship between those features and the outcome may change if the model is used to make admition decisons. \citet{Caruana2015} found exactly this effect in a real data set. The model learnt that (among other things) people suffering asthma were \emph{less} likely to die from pneumonia. They realised this was because doctors were treating such patients very aggressively, thus actually lowering their risk. The issue is not with model, it performed very well at the task for which it was trained, which is to predict wo would be likely to die under the original admition and treatment protocols. However, using it to decide how to \emph{change} these protocols could kill. The actual question of interest in this case is what happens to patients with charachteristics $X$ if we assign them treatment according to decision rule $Z$. 
 
-Predicting which customers will leave or who will re-offend if granted parole also fit within the category of problems where you wish to identify a group for which a problem will occur and target some treatment to them (hospitalisation, loyalty reward, more monitoring \& support on parole, etc). For all these problems the assumptions required to treat them as pure prediction problems are;
+Predicting which customers will leave or who will re-offend if granted parole also fit within the category of problems where you wish to identify a group for which a problem will occur and target some treatment to them (hospitalisation, loyalty reward, more monitoring \& support on parole, etc). For all these problems the assumptions required to treat them as pure prediction problems are 
 \begin{enumerate}
 \item The treatment is assumed to be effective (at least better than nothing)
 \item Deciding who to treat on the based of the model predictions won't change the relationship between features and outcome 
@@ -349,7 +350,7 @@ Predicting which customers will leave or who will re-offend if granted parole al
 
 Demand prediction seems like a relatively straightforward prediction problem. These models use features such as location, pricing, marketing, time of year, weather, etc to forecast the demand for a product. It seems unlikely that using the model to ensure stock is available will itself change demand. However, depending on the way demand is measured, there is a potential data censoring issue. If demand is modelled by the number of sales, then if a product is out of stock demand will appear to be zero. Changing availability does then change demand.
    
-Playing Go (and other games) is another case with some subtleties. At every turn, the AI agent has a number of actions available. The board state following each action is deterministic and given by the rules of the game. The agent can apply supervised machine learning based on millions of previous games to estimate the probability that each of these board states will lead to a win. ... this is interesting maybe come back to it ... an alternate approach would be to try to forecast the probability of a win given each action given the current board state as context ... One approach to causal inference is indeed to learn about actions from taking actions (or observing the actions that other have taken). When can we learn from the actions others have taken? When there is no confounding. And does this hold with Go? Probably because the board state encapsulates everything that should determine what move is played. Learning directly from actions and trying to generalise (can in some instances reduce the problem to standard ML)
+Playing Go (and other games) is a case with some subtleties. At every turn, the AI agent has a number of actions available. The board state following each action is deterministic and given by the rules of the game. The agent can apply supervised machine learning based on millions of previous games to estimate the probability that each of these board states will lead to a win. ... this is interesting maybe come back to it ... an alternate approach would be to try to forecast the probability of a win given each action given the current board state as context ... One approach to causal inference is indeed to learn about actions from taking actions (or observing the actions that other have taken). When can we learn from the actions others have taken? When there is no confounding. And does this hold with Go? Probably because the board state encapsulates everything that should determine what move is played. Learning directly from actions and trying to generalise (can in some instances reduce the problem to standard ML)
 
 Having considered these examples we can now identify some general aspects of the problem that determine whether or not we require a causal model.
 
@@ -465,7 +466,7 @@ Suppose a pharmaceutical company wants to assess the effectiveness of a new drug
 \vspace*{.3cm}
 \begin{example}
 \label{exm:adjusting}
-Suppose we want to estimate the impact on high school graduation rates of compulsory preschool for all 4 year olds. We have a large cross-sectional data set on a group of 20 year olds that records if they attended pre-school, if they graduated high school and their parents socio-economic status (SES). We will let $X\in \set{0,1}$ indicate if an individual attended pre-school, $Y \in \set{0,1}$ indicate if they graduated high school and $Z \in \set{0,1}$ represent if they are from a low or high SES background respectively.\footnote{There has been substantial empirical work on the effectiveness of early childhood education including a landmark randomised trial, the Perry Preschool project, which ran from 1962-1967 \citep{weikart1970longitudinal}.}
+Suppose we want to estimate the impact on high school graduation rates of compulsory preschool for all four year olds. We have a large cross-sectional data set on a group of twenty year olds that records if they attended pre-school, if they graduated high school and their parents socio-economic status (SES). We will let $X\in \set{0,1}$ indicate if an individual attended pre-school, $Y \in \set{0,1}$ indicate if they graduated high school and $Z \in \set{0,1}$ represent if they are from a low or high SES background respectively.\footnote{There has been substantial empirical work on the effectiveness of early childhood education including a landmark randomised trial, the Perry Preschool project, which ran from 1962-1967 \citep{weikart1970longitudinal}.}
 \end{example}
 
 
@@ -505,7 +506,7 @@ We can represent this graphically by drawing a network with a node for each vari
 
 \begin{figure}
 \centering
-\caption{Some valid Bayesian networks for a distribution that an be factorised as $\P{X_1,X_2,X_3} = \P{X_1}\P{X_2|X_1}\P{X_3|X_2}$ (which implies $X_3 \ci X_1 | X_2$)}
+\caption{Some valid Bayesian networks for a distribution $P$ over $(X_1,X_2,X_3)$ in which $X_3$ is conditionally independent of $X_1$ given $X_2$, denoted $X_3 \ci X_1 | X_2$. Graphs (a), (b) and (c) are all a \emph{perfect map} for $P$ as the graphical stucture implies exactly the same set of independencies exhibitied by the distribution. Graph (d), like figure \ref{fig:bayesnet} does not imply any conditional independencies, and is thus a valid (but not very useful) Bayesian network representation for any distribution over three variables.}
 \label{fig:bayesnet2}
 \begin{subfigure}[t]{0.15\textwidth}
 \centering
@@ -562,8 +563,7 @@ We can represent this graphically by drawing a network with a node for each vari
 \end{figure}
 
 
-
-The statement that a given graph $G$ is a Bayesian network for a distribution $P$ tells us that the distribution can be factorised over the nodes and edges in the graph. There can be no missing edges in $G$ that do not correspond to conditional independencies in $P$, (the converse is not true $G$ can have extra edges). If we let $parents_{X_{i}}$ represent the set of variables that are parents of the variable $X_{i}$ in $G$ then we can write the joint distribution as; 
+The statement that a given graph $G$ is a Bayesian network for a distribution $P$ tells us that the distribution can be factorised over the nodes and edges in the graph. There can be no missing edges in $G$ that do not correspond to conditional independencies in $P$, (the converse is not true: $G$ can have extra edges). If we let $parents_{X_{i}}$ represent the set of variables that are parents of the variable $X_{i}$ in $G$ then we can write the joint distribution as; 
 
 \eqn{
 \P{X_{1},...,X_{N}} = \prod_{i = 1...N}\P{X_{i}|parents_{X_{i}}}
@@ -571,11 +571,11 @@ The statement that a given graph $G$ is a Bayesian network for a distribution $P
 
 A causal Bayesian network is a Bayesian network in which a link $X_{i} \rightarrow X_{j}$, by definition, implies $X_{i}$ causes $X_{j}$. This means that if we intervene and change the value of $X_{i}$, we expect $X_{j}$ to change, but if we intervene to change $X_{j}$, $X_{i}$ will not change. We need some notation to describe interventions and represent distributions over variables in the network after an intervention. In this thesis I use the do operator introduced by Pearl \citep{Pearl2000}.
 
-
+\vspace{0.5cm}
 \begin{definition}{The do-notation}
 \begin{itemize}
 \item $do(X=x)$ denotes an intervention that sets the random variable(s) $X$ to $x$.
-\item $\P{Y|do(X)}$ is the distribution of $Y$ conditional on an \emph{intervention} that sets $X$. This notation is somewhat overloaded. It may be used represent a probability distribution/mass function or a family of distribution functions depending on whether the variables are discrete or continuous and whether or not we are treating them as fixed. For example it could represent 
+\item $\P{Y|do(X)}$ is the distribution of $Y$ conditional on an \emph{intervention} that sets $X$. This notation is somewhat overloaded. It may be used to represent a probability distribution/mass function or a family of distribution functions depending on whether the variables are discrete or continuous and whether or not we are treating them as fixed. For example it could represent 
 \begin{itemize}
 \item the probability $\P{Y=1|do(X=x)}$ as a function of $x$,
 \item the probability mass function for a discrete $Y$ : $\P{Y|do(X=x)}$,
@@ -586,23 +586,20 @@ Where the distinction is important and not clear from context we will use one of
 \end{itemize}
 \end{definition}
 
-
+\vspace{0.5cm}
 \begin{theorem}[Truncated product formula \citep{Pearl2000}]
 \label{thm:truncated_prodcut}
-If $G$ is a causal network for a distribution $P$ defined over variables $X_{1}...X_{N}$, then we can calculate the distribution after an intervention where we set $Z \subset X$ to $z$, denoted $do(Z=z)$ by dropping the terms for each of the variables in $Z$ from the factorisation given by the network. 
+If $G$ is a causal network for a distribution $P$ defined over variables $X_{1}...X_{N}$, then we can calculate the distribution after an intervention where we set $Z \subset X$ to $z$, denoted $do(Z=z)$ by dropping the terms for each of the variables in $Z$ from the factorisation given by the network. Let $\parents{X_i}$ denote the parents of the variable $X_i$ in $G$.
 
 \begin{equation}
 \label{eq:truncatedproduct}
-\P{X_1...X_N|do(Z=z)} =
-  \begin{cases}
-  \prod_{i \notin Z}\P{X_{i}|parents_{X_{i}}} & \text{if $(X_{1}...X_{N})$ consistent with $Z=z$}  \\
-   0       & \text{otherwise } 
-  \end{cases}
+\P{X_1...X_N|do(Z=z)} = \ind{Z = z}
+  \prod_{X_i \notin Z}\P{X_{i}|\parents{X_i}}
 \end{equation}
 \end{theorem}
 
 
-Theorem \ref{thm:truncated_prodcut} does not hold for standard Bayesian networks because there are multiple valid networks for the same distribution. The truncated product formula will give different results depending on the selected network. The result is possible with causal Bayesian networks because it follows directly from the assumption that the direction of the link indicates causality. In fact, from the interventionist viewpoint of causality, the truncation product formula defines what it means for a link to be causal. 
+Theorem \ref{thm:truncated_prodcut} does not hold for standard Bayesian networks because there are multiple valid networks for the same distribution. The truncated product formula will give different results depending on the selected network. The result is possible with causal Bayesian networks because it follows directly from the assumption that the direction of the link indicates causality. In fact, from the interventionist viewpoint of causality, the truncated product formula defines what it means for a link to be causal. 
 
 
 Returning to example \ref{exm:ranomized_experiment}, and phrasing our query in terms of interventions; what would the distribution of outcomes look like if everyone was treated $\P{Y|do(X=1)}$, relative to if no one was treated $\P{Y|do(X=0)}$? The treatment $X$ is a potential cause of $Y$, along with other unobserved variables, such as the age, gender and the disease sub-type of the patient. Since $X$ is assigned via deliberate randomisation we know that it is not affected by any latent variables. The causal Bayesian network for this scenario is shown in figure \ref{fig:causal_network_example}. This network represents the (causal) factorisation  $\P{X,Y} = \P{X}\P{Y|X}$, so from equation (\ref{eq:truncatedproduct}), $\P{Y|do(X)} = \P{Y|X}$. In this example, the interventional distribution is equivalent to the observational one.
@@ -683,11 +680,10 @@ We could represent problems of the type where we try to infer properties of the 
 
 A causal Bayesian network represents much more information than a Bayesian network with identical structure. A causal network encodes all possible interventions that could be specified with the do-notation. For example, if the network in figure \ref{fig:causal_adjust} were an ordinary Bayesian network and all the variables were binary, the associated distribution could be described by 7 parameters. The equivalent causal Bayesian network additionally represents the post-interventional distributions for six possible single variable interventions and twelve possible two variable interventions. Encoding all this information without the assumptions implicit in the causal Bayesian network would require an additional 30 parameters \footnote{After each single variable intervention we have a distribution over two variables, which can be represented by three parameters. After each two variable intervention, we have a distribution over one variables which requires one parameter. This takes us to a total of $6\times3+12\times1 = 30$ additional parameters.}.
 
-
-Causal Bayesian networks are Bayesian networks, so results that apply to Bayesian networks carry directly across; the local Markov property states that variables are independent of their non-effects given their direct causes. Similarly the global Markov property and d-separation also hold in causal networks. 
+Causal Bayesian networks are Bayesian networks, so results that apply to Bayesian networks carry directly across: the local Markov property states that variables are independent of their non-effects given their direct causes. The global Markov property and d-separation also hold in causal networks. D-speration, which characterises which conditional independencies must hold in any distribution that can represented by a given Bayesian network $G$, is key to many important results and algorithms for causal inference. We include a brief introduction in section \ref{sec:dsep}. 
 
 \subsubsection{Limitations of causal Bayesian networks}
-A number of criticisms have been levelled at this approach to modelling causality. One is that the definition of an intervention only in terms of setting the value of one or more variables is too precise and that any real world intervention will affect many variables in complex and non-deterministic ways \citep{rickles2009causality,cartwright2007hunting}. However, by augmenting the causal graph with additional variables that model how interventions may take effect, the deterministic do operator can model more complex interventions. For example, in the drug treatment case, we assumed that all subjects complied, taking the treatment or placebo as assigned by the experimenter. But what if some people failed to take the prescribed treatment. We can model this within the framework of deterministic interventions by adding a node representing what they were prescribed (the intervention) which probabilistically influences the treatment they actually receive, see figure \ref{fig:randomized_imperfect_compliance}. Note that the fact that we no longer directly assign the treatment opens the possibility that an unobserved latent variable could affect both the actual treatment taken and the outcome.
+A number of criticisms have been levelled at this approach to modelling causality. One is that the definition of an intervention only in terms of setting the value of one or more variables is too precise and that any real world intervention will affect many variables in complex and non-deterministic ways \citep{rickles2009causality,cartwright2007hunting}. However, by augmenting the causal graph with additional variables that model how interventions may take effect, the deterministic do operator can model more complex interventions. For example, in the drug treatment case, we assumed that all subjects complied, taking the treatment or placebo as assigned by the experimenter. But, what if some people failed to take the prescribed treatment? We can model this within the framework of deterministic interventions by adding a node representing what they were prescribed (the intervention) which probabilistically influences the treatment they actually receive, see figure \ref{fig:randomized_imperfect_compliance}. Note that the fact that we no longer directly assign the treatment opens the possibility that an unobserved latent variable could affect both the actual treatment taken and the outcome.
 
 \begin{figure}[h]
 \caption{Randomised treatment with imperfect compliance}
@@ -705,7 +701,7 @@ A number of criticisms have been levelled at this approach to modelling causalit
 \end{tikzpicture}
 \end{figure}
 
-Another key issue with causal Bayesian networks is that they cannot handle cyclic dependencies between variables. Such feedback loops are common in real-life systems, for example the relationship between supply and demand in economics or predator and prey in ecology. We might regard the underlying causal mechanisms in these examples to be acyclic; the number of predators at one time influences the number of prey in the next period and so on. However, if our measurements of these variables must be aggregated over time frames that are longer than the scale at which these interactions occur the result is a cyclical dependency. Even were we able to measure on shorter timescales, we might then not have sufficient data on each variable for inference. Such problems have mostly been studied within the dynamic systems literature, typically focusing on understanding the stationary or equilibrium state of the system and making very specific assumptions about functional form in order to make problems tractable. \citet{Poole2013} compare the equilibrium approach to reasoning about cyclic problems with structural equation models, which we discuss in section \ref{sec:SEM} and which can be seen as Bayesian causal networks with additional functional assumptions. 
+Another key issue with causal Bayesian networks is that they cannot handle cyclic dependencies between variables. Such feedback loops are common in real-life systems, for example the relationship between supply and demand in economics or predator and prey in ecology. We might regard the underlying causal mechanisms in these examples to be acyclic; the number of predators at one time influences the number of prey in the next period and so on. However, if our measurements of these variables must be aggregated over time frames that are longer than the scale at which these interactions occur the result is a cyclical dependency. Even were we able to measure on shorter timescales, we might then not have sufficient data on each variable for inference. Such problems have mostly been studied within the dynamical systems literature, typically focusing on understanding the stationary or equilibrium state of the system and making very specific assumptions about functional form in order to make problems tractable. \citet{Poole2013} compare the equilibrium approach to reasoning about cyclic problems with structural equation models, which we discuss in section \ref{sec:SEM} and which can be seen as Bayesian causal networks with additional functional assumptions. 
 
 \section{Counterfactuals}
 \label{sec:counterfactuals}
@@ -716,11 +712,11 @@ In example \ref{exm:ranomized_experiment}, the causal effect of the drug relativ
 
 Putting aside any estimates of individual causal effects, it is possible to learn something about the distributions under treatment or placebo. Let $\cf{Y}{1}$ be a random variable representing the potential outcome if treated. The distribution of $\cf{Y}{1}$ is the distribution of $Y$ if everyone was treated. Similarly $Y^{0}$ represents the potential outcome for the placebo. The difference between the probability of recovery, across the population, if everyone was treated and the probability of recovery given placebo is $\P{\cf{Y}{1}}-\P{\cf{Y}{0}}$. We can estimate (from an experimental or observational study):
 \begin{itemize}
-\item $\P{Y|X=1}$, the probability that those who took the treatment will recover
-\item $\P{Y|X=0}$, the probability that those who were not treated will recover
+\item $\P{Y=1|X=1}$, the probability that those who took the treatment will recover
+\item $\P{Y=1|X=0}$, the probability that those who were \emph{not} treated will recover
 \end{itemize}
 
-Now, for those who took the treatment, the outcome \emph{had} they taken the treatment $\cf{Y}{1}$ is the same as the observed outcome. For those who did not take the treatment, the observed outcome is the sames as the outcome \emph{had} they not taken the treatment. Equivalently stated:
+Now, for those who took the treatment, the outcome \emph{had} they taken the treatment $\cf{Y}{1}$ is the same as the observed outcome. For those who did not take the treatment, the observed outcome is the same as the outcome \emph{had} they not taken the treatment. Equivalently stated:
 
 \eq{
 \P{Y^{0}|X=0}&= \P{Y|X=0}\\
@@ -740,10 +736,10 @@ This implies the counterfactual distributions are equivalent to the correspondin
 \P{Y^{1}}-\P{Y^{0}} = \P{Y|X=1} - \P{Y|X=0}
 }
 
-The assumptions $X \ci Y^{1}$ and $X \ci Y^{0}$  are referred to as ignorability assumptions \citep{Rosenbaum1983}. They state that the treatment each person receives is independent of whether they would recover if treated and if they would recover if not treated. This is justified in example \ref{exm:ranomized_experiment} due to the randomisation of treatment assignment. In general the treatment assignment will not be independent of the potential outcomes. In example \ref{exm:adjusting}, the children who attended preschool may be more likely to have graduated high school had they in fact not attended than the children who actually did not attend, $X \nci \cf{Y}{0}$. Similarly, had the poorer children who did not attend pre-school attended they might not have done as well as the children who did in fact attend, $X \nci \cf{Y}{1}$. A more general form of the ignorability assumption is to identify a set of variables $Z$ such that $X \ci Y^{1}|Z$ and $X \ci Y^{0}|Z$. 
+The assumptions $X \ci Y^{1}$ and $X \ci Y^{0}$  are referred to as ignorability assumptions \citep{Rosenbaum1983}. They state that the treatment each person receives is independent of whether they would recover if treated and if they would recover if not treated. This is justified in example \ref{exm:ranomized_experiment} due to the randomisation of treatment assignment. In general the treatment assignment will not be independent of the potential outcomes. In example \ref{exm:adjusting}, the children who attended preschool may be more likely to have graduated high school had they in fact not attended than the children who actually did not attend, i.e. $X \nci \cf{Y}{0}$. Similarly, had the poorer children who did not attend pre-school attended they might not have done as well as the children who did in fact attend, i.e. $X \nci \cf{Y}{1}$. A more general form of the ignorability assumption is to identify a set of variables $Z$ such that $X \ci Y^{1}|Z$ and $X \ci Y^{0}|Z$. 
 
 \vspace*{.3cm}
-\begin{theorem}[Ignorability] If $X \ci Y^{1}|Z$ and $X \ci Y^{0}|Z$,
+\begin{theorem}[Ignorability \citep{Rosenbaum1983, Pearl2000}] If $X \ci Y^{1}|Z$ and $X \ci Y^{0}|Z$,
 
 \eqn{
 \label{eqn:counterfactual1}
@@ -823,7 +819,7 @@ Mathematically, each variable is a deterministic function of its direct causes a
 
 This model encodes the assumption that the outcome $y_{i}$ for an individual $i$ is caused solely by the treatment $x_{i}$ they receive and other factors $\epsilon_{y_{i}}$ that are independent of $X$. This is justifiable on the grounds that $X$ is random. The outcome of a coin flip for each patient should not be related to any of their characteristics (hidden or otherwise). Note that the causal graph in figure \ref{fig:sem_randomized_treatment} is identical to that the Bayesian network for the same problem, figure \ref{fig:causal_network_example}. The latent variables $\epsilon_x$ and $\epsilon_y$ are not explicitly drawn in figure \ref{fig:causal_network_example} as they are captured by the probabilistic nature of the nodes in a Bayesian network.
 
-Taking the \emph{action} $X=1$ corresponds to replacing the equation $X=f_x(\epsilon_x)$ with $X=1$. The function $f_y$ and distribution over $\epsilon_y$ does not change. This results in the interventional distribution \footnote{We have assumed the variables are discrete only for notational convenience},
+Taking the \emph{action} $X=1$ corresponds to replacing the equation $X=f_x(\epsilon_x)$ with $X=1$. The function $f_y$ and distribution over $\epsilon_y$ does not change. This results in the interventional distribution, \footnote{We have assumed the variables are discrete only for notational convenience}
 
 \eqn {
 \P{Y=y|do(X=1)} = \sum_{\epsilon_y}\P{\epsilon_y}\ind{f_y(1,\epsilon_y)=y}
@@ -938,20 +934,20 @@ Once the data is broken down by gender, drug B looks better for both men \emph{a
 Let's represent the treatment by the variable $T$, the gender of the patient by $Z$ and whether or not the treatment was successful by $Y$. The doctor cares about $\P{Y|do(T)}$, not the standard conditional distributions $\P{Y|T}$. Unfortunately, the data in tables \ref{tab:simpson1} and \ref{tab:simpson2} is insufficient to enable estimation of the interventional distribution $\P{Y|do(T)}$ or determine if $do(T=A)$ is better or worse than $do(T=B)$. Some assumptions about the causal relationships between the variables are required. In this example, it seems reasonable to conclude that gender may affect the treatment chosen and the outcome. Assuming there are no other such confounding variables (for example income) then we obtain the causal network in figure \ref{fig:simpsons_paradox}.
 
 \begin{figure}[h]
-\caption{An example of Simpson's Paradox}
+\caption{An example of causal network that can give rise to Simpson's Paradox. In this case we should select treatment on the basis of the gender specific results.}
 \label{fig:simpsons_paradox}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
-\node[node](1){Gender};
-\node[node, below left=of 1](2){Treatment};
-\node[node, below right=of 1](3){Outcome};
+\node[node](1){Z = Gender};
+\node[node, below left=of 1](2){T = Treatment};
+\node[node, below right=of 1](3){Y = Outcome};
 \path[]
 	(1) edge (2) edge (3) 
 	(2) edge (3);
 \end{tikzpicture}
 \end{figure}
 
-With this model, women are more likely to choose drug A and are also more likely to recover than men regardless of the treatment they receive. Knowing a patient took drug A indicates they are more likely to be female. When we compare the group of people who took A against those who took B, the effect of the higher proportion of females in the first group conceals the greater benefit of drug B leading to an apparent reversal in effectiveness. However, when the doctor intervenes to set the treatment each person receives there will no longer be a link from gender to treatment. So in this case she should choose which drug to prescribe from the gender specific table (and weight by the proportion of the population that belongs to each gender). Drug B is the better choice. 
+With this model, women are more likely to choose drug A and are also more likely to recover than men regardless of the treatment they receive. Knowing a patient took drug A indicates they are more likely to be female. When we compare the group of people who took A against those who took B, the effect of the higher proportion of females in the first group conceals the greater benefit of drug B leading to an apparent reversal in effectiveness. However, when the doctor intervenes to set the treatment each person receives there will no longer be a link from gender to treatment. So in this case she should choose which drug to prescribe from the gender specific table (and weight by the proportion of the population that belongs to each gender). Drug B is the better choice.
 
 \eqn{
 \P{Y|do(T)} = \P{Y|T,female}\P{female}+ \P{Y|T,male}\P{male}
@@ -960,13 +956,13 @@ With this model, women are more likely to choose drug A and are also more likely
 Is the solution to Simpson's paradox to always to break down the data by as many variables as possible? No. Suppose we have the identical data as in \ref{tab:simpson1} and \ref{tab:simpson2} but replace the column name 'gender' with 'blood pressure', 'M' with 'high' and 'F' with 'normal'. This is a drug designed to prevent heart disease. One pathway to doing so might well be to lower blood pressure. Figure \ref{fig:simpsons_paradox2} shows a plausible causal graph for this setting. It differs from the graph in figure \ref{fig:simpsons_paradox} only in the direction of a single link. Now, however, table \ref{tab:simpson2} tells us that people who took treatment $A$ had better blood pressure control and better overall outcomes. In this setting $\P{Y|do(T)} = \P{Y|T}$ and drug A is the better choice. 
 
 \begin{figure}[h]
-\caption{An example of Simpson's Paradox}
+\caption{Another causal network that can exhibit Simpson's paradox. In this case, \quotes{the solution} is not to stratify on $Z$.}
 \label{fig:simpsons_paradox2}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
-\node[node](1){Blood Pressure};
-\node[node, below left=of 1](2){Treatment};
-\node[node, below right=of 1](3){Outcome};
+\node[node](1){Z = Blood Pressure};
+\node[node, below left=of 1](2){T = Treatment};
+\node[node, below right=of 1](3){Y = Outcome};
 \path[]
 	(1) edge (3) 
 	(2) edge (3)
