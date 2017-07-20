@@ -274,44 +274,25 @@ The rise of big data sets and powerful computers has seen an explosion in the ap
 However, despite the huge advances in machine learning (in particular deep learning), machine learning algorithms are effective only within very narrow problem settings. Getting them to generalise to even slightly different problems or data sets remains very challenging. Deciding how we should act or what policies we should implement requires us to be able to predict how a system will behave if we change it. The correlations detected by standard machine learning algorithms do not enable us to do this, no matter how many petabytes of data they are based on. As machine learning algorithms are incorporated into more and more of the decision making processes that shape the world we live it, it is critical to ensure that we understand the distinction between causality and prediction and that we develop techniques for learning how to act that are as effective as those we have for pattern recognition.
 
 
-\section{What is causality and why do we care? }
+\section{What is causality? }
 
-The notion of causality has been widely debated in science and philosophy \citep{hume1741treatise,mill1893system,pearson1911grammar,Pearl2000,Lewis2000,woodward2005making,heckman20051,cartwright2007hunting} but is still widely viewed as poorly defined. This has led to a reluctance among applied researchers in many fields to refer to causality in their work, leading them instead to report that variables are \textit{related}, \textit{correlated} or \textit{associated}. However, the magnitude, direction and even existence of an association depends on what other variables we adjust for (or include in a regression). Avoiding formalising causation, the real question of interest, leaves it up to the reader to determine via common sense the \emph{implications} of the reported associations. 
+The notion of causality has been widely debated in science and philosophy \citep{hume1741treatise,mill1893system,pearson1911grammar,Pearl2000,Lewis2000,woodward2005making,heckman20051,cartwright2007hunting} but is still widely viewed as poorly defined. This has led to a reluctance among applied researchers in many fields to refer to causality in their work, leading them instead to report that variables are \textit{related}, \textit{correlated} or \textit{associated}. However, the magnitude, direction and even existence of an association depends on what other variables we adjust for (or include in a regression). Avoiding formalising causation, the real question of interest, leaves it up to the reader to determine via \quotes{common sense} the implications of the reported associations.
 
-We discuss more detailed definitions of causality in section c
+There are two ways in which an association detected in a dataset may be non-causal. The first is that the variables concerned may not be related at all, and the association has arisen by chance in that data sample. Given a finite data on enough variables, there is a high probability of finding some that appear correlated even though they are completely unrelated. For example, based on data from the years 1999 to 2009, the age of miss America is strongly correlated with the number of murders  (in the US) by steam, hot vapours and hot objects \citep{Vigen2015}. We would not expect this relationship to hold if we were to look at a new sample of data. This form of spurious correlation also has serious repercussions. It lies at the heart of major problems with the process of scientific research: researchers are incentivised to detect effects and thus to explore many possible paths in the process of analysing data and studies that fail to find an effect are less likely to be published. As a consequnce, the likelyhood that reported effects have arisen by chance is underestimated, leading to the conclusion that \quotes{most published scientific results are false} \citep{Ioannidis2005}. This issue is also highlighted by recent crises in replication \citep{OpenScienceCollaboration2015}. This issue can be ameliorated by getting more data and by seperating learning models from evaluating their performance, for example by evaluating models on a stict hold-out set or on the extent to which their results can be replicated. 
 
+However, a strong association, observed in multiple indpendent studies may still not be causal. The correlation can arise because both variables are consequences of some other, unmeasured factor. For example, the reading ability of children under twelve is strongy correlated with their height, because older children are taller and can read better. However height is not a cause of reading ability because if we were to intervene to increase a child's height, for example by giving them growth hormones, we would not expect dramatic improvements in their reading. Similarly, extra tutoring in reading will not make a child grow taller. This problem is fundamentally different to the issue of spurious correlations arising by chance in finite datasets. Obtaining more (even infinitely many more) samples without directly intervening in the system to manipulate the variables does not allow us to seperate causation from correlation. 
 
-The what-if type questions from the why. \citep{Gelman2010} \citep{}. Why do whites to better than blacks in school (in America). Suggests that reverse causal inference questions are more interesting and motivate most of social science. 
+The key distinction between a real, but non-causal, association and a causal relationship is in what happens if we intervene in the system and change one of the variables. In this thesis, I take an interventionalist viewpoint of causality: any model or approach designed to predict the outcome of intervening in a system is causal. This viewpoint captures the types of questions that motivate this thesis. How can we change the way we do things to obtain better outcomes. 
 
-I do not find this distinction useful. 
-We can only change the future - history is useful only as far as it tells us something about the future.
-Reverse causal questions can be reposed as forward ones, when making the translation a reverse causal query will be effectively asking about many possible interventions (rather than just one). Problems highlighted as intractable in the reverse causal sense are also intractable in the forward inference form, typically because concern situations for which we do not have a sufficient number of similar instances to allow statistical reasoning. For example, the war question posed in Gelman. 
+Causality is often liked to explaination; understanding how and why things happen. I view explaination in terms of compression and generalisabilty: how much information about the world a model can capture. This creates a hierachy in the degree to which models are explainitory, rather than a simple binary distinction. A standard predictive model encodes all the information we need to predict some output given inputs provided the system generating the data does not change. A high-level causal model might be able to predict the outcome of a specific intervention holding all else fixed. More detailed causal models could predict the outcome for a wide range of combiations of interventions conditional on a range of contexts. By considering conditional interventions within our definition of causal questions we also capture mediation: the study of through which pathways one variable causes another \cite{vanderweele2015explanation}. Finally, a model that can distil how elements interact to mathematical equatons like Newton's laws can be used to predict what will happen in an astounding range of settings, including many we have never previously observed \footnote{Although Newton's laws are not fully general, as they break down for extremely massive objects}.
 
-A distinction between forward causal inference, what happens if we do X and reverse casual inference 
+\citet{Gelman2010,gelman2013ask} make a distinction between forward causal inference, the types of \quotes{What if} questions I focus on in this thesis, and reverse causal questions, asking why something occurs. The former aims to identify the effect of a known cause. The latter can be viewed as identiying causes of an effect. They regard forward causal inference as well defined within the counterfactual and graphical model frameworks for causal inference, which we describe in chapter \ref{chap:causal_models}. However, state that \quotes{A reverse causal question does not in general have a well-defined answer, even in a setting where all possible data are made available.} I view this as overly pessimistic, depending on how \quotes{all possible data} is defined. The goal of identifying the causes of an effect can be formalised within the graphical causal model framework. Solving this problem is certainly much more challanging than identifying the effect of a specific intervention on given outcome, since it requires us to test or infer the effect of interventions on many different variables. These practical difficulties may well be overwealming, particularly in fields such as social science and economics where datasets are relatively small, systems are complex, the variables are difficult to directly manipulate and even relatively simple "What if" questions are hard to resolve conclusively. However, this does not mean that the problem of identifying causes of effects is ill-posed in principle. It can be viewed as a form of causal discovery: the attempt to learn the structure of the causal relationships between variables, on which there is a rich liturature which we review briefly in section \ref{sec:causal-discovery}.
 
-To explain or to predict \citep{Shmueli2010}
-The two cultures \citep{Breiman2001}
+There has traditionally been a large gap between researches in machine learning who focus on prediction, use largly non-interpretable models and researches in statistics, social science and economics who (at least implicitly) aim to answer causal questions and tend to use heavily theory driven models. However, there is relatively little awareness, particularly within the machine learning and data science communities, of what constitutes a causal problem and the implications of for the training and evaluation models. In the next section we emphasise the subtley that can exist in determining if a problem is causal by examiming some typical examples. 
 
-\paragraph*{There are two reasons why correlation is not causation}. The first is related to variance and over-fitting. Observations are noisy. With a finite data set with enough variables we will be able to find some that are completely unrelated but correlate purely by chance. The second arises from bias, typically introduced by an un-observed confounding variable. In this case, variables are correlated not by chance. We would expect the relationship to hold if we sampled more data. However, they are not causally related in that intervening to set one would not likely effect the other. EXAMPLE WITH FIGURE. 
+\section{What makes a causal inference problem?}
 
-
-
-
-
-
-\subsection{Defining causality}
-\begin{itemize}
-\item what is explanation?
-\item any model that aims to predict the outcome of an action or intervention in a system
-\item I do not see the distinction between explanation and (causal) prediction. Explanation is all about the ability to compress and to generalise. The more a model can do this, the more we view as providing an understanding of the why. 
-\item mediation?
-\end{itemize}
-
-\section{What problems require causal inference?}
-
-\subsubsection{Examples of typical machine learning problems. Are they causal?}
-
-Consider the following problems, which span a wide range of the types of questions machine learning is currently being applied to. Which of them require casual inference? How can we identify characteristics of a problem that make causal modelling important?
+Machine learning is in the midst of a boom, driven by the availability of large datasets and the computation resources to process them. Machine learning techniques are being applied a huge range of problems, in both industry and achademia. The following examles are inteded to capture the bredth of problems that machine learning algorithms are actively beeing applied to. Which, if any, of these problems require causal inference? 
 
 \begin{itemize}
 \item Speech recognition (for systems like Siri or Google)
@@ -326,9 +307,7 @@ Consider the following problems, which span a wide range of the types of questio
 \item Playing Go 
 \end{itemize}
 
-Asking if these problem require causal inference is somewhat disingenuous as they are not posed in sufficient detail to determine if causality is an important consideration. In particular, I failed to specify how any (machine learning) model we might build would be used, and what actions could be taken in response to its predictions. This is a trivial but significant observation. 
-
-It comes down to asking, is the objective or loss function we are minimising a good proxy for our underlying goal in building the model. 
+The question is disingenuous because I have not posed the problems in sufficient detail to determine if causality is an important considertion. In particular, I failed to specify how any model we might build would be used: what actions would be taken in response to its predictions. 
 
 Consider speech recognition. You say something, which causes sound waves, which are converted converted to a digital signal that Siri maps to words. Whatever action Siri takes is unlikely to change the distribution of words you use, and even less likely to change the function that maps sound waves to text (unless she sends you a DVD on elocution). A similar argument could be made for many applications of machine translation and image classification. 
 
@@ -340,20 +319,35 @@ Identifying spam and automated essay marking both involve  processing text to de
 
 This example also highlights a connection between causal models and transparancy in machine learning. If we are using a non-causal model to make decision effecting people, there will be a trade-off between the performance and transparancy of the model; not because the requirement for transparancy restricts us to simple models but because revealing how the model works allows people to change their behaviour to game it. 
 
-What about predicting the risk of death in patients with pneumonia? Suppose the goal is to build a model to decide who should be treated in hospital and who can be sent home with antibiotics. If we assume that in hospital treatment is more effective for serious cases, this seems like a straightforward prediction problem. It is not. Depending on how the decision to admit was previously made and what features are included (or omitted) in the model, the relationship between those features and the outcome may change if the model is used to make admition decisons. \citet{Caruana2015} found exactly this effect in a real data set. The model learnt that (among other things) people suffering asthma were \emph{less} likely to die from pneumonia. They realised this was because doctors were treating such patients very aggressively, thus actually lowering their risk. The issue is not with model, it performed very well at the task for which it was trained, which is to predict wo would be likely to die under the original admition and treatment protocols. However, using it to decide how to \emph{change} these protocols could kill. The actual question of interest in this case is what happens to patients with charachteristics $X$ if we assign them treatment according to decision rule $Z$. 
+What about predicting the risk of death in patients with pneumonia? Suppose the goal is to build a model to decide who should be treated in hospital and who can be sent home with antibiotics. If we assume that in hospital treatment is more effective for serious cases, this seems like a straightforward prediction problem. It is not. Depending on how the decision to admit was previously made and what features are included (or omitted) in the model, the relationship between those features and the outcome may change if the model is used to make admition decisons. \citet{Caruana2015} found exactly this effect in a real data set. The model learnt that people suffering asthma were \emph{less} likely to die from pneumonia. They realised this was because doctors were treating such patients very aggressively, thus actually lowering their risk. The issue is not with model, it performed very well at the task for which it was trained, which is to predict wo would be likely to die under the original admition and treatment protocols. However, using it to decide how to \emph{change} these protocols could kill. The actual question of interest in this case is what happens to patients with charachteristics $X$ if we assign them treatment according to decision rule $Z$. 
 
-Predicting which customers will leave or who will re-offend if granted parole also fit within the category of problems where you wish to identify a group for which a problem will occur and target some treatment to them (hospitalisation, loyalty reward, more monitoring \& support on parole, etc). For all these problems the assumptions required to treat them as pure prediction problems are 
-\begin{enumerate}
-\item The treatment is assumed to be effective (at least better than nothing)
-\item Deciding who to treat on the based of the model predictions won't change the relationship between features and outcome 
-\end{enumerate}
+Predicting which customers will leave or who will re-offend if granted parole also fit within the category of problems where you wish to identify a group for which a problem will occur and target some treatment to them (hospitalisation, loyalty reward, more monitoring \& support on parole, etc). Predictive models can be applied to such problems provided it is known which treatment option will be most effective for the target group and deciding who to treat on the based of the model predictions won't change the relationship between features and outcome.
 
 Demand prediction seems like a relatively straightforward prediction problem. These models use features such as location, pricing, marketing, time of year, weather, etc to forecast the demand for a product. It seems unlikely that using the model to ensure stock is available will itself change demand. However, depending on the way demand is measured, there is a potential data censoring issue. If demand is modelled by the number of sales, then if a product is out of stock demand will appear to be zero. Changing availability does then change demand.
    
-Playing Go (and other games) is a case with some subtleties. At every turn, the AI agent has a number of actions available. The board state following each action is deterministic and given by the rules of the game. The agent can apply supervised machine learning based on millions of previous games to estimate the probability that each of these board states will lead to a win. ... this is interesting maybe come back to it ... an alternate approach would be to try to forecast the probability of a win given each action given the current board state as context ... One approach to causal inference is indeed to learn about actions from taking actions (or observing the actions that other have taken). When can we learn from the actions others have taken? When there is no confounding. And does this hold with Go? Probably because the board state encapsulates everything that should determine what move is played. Learning directly from actions and trying to generalise (can in some instances reduce the problem to standard ML)
+Playing Go (and other games) is a case with some subtleties. At every turn, the AI agent has a number of actions available. The board state following each action is deterministic and given by the rules of the game. The agent can apply supervised machine learning, based on millions of previous games, to estimate the probability that each of these reachable board states will lead to a win \footnote{This is a challenging pattern recognition problem. There are around $2 \times 10^{170}$ legal board positions in Go, (\citep{tromp2016number}), so the algorithm cannot simply memorise the proportion of times each state leads to a win, it must identify higher level features of the board state that are associated with winning.}. Supervised learning can also be applied to learn a policy $\P{a|s}$, the probability of selecting action $a$ given board state $s$. This allows the agent to estimate the likelyhood of winning from a given starting state by simulating (many times) the remainder of the game, drawing actions from $\P{a|s}$ for both players. Google's Alpha Go, which in May 2017 beat the then strongest human player \citep{Mozur2017}, incorporates a compbination of these approaches \citep{silver2016mastering}. The supervised learning was enhanced by having the agent play (varients) of itself many times, so that its estimates of value for each board state and of the likelyhood an opponent will play as given move are based on a combination of replicating the way humans play and on the moves that led to a win when playing itself. 
+
+The problem of playing go is clearly causal from the interventionalist perspective. The agent wishes to learn the probability of a win given an action they take. However, 
+
+
+
+
+
+
+
+
+
+
+
+
+... this is interesting maybe come back to it ... an alternate approach would be to try to forecast the probability of a win given each action given the current board state as context ... One approach to causal inference is indeed to learn about actions from taking actions (or observing the actions that other have taken). 
+
+When can we learn from the actions others have taken? When there is no confounding. And does this hold with Go? Probably because the board state encapsulates everything that should determine what move is played. Learning directly from actions and trying to generalise (can in some instances reduce the problem to standard ML)
 
 Having considered these examples we can now identify some general aspects of the problem that determine whether or not we require a causal model.
 
+
+This is a trivial but significant observation. It comes down to asking, is the objective or loss function we are minimising a good proxy for our underlying goal in building the model. 
 \begin{itemize}
 \item Does acting on the predictions of the model change the mapping from features to target? (at least if the decision process is open to scrutiny). In general, if we believe that humans are generally trying to optimise to various goals of their own then for any system interacting with them the answer to this will be yes.
 \item 
@@ -369,9 +363,14 @@ Having considered these examples we can now identify some general aspects of the
 
 Optimising hard to the wrong metric. 
 
+How can we characterise which problems are predictive and which are causal?
+
 Mention transferability viewpoint
 
 I hope these examples gave you a feel for the richness and subtitles of causal inference. We will return to some of them in more detail once we have established some more concrete language and tools to approach them with.
+
+
+Always, unless you can demonstrate otherwise.
 
 \section{An overview of this thesis and its contributions}
 
@@ -389,6 +388,8 @@ I hope these examples gave you a feel for the richness and subtitles of causal i
 
 
 \section{Approaches to causality}
+This stuff gets built into explaining how the thesis fits together.
+
 
 There are two broad approaches to deciding how to act. Reinforcement learning and causal inference. In reinforcement learning we estimate the effect of actions by taking them. We assume there is an agent capable of intervening in the system and try to find policies for the agent to follow in selecting actions so as to maximise some kind of reward. This is a very powerful and general framework (REFERENCES TO GENERAL AI). However, POINT OUT SOME OF THE DIFFICULTIES WITH REINFORCEMENT LEARNING. We are frequently presented with large bodies of data that have been collected from a system in which we did not have any control over what actions were taken. 
 
@@ -869,6 +870,15 @@ Equation \ref{eqn:sem:adjusting} corresponds to equations \ref{eqn:backdoor_exam
 \end{figure}
 
 Structural equation models are generally applied with strong constraints on the functional form of the relationship between the variables and noise is typically assumed to be additive, $X_i = f_i(\cdot)+\epsilon_i$. A structural equation model with $N$ variables resembles a set of $N$ simultaneous equations, with each variable playing the role of the dependent (left hand side) variable in one equation. However a SEM is, by definition, more than a set of simultaneous equations. By declaring it to be structural we are saying that it represents assumptions about the relationships between variables. When we visualise the model as a network the absence of an arrow between two variables encodes the assumption that one does not cause the other. The similarity between the notation used to describe and analyse structural equation models and simultaneous equations, combined with a reluctance to make explicit statements about causality, has led to some confusion in the interpretation of SEMs \citep{heckman2015causal,Pearl2000}. 
+
+\section{Granger causality}
+
+Mentioned in the category of causal frameworks,
+
+Granger causality is less of a framework for defining causality and on which a wide range of algorithms and methods can be constructed, but a method for infering causal structure from data. As such is discussion really belongs in section \ref{sec:causal-discovery}.
+
+TODO move this to a paragraph at the end of the comparing and unifying section. \todo{}
+
 
 \section{Comparing and unifying the models}
 
@@ -1768,6 +1778,7 @@ The performance of methods for causal effect estimation can be tested on simulat
 
 
 \section{Causal Discovery}
+\label{sec:causal-discovery}
 
 %Cyclic models \citep{Hyttinen2012}
 
@@ -3245,6 +3256,8 @@ Therefore $m(\eta*) \leq m(\eta) \leq 2m(\boldsymbol{q})$ as required.
 %Thus, for $a = do(X_i = j)$ letting $\eta_a \propto \ind{\P{X_i = j} \leq 1/m} / (2m)$ guarantees $\eta_a \ge \frac{1}{2m}$ when $\eta_a \ne 0$.
 %It is then easy to check that $m(\eta) \leq 2m$ using an argument like that for Proposition~\ref{pro:m-bound}.
 
+
+
 \chapter{Conclusion}
 
 
@@ -3252,6 +3265,28 @@ Therefore $m(\eta*) \leq m(\eta) \leq 2m(\boldsymbol{q})$ as required.
 \bibliography{library}% write the directory to the .bib file
 \end{document}
 
+\chapter{Causation vs Prediction}
 
+The two cultures \citep{Breiman2001}
+ - wrong because suggets we can just use the machine learning approach for everything. Does not address the problems that a) structural assumptions required for causal inference. b) we cannot use cross-vaidation to assess the validity of a causal model (really b is the whole point).
+
+
+To explain or to predict \citep{Shmueli2010}
+- wrong because they assume all the parts of explanatory modelling are required - so black box models cannot be used. 
+
+
+
+Predict the relationship between X and Y as a way to stratify to reduce the variance in an experiment.
+
+They consider a different definition of explanatory models, 
+
+Definition as backwards. Explanatory models focus on theory because some theory (or equivelently stated assumptions) are required in order to predict the outcome of an intervention from observational data. 
+
+Causal modelling frameworks allow us to seperate assumptions about the structure of the relationships between variables from assumptions about the functional form. 
+
+What can be data driven and what cannot? (for a given set of assumptions). 
+
+
+Allowing for the possibility that we might only need to be able to predict the outcome of an intervention on a given subset of variables (for example those over which we have the ability to manipulate) or the possibility that we can can obtain observation from directly intervening in a system creates creates a need for models that are neither explanatory or predictive in the languate of EoP but are built on a hybrid of both approaches. 
 
 
