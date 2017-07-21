@@ -327,33 +327,15 @@ Demand prediction seems like a relatively straightforward prediction problem. Th
    
 Playing Go (and other games) is a case with some subtleties. At every turn, the AI agent has a number of actions available. The board state following each action is deterministic and given by the rules of the game. The agent can apply supervised machine learning, based on millions of previous games, to estimate the probability that each of these reachable board states will lead to a win \footnote{This is a challenging pattern recognition problem. There are around $2 \times 10^{170}$ legal board positions in Go, (\citep{tromp2016number}), so the algorithm cannot simply memorise the proportion of times each state leads to a win, it must identify higher level features of the board state that are associated with winning.}. Supervised learning can also be applied to learn a policy $\P{a|s}$, the probability of selecting action $a$ given board state $s$. This allows the agent to estimate the likelyhood of winning from a given starting state by simulating (many times) the remainder of the game, drawing actions from $\P{a|s}$ for both players. Google's Alpha Go, which in May 2017 beat the then strongest human player \citep{Mozur2017}, incorporates a compbination of these approaches \citep{silver2016mastering}. The supervised learning was enhanced by having the agent play (varients) of itself many times, so that its estimates of value for each board state and of the likelyhood an opponent will play as given move are based on a combination of replicating the way humans play and on the moves that led to a win when playing itself. 
 
-The problem of playing go is clearly causal from the interventionalist perspective. The agent wishes to learn the probability of a win given an action they take. However, 
+The problem of playing go is causal from the interventionalist perspective. The agent wishes to learn the probability of a win given an action they take. However, there are some special characteristics to the go problem that make it amenable to a primarily supervised learning approach. The actions the agent has to explore are the sames ones as human players explored to generate the trainging data, and both have the same objective - to win the game. In addition, the state of the board encapsulates all the information relevent to selecting a move. These factors make it reasonable to conclude that selecting moves with an algorithm will not change the value of a board state or the probability of given move by the opponent by a sufficiently large margin to invalidate the training data. 
+ 
+Having considered these examples we can now identify some general aspects of problems that require causal (as opposed to purely predicive) inference. A predictive model may be sufficient if;
 
-
-
-
-
-
-
-
-
-
-
-
-... this is interesting maybe come back to it ... an alternate approach would be to try to forecast the probability of a win given each action given the current board state as context ... One approach to causal inference is indeed to learn about actions from taking actions (or observing the actions that other have taken). 
-
-When can we learn from the actions others have taken? When there is no confounding. And does this hold with Go? Probably because the board state encapsulates everything that should determine what move is played. Learning directly from actions and trying to generalise (can in some instances reduce the problem to standard ML)
-
-Having considered these examples we can now identify some general aspects of the problem that determine whether or not we require a causal model.
-
-
-This is a trivial but significant observation. It comes down to asking, is the objective or loss function we are minimising a good proxy for our underlying goal in building the model. 
 \begin{itemize}
 \item Does acting on the predictions of the model change the mapping from features to target? (at least if the decision process is open to scrutiny). In general, if we believe that humans are generally trying to optimise to various goals of their own then for any system interacting with them the answer to this will be yes.
 \item 
+This is more likely be be the case if the actions are recorded in the training data (unlike in the pneumonia example), and the algorithm has the same objective and information on which to base its decisions as generated the training data. 
 
- Covariate shift clearly comes in here. Because there are areas where mechanisms are understood it is relatively easy to argue that covariate shift is not occurring and that results will be transferable. The mechanism is known but the function may be complex. Can we write down something that causal models are invariant to in terms of shift that is not the case for non-causal models? Yes, if the way in which features get their values changes, then causal models will be invariant to that in a way that non-causal ones are not. 
- 
 \item To decide between actions we only need to rank them (not estimate their actual effect). 
 \item The predicted outcome in the absence of an intervention provides a single point. We can use this to find which problems are most serious if left alone - and prioritise those for modelling changes. 
 \item Any decision we take does not significantly impact the system from which the data was drawn to make it (for repeat decision making)
@@ -361,16 +343,16 @@ This is a trivial but significant observation. It comes down to asking, is the o
 \item Ethics - ... People's viewpoint on if its OK...
 \end{itemize}
 
+
+We can also view causal inference problems as a particular form of the transfer learning problem. We have training data obtained from one system, but we wish te estimate 
+
+It comes down to asking, is the objective or loss function we are minimising a good proxy for our underlying goal in building the model. 
+
 Optimising hard to the wrong metric. 
 
-How can we characterise which problems are predictive and which are causal?
-
-Mention transferability viewpoint
-
-I hope these examples gave you a feel for the richness and subtitles of causal inference. We will return to some of them in more detail once we have established some more concrete language and tools to approach them with.
 
 
-Always, unless you can demonstrate otherwise.
+In conclusion, it is rare that anyone would build a model without indending that some kind of decion be made on the basis of its results. For this reason we assume that a causal model is required unless we can justify otherwise. I hope these examples gave you a feel for the richness and subtitles of causal inference. We will return to some of them in more detail once we have established some more concrete language and tools to approach them with.
 
 \section{An overview of this thesis and its contributions}
 
