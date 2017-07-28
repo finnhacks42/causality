@@ -286,7 +286,7 @@ We now live in a world of data. Hours of our lives are spent online, where every
 
 The rise of big data sets and powerful computers has seen an explosion in the application of machine learning. From health care, to entertainment and self driving cars; machine learning algorithms will transform many industries. It has been suggested that the impressive ability of statistical machine learning to detect complex patterns in huge data sets heralds the end of theory \citep{anderson2008end} and that we may be only a short step from \quotes{The Singularity}, where artificial intelligence exceeds our own and then grows exponentially. 
 
-However, despite the huge advances in machine learning (in particular deep learning), machine learning algorithms are effective only within narrow problem settings. Getting them to generalise to even slightly different problems or data sets remains very challenging. Deciding how we should act or what policies we should implement requires us to be able to predict how a system will behave if we change it. The correlations detected by standard machine learning algorithms do not enable us to do this, no matter how many petabytes of data they are based on. As machine learning algorithms are incorporated into more and more of the decision making processes that shape the world we live it, it is critical to ensure that we understand the distinction between causality and prediction and that we develop techniques for learning how to act that are as effective as those we have for pattern recognition.
+However, despite the huge advances in machine learning (in particular deep learning), machine learning algorithms are effective only within very narrow problem settings. Getting them to generalise to even slightly different problems or data sets remains very challenging. Deciding how we should act or what policies we should implement requires us to be able to predict how a system will behave if we change it. The correlations detected by standard machine learning algorithms do not enable us to do this, no matter how many petabytes of data they are based on. As machine learning algorithms are incorporated into more and more of the decision making processes that shape the world we live it, it is critical to ensure that we understand the distinction between causality and prediction and that we develop techniques for learning how to act that are as effective as those we have for pattern recognition.
 
 
 \section{What is causality? }
@@ -397,6 +397,8 @@ We can represent this graphically by drawing a network with a node for each vari
 
 \begin{figure}[h]
 \centering
+\caption{A general Bayesian network for the joint distribution over three variables. This network does not encode any conditional independencies between its variables and can thus represent any distribution over three variables.}
+\label{fig:bayesnet}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={observed}]
 
@@ -412,14 +414,14 @@ We can represent this graphically by drawing a network with a node for each vari
     (2) edge node {} (3);
 	
 \end{tikzpicture}
-\caption{A general Bayesian network for the joint distribution over three variables. This network does not encode any conditional independencies between its variables and can thus represent any distribution over three variables.}
-\label{fig:bayesnet}
 \end{figure}
 
 
 
 \begin{figure}
 \centering
+\caption{Some valid Bayesian networks for a distribution $P$ over $(X_1,X_2,X_3)$ in which $X_3$ is conditionally independent of $X_1$ given $X_2$, denoted $X_3 \ci X_1 | X_2$. Graphs (a), (b) and (c) are all a \emph{perfect map} for $P$ as the graphical stucture implies exactly the same set of independencies exhibitied by the distribution. Graph (d), like figure \ref{fig:bayesnet} does not imply any conditional independencies, and is thus a valid (but not very useful) Bayesian network representation for any distribution over three variables.}
+\label{fig:bayesnet2}
 \begin{subfigure}[t]{0.15\textwidth}
 \centering
 \caption{}
@@ -472,8 +474,6 @@ We can represent this graphically by drawing a network with a node for each vari
     (2) edge (3);
 \end{tikzpicture}
 \end{subfigure}
-\caption{Some valid Bayesian networks for a distribution $P$ over $(X_1,X_2,X_3)$ in which $X_3$ is conditionally independent of $X_1$ given $X_2$, denoted $X_3 \ci X_1 | X_2$. Graphs (a), (b) and (c) are all a \emph{perfect map} for $P$ as the graphical stucture implies exactly the same set of independencies exhibitied by the distribution. Graph (d), like figure \ref{fig:bayesnet} does not imply any conditional independencies, and is thus a valid (but not very useful) Bayesian network representation for any distribution over three variables.}
-\label{fig:bayesnet2}
 \end{figure}
 
 
@@ -519,6 +519,8 @@ Theorem \ref{thm:truncated_prodcut} does not hold for standard Bayesian networks
 Returning to example \ref{exm:ranomized_experiment}, and phrasing our query in terms of interventions; what would the distribution of outcomes look like if everyone was treated $\P{Y|do(X=1)}$, relative to if no one was treated $\P{Y|do(X=0)}$? The treatment $X$ is a potential cause of $Y$, along with other unobserved variables, such as the age, gender and the disease sub-type of the patient. Since $X$ is assigned via deliberate randomisation we know that it is not affected by any latent variables. The causal Bayesian network for this scenario is shown in figure \ref{fig:causal_network_example}. This network represents the (causal) factorisation  $\P{X,Y} = \P{X}\P{Y|X}$, so from equation (\ref{eq:truncatedproduct}), $\P{Y|do(X)} = \P{Y|X}$. In this example, the interventional distribution is equivalent to the observational one.
 
 \begin{figure}[h]
+\caption{Causal Bayesian network for example \ref{exm:ranomized_experiment}}
+\label{fig:causal_network_example}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
 \node[node](2){$X \text{ (Treatment)}$};
@@ -526,8 +528,6 @@ Returning to example \ref{exm:ranomized_experiment}, and phrasing our query in t
 \path[]
 	(2) edge (3);
 \end{tikzpicture}
-\caption{Causal Bayesian network for example \ref{exm:ranomized_experiment}}
-\label{fig:causal_network_example}
 \end{figure}
 
 
@@ -544,6 +544,8 @@ We have seen from these two examples that the expression to estimate the causal 
 
 \begin{figure}
 \center
+\caption{Causal Bayesian network for example \ref{exm:adjusting}}
+\label{fig:causal_adjust}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.2cm, thick,node/.style={observedrect},lt/.style={latent}]
 
  %nodes
@@ -553,9 +555,7 @@ We have seen from these two examples that the expression to estimate the causal 
 \path[every node/.style={font=\sffamily\small}]
     (1) edge (2) edge (3)
     (2) edge (3); 
-\end{tikzpicture}
-\caption{Causal Bayesian network for example \ref{exm:adjusting}}
-\label{fig:causal_adjust} 
+\end{tikzpicture} 
 \end{figure}
 
 Formalising the definition of an intervention within the framework of causal graphical models provides us with an explicit mechanism to map information from one data generating process, the system pre-intervention, to another, the system post-intervention. The power of defining an intervention in this way stems from the number of things that are invariant between the two processes. All the (conditional) distributions for variables in the graph that were not directly set by the intervention are assumed not be changed by it.  
@@ -565,6 +565,8 @@ We could represent problems of the type where we try to infer properties of the 
 
 \begin{figure}[h]
 \center
+\caption{Causal inference with ordinary Bayesian networks. The plate on the left represents the observed data generated prior to the intervention and the plate on the right the data we anticipate obtaining after an intervention that sets the pre-interventional variable $X$ to $x$. The assumptions characterised by this plate model correspond to those implied by the causal Bayesian network in figure \ref{fig:causal_adjust} for the intervention $do(X=x)$. As the networks in this figure are ordinary Bayesian networks, we could have represented the same information with a different ordering of the links within each plate. However, we would then have a complex transformation relating the parameters between the two plates rather than a simple invariance.}
+\label{fig:causal_ordinary_bayes}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.2cm, thick,node/.style={observed},lt/.style={latent}]
 \tikzstyle{box}=[rectangle, draw=black!100]
  %nodes
@@ -588,8 +590,6 @@ We could represent problems of the type where we try to infer properties of the 
 \node[rectangle, inner sep=4.0mm, fit= (1) (2) (3),draw=black!100,label=below right:N] {};
 \node[rectangle, inner sep=4.0mm, fit= (5) (6),draw=black!100,label=below right:M] {};
 \end{tikzpicture} 
-\caption{Causal inference with ordinary Bayesian networks. The plate on the left represents the observed data generated prior to the intervention and the plate on the right the data we anticipate obtaining after an intervention that sets the pre-interventional variable $X$ to $x$. The assumptions characterised by this plate model correspond to those implied by the causal Bayesian network in figure \ref{fig:causal_adjust} for the intervention $do(X=x)$. As the networks in this figure are ordinary Bayesian networks, we could have represented the same information with a different ordering of the links within each plate. However, we would then have a complex transformation relating the parameters between the two plates rather than a simple invariance.}
-\label{fig:causal_ordinary_bayes}
 \end{figure}
 
 A causal Bayesian network represents much more information than a Bayesian network with identical structure. A causal network encodes all possible interventions that could be specified with the do-notation. For example, if the network in figure \ref{fig:causal_adjust} were an ordinary Bayesian network and all the variables were binary, the associated distribution could be described by 7 parameters. The equivalent causal Bayesian network additionally represents the post-interventional distributions for six possible single variable interventions and twelve possible two variable interventions. Encoding all this information without the assumptions implicit in the causal Bayesian network would require an additional 30 parameters \footnote{After each single variable intervention we have a distribution over two variables, which can be represented by three parameters. After each two variable intervention, we have a distribution over one variables which requires one parameter. This takes us to a total of $6\times3+12\times1 = 30$ additional parameters.}.
@@ -600,6 +600,8 @@ Causal Bayesian networks are Bayesian networks, so results that apply to Bayesia
 A number of criticisms have been levelled at this approach to modelling causality. One is that the definition of an intervention only in terms of setting the value of one or more variables is too precise and that any real world intervention will affect many variables in complex and non-deterministic ways \citep{rickles2009causality,cartwright2007hunting}. However, by augmenting the causal graph with additional variables that model how interventions may take effect, the deterministic do operator can model more complex interventions. For example, in the drug treatment case, we assumed that all subjects complied, taking the treatment or placebo as assigned by the experimenter. But, what if some people failed to take the prescribed treatment? We can model this within the framework of deterministic interventions by adding a node representing what they were prescribed (the intervention) which probabilistically influences the treatment they actually receive, see figure \ref{fig:randomized_imperfect_compliance}. Note that the fact that we no longer directly assign the treatment opens the possibility that an unobserved latent variable could affect both the actual treatment taken and the outcome.
 
 \begin{figure}[h]
+\caption{Randomised treatment with imperfect compliance}
+\label{fig:randomized_imperfect_compliance}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
 \node[node](1){Prescribed Treatment};
@@ -611,8 +613,6 @@ A number of criticisms have been levelled at this approach to modelling causalit
 	(2) edge (3) 
 	(4) edge (3) edge (2);
 \end{tikzpicture}
-\caption{Randomised treatment with imperfect compliance}
-\label{fig:randomized_imperfect_compliance}
 \end{figure}
 
 Another key issue with causal Bayesian networks is that they cannot handle cyclic dependencies between variables. Such feedback loops are common in real-life systems, for example the relationship between supply and demand in economics or predator and prey in ecology. We might regard the underlying causal mechanisms in these examples to be acyclic; the number of predators at one time influences the number of prey in the next period and so on. However, if our measurements of these variables must be aggregated over time frames that are longer than the scale at which these interactions occur the result is a cyclical dependency. Even were we able to measure on shorter timescales, we might then not have sufficient data on each variable for inference. Such problems have mostly been studied within the dynamical systems literature, typically focusing on understanding the stationary or equilibrium state of the system and making very specific assumptions about functional form in order to make problems tractable. \citet{Poole2013} compare the equilibrium approach to reasoning about cyclic problems with structural equation models, which we discuss in section \ref{sec:SEM} and which can be seen as Bayesian causal networks with additional functional assumptions. 
@@ -694,12 +694,12 @@ P(\tau) = N(\mu_1 - \mu_0,2\sigma^{2}(1-\rho))
 \begin{figure}[h]
 \captionsetup[subfigure]{position=b}
 \centering
+\caption{The distribution of individual treatment effects is not identifiable, even from a randomised controlled trial.}
+\label{fig:metaphysical_distribution_difference}
 \subcaptionbox{Marginal distributions over the potential outcomes $\cf{Y}{1}$ and $\cf{Y}{0}$ for $\mu_1=1$, $\mu_0=0$ and $\sigma = 1$. The blue curve shows the distribution of $Y$ if everyone were to be treated and the blue curve the distribution if no-one was treated. \label{fig:metaphys_a}}{\includegraphics[width=.45\linewidth]{figures/counterfactual_nonidentify_a.pdf}}
 \hspace{0.02\textwidth}
 \subcaptionbox{Two very different distributions of individual causal effects consistent with the potential outcome distributions. \label{fig:metaphys_b}}
 {\includegraphics[width=.45\linewidth]{figures/counterfactual_nonidentify_b.pdf}}
-\caption{The distribution of individual treatment effects is not identifiable, even from a randomised controlled trial.}
-\label{fig:metaphysical_distribution_difference}
 \end{figure}
 
 From a (large) randomised controlled trial we can estimate the marginal distributions over the counterfactual variables, see figure \ref{fig:metaphys_a}. These represent the distributions we would expect over the outcome $Y$ if everyone were treated or not treated respectively. However, the distribution over the individual causal effects depends on $\rho$, see figure \ref{fig:metaphys_b}. The key problem is that we can never observe the joint distribution over $\cf{Y}{1}$ and $\cf{Y}{0}$. As a result, $\rho$ and thus the variance of $\tau$ is not identifiable, even from experimental data. \citet{Dawid2000} argues that we should avoid using counterfactuals as they are defined in terms of (metaphysical) individual causal effects. He further points out that the interventional distributions in figure \ref{fig:metaphys_a}, along with a loss function, contain all the information required to decide how to treat a new patient.  
@@ -716,6 +716,8 @@ Structural equation models (SEMs) describe a deterministic world, where some und
 Mathematically, each variable is a deterministic function of its direct causes and a noise term that captures unmeasured variables. The noise terms are required to be mutually independent. If there is the possibility that an unmeasured variable influences more than one variable of interest in a study, it must be modelled explicitly as a latent variable. Structural equation models can be represented visually as a network. Each variable is a node and arrows are drawn from causes to their effects. Figure \ref{fig:sem_randomized_treatment} illustrates the SEM for example \ref{exm:ranomized_experiment}.
 
 \begin{figure}[h]
+\caption{SEM for example \ref{exm:ranomized_experiment}}
+\label{fig:sem_randomized_treatment}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
 \node[node](2){$X = f_x(\epsilon_x)$};
@@ -727,8 +729,6 @@ Mathematically, each variable is a deterministic function of its direct causes a
 	(4) edge (3)
 	(5) edge (2);
 \end{tikzpicture}
-\caption{SEM for example \ref{exm:ranomized_experiment}}
-\label{fig:sem_randomized_treatment}
 \end{figure}
 
 This model encodes the assumption that the outcome $y_{i}$ for an individual $i$ is caused solely by the treatment $x_{i}$ they receive and other factors $\epsilon_{y_{i}}$ that are independent of $X$. This is justifiable on the grounds that $X$ is random. The outcome of a coin flip for each patient should not be related to any of their characteristics (hidden or otherwise). Note that the causal graph in figure \ref{fig:sem_randomized_treatment} is identical to that the Bayesian network for the same problem, figure \ref{fig:causal_network_example}. The latent variables $\epsilon_x$ and $\epsilon_y$ are not explicitly drawn in figure \ref{fig:causal_network_example} as they are captured by the probabilistic nature of the nodes in a Bayesian network.
@@ -763,6 +763,8 @@ Equation \ref{eqn:sem:adjusting} corresponds to equations \ref{eqn:backdoor_exam
 
 
 \begin{figure}[h]
+\caption{SEM for example \ref{exm:adjusting}}
+\label{fig:sem:preschool}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
 \node[node](2){$X = f_x(Z,\epsilon_x)$};
@@ -778,8 +780,6 @@ Equation \ref{eqn:sem:adjusting} corresponds to equations \ref{eqn:backdoor_exam
 	(7) edge (6)
 	(6) edge (2) edge (3);
 \end{tikzpicture}
-\caption{SEM for example \ref{exm:adjusting}}
-\label{fig:sem:preschool}
 \end{figure}
 
 Structural equation models are generally applied with strong constraints on the functional form of the relationship between the variables and noise is typically assumed to be additive, $X_i = f_i(\cdot)+\epsilon_i$. A structural equation model with $N$ variables resembles a set of $N$ simultaneous equations, with each variable playing the role of the dependent (left hand side) variable in one equation. However a SEM is, by definition, more than a set of simultaneous equations. By declaring it to be structural we are saying that it represents assumptions about the relationships between variables. When we visualise the model as a network the absence of an arrow between two variables encodes the assumption that one does not cause the other. The similarity between the notation used to describe and analyse structural equation models and simultaneous equations, combined with a reluctance to make explicit statements about causality, has led to some confusion in the interpretation of SEMs \citep{heckman2015causal,Pearl2000}. 
@@ -857,6 +857,8 @@ Once the data is broken down by gender, drug B looks better for both men \emph{a
 Let's represent the treatment by the variable $T$, the gender of the patient by $Z$ and whether or not the treatment was successful by $Y$. The doctor cares about $\P{Y|do(T)}$, not the standard conditional distributions $\P{Y|T}$. Unfortunately, the data in tables \ref{tab:simpson1} and \ref{tab:simpson2} is insufficient to enable estimation of the interventional distribution $\P{Y|do(T)}$ or determine if $do(T=A)$ is better or worse than $do(T=B)$. Some assumptions about the causal relationships between the variables are required. In this example, it seems reasonable to conclude that gender may affect the treatment chosen and the outcome. Assuming there are no other such confounding variables (for example income) then we obtain the causal network in figure \ref{fig:simpsons_paradox}.
 
 \begin{figure}[h]
+\caption{An example of causal network that can give rise to Simpson's Paradox. In this case we should select treatment on the basis of the gender specific results.}
+\label{fig:simpsons_paradox}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
 \node[node](1){Z = Gender};
@@ -866,8 +868,6 @@ Let's represent the treatment by the variable $T$, the gender of the patient by 
 	(1) edge (2) edge (3) 
 	(2) edge (3);
 \end{tikzpicture}
-\caption{An example of causal network that can give rise to Simpson's Paradox. In this case we should select treatment on the basis of the gender specific results.}
-\label{fig:simpsons_paradox}
 \end{figure}
 
 With this model, women are more likely to choose drug A and are also more likely to recover than men regardless of the treatment they receive. Knowing a patient took drug A indicates they are more likely to be female. When we compare the group of people who took A against those who took B, the effect of the higher proportion of females in the first group conceals the greater benefit of drug B leading to an apparent reversal in effectiveness. However, when the doctor intervenes to set the treatment each person receives there will no longer be a link from gender to treatment. So in this case she should choose which drug to prescribe from the gender specific table (and weight by the proportion of the population that belongs to each gender). Drug B is the better choice.
@@ -879,6 +879,8 @@ With this model, women are more likely to choose drug A and are also more likely
 Is the solution to Simpson's paradox to always to break down the data by as many variables as possible? No. Suppose we have the identical data as in \ref{tab:simpson1} and \ref{tab:simpson2} but replace the column name 'gender' with 'blood pressure', 'M' with 'high' and 'F' with 'normal'. This is a drug designed to prevent heart disease. One pathway to doing so might well be to lower blood pressure. Figure \ref{fig:simpsons_paradox2} shows a plausible causal graph for this setting. It differs from the graph in figure \ref{fig:simpsons_paradox} only in the direction of a single link. Now, however, table \ref{tab:simpson2} tells us that people who took treatment $A$ had better blood pressure control and better overall outcomes. In this setting $\P{Y|do(T)} = \P{Y|T}$ and drug A is the better choice. 
 
 \begin{figure}[h]
+\caption{Another causal network that can exhibit Simpson's paradox. In this case, \quotes{the solution} is not to stratify on $Z$.}
+\label{fig:simpsons_paradox2}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
 \node[node](1){Z = Blood Pressure};
@@ -889,8 +891,6 @@ Is the solution to Simpson's paradox to always to break down the data by as many
 	(2) edge (3)
 	(2) edge (1);
 \end{tikzpicture}
-\caption{Another causal network that can exhibit Simpson's paradox. In this case, \quotes{the solution} is not to stratify on $Z$.}
-\label{fig:simpsons_paradox2}
 \end{figure}
 
 Note that we have not changed the data itself, only the description of the variables that it is associated with. This illustrates that the resolution to Simpson's paradox lies fundamentally not in the data, but in the assumptions we are willing to make. From a purely statistical viewpoint there is no paradox. The reversal just stems from the mathematical property of ratios expressed in equation \ref{eqn:simpsons_paradox} and represented graphically in figure \ref{fig:simpsons_vector}. The paradox only arises when we attempt to use the data to select an intervention and is resolved when we apply a causal approach to do so.
@@ -905,9 +905,9 @@ Note that we have not changed the data itself, only the description of the varia
 
 \begin{figure}
 \centering
-\includegraphics[scale=.4]{figures/simpson_vector}
 \caption{Simpson's reversal visualised. The ratios involving $N_i'$ are steeper than than those involving $N_i$ for both the blue and green vectors. However, when we sum them, the ratio is steeper for the un-primed variables.}
 \label{fig:simpsons_vector}
+\includegraphics[scale=.4]{figures/simpson_vector}
 \end{figure}
 
 There are many other plausible causal graphs for both scenarios above. Perhaps income affects drug choice as well as gender, or gender might affect treatment choice and blood pressure control given treatment, etc. Causal modelling provides a powerful tool to specify such assumptions and to determine how to estimate causal effects for a given model see section \ref{sec:causal effect estimation}.
@@ -956,6 +956,8 @@ The statement that $X$ is conditionally independent of $Y$ given $Z$ implies tha
 The structure in figure \ref{fig:dseptripple4} is referred to as a collider or v-structure. The somewhat counter-intuitive result that conditioning on $Z$ introduces dependence between $X$ and $Y$ is called the \textit{explaining away phenomena}. As an example, consider a scholarship available to female or disadvantaged students. Let $X$ be gender, $Y$ be family background and $Z$ receipt of the scholarship. There are roughly equal numbers of boys and girls in both poor and wealthy families so $X$ and $Y$ are independent. However, if we know a student is receiving a scholarship then learning that they are male  increases the probability that they are disadvantaged.
 \begin{figure}[h]
 \centering
+\caption{All possible two edge paths from $X$ to $Y$ via $Z$}
+\label{fig:dseptriples}
 \begin{subfigure}[t]{0.2\textwidth}
 \centering
 \caption{$X \ci Y| Z$}
@@ -1012,8 +1014,6 @@ The structure in figure \ref{fig:dseptripple4} is referred to as a collider or v
     (3) edge node {} (1);	
 \end{tikzpicture}
 \end{subfigure}
-\caption{All possible two edge paths from $X$ to $Y$ via $Z$}
-\label{fig:dseptriples}
 \end{figure}
 
 \vspace{.3cm}
@@ -1057,6 +1057,8 @@ If $(\boldsymbol{Y} \ci \boldsymbol{W} | \boldsymbol{Z},\boldsymbol{X})$ in $G_{
 
 \begin{figure}[h]
 \centering
+\caption{Rule 1 example. $(Y \ci W|X)$ in  $G_{\overline{\boldsymbol{X}}} \implies \P{Y|do(X),W} = \P{Y|do(X)}$ }
+\label{fig:mutilatednet}
 \begin{subfigure}[t]{0.3\textwidth}
 \centering
 \caption{original network, $G$}
@@ -1099,8 +1101,6 @@ If $(\boldsymbol{Y} \ci \boldsymbol{W} | \boldsymbol{Z},\boldsymbol{X})$ in $G_{
     
 \end{tikzpicture}
 \end{subfigure}
-\caption{Rule 1 example. $(Y \ci W|X)$ in  $G_{\overline{\boldsymbol{X}}} \implies \P{Y|do(X),W} = \P{Y|do(X)}$ }
-\label{fig:mutilatednet}
 \end{figure}
 
 \subsubsection{Rule 2: (exchanging actions with observations)}
@@ -1126,6 +1126,8 @@ do(\boldsymbol{Z}=\boldsymbol{z}),
 
 \begin{figure}[h]
 \centering
+\caption{An example of rule 2 with a single intervention $(Y \ci X|W)$ in  $G_{\underline{\boldsymbol{X}}} \implies \P{Y|do(X),W} = \P{Y|X,W}$. In this example, observing $X$ provides information about $Y$ both directly and indirectly, because knowing $X$ tells us something about $W$ which also influences $Y$. If we condition on $W$, we block this indirect path.}
+\label{fig:rule2}
 \begin{subfigure}[t]{0.29\textwidth}
 \centering
 \caption{original network, $G$}
@@ -1179,12 +1181,12 @@ do(\boldsymbol{Z}=\boldsymbol{z}),
     
 \end{tikzpicture} 
 \end{subfigure}
-\caption{An example of rule 2 with a single intervention $(Y \ci X|W)$ in  $G_{\underline{\boldsymbol{X}}} \implies \P{Y|do(X),W} = \P{Y|X,W}$. In this example, observing $X$ provides information about $Y$ both directly and indirectly, because knowing $X$ tells us something about $W$ which also influences $Y$. If we condition on $W$, we block this indirect path.}
-\label{fig:rule2}
 \end{figure}
 
 \begin{figure}[h]
 \centering
+\caption{An example of applying equation \ref{eq:Do2}. In this case $(Y \ci X|Z) \text{ in } G_{\underline{X}\overline{Z}}\implies \P{Y|do(X=x),do(Z=z)} = \P{Y|X=x,do(Z=z)}$. Observing, rather than intervening, on $Z$ would not have allowed us to exchange $do(X=x)$ for $X=x$. Conditioning on $Z$ does block the indirect path $X-Z-V-Y$ but opens $X-U-Z-V-Y$.  }
+\label{fig:rule2_2}
 \begin{subfigure}[t]{0.29\textwidth}
 \centering
 \caption{original network, $G$}
@@ -1244,8 +1246,6 @@ do(\boldsymbol{Z}=\boldsymbol{z}),
     (5) edge (3);
 \end{tikzpicture} 
 \end{subfigure}
-\caption{An example of applying equation \ref{eq:Do2}. In this case $(Y \ci X|Z) \text{ in } G_{\underline{X}\overline{Z}}\implies \P{Y|do(X=x),do(Z=z)} = \P{Y|X=x,do(Z=z)}$. Observing, rather than intervening, on $Z$ would not have allowed us to exchange $do(X=x)$ for $X=x$. Conditioning on $Z$ does block the indirect path $X-Z-V-Y$ but opens $X-U-Z-V-Y$.  }
-\label{fig:rule2_2}
 \end{figure}
 
 \subsubsection{Rule 3: (adding or removing actions)}
@@ -1271,6 +1271,8 @@ The statement that $\boldsymbol{Y} \ci \boldsymbol{\hat{X}}$ (without conditioni
 
 \begin{figure}[h]
 \centering
+\caption{Example application of equation \ref{eq:Do3}. $(Y \ci \hat{X}|W,Z) \implies \P{Y|do(X),W,Z} = \P{Y|W,Z}$. We have to condition on $Z$ because conditioning on $W$ blocks the path $\hat{X}-X-W-Y$ but opens $\hat{X}-X-Z-Y$.}
+\label{fig:rule3}
 \begin{subfigure}[t]{0.29\textwidth}
 \centering
 \caption{original network, $G$}
@@ -1324,8 +1326,6 @@ The statement that $\boldsymbol{Y} \ci \boldsymbol{\hat{X}}$ (without conditioni
     (4) edge (3);
 \end{tikzpicture} 
 \end{subfigure}
-\caption{Example application of equation \ref{eq:Do3}. $(Y \ci \hat{X}|W,Z) \implies \P{Y|do(X),W,Z} = \P{Y|W,Z}$. We have to condition on $Z$ because conditioning on $W$ blocks the path $\hat{X}-X-W-Y$ but opens $\hat{X}-X-Z-Y$.}
-\label{fig:rule3}
 \end{figure}
 
 
@@ -1348,6 +1348,8 @@ Figure \ref{fig:identify} shows some examples of identifiable and non identifiab
 
 \begin{figure}[h]
 \centering
+\caption{Examples of identifiable and non-identifiable queries. In subfigures (a), (b) and (c) the causal query $\P{Y|do(X)}$ is identifiable. In subfigures (d), (e) and (f) it is not.}
+\label{fig:identify}
 \begin{subfigure}[t]{0.29\textwidth}
 \centering
 \caption{}
@@ -1448,8 +1450,6 @@ Figure \ref{fig:identify} shows some examples of identifiable and non identifiab
     (1) edge (3);
 \end{tikzpicture} 
 \end{subfigure}
-\caption{Examples of identifiable and non-identifiable queries. In subfigures (a), (b) and (c) the causal query $\P{Y|do(X)}$ is identifiable. In subfigures (d), (e) and (f) it is not.}
-\label{fig:identify}
 \end{figure}
 
 
@@ -1517,6 +1517,8 @@ The backdoor criterion derives from rule 2 of the do-calculus. Selecting which c
 
 \begin{figure}
 \centering
+\caption{}
+\label{fig:adjustment}
 \begin{subfigure}[t]{0.48\textwidth}
 \centering
 \caption{There can be multiple valid adjustment sets. $Z_1$ or $Z_2$ or $\set{Z_1,Z_2}$ all block the backdoor path from $X$ to $Y$.}
@@ -1550,11 +1552,7 @@ The backdoor criterion derives from rule 2 of the do-calculus. Selecting which c
     (5) edge (2) edge (1);
 \end{tikzpicture} 
 \end{subfigure}
-\caption{}
-\label{fig:adjustment}
 \end{figure}
-
-\todo{fix this caption}
 
 Given that a set of variables $\boldsymbol{Z}$ satisfies the backdoor criterion (or equivalently the conditional ignorability assumption), the interventional distribution is asymptotically identifiable and can be estimated from equation \ref{eqn:backdoor}. The expected value of $Y$ after the intervention $do(X=x)$ is given by equation \ref{eqn:expected_post_intervention} and the average causal effect for a binary intervention $x \in \set{0,1}$ is given by equation \ref{eqn:ace_ignoreable}.
 
@@ -1629,10 +1627,10 @@ If the parametric model is miss-specified then the parameter that minimises the 
 
 \begin{figure}[h]
 \centering
-\includegraphics[scale=.55]{covariate_shift_estimation.pdf}
 \caption{
 Parametric regression may yield poor estimates of causal effects if the model is miss-specified, even if the model fits well over the domain of the training data. In this example, $\P{Z|X=0} \sim N(\mu_0,\sigma_0^2)$ and $\P{Z|X=1} \sim N(\mu_1,\sigma_1^2)$ with little overlap in the densities. If $X=0$ then $Y \sim N(f_1(x)=sin(x),\sigma_y^2)$ and if $X=1$ then $Y \sim N(f_0(x) = \frac{1}{x+1},\sigma_y^2)$. We estimate $f_1(z)$ from the sample in which $X=1$ (green points) and $f_0(z)$ from the sample for which $X=0$ (blue points). In both cases the linear model is a good fit to the data. However, the resulting estimate of the causal effect is very poor for the lower values of $z$. } 
 \label{fig:covariate_shift_adjust}
+\includegraphics[scale=.55]{covariate_shift_estimation.pdf}
 \end{figure}
 
 
@@ -1788,6 +1786,8 @@ There are an number of difficulties in extending the approach of the last sectio
 
 \begin{figure}
 \centering
+\caption{A distribution faithful to this DAG is not faithful to any DAG over the variables $\{A,B,C,D\}$ after marginalising over $U$. }
+\label{fig:DAGSnotclosed}
  \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,  thick,main node/.style={observed},lt/.style={latent}]
  %nodes
 \node[lt](1){U}; 
@@ -1803,8 +1803,6 @@ There are an number of difficulties in extending the approach of the last sectio
     (5) edge node {} (3);
     	
 \end{tikzpicture}
-\caption{A distribution faithful to this DAG is not faithful to any DAG over the variables $\{A,B,C,D\}$ after marginalising over $U$. }
-\label{fig:DAGSnotclosed}
 \end{figure}
  
 \begin{theorem}
@@ -1827,6 +1825,8 @@ The circles indicate where it is ambiguous if there should be an arrowhead (IE w
 
 \begin{figure}
 \centering
+\caption{FCI examples: true graph and FCI output}
+\label{fig:FCIExamples}
  \begin{subfigure}[t]{0.4\textwidth}
  \centering
  \caption{True DAG}
@@ -1899,8 +1899,6 @@ The circles indicate where it is ambiguous if there should be an arrowhead (IE w
     (3) edge [pil] node {} (1);    	
 \end{tikzpicture}
 \end{subfigure}
-\caption{FCI examples: true graph and FCI output}
-\label{fig:FCIExamples}
 \end{figure} 
 
 The FCI algorithm can be made complete such that it discovers all aspects of the true causal structure that are identifiable from the conditional independence relations of a distribution over observed variables and the faithfulness assumption \citep{Zhang2008}. More recently \citet{Colombo2012} have proposed the RFCI algorithm, which in some cases returns more ambiguous links than FCI but is substantially faster. \citet{Claassen2013} point out that the problem of learning sparse causal networks from data is not NP-hard and propose the FCI+ algorithm, that requires $O(N^{2(k+2)})$ conditional independence tests, where $k$ is the maximum node degree over the observed variables. 
@@ -1949,6 +1947,8 @@ The previous sections all focus on aspects of the question; how can we estimate 
 Randomised controlled trials are often presented as the gold standard for determining causal effects. What is it about randomisation that makes it so important when it comes to causality? The graphical model for a randomised controlled experiment is shown in figure \ref{fig:random_experiment_network}. If we assume perfect compliance (everyone takes the treatment that we select for them) then we have a perfect model for the treatment assignment process. Since treatment is assigned randomly, there can be no other variables that influence it and thus no confounding variables that effect both treatment and outcome. 
 
 \begin{figure}
+\caption{causal network for a randomised experiment}
+\label{fig:random_experiment_network}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=3em,thick, node/.style={observedrect}, lt/.style={latent}]
 \node[node](1){Treatment};
@@ -1960,8 +1960,6 @@ Randomised controlled trials are often presented as the gold standard for determ
 	(1) edge (3)
 	(4) edge (3);
 \end{tikzpicture}
-\caption{causal network for a randomised experiment}
-\label{fig:random_experiment_network}
 \end{figure} 
 
 Randomisation does not ensure target and control group are exactly alike. The more other features (observed or latent) influence the outcome, the more likely it is that there will be a significant difference in the joint distribution of these variables between the target and control groups in a finite data sample. However, the variance in the outcome, within both the target and control groups, also increases. The net result is increased variance (but not bias) in  the estimate of causal effects. 
@@ -1969,6 +1967,8 @@ Randomisation does not ensure target and control group are exactly alike. The mo
 Stratified randomised experiments address the issue of variance due to covariate imbalance by randomly allocating treatment conditional on covariates believed to influence the outcome of interest. If we stratify in such a way that the probability an instance receives a given treatment is independent of its covariates, for example, by grouping instances by each assignment to the covariates and then assigning treatment randomly with fixed probabilities, the causal graphical model in figure \ref{fig:random_experiment_network} still holds and we can estimate the average causal effects directly from the differences in outcome across treatments. More complex stratification strategies can introduce a backdoor path from treatment to outcome via the covariates on which treatment is stratified, see figure \ref{fig:random_experiment_network_stratified}, necessitating that one condition on these covariates in computing the average casual effect in the same way as for estimating causal effects under under ignorability \S\ref{sec:causal_effect_under_ignorability}. The key difference is that the propensity score is known, as it is designed by the experimenter, and there are guaranteed (rather than assumed) to be no latent confounding variables (that influence both treatment and outcome). See \citet{imbens2015causal} for a discussion of the trade-offs between stratified versus completely random experiments. 
 
 \begin{figure}
+\caption{causal network for a stratified randomised experiment if the probability an individual is assigned a given treatment depends on some covariates.}
+\label{fig:random_experiment_network_stratified}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=3em,thick, node/.style={observedrect}, lt/.style={latent}]
 \node[node](1){Treatment};
@@ -1983,8 +1983,6 @@ Stratified randomised experiments address the issue of variance due to covariate
 	(4) edge (3)
 	(5) edge (3) edge (1);
 \end{tikzpicture}
-\caption{causal network for a stratified randomised experiment if the probability an individual is assigned a given treatment depends on some covariates.}
-\label{fig:random_experiment_network_stratified}
 \end{figure} 
 
 The benefit provided by randomisation in breaking the link between the treatment variable and any latent confounders should not be understated. The possibility of unobserved confounders cannot be empirically ruled out from observational data \citep{Pearl2000} (there is no test for confounding). This means causal estimates from non-experimental data are always subject to the criticism that an important confounder may have been overlooked or not properly adjusted for. However, randomised experiments do have some limitations. 
@@ -1995,6 +1993,8 @@ The benefit provided by randomisation in breaking the link between the treatment
 The idealised notion of an experiment represented by figure \ref{fig:random_experiment_network} does not capture the complexities of randomised experiments in practice. There may be imperfect compliance, the treatment selected by the randomiser is not always followed, or output censoring, the experimenter is not able to observe the outcome for all units (for example if people drop out). If compliance or attrition is not random but associated with (potentially latent) variables that also effect the outcome then the problem of confounding bias returns.\footnote{Non-compliance is a problem if the goal is to estimate the causal effect of the treatment on the outcome but not if the goal is to estimate the causal effect of prescribing the treatment. The latter makes sense in a context where the process by which people decide whether or not to take the treatment they have been prescribed is likely to be the same if the treatment were made available more generally beyond experimental trial.} See figure \ref{fig:random_experiment_network_imperfect_compliance} for a the graphical model of a randomised experiment with imperfect compliance.
 
 \begin{figure}
+\caption{causal network for a randomised experiment with imperfect compliance}
+\label{fig:random_experiment_network_imperfect_compliance}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=3em,thick, node/.style={observedrect}, lt/.style={latent}]
 \node[node](1){Actual Treatment};
@@ -2008,18 +2008,16 @@ The idealised notion of an experiment represented by figure \ref{fig:random_expe
 	(1) edge (3)
 	(4) edge (3) edge (1);
 \end{tikzpicture}
-\caption{causal network for a randomised experiment with imperfect compliance}
-\label{fig:random_experiment_network_imperfect_compliance}
 \end{figure} 
 
 It is not always possible or ethical to conduct a randomised controlled trial as is beautifully demonstrated by the paper of \citet{smith2003parachute} on randomised cross-over trials of parachute use for the reduction of the mortality and morbidity associated with falls from large heights \ref{fig:parashute}. When experimentation is possible, it is frequently difficult or expensive. This means experimental data sets are often much smaller than observational ones, limiting the complexity of models we can explore. In addition, they are often conducted on a convenient but unrepresentative sample of the broader population of interest (for example first year students at research universities). This can result in estimates with high \emph{internal validity} \citep{Campbell1963} in that they should replicate well in a similar population, but very low \emph{external validity}; the results may not carry over to the general population of interest. The question of whether an experiment conducted on one population can be mapped to another is referred to as the transportability problem \citep{Bareinboim2013} and relies on very similar assumptions and arguments to causal inference and the do-calculus. 
 
 \begin{figure}
 \begin{center}
-\includegraphics[scale=.4]{double_blind_parashute_trial_cartoon.png}
-\end{center}
 \caption{Experiments are not always ethical; an illustration of a randomised cross-over trial of parachutes for the prevention of morbidity and mortality associated with falls from large heights.}
 \label{fig:parashute}
+\includegraphics[scale=.4]{double_blind_parashute_trial_cartoon.png}
+\end{center}
 \end{figure}
 
 Finally, non-adaptive randomised experiments are not optimal from either an active or reinforcement learning perspective. As an experiment proceeds information is obtained about the expectation and variance of each intervention (or treatment). Fixed experimental designs cannot make use of this information to select which intervention to try next. This results in both poorer estimates for a fixed number of experimental samples and more sub-optimal actions during the course of the experiment.
@@ -2066,9 +2064,9 @@ The adaptive nature of multi-armed bandit algorithms complicates the design and 
 
 \begin{figure}[h]
 \centering
-\includegraphics[scale=1]{extreme_early_stopping}
 \caption{Standard empirical estimators can be biased if the number of samples, $n$, is not fixed in advance, but is a random variable that depends on the values of previous samples. This example plots the distribution (over $10^6$ simulations) of $\hat{\mu} = \frac{1}{n}\sum_{i=1}^n X_i$, where $X_i \sim Bernoulli(0.2)$. In each simulation, we stop taking samples if the average value of $X_i$ up to that point exceeds a threshold of $0.3$ or $n$ reaches $100$. $\E{\hat{\mu}} = 0.439$. The estimator is substantially biased above $\E{X_i} = 0.2$ by the early stopping. Note that excluding experiments that were stopped early creates a bias in the opposite direction, $\E{\hat{\mu}|n=100} = 0.185$, as trials that obtained positive results early are excluded. This has some interesting potential real world implications. Early stopping of clinical trials is controversial. A researcher conducting a meta-analysis who wished to avoid (rather than bound) bias due to early stopping would have to exclude not only those trials which were stopped early but those which \emph{could} have been stopped early.}
 \label{fig:early_stopping}
+\includegraphics[scale=1]{extreme_early_stopping}
 \end{figure}
 
 There are a few key principles that are used to guide the development of bandit algorithms. The simplest is to explicitly separate exploration from exploitation and base estimation of the expected rewards of each arm only on the data generated during exploration steps. A common example in practice is uniform exploration (or A/B testing) for some fixed period followed by selecting the action found to be best during the exploration phase. This results in simpler analysis, particularly if the number of exploration steps is fixed in advance, however it is sub-optimal, even if the exploration period is adaptive \citep{NIPS2016_6179}. 
@@ -2105,9 +2103,9 @@ Somewhat unintuitively, the regret increases as the value of the arms gets close
 }  
 
 \begin{figure}
-\includegraphics[scale=1]{ucb_regret_vs_delta}
 \caption{The regret bound in equation \ref{eqn:ucb_problem_dependent_regret} grows as the differences between the expected rewards for each arm shrink. The solid curve shows the mean (cumulative) regret, over a 1000 simulations for a 2-armed, Bernoulli bandit with fixed horizon, $T = 500$, as a function of the difference in the expected reward for the arms $\Delta$. The dashed curves show the corresponding upper bounds; $T\Delta$ and equation \ref{eqn:ucb_problem_dependent_regret}}
 \label{fig:ucb_regret_vs_delta}
+\includegraphics[scale=1]{ucb_regret_vs_delta}
 \end{figure}
 
 The form of the dependence on the number of arms $k$ and horizon $T$ differs between the problem dependent and worst case regret. The problem dependent regret grows linearly with the number of arms, $k$, and logarithmically with $T$. The difference stems from the fact the problem dependent regret defines how the regret grows for a given set of reward distributions as $T$ increases, whereas in the worst case regret, the gap between expected rewards is varied as a function of $T$. \citet{Auer1995} show that the worst case regret for the k-armed bandit problem is lower bounded by $\regret \in \bigomega{\sqrt{kT}}$
@@ -2115,9 +2113,9 @@ The form of the dependence on the number of arms $k$ and horizon $T$ differs bet
 Subtle modifications to the UCB algorithm can eliminate the logarithmic term equation \ref{eqn:ucb_worst_case_regret}. This yields regret $ \bigo{\sqrt{TK}}$ and closes the gap with the worst case lower bound \citep{Audibert2009,Lattimore2015}, whilst retaining a good problem dependent bound of the form achieved by UCB \citep{Lattimore2015}.
 
 \begin{figure}
-\includegraphics[scale=1]{upper_bound_vs_actual_average_regret}
 \caption{The actual performance of the UCB algorithm can be substantially better than suggested by the upper bound, particularly for small $T$. The solid curve shows the mean expected regret associated with the sequence of arms chosen by UCB-1 with $k=2$ arms and the rewards sampled from $bernoulli([.3,.7])$ over 1000 simulations. The dashed curve shows the corresponding upper bound given by the minimum of $T\Delta_{max}$ and equation\ref{eqn:ucb_problem_dependent_regret}.}
 \label{fig:ucb_upperbound_vs_actual_performance}
+\includegraphics[scale=1]{upper_bound_vs_actual_average_regret}
 \end{figure}
 
 Finally, there is the heuristic principle of playing each arm with probability proportional to the likelyhood that it is optimal. This approach is generally called Thompson sampling as it was the method proposed in the original bandit paper by \citet{Thompson1993}. Thompson sampling has strong empirical performance, \citep{chapelle2011empirical}. However, it is complex to analyse, \citet{kaufmann2012thompson} demonstrate that it obtains optimal problem dependent bounds, \citet{agrawal2013further} show that it obtains worst case regret of $\bigo{\sqrt{kT\log(T)}}$, equivalent to UCB. 
@@ -2178,6 +2176,7 @@ The seminal algorithm for adversarial bandits is Exp-3 \citep{Auer2002}, which, 
 Adversarial bandits appear to be more applicable to real world problems because they do not assume that the rewards associated with each arm are constant over time or independent of the previous actions of the learner. However, pseudo-regret, as defined in equation \ref{eqn:pseudo_regret-adversarial}, is not a good measure of an algorithms performance in such cases because it is defined with respect to playing the single arm with the best average return over the game. In settings were the rewards change over time, the pseudo-regret can be negative, see figure \ref{fig:non-stationary-bandit}, so upper bounds on the pseudo-regret do not reflect how sub-optimal the algorithm may be. Adversarial bandit algorithms may perform better in non-stationary settings than standard stochastic policies to the extend that they explore more (to avoid the adversary simulating their behaviour), however it is preferable to develop algorithms specifically for non-stationary settings (subject to assumptions about how rapidly or frequently rewards can change), see for example \citep{garivier2008upper,Garivier2011a,Besbes2014}. 
 
 \begin{figure}[h]
+  \caption{The pseudo-regret can be negative if rewards are non-stationary. This example shows the results of 1000 simulations of running the UCB-1 algorithm on a 2-armed Bernoulli bandit problem where the expected rewards change linearly over time, up to a horizon $T=10,000$. Figure (a) shows the expected rewards of each arm, and the proportion of time that arm-1 is played, as a function of time. The single best-arm is arm-1 as it has the highest expected reward (averaged over $t$). An oracle that selects arm-1 in every round obtains an expected reward of $5,000$. However, despite not being designed to do so, the UCB-algorithm can adapt to the changing reward distribution to obtain consistently higher rewards. The distribution of regret over the 1000 simulations is shown in figure (b).}\label{fig:non-stationary-bandit}
     \begin{subfigure}[t]{0.49\textwidth}
 	\centering   
 	 \caption{Behaviour over time}\label{fig:non-stationary-bandit-time} 
@@ -2189,7 +2188,6 @@ Adversarial bandits appear to be more applicable to real world problems because 
         \label{fig:non-stationary-bandit-regret}
         \includegraphics[scale=.5]{non-stationary-bandit-regret}
     \end{subfigure}
-      \caption{The pseudo-regret can be negative if rewards are non-stationary. This example shows the results of 1000 simulations of running the UCB-1 algorithm on a 2-armed Bernoulli bandit problem where the expected rewards change linearly over time, up to a horizon $T=10,000$. Figure (a) shows the expected rewards of each arm, and the proportion of time that arm-1 is played, as a function of time. The single best-arm is arm-1 as it has the highest expected reward (averaged over $t$). An oracle that selects arm-1 in every round obtains an expected reward of $5,000$. However, despite not being designed to do so, the UCB-algorithm can adapt to the changing reward distribution to obtain consistently higher rewards. The distribution of regret over the 1000 simulations is shown in figure (b).}\label{fig:non-stationary-bandit}
 \end{figure}
 
 \subsection{Contextual bandits}
@@ -2239,6 +2237,8 @@ It is worth noting that definition \ref{def:contextual-bandit-problem} does not 
 
 \begin{figure}[h]
 \centering
+\caption{Several potential causal graphical models for the contextual bandit problem (if actions are selected at random). $\vec{X}$ and $\vec{Y}$ represent the context and reward vectors respectively, and $Y = \vec{Y}^a$ is the reward received by the learner, which is a deterministic function of $\vec{Y}$ and $a$. Regardless of the causal structure, observing the context $\vec{X}$ provides information about the vector of rewards $\vec{Y}$. To represent a realistic (contextual) bandit problem, where actions are not selected at random, we would need to \quotes{unroll} the graphs, such that there was a copy for each time-step $t$ and allow the action $A_t$ to depend on the context $\vec{X}_t$ and the previous observations $(\vec{X},A,Y)_1^{t-1}$. }
+\label{fig:contextual-bandit-causal-graph}
 \begin{subfigure}[t]{0.29\textwidth}
 \centering
 \caption{$\vec{X}$ causes $\vec{Y}$}
@@ -2291,8 +2291,6 @@ It is worth noting that definition \ref{def:contextual-bandit-problem} does not 
    (5) edge (4) edge (1);
 \end{tikzpicture}
 \end{subfigure}
-\caption{Several potential causal graphical models for the contextual bandit problem (if actions are selected at random). $\vec{X}$ and $\vec{Y}$ represent the context and reward vectors respectively, and $Y = \vec{Y}^a$ is the reward received by the learner, which is a deterministic function of $\vec{Y}$ and $a$. Regardless of the causal structure, observing the context $\vec{X}$ provides information about the vector of rewards $\vec{Y}$. To represent a realistic (contextual) bandit problem, where actions are not selected at random, we would need to \quotes{unroll} the graphs, such that there was a copy for each time-step $t$ and allow the action $A_t$ to depend on the context $\vec{X}_t$ and the previous observations $(\vec{X},A,Y)_1^{t-1}$. }
-\label{fig:contextual-bandit-causal-graph}
 \end{figure}
 
 \subsection{Learning from logged bandit data}
@@ -2310,6 +2308,8 @@ As in estimating average causal effects under ignorability, we have a covariate 
 
 \begin{figure}
 \centering
+\caption{Causal graphical model for learning from logged feedback data under the assumption the original policy $\pi$ for selecting actions was stationary and dependent only on some observed context $\vec{X}$, $a \sim \pi(\vec{x})$}
+\label{fig:off-policy-evaluation}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={observed},lt/.style={latent}]
 \node[main node](1){$\vec{X}$};
@@ -2319,8 +2319,6 @@ As in estimating average causal effects under ignorability, we have a covariate 
    (3) edge (2)
    (1) edge (2) edge (3);
 \end{tikzpicture} 
-\caption{Causal graphical model for learning from logged feedback data under the assumption the original policy $\pi$ for selecting actions was stationary and dependent only on some observed context $\vec{X}$, $a \sim \pi(\vec{x})$}
-\label{fig:off-policy-evaluation}
 \end{figure}
 
 
@@ -2341,6 +2339,8 @@ In the next chapter, I propose a very natural connection between causal graphs a
 A natural way to connect the causal framework with the bandit setting is to model the action space as interventions on variables in a causal directed acyclic graph. Each possible assignment of variables to values is a potential action (or bandit arm), see figure \ref{fig:unify_frameworks} for a simple example. In some settings, it makes sense to restrict the action space available to the agent to a subset of all the possible actions, for example the set of single variable interventions. The reward could be a general function of the action selected and the final state of the graph. However for simplicity, we will consider the reward to be the value of a single specified node. We refer to these problems as \emph{causal bandit problems}. In this thesis I focus on the case where the causal graph is known. Extending this work to simultaneously learning the casual graph is discussed in \S\ref{sec:causal_bandit_discussion}.
 
 \begin{figure}
+\caption{A simple causal graphical model and corresponding complete action space. $W$ and $Z$ represent binary variables that can be intervened on and $Y$ represents the reward.}
+\label{fig:unify_frameworks}
 \centering
 \begin{subfigure}[c]{0.3\textwidth}
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=3em,thick,main node/.style={observed}, tg/.style={target}]
@@ -2368,8 +2368,6 @@ $\actionspace$ = \begin{tabular}{|c|}
   \hline
 \end{tabular}
 \end{subfigure}
-\caption{A simple causal graphical model and corresponding complete action space. $W$ and $Z$ represent binary variables that can be intervened on and $Y$ represents the reward.}
-\label{fig:unify_frameworks}
 \end{figure} 
 
 The type of problem we are concerned with is best illustrated with an example. Consider a farmer wishing to optimise the yield of her crop. She knows that crop yield is only affected by temperature, a particular soil nutrient, and moisture level but the precise effect of their combination is unknown. In each season the farmer has enough time and money to intervene and control at most one of these
@@ -2401,6 +2399,8 @@ P(Y|do(W = 0)) &= P(Y|do(),W = 0) \\
 }
 
 \begin{figure}
+\caption{Example causal graph (based on \citet{Koller2009}) where the outcome of interest (reward) is cholesterol level . The do-calculus can be applied to eliminate some actions immediately without the need to do any experiments. For example, no actions involving 'Test Result' need to be considered and interventions on 'Diet' do not need to be considered in conjunction with any other variables.}
+\label{fig:cholesterol_graph}
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},tg/.style={targetrect}]
 \node[node](1){Health conscious};
@@ -2417,8 +2417,6 @@ P(Y|do(W = 0)) &= P(Y|do(),W = 0) \\
 	(5) edge (6)
 	(7) edge (3);
 \end{tikzpicture}
-\caption{Example causal graph (based on \citet{Koller2009}) where the outcome of interest (reward) is cholesterol level . The do-calculus can be applied to eliminate some actions immediately without the need to do any experiments. For example, no actions involving 'Test Result' need to be considered and interventions on 'Diet' do not need to be considered in conjunction with any other variables.}
-\label{fig:cholesterol_graph}
 \end{figure}
 
 
@@ -2467,6 +2465,7 @@ The causal model for this class of problems has $N$ binary variables $\{ X_1, \l
 In the farming example from the introduction, $X_1$ might represent temperature (\eg, $X_1=0$ for low and $X_1=1$ for high). The interventions $do(X_1 = 0)$ and $do(X_1 = 1)$ indicate the use of shades or heat lamps to keep the temperature low or high, respectively.
 
 \begin{figure}
+  \caption{Causal Models}\label{fig:causalmodels}
     \begin{subfigure}[t]{0.34\textwidth}
 	\centering   
 	 \caption{Parallel graph}\label{fig:parallel} 
@@ -2518,7 +2517,6 @@ In the farming example from the introduction, $X_1$ might represent temperature 
     (4) edge (5);
 \end{tikzpicture}
     \end{subfigure}
-      \caption{Causal Models}\label{fig:causalmodels}\label{fig:causal_models_causal_bandit}
 \end{figure}
 
 
@@ -3189,6 +3187,8 @@ Y & \sim N(w_{yu}U +w_{yz}Z + w_{yx}X , V_y)
 
 \begin{figure}[h]
 \centering
+\caption{ }
+\label{fig:careful_with_priors}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={observed},lt/.style={latent}]
 
@@ -3206,8 +3206,6 @@ Y & \sim N(w_{yu}U +w_{yz}Z + w_{yx}X , V_y)
     (4) edge (1) edge (3);
 	
 \end{tikzpicture} 
-\caption{ }
-\label{fig:careful_with_priors}
 \end{figure}
 
 
