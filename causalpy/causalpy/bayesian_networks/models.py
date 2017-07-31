@@ -1,6 +1,8 @@
 import numpy as np
+import numbers
 from sympy import Symbol, Matrix
 from itertools import product
+from sympy.core import Float
 
 def set_difference(lst1,lst2):
     """ returns the elements and indicies of elements in lst1 that are not in lst2"""
@@ -79,12 +81,6 @@ class DiscreteFactor(object):
     def condition(self,variables,values):
         return 1
 
-d1 = DiscreteFactor(['X','Y'],[2,2],['a','b','c','d'])
-d2 = DiscreteFactor(['Y'],[2],['e','f'])
-d3 = d1.multiply(d2)
-print d3.data
-
-
 
 class DiscreteBN(object):
     def __init__(self):
@@ -137,21 +133,7 @@ class DiscreteBN(object):
         
     def _p_symbol(self,variable,assignment):
         return Symbol("P"+variable+"_"+"".join([str(a) for a in assignment]))
-        
-   
-        
-        
-        
-bn = DiscreteBN()
-bn.add_var('Z',2,prob_table=[.1,.9])
-bn.add_var('X',2,['Z'])
-bn.add_var('Y',2,['X'])  
-for c in bn._conditionals:
-    print "c",c
-print bn.joint    
-
     
-
 class LinearGaussianBN(object):
     """
     A Bayesian network in which all variables are linear functions of their parents plus additive gaussian noise.
@@ -179,7 +161,35 @@ class LinearGaussianBN(object):
         model._weights_p =self._weights_p.copy()
         model._variance_p = self._variance_p.copy()
         return model 
+        
+    def __str__(self):
+        result = ""
+        for variable in self.variables:
+            parent_list = self.parents(variable)
+            weights = self.get_weights(variable)
+            equation = str(weights[0])
+            for i, p in enumerate(parent_list):
+                w = weights[i+1]
+                if isinstance(w,Float):
+                    w = float(w)
+                try:
+                    equation += " + {0:g}*{1}".format(w,p)
+                except ValueError:
+                    equation += " + {0}*{1}".format(w,p)
+                    
+            if equation.startswith("0 +"):
+                equation = equation[4:]
+                
+            v = self.get_variance(variable)
+            result += "{0} ~ N({1} ; {2})\n".format(variable,equation,v)
+        return result
+            
 
+    def get_variance(self,variable):
+        return self._variance[variable]
+    
+    def get_weights(self,variable):
+        return self._weights[variable]
     
     def _variance_symbol(self,variable):
         """returns a symbol for the variance of variable string specified."""
@@ -196,6 +206,7 @@ class LinearGaussianBN(object):
         - variable: a string representing the variable
         - parents: a list of the names of the parents of this variable (must already be in the network)
         - weights (optional): the weights of this variable to its parents. The first entry should be the offset
+        - variance: the variance of this variable after conditioning on its parents values.
         """
         if parents is None:
             parents = []
@@ -205,30 +216,25 @@ class LinearGaussianBN(object):
         if variable in self._variables:
             raise ValueError("Duplicate variable name, variable {v} already exists in this network".format(v = variable))
         
+        if variance is None:
+            variance = self._variance_symbol(variable)
+        
         if weights is None:
             beta = [self._weight_symbol(variable,v) if v in parents else 0 for v in self._variables]
             mu = self._weight_symbol(variable,None)
-            self._weights[variable] = Matrix([mu] + [self._weight_symbol(variable,v) for v in parents]) # order is with respect to parents as specified (not covariance matrix index)
-
+            weights = [mu]+[self._weight_symbol(variable,v) for v in parents]
+            
         else:
             if len(weights) != len(parents) + 1:
                 raise ValueError("""The vector of weights has length {0} but should be of length {1}, 
                                      (offset, weight_parent_1, weight_parent_2, ...,weight_parent_n)""".format(len(weights),len(parents)+1))
-            symbolic_weights = [Symbol(w) if isinstance(w,str) else w for w in weights]
-            symbol_dict = dict(zip(parents,symbolic_weights[1:]))
+           
+            weights = [w if isinstance(w,numbers.Number) else Symbol(w) for w in weights]
+            symbol_dict = dict(zip(parents,weights[1:]))
             beta = [symbol_dict[v] if v in parents else 0 for v in self.variables]
-            mu = Symbol(weights[0]) if isinstance(weights[0],str) else weights[0]
-            self._weights[variable] = Matrix(symbolic_weights)
-        
-        if variance is None:
-            variance = self._variance_symbol(variable)
-        
-        self._variance[variable] = variance
-        v = variance   
+            mu = weights[0]
             
-        self._parents[variable] = parents        
-        
-        
+        v = variance 
         if len(beta) > 0:
             beta = Matrix(beta)
             
@@ -245,8 +251,18 @@ class LinearGaussianBN(object):
         else: # first time round - everything is None
             self._cov = Matrix([v])
             self._mean = Matrix([mu])
-            
+        
+
+        
+        self._weights[variable] = Matrix(weights) # order is with respect to parents as specified (not covariance matrix index)
+        self._variance[variable] = variance
+        self._parents[variable] = parents    
         self._variables.append(variable)
+        
+        try: # if the parameters are numeric, set current parameterisation.
+            self.set_var_params(variable,weights,variance)
+        except ValueError:
+            pass
     
     @property
     def mu(self):
@@ -353,6 +369,12 @@ class LinearGaussianBN(object):
         """
         if variable not in self._weights:
             raise ValueError("Variable {0} not in network".format(variable))
+        
+        if not all(isinstance(w,numbers.Number) for w in weights):
+            raise ValueError("Weights are not all numeric, {0}".format(weights))
+        
+        if not isinstance(variance,numbers.Number):
+            raise ValueError("Variance is not numeric")
 
         expected_num_weights = len(self._weights[variable])
         if len(weights) != expected_num_weights:
@@ -361,7 +383,11 @@ class LinearGaussianBN(object):
         self._variance_p[variable] = variance
         
     def set_params(self,variable_param_dict):
-        """Set numerical values for all variables based on dictionary."""
+        """
+        Set numerical values for all variables based on dictionary.
+        The dictionary keys should be variable names and the values a tuple containing (weights, variance), eg
+        {"Z":([0],1), "X":([0,.5],.2)}
+        """
         for variable,(weights,variance) in variable_param_dict.items():
             self.set_var_params(variable,weights,variance)
         return self
@@ -386,4 +412,32 @@ class LinearGaussianBN(object):
         cov = np.asarray(cov).astype(np.float64)
         mu = np.asarray(mu).astype(np.float64)
         return np.random.multivariate_normal(mu.ravel(),cov,size=n)
+        
+    
+    #def sample2(self,n):
+    #    data_dict = {}
+    #    for v in self.variables:
+    #        parent_list = self.parents(variable)
+    #        weights = self.weights_p[variable]
+    #        data = np.random.normal(mu,variance,size=n)
+            
+            
+#model = LinearGaussianBN()
+#model.add_var("U",None,[0],1)
+#model.add_var("Z",["U"],[0,2],1)
+#model.add_var("X",["Z"],[0,.5],2)
+#model.add_var("Y",["U","Z","X"],[0,3,-1,2],1)
+#
+#print model
+#model.sample(10)   
+#        
+#model = LinearGaussianBN()
+#model.add_var("U",[])
+#model.add_var("Z",["U"])
+#model.add_var("X",["Z"])
+#model.add_var("Y",["U","Z","X"])
+#
+#print model
+        
+
 

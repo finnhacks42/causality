@@ -1,3 +1,12 @@
+        
+bn = DiscreteBN()
+bn.add_var('Z',2,prob_table=[.1,.9])
+bn.add_var('X',2,['Z'])
+bn.add_var('Y',2,['X'])  
+for c in bn._conditionals:
+    print "c",c
+print bn.joint    
+
 #############################################################
 model = LinearGaussianBN()
 model.add_var('X',weights = [0])
