@@ -192,8 +192,8 @@ class LinearGaussianBN(object):
         return self._weights[variable]
     
     def _variance_symbol(self,variable):
-        """returns a symbol for the variance of variable string specified."""
-        return Symbol("V_{0}".format(variable))
+        """returns a symbol for the marginal variance of variable string specified."""
+        return Symbol("e_{0}".format(variable))
     
     def _weight_symbol(self,variable,parent):
         if parent is not None:

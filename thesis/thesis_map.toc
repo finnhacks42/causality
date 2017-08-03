@@ -60,5 +60,4 @@
 \contentsline {subsubsection}{Proof of Theorem \ref {thm:general}}{76}{section*.67}
 \contentsline {subsubsection}{Relationship between $m(\eta )$ and $m(\boldsymbol {q})$}{77}{section*.68}
 \contentsline {chapter}{\numberline {6}Conclusion}{79}{chapter.6}
-\contentsline {chapter}{\numberline {7}Careful with that prior}{80}{chapter.7}
-\contentsline {section}{\numberline {7.1}Example}{81}{section.7.1}
+\contentsline {section}{\numberline {6.1}Example}{81}{section.6.1}
