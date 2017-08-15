@@ -40,6 +40,88 @@ def prod_all_but_j(vector):
     joint = np.prod(vector)
     return np.true_divide(joint,vector)
     
+class ProbabilityConstraintError(ValueError):
+    '''Thrown when probabilities are negative or do not sum to 1'''
+    
+
+    
+
+    
+class DiscreteContextualEnviroment(object):
+    def __init__(self,reward_matrix, context_distribution):
+        """
+        reward_matrix: 2d array containing the probabilities of obtaining a (binary) reward 
+                       with a column for each context and row for each action.
+        context_distribution: a vector containing the probability that each context is selected.
+        """
+        self.num_contexts = reward_matrix.shape[1]
+        self.K = reward_matrix.shape[0]
+        self.contexts = np.arange(self.num_contexts)
+        self.reward_matrix = reward_matrix 
+        self.context_distribution = context_distribution
+        
+        # expected marginal rewards
+        self.expected_rewards = np.dot(self.reward_matrix,self.context_distribution) 
+        
+        
+    @classmethod
+    def create_random(cls,num_contexts,num_actions):
+        reward_matrix = np.random.uniform(size=(num_actions,num_contexts))
+        context_distribution = np.full(num_contexts,1.0/num_contexts) 
+        return cls(reward_matrix,context_distribution)
+        
+    @classmethod
+    def create_uninformative_context(cls,num_contexts,num_actions,epsilon = 0.1):
+        reward_dist = np.full(num_actions,.5)
+        reward_dist[0] = .5+epsilon
+        reward_dist = reward_dist.reshape((num_actions,1))
+        reward_matrix = np.tile(reward_dist,num_contexts)# same reward distribution for each context.
+        context_distribution = np.full(num_contexts,1.0/num_contexts) 
+        return cls(reward_matrix,context_distribution)
+                
+    def sample_context(self):
+        """ Sample a value from the context """
+        return np.random.choice(self.contexts,p=self.context_distribution)
+        
+    def best_reward(self):
+        """ return a vector containing reward of the optimal action for each context."""
+        return self.reward_matrix.max(axis=0)
+        
+    def expected_reward_sequence(self,arms,contexts):
+        """ 
+        arms: a vector containing which arm was pulled in each timestep.
+        contexts: a vector of the corresponding contexts.
+        returns: a vector of the expected rewards at each timestep. 
+        """
+        return self.reward_matrix[arms,contexts]
+        
+    
+    def expected_conditional_rewards(self,context):
+        """
+        Returns a vector of the expected rewards for all the actions given the supplied context.
+        """
+        return self.reward_matrix[:,context]
+    
+    def sample_conditional_reward(self,context,action,n=1):
+        """
+        Sample reward(s) from P(Y = 1|C,A)
+        returns a 1-d array containing the samples
+        """
+        return np.random.binomial(1,self.reward_matrix[action,context],size=n)
+    
+    def sample_conditional_rewards(self,context,n=1):
+        """
+        Sample the rewards for all the actions given the supplied context.
+        returns a 2d-array where each row is a sample and each column corresponds to an action. 
+        """
+        return np.random.binomial(1,self.reward_matrix[:,context],size=(n,self.num_contexts))
+        
+        # methods for algorithms that are unaware of the context
+    def sample_multiple(self,actions,n=1):
+        """ sample from the marginal expected rewards """
+        return binomial(n,self.expected_rewards[actions])
+    
+    
 class TimeVaryingBernoulliModel(object):
     """ 
     A model that shifts the rewards for each arm linearly,

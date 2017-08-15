@@ -6,6 +6,9 @@ causalpy.egg-info/dependency_links.txt
 causalpy.egg-info/requires.txt
 causalpy.egg-info/top_level.txt
 causalpy/bandits/__init__.py
+causalpy/bandits/algorithms.py
+causalpy/bandits/enviroments.py
+causalpy/bandits/regret.py
 causalpy/bayesian_networks/__init__.py
 causalpy/bayesian_networks/checks.py
 causalpy/bayesian_networks/models.py

@@ -86,27 +86,85 @@ class ParallelCausal(object):
         infrequent = s_indx[0:m_hat]
         return infrequent
         
+class DiscreteContextualBandit(object):
+    """ run a seperate bandit algorithm for each possible value of the context"""
+    def __init__(self,num_contexts,bandit_cls):
+        self.bandits = [bandit_cls() for i in range(num_contexts)] # create one for each
+        
+        
+    def expected_regret(self,model):
+        return model.best_reward()[self.contexts] - model.expected_reward_sequence(self.arms,self.contexts)
+            
+    def run(self,T,model):
+        self.contexts = np.full(T,-1,dtype=int)
+        self.arms = np.full(T,-1,dtype=int)
+        for bandit in self.bandits:
+            bandit.initialize(T,model)
+        
+        for t in xrange(T):
+            context = model.sample_context()
+            self.contexts[t] = context
+            bandit = self.bandits[context]
+            arm = bandit.select_action()
+            reward = model.sample_conditional_reward(context,arm)
+            bandit.update_reward(arm,reward)
+        
+        for context, bandit in enumerate(self.bandits):
+            self.arms[self.contexts == context] = bandit.arms[0:bandit.t]
+        
+        
 class ThompsonSampling(object):
     """ Sample actions via the Thomson sampling approach and return the empirically best arm 
         when the number of rounds is exhausted """
     label = "Thompson Sampling"
     
-    def run(self,T,model):
+    def expected_reward(self,model):
+        return model.expected_rewards[self.arms]
+    
+    def expected_regret(self,model):
+        """ returns the expected regret of the actual sequence of arm choices as a vector of length T"""
+        return max(model.expected_rewards) - self.expected_reward(model)
+    
+    def regret(self,model):
+        return max(model.expected_rewards)*len(self.rewards) - self.rewards.sum()
+        
+    def initialize(self,T,model):
         self.trials = np.full(model.K,2,dtype=int)
         self.success = np.full(model.K,1,dtype=int)
         self.rewards = np.zeros(T)
-        self.arms = np.zeros(T)
+        self.arms = np.full(T,-1,dtype=int)
+        self.t = 0
+        
+    def select_action(self):
+        fails = self.trials - self.success
+        theta = np.random.beta(self.success,fails)
+        arm = argmax_rand(theta)
+        self.trials[arm] +=1 # keeps track of the number of times each arm played
+        self.arms[self.t] = arm # keeps track of when each arm was played
+        return arm
+        
+    def update_reward(self,arm,reward):
+        self.success[arm]+= reward
+        self.rewards[self.t] = reward
+        self.t +=1
+            
+    def run(self,T,model):
+        """
+        Run Thompson sampling on the specified model for T timesteps.
+        model: a model from which to sample rewards. 
+               Should implement sample_multiple method and have expected_rewards property.
+        T: the number of timesteps over which the algorithm should be run. 
+        
+        returns: the simple regret: the difference between the expected reward 
+                 of the best arm and the expected reward of the arm the algorithm believes to be optimal
+        """
+        self.initialize(T,model) 
         
         for t in xrange(T):
-            fails = self.trials - self.success
-            theta = np.random.beta(self.success,fails)
-            arm = argmax_rand(theta)
-            self.trials[arm] +=1
+            arm = self.select_action()
             reward = model.sample_multiple(arm,1)
-            self.success[arm]+= reward
-            self.rewards[t] = reward
-            self.arms[t] = arm
-        
+            self.update_reward(arm,reward)
+                
         mu = np.true_divide(self.success,self.trials)
         self.best_action = argmax_rand(mu)
         return max(model.expected_rewards) - model.expected_rewards[self.best_action]
