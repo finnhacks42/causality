@@ -1,31 +1,31 @@
-\contentsline {chapter}{\numberline {1}Introduction}{6}{chapter.1}
-\contentsline {section}{\numberline {1.1}Motivation}{6}{section.1.1}
-\contentsline {section}{\numberline {1.2}What is causality? }{7}{section.1.2}
-\contentsline {section}{\numberline {1.3}What makes a problem causal?}{8}{section.1.3}
-\contentsline {section}{\numberline {1.4}An overview of this thesis and its contributions}{11}{section.1.4}
-\contentsline {chapter}{\numberline {2}Learning to act from observational data}{13}{chapter.2}
-\contentsline {section}{\numberline {2.1}Causal models}{13}{section.2.1}
-\contentsline {section}{\numberline {2.2}Causal Bayesian networks}{13}{section.2.2}
-\contentsline {subsection}{\numberline {2.2.1}Can't everything be encoded in a Bayesian model?}{16}{subsection.2.2.1}
-\contentsline {subsection}{\numberline {2.2.2}Limitations of causal Bayesian networks}{17}{subsection.2.2.2}
-\contentsline {section}{\numberline {2.3}Counterfactuals}{18}{section.2.3}
-\contentsline {section}{\numberline {2.4}Structural Equation models}{21}{section.2.4}
-\contentsline {section}{\numberline {2.5}Comparing and unifying the models}{23}{section.2.5}
-\contentsline {section}{\numberline {2.6}What does a causal model give us? Resolving Simpson's paradox}{24}{section.2.6}
-\contentsline {section}{\numberline {2.7}Causal effect estimation}{26}{section.2.7}
-\contentsline {subsection}{\numberline {2.7.1}Independence in Bayesian networks: D-separation}{28}{subsection.2.7.1}
-\contentsline {section}{\numberline {2.8}The Do Calculus}{29}{section.2.8}
-\contentsline {subsubsection}{Rule 1: (adding or removing evidence)}{29}{section*.21}
-\contentsline {subsubsection}{Rule 2: (exchanging actions with observations)}{29}{section*.23}
-\contentsline {subsubsection}{Rule 3: (adding or removing actions)}{30}{section*.26}
-\contentsline {subsection}{\numberline {2.8.1}Identifiability}{31}{subsection.2.8.1}
-\contentsline {section}{\numberline {2.9}Estimation}{33}{section.2.9}
-\contentsline {subsection}{\numberline {2.9.1}Defining causal effects}{33}{subsection.2.9.1}
-\contentsline {subsection}{\numberline {2.9.2}Estimating causal effects by adjusting for confounding variables}{34}{subsection.2.9.2}
-\contentsline {subsubsection}{Regression}{36}{section*.31}
-\contentsline {subsubsection}{Propensity scores}{37}{section*.32}
-\contentsline {subsubsection}{Matching}{38}{section*.34}
-\contentsline {chapter}{\numberline {3}The interventionist viewpoint}{40}{chapter.3}
+\contentsline {chapter}{\numberline {1}Introduction}{5}{chapter.1}
+\contentsline {section}{\numberline {1.1}Motivation}{5}{section.1.1}
+\contentsline {section}{\numberline {1.2}What is causality? }{6}{section.1.2}
+\contentsline {section}{\numberline {1.3}What makes a problem causal?}{7}{section.1.3}
+\contentsline {section}{\numberline {1.4}An overview of this thesis and its contributions}{10}{section.1.4}
+\contentsline {chapter}{\numberline {2}Learning from observational data}{12}{chapter.2}
+\contentsline {section}{\numberline {2.1}Causal models}{12}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}Causal Bayesian networks}{13}{subsection.2.1.1}
+\contentsline {subsubsection}{Can't everything be encoded in a Bayesian model?}{16}{section*.10}
+\contentsline {subsubsection}{Limitations of causal Bayesian networks}{17}{section*.12}
+\contentsline {subsection}{\numberline {2.1.2}Counterfactuals}{18}{subsection.2.1.2}
+\contentsline {subsection}{\numberline {2.1.3}Structural Equation models}{20}{subsection.2.1.3}
+\contentsline {subsection}{\numberline {2.1.4}Comparing and unifying the models}{22}{subsection.2.1.4}
+\contentsline {section}{\numberline {2.2}What does a causal model give us? Resolving Simpson's paradox}{23}{section.2.2}
+\contentsline {section}{\numberline {2.3}Causal effect estimation}{25}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Independence in Bayesian networks: D-separation}{27}{subsection.2.3.1}
+\contentsline {subsection}{\numberline {2.3.2}The Do Calculus}{28}{subsection.2.3.2}
+\contentsline {subsubsection}{Rule 1: (adding or removing evidence)}{29}{section*.24}
+\contentsline {subsubsection}{Rule 2: (exchanging actions with observations)}{29}{section*.26}
+\contentsline {subsubsection}{Rule 3: (adding or removing actions)}{29}{section*.29}
+\contentsline {subsection}{\numberline {2.3.3}Identifiability}{31}{subsection.2.3.3}
+\contentsline {subsection}{\numberline {2.3.4}Estimation}{32}{subsection.2.3.4}
+\contentsline {subsubsection}{Defining causal effects}{32}{section*.32}
+\contentsline {subsubsection}{Estimating causal effects by adjusting for confounding variables}{33}{section*.33}
+\contentsline {subsubsection}{Regression}{35}{section*.36}
+\contentsline {subsubsection}{Propensity scores}{36}{section*.37}
+\contentsline {subsubsection}{Matching}{38}{section*.39}
+\contentsline {chapter}{\numberline {3}Learning from interventions}{40}{chapter.3}
 \contentsline {section}{\numberline {3.1}Randomised experiments}{40}{section.3.1}
 \contentsline {subsection}{\numberline {3.1.1}Limitations of randomised experiments}{41}{subsection.3.1.1}
 \contentsline {section}{\numberline {3.2}Multi armed bandits}{43}{section.3.2}
@@ -34,27 +34,26 @@
 \contentsline {subsection}{\numberline {3.2.3}Pure-exploration problems}{49}{subsection.3.2.3}
 \contentsline {subsection}{\numberline {3.2.4}Adversarial Bandits}{49}{subsection.3.2.4}
 \contentsline {subsection}{\numberline {3.2.5}Contextual bandits}{51}{subsection.3.2.5}
-\contentsline {subsubsection}{The causal structure of contextual bandits}{53}{section*.44}
+\contentsline {subsubsection}{The causal structure of contextual bandits}{53}{section*.49}
 \contentsline {subsection}{\numberline {3.2.6}Learning from logged bandit data}{54}{subsection.3.2.6}
 \contentsline {subsection}{\numberline {3.2.7}Adding structure to actions}{55}{subsection.3.2.7}
 \contentsline {chapter}{\numberline {4}Causal Bandits: Unifying the approaches}{56}{chapter.4}
 \contentsline {section}{\numberline {4.1}The framework}{56}{section.4.1}
 \contentsline {section}{\numberline {4.2}Causal bandits with post action feedback}{59}{section.4.2}
-\contentsline {paragraph}{Related Work}{60}{section*.51}
+\contentsline {paragraph}{Related Work}{60}{section*.56}
 \contentsline {subsection}{\numberline {4.2.1}The parallel bandit problem}{60}{subsection.4.2.1}
-\contentsline {paragraph}{The Parallel Bandit Algorithm}{61}{section*.53}
+\contentsline {paragraph}{The Parallel Bandit Algorithm}{61}{section*.58}
 \contentsline {subsection}{\numberline {4.2.2}General graphs}{62}{subsection.4.2.2}
-\contentsline {paragraph}{Choosing the Sampling Distribution}{64}{section*.54}
+\contentsline {paragraph}{Choosing the Sampling Distribution}{64}{section*.59}
 \contentsline {subsection}{\numberline {4.2.3}Experiments}{65}{subsection.4.2.3}
 \contentsline {subsection}{\numberline {4.2.4}Discussion \& Future work}{67}{subsection.4.2.4}
-\contentsline {paragraph}{Making Better Use of the Reward Signal}{67}{section*.58}
-\contentsline {paragraph}{Cumulative Regret}{68}{section*.59}
-\contentsline {paragraph}{Causal Models with Non-Observable Variables}{68}{section*.60}
-\contentsline {paragraph}{Partially or Completely Unknown Causal Graph}{69}{section*.61}
+\contentsline {paragraph}{Making Better Use of the Reward Signal}{67}{section*.63}
+\contentsline {paragraph}{Cumulative Regret}{68}{section*.64}
+\contentsline {paragraph}{Causal Models with Non-Observable Variables}{68}{section*.65}
+\contentsline {paragraph}{Partially or Completely Unknown Causal Graph}{69}{section*.66}
 \contentsline {subsection}{\numberline {4.2.5}Proofs}{69}{subsection.4.2.5}
-\contentsline {subsubsection}{Proof of Theorem \ref {thm:uq-simple}}{69}{section*.62}
-\contentsline {subsubsection}{Proof of Theorem \ref {thm:lower}}{71}{section*.63}
-\contentsline {subsubsection}{Proof of Theorem \ref {thm:general}}{72}{section*.64}
-\contentsline {subsubsection}{Relationship between $m(\eta )$ and $m(\boldsymbol {q})$}{73}{section*.65}
+\contentsline {subsubsection}{Proof of Theorem \ref {thm:uq-simple}}{69}{section*.67}
+\contentsline {subsubsection}{Proof of Theorem \ref {thm:lower}}{71}{section*.68}
+\contentsline {subsubsection}{Proof of Theorem \ref {thm:general}}{72}{section*.69}
+\contentsline {subsubsection}{Relationship between $m(\eta )$ and $m(\boldsymbol {q})$}{73}{section*.70}
 \contentsline {chapter}{\numberline {5}Conclusion}{74}{chapter.5}
-\contentsline {section}{\numberline {5.1}Example}{77}{section.5.1}

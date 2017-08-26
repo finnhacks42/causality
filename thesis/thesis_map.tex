@@ -303,6 +303,7 @@ The key distinction between a real, but non-causal, association and a causal rel
 Causality is often liked to explaination; understanding how and why things happen. I view explaination in terms of compression and generalisabilty: how much information about the world a model can capture. This creates a hierachy in the degree to which models are explainitory, rather than a simple binary distinction. A standard predictive model encodes all the information we need to predict some output given inputs provided the system generating the data does not change. A high-level causal model might be able to predict the outcome of a specific intervention holding all else fixed. More detailed causal models could predict the outcome for a wide range of combiations of interventions conditional on a range of contexts. By considering conditional interventions within our definition of causal questions we also capture mediation: the study of through which pathways one variable causes another \cite{vanderweele2015explanation}. Finally, a model that can distil how elements interact to mathematical equatons like Newton's laws can be used to predict what will happen in an astounding range of settings, including many we have never previously observed \footnote{Although Newton's laws are not fully general, as they break down for extremely massive objects}.
 
 \citet{Gelman2010,gelman2013ask} make a distinction between forward causal inference, the types of \quotes{What if} questions I focus on in this thesis, and reverse causal questions, asking why something occurs. The former aims to identify the effect of a known cause. The latter can be viewed as identiying causes of an effect. They regard forward causal inference as well defined within the counterfactual and graphical model frameworks for causal inference, which we describe in chapter \ref{chap:causal_models}. However, state that \quotes{A reverse causal question does not in general have a well-defined answer, even in a setting where all possible data are made available.} I view this as overly pessimistic, depending on how \quotes{all possible data} is defined. The goal of identifying the causes of an effect can be formalised within the graphical causal model framework. Solving this problem is certainly much more challanging than identifying the effect of a specific intervention on given outcome, since it requires us to test or infer the effect of interventions on many different variables. These practical difficulties may well be overwealming, particularly in fields such as social science and economics where datasets are relatively small, systems are complex, the variables are difficult to directly manipulate and even relatively simple "What if" questions are hard to resolve conclusively. However, this does not mean that the problem of identifying causes of effects is ill-posed in principle. It can be viewed as a form of causal discovery: the attempt to learn the structure of the causal relationships between variables, on which there is a rich liturature which we review briefly in section \ref{sec:causal-discovery}.
+\todo{reference a review paper on causal discovery here}
 
 There has traditionally been a large gap between researches in machine learning who focus on prediction, use largly non-interpretable models and researches in statistics, social science and economics who (at least implicitly) aim to answer causal questions and tend to use heavily theory driven models. However, there is relatively little awareness, particularly within the machine learning and data science communities, of what constitutes a causal problem and the implications of for the training and evaluation models. In the next section we emphasise the subtley that can exist in determining if a problem is causal by examiming some typical examples. 
 
@@ -378,13 +379,24 @@ In chapter five, I develop a framework that unifies the causal graphical model a
 
 Chapters two to four predominantly review the existing liturature with the goal of making connections between the different viewpoints and approaches. They do not contain novel technical results but present the material in a unified way. Chapter five is a novel contribution. It formally connect causal graphical models and multi-armed bandit problems, demonstrates this leads to a form of structure that had not previously been analysed within the bandit liturature and describes an algorithm that can leverage this structure to make better decisons. 
 
-\chapter{Causal inference from observational data}
+\chapter{Learning from observational data}
 \label{chap:causality}
+
+The goal of causal inference is to learn the effect of taking an action. We can do this directly via experimental approaches, however any given agent only has a limited capacity to manipulate the world. We are generating and storing data on almost every aspect of our lives at an unprecedented rate. As we incorporate sensors and robotics into our cities, homes, cars, everyday products and even our bodies, the breadth and scale of this data will only increase. However, only a tiny fraction of this data will be generated in a controlled way with the specific goal of answering a single question. An agent that can only learn from data when it had explicit control (or perfect knowledge of) the process by which that data was generated will be severly limted. This makes it critical that we develop effective methods that us to predict the outcome of an intervention in some system from observing it. This is the problem of observational causal inference. 
 
 \section{Causal models}
 \label{sec:causal_models}
 
-Observational causal inference aims to infer the outcome of an intervention in some system from data obtained by observing (but not intervening in) it. To do this we need terminology to describe actions and how we anticipate the system will respond to them. Three key approaches have emerged: counterfactuals, structural equation models and causal Bayesian networks. In this chapter we will examine the problems these approaches allow us to solve, the assumptions they rely on and how they differ. We will also use them to describe the following simplified examples. The aim is to demonstrate the notations and formalisms needed to tackle more interesting problems later on.
+As previusly mentioned, observational causal inference is 
+
+Observational causal inference aims to infer the outcome of an intervention in some system from data obtained by observing (but not intervening in) it. As previuosly mentioned, this is a form of transfer learning; we need to infer properties of the system post-intervention from observations of the system pre-intervention. Doing this requires some assumptions about how these two systems are related, or other words, a way of describing actions and how we anticipate the system will respond to them. Three key approaches have emerged: counterfactuals, structural equation models and causal Bayesian networks. 
+
+counterfactuals 
+
+MOTIVATE WHY I AM DESCRIBING THEM ALL SUMMARISE WHAT EACH OFFERS.
+
+
+In this chapter we will examine the problems these approaches allow us to solve, the assumptions they rely on and how they differ. We will also use them to describe the following simplified examples. The aim is to demonstrate the notations and formalisms needed to tackle more interesting problems later on.
 
 \vspace*{.3cm}
 \begin{example}
@@ -399,7 +411,7 @@ Suppose we want to estimate the impact on high school graduation rates of compul
 \end{example}
 
 
-\section{Causal Bayesian networks}
+\subsection{Causal Bayesian networks}
 
 Causal Bayesian networks are an extension of Bayesian networks. A Bayesian network is a graphical way of representing how a distribution factorises. Any joint probability distribution can be factorised into a product of conditional probabilities. There are multiple valid factorisations, corresponding to permutations of variable ordering.
 
@@ -575,7 +587,7 @@ We have seen from these two examples that the expression to estimate the causal 
 
 Causal Bayesian networks are Bayesian networks, so results that apply to Bayesian networks carry directly across: the local Markov property states that variables are independent of their non-effects given their direct causes. The global Markov property and d-separation also hold in causal networks. D-speration, which characterises which conditional independencies must hold in any distribution that can represented by a given Bayesian network $G$, is key to many important results and algorithms for causal inference. We include a brief introduction in section \ref{sec:dsep}. 
 
-\subsection{Can't everything be encoded in a Bayesian model?}
+\subsubsection{Can't everything be encoded in a Bayesian model?}
 Formalising the definition of an intervention within the framework of causal graphical models provides us with an explicit mechanism to map information from one data generating process, the system pre-intervention, to another, the system post-intervention. The power of defining an intervention in this way stems from the number of things that are invariant between the two processes. All the (conditional) distributions for variables in the graph that were not directly set by the intervention are assumed not be changed by it.  
 
 We could represent problems of the type where we try to infer properties of the post-interventional system based on data generated by the pre-interventional distribution by explicitly representing both systems and what they have in common, see figure \ref{fig:causal_ordinary_bayes}. This does not require any special framework or notation. The graphs in figure  \ref{fig:causal_ordinary_bayes} are ordinary Bayesian networks. However, without a causal framework, we have to make assumptions about what will be invariant to the intervention specifically for each such problem we encounter. For complex problems, it is very difficult to conceptualise the assumptions we expect to hold without the benefit of a causal framework.  
@@ -611,9 +623,7 @@ We could represent problems of the type where we try to infer properties of the 
 
 A causal Bayesian network represents much more information than a Bayesian network with identical structure. A causal network encodes all possible interventions that could be specified with the do-notation. For example, if the network in figure \ref{fig:causal_adjust} were an ordinary Bayesian network and all the variables were binary, the associated distribution could be described by 7 parameters. The equivalent causal Bayesian network additionally represents the post-interventional distributions for six possible single variable interventions and twelve possible two variable interventions. Encoding all this information without the assumptions implicit in the causal Bayesian network would require an additional 30 parameters \footnote{After each single variable intervention we have a distribution over two variables, which can be represented by three parameters. After each two variable intervention, we have a distribution over one variables which requires one parameter. This takes us to a total of $6\times3+12\times1 = 30$ additional parameters.}.
 
-
-
-\subsection{Limitations of causal Bayesian networks}
+\subsubsection{Limitations of causal Bayesian networks}
 A number of criticisms have been levelled at this approach to modelling causality. One is that the definition of an intervention only in terms of setting the value of one or more variables is too precise and that any real world intervention will affect many variables in complex and non-deterministic ways \citep{rickles2009causality,cartwright2007hunting}. However, by augmenting the causal graph with additional variables that model how interventions may take effect, the deterministic do operator can model more complex interventions. For example, in the drug treatment case, we assumed that all subjects complied, taking the treatment or placebo as assigned by the experimenter. But, what if some people failed to take the prescribed treatment? We can model this within the framework of deterministic interventions by adding a node representing what they were prescribed (the intervention) which probabilistically influences the treatment they actually receive, see figure \ref{fig:randomized_imperfect_compliance}. Note that the fact that we no longer directly assign the treatment opens the possibility that an unobserved latent variable could affect both the actual treatment taken and the outcome.
 
 \begin{figure}[h]
@@ -634,7 +644,7 @@ A number of criticisms have been levelled at this approach to modelling causalit
 
 Another key issue with causal Bayesian networks is that they cannot handle cyclic dependencies between variables. Such feedback loops are common in real-life systems, for example the relationship between supply and demand in economics or predator and prey in ecology. We might regard the underlying causal mechanisms in these examples to be acyclic; the number of predators at one time influences the number of prey in the next period and so on. However, if our measurements of these variables must be aggregated over time frames that are longer than the scale at which these interactions occur the result is a cyclical dependency. Even were we able to measure on shorter timescales, we might then not have sufficient data on each variable for inference. Such problems have mostly been studied within the dynamical systems literature, typically focusing on understanding the stationary or equilibrium state of the system and making very specific assumptions about functional form in order to make problems tractable. \citet{Poole2013} compare the equilibrium approach to reasoning about cyclic problems with structural equation models, which we discuss in section \ref{sec:SEM} and which can be seen as Bayesian causal networks with additional functional assumptions. 
 
-\section{Counterfactuals}
+\subsection{Counterfactuals}
 \label{sec:counterfactuals}
 
 The Neyman-Rubin model \citep{Rubin1974,Rubin1978,Rosenbaum1983, Rubin2005,Rubin2008} defines causality in terms of potential outcomes, or counterfactuals. Counterfactuals are statements about imagined or alternate realities, are prevalent in everyday language and may play a role in the development of causal reasoning in humans \citep{Weisberg2013}. Causal effects are differences in counterfactual variables: what is the difference between what would have happened if we did one thing versus what would have happened if we did something else. 
@@ -725,7 +735,7 @@ This result is unintuitive. It seems on the face of it that the distribution of 
 
 One way of looking at counterfactuals is as a natural language short hand for describing highly specific interventions like those denoted by the do-notation. Rather than talking about the distribution of $Y$ given we intervene to set $X=x$ and hold everything else about the system constant we just say what would the distribution of $Y$ be had $X$ been $x$. This is certainly convenient, if rather imprecise. However, the ease with which we can make statements with counterfactuals that cannot be tested with empirical data warrants careful attention. It is important to be clear what assumptions are being made and whether or not they could be validated (at least in theory). 
 
-\section{Structural Equation models}
+\subsection{Structural Equation models}
 \label{sec:SEM}
 
 Structural equation models (SEMs) describe a deterministic world, where some underlying mechanism or function determines the output of any process for a given input. The mechanism (but not the output) is assumed to be independent of what is fed into it. Uncertainties are not inherent but arise from unmeasured variables. Linear structural equation models have a long history for causal estimation \cite {Wright1921,Haavelmo1943}. More recently, they have been formalised, generalised to the non-linear setting and connected to developments in graphical models to provide a powerful causal framework \citep{Pearl2000}.
@@ -801,7 +811,7 @@ Equation \ref{eqn:sem:adjusting} corresponds to equations \ref{eqn:backdoor_exam
 
 Structural equation models are generally applied with strong constraints on the functional form of the relationship between the variables and noise is typically assumed to be additive, $X_i = f_i(\cdot)+\epsilon_i$. A structural equation model with $N$ variables resembles a set of $N$ simultaneous equations, with each variable playing the role of the dependent (left hand side) variable in one equation. However a SEM is, by definition, more than a set of simultaneous equations. By declaring it to be structural we are saying that it represents assumptions about the relationships between variables. When we visualise the model as a network the absence of an arrow between two variables encodes the assumption that one does not cause the other. The similarity between the notation used to describe and analyse structural equation models and simultaneous equations, combined with a reluctance to make explicit statements about causality, has led to some confusion in the interpretation of SEMs \citep{heckman2015causal,Pearl2000}. 
 
-\section{Comparing and unifying the models}
+\subsection{Comparing and unifying the models}
 
 Remarkably for models developed relatively independently in fields with very different approaches and problems, the models we have discussed can be nicely unified for interventional queries (those that can be expressed with the do-notation). If the network for a structural equation model is acyclic, that is if starting from any node and following edges in the direction of the arrows you cannot return to the starting point, then it implies a recursive factorisation of the joint distribution over its variables. In other words, the network is a causal Bayesian network. All of the results that apply to causal Bayesian networks also apply to acyclic structural equation models.  Taking an action that sets a variable to a specific value equates to replacing the equation for that variable with a constant. This corresponds to dropping a term in the factorisation and the truncated product formula (equation \ref{eq:truncatedproduct}). Thus, the interventional query $P(Y|do(X))$ is identical in these two frameworks. We can also connect this to counterfactuals via:
 
@@ -919,8 +929,6 @@ Note that we have not changed the data itself, only the description of the varia
 \end{figure}
 
 There are many other plausible causal graphs for both scenarios above. Perhaps income affects drug choice as well as gender, or gender might affect treatment choice and blood pressure control given treatment, etc. Causal modelling provides a powerful tool to specify such assumptions and to determine how to estimate causal effects for a given model see section \ref{sec:causal effect estimation}.
-
-
 
 
 
@@ -1046,7 +1054,7 @@ Theorem \ref{thrm:dsep_independence} says that independencies implied by d-separ
 
 If $\indep{G} = \indep{P}$ then $G$ is called a perfect map for $P$. However, it is possible to construct distributions that do not have a perfect map, that is they contain conditional independencies that cannot be represented by d-separation. A particular case in which this occurs is when there are deterministic relationships between variables. If we have a Bayesian network $G$ in which we specify that some nodes are deterministic we cannot conclude that if $X$ and $Y$ are d-connected then there exists a distribution $P'$ \emph{consistent} with $G$ in which they are dependent. This does not conflict with theorem \ref{thrm:dsep_independence} as \emph{consistent} in this setting requires that $P'$ both factorises over $G$ and satisfies the specified the deterministic relations between variables. This subtlety led to confusion in assessing what independencies hold between counterfactuals via twin networks \citep{Pearl2000,Richardson2013} and demonstrates the caution required in using d-connecteness to assert lack of independence. D-separation can be extended to compute the additional independencies implied by a graph in which certain nodes are known to be deterministic \citep{Geiger1990}. 
 
-\section{The Do Calculus} 
+\subsection{The Do Calculus} 
 \label{sec:do_calculus}
 
 The do-calculus is a set of three rules \citep{Pearl1995} that can be applied to simplify the expression for an interventional distribution. If by repeated application of the do-calculus, along with standard probability transformations, we can obtain an expression containing only observational quantities then we can use it to estimate the interventional distribution from observational data. Let $\boldsymbol{X}$,$\boldsymbol{Y}$,$\boldsymbol{Z}$ and $\boldsymbol{W}$ be disjoint sets of variables in a causal graph $G$. We denote the graph $G$ after the an intervention $do(\boldsymbol{X})$, which has the effect of removing all edges into variables in $\boldsymbol{X}$, as $G_{\overline{\boldsymbol{X}}}$
@@ -1466,8 +1474,8 @@ Many interesting questions relating to identifiability remain open. What is the 
 Although identifiability is a natural and important question to ask, it does not partition causal questions into solvable and unsolvable. Estimators for identifiable queries can be slow to converge and we may be able to obtain useful bounds on causal effects in cases where point estimates are not identified.
 
 
-\section{Estimation}
-\subsection{Defining causal effects} 
+\subsection{Estimation}
+\subsubsection{Defining causal effects} 
 So far we have described causal effect estimation in term of identifying the interventional distribution $\P{Y|do(X)}$ from observational data. This interventional distribution is in fact a family of distributions parameterised by the value, $x$, to which the treatment variable $X$ is set. From a decision theoretic viewpoint, we can select an optimal action $x$ by specifying a utility function $\mathcal{U}:y \in \mathcal{Y} \rightarrow \mathbb{R}$ that assigns a value to each outcome $y$ and then selecting the action that maximises the expected utility. 
 
 \eqn{
@@ -1507,7 +1515,7 @@ Causal effects can also be written in terms of counterfactuals. The ACE is $\E{\
 Another way of conceptualising causal effects is as a property indicating the strength of the causal link between two variables. This notion is complex to formalise when the relationship between variables is non-linear. Suppose $Y = X \oplus Z$ with $P(Z=1)=\frac{1}{2}$, the interventional distributions over $X$ are identical after marginalising out $Z$. \citet{Janzing2013} propose a number of postulates that a notion of causal strength could satisfy, demonstrate why previous measures fail these postulates and propose an alternative based on information flow. 
 
 
-\subsection{Estimating causal effects by adjusting for confounding variables}
+\subsubsection{Estimating causal effects by adjusting for confounding variables}
 \label{sec:causal_effect_under_ignorability}
 Probably the two most frequently applied approaches to estimating causal effects from observational data are instrumental variables and adjusting for confounding factors. Instrumental variables correspond to the graph in figure \ref{fig:nid2_instrumental_variable}, which is not identifiable without parametric assumptions, however they can provide tight bounds. Adjusting for confounding equates to identifying a set of variables $\boldsymbol{Z}$ such that the ignorability assumption discussed in section \ref{sec:counterfactuals} holds. This corresponds to a simple graphical test known as the backdoor criterion \citep{Pearl2000}. The setting is also referred to as unconfounded. 
 
