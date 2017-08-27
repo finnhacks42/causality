@@ -1,3 +1,26 @@
+\section{careful prior}
+
+\subsubsection{Example}
+
+\eqn{
+U &\sim N(0 , 1)\\
+Z &\sim N(2U , 0.09)\\
+X &\sim N(0.5Z , 1)\\
+Y &\sim N(3U + -Z + 0.5X , 0.25)
+}
+
+\begin{figure}[h]
+\includegraphics[scale=.3]{prior_no_prior}
+\caption{no prior, posterior on $w_{yx}$ centered around $w_{yx}$}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[scale=.3]{prior_bad_prior}
+\caption{Prior around $w_{yz}$, $\beta \sim N(w_{yz},\sigma = 0.5)$. The posterior on $w_{yx}$ is biased away from its true value}
+\end{figure}
+
+
+
 Observational causal inference, the problem of estimating the impact of some intervention in a system from observational data, has been studied in depth, particularly within economics and the social sciences for
 
 The problem of estimating the impact of an intervention in a system from observational data has been studied in depth, particularly in economics and social sciences, for many years. 
@@ -444,5 +467,48 @@ I hope these examples give a feel for the richness and subtitles of causal probl
 
 
 We will call data sets where we do not have control over the decision making process that generated the data observational. Versus experimental data sets, where we do have control (experimental data sets do not always have to be randomised - although that is a powerful approach to ensure we have control. There is a space in the middle where we have partially controlled the process by which agent select actions. Randomised data with imperfect compliance would be an example.
+
+However, although each framework has it own set of advantages, it turns out that they are functionally equivelent for a wide class of problems - those relating to estimating the outcome of an intervention. 
+
+
+\section{Philosophical objections to counterfactuls}
+There are complex philosophical objections to counterfactuals arising from the way they describe alternate universes that were never realised. This makes it quite easy to (accidentally) make statements about counterfactuals that cannot be tested with empirical data. Consider the following example based on \citet{Dawid2000}. Again we have a drug where the outcome for an individual if treated is represented by the counterfactual variable $\cf{Y}{1}$ and the outcome if not treated is $\cf{Y}{0}$. Suppose these counterfactual variables $\cf{Y}{1}$ and $\cf{Y}{0}$ are jointly normal with equal variance (for simplicity).
+
+% vector with mean mu_t,mu_c and a covariance matrix
+\eqn{
+P(\cf{Y}{1},\cf{Y}{0}) \sim N( 
+         \begin{bmatrix}
+           \mu_{1} \\
+           \mu_2 \\
+         \end{bmatrix},
+         \begin{bmatrix}
+           \sigma^2 & \rho \sigma^2 \\
+           \rho \sigma^2 & \sigma^2 \\
+         \end{bmatrix}
+         )
+}
+
+The distribution of \emph{individual treatment effects}, $\tau = \cf{Y}{1} - \cf{Y}{0}$ is also normal,
+
+\eqn{
+P(\tau) = N(\mu_1 - \mu_0,2\sigma^{2}(1-\rho))
+}
+
+
+\begin{figure}[h]
+\captionsetup[subfigure]{position=b}
+\centering
+\subcaptionbox{Marginal distributions over the potential outcomes $\cf{Y}{1}$ and $\cf{Y}{0}$ for $\mu_1=1$, $\mu_0=0$ and $\sigma = 1$. The blue curve shows the distribution of $Y$ if everyone were to be treated and the blue curve the distribution if no-one was treated. \label{fig:metaphys_a}}{\includegraphics[width=.45\linewidth]{figures/counterfactual_nonidentify_a.pdf}}
+\hspace{0.02\textwidth}
+\subcaptionbox{Two very different distributions of individual causal effects consistent with the potential outcome distributions. \label{fig:metaphys_b}}
+{\includegraphics[width=.45\linewidth]{figures/counterfactual_nonidentify_b.pdf}}
+\caption{The distribution of individual treatment effects is not identifiable, even from a randomised controlled trial.}
+\label{fig:metaphysical_distribution_difference}
+\end{figure}
+
+From a (large) randomised controlled trial we can estimate the marginal distributions over the counterfactual variables, see figure \ref{fig:metaphys_a}. These represent the distributions we would expect over the outcome $Y$ if everyone were treated or not treated respectively. However, the distribution over the individual causal effects depends on $\rho$, see figure \ref{fig:metaphys_b}. The key problem is that we can never observe the joint distribution over $\cf{Y}{1}$ and $\cf{Y}{0}$. As a result, $\rho$ and thus the variance of $\tau$ is not identifiable, even from experimental data. \citet{Dawid2000} argues that we should avoid using counterfactuals as they are defined in terms of (metaphysical) individual causal effects. He further points out that the interventional distributions in figure \ref{fig:metaphys_a}, along with a loss function, contain all the information required to decide how to treat a new patient.  
+
+This result is unintuitive. It seems on the face of it that the distribution of individual causal effects is relevant to our decision making. If $\rho = 1$ then almost everyone benefits slightly from the treatment whilst if $\rho=0$, there is a wide range, with some people benefiting a lot and others suffering significant harm. This confusion can be resolved by thinking about personalised rather than individual causal effects. It is entirely possible that potentially observable characteristics (such as gender, age, genetics, etc) affect how people will respond to the treatment. We can partition people into sub-populations on the basis of these characteristics and measure different \emph{personalised} causal effects for each group. The variance of the potential outcome distributions $f(\cf{Y}{1})$ and $f(\cf{Y}{0})$ provides bounds on how much can be gained from further personalisation. The metaphysical nature of individual causal effects only arises when we are at the point where the only remaining variation is due to inherent randomness (or variables that we could not even in principle measure). 
+
 
 

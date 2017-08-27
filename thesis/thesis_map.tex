@@ -233,6 +233,8 @@
 \author{Finnian Lattimore}
 \title{Learning how to act: making good decisions with machine learning}
 
+\setcounter{secnumdepth}{4}
+
 \begin{document}
 \todo{figure out theoremstle is undefined}
 %\def\ci{\perp\!\!\!\perp} % from Wikipedia
@@ -264,13 +266,13 @@ That what we chanced, was what we meant, to do.}{Alexander Pope}
 \item Are there any problematic counterfactuals being used in defining bandit problems
 \item in the Schölkopf causal fairness paper - is there an issue with the use of twin networks. Could it be fixed with SWIGs?
 \item Contextual bandits are solving this argmax h problem. Should causal inference actually be solving the same thing?
-\item what is the connection between which variables should be included when doing estimating causal effects from observational data and stratification in randomized experimental design?
+\item what is the connection between which variables should be included when doing estimating causal effects from observational data and stratification in randomised experimental design?
 \item I don't understand why covariate shift is not supposed to be an issue in Bayesian models. 
-\item What does conditioning mean in the Bayesian sense? - can imposing a prior which is true with respect to that variable, increase bias due to confounding? (In the same way that in the pnemonia case, the coefficient for Asthma should be set to zero after the model has been fit, not before. 
+\item What does conditioning mean in the Bayesian sense? - can imposing a prior which is true with respect to that variable, increase bias due to confounding? (In the same way that in the pneumonia case, the coefficient for Asthma should be set to zero after the model has been fit, not before. 
 
-\item What are the nessessary and sufficient conditioins for decision making? How much about a the distribution of rewards for different arms must I know in order to select one (under different assumptions about the loss function). Ie when is the mean sufficient? What about the mean and the variance? - when can we take one set of results and compute something about a different loss function?
+\item What are the necessary and sufficient conditions for decision making? How much about a the distribution of rewards for different arms must I know in order to select one (under different assumptions about the loss function). Ie when is the mean sufficient? What about the mean and the variance? - when can we take one set of results and compute something about a different loss function?
 
-\item Does the way we define supervised learning and loss fuctions imply an additive noise model? Why would we expect this to hold - why don't we run into more problems?
+\item Does the way we define supervised learning and loss functions imply an additive noise model? Why would we expect this to hold - why don't we run into more problems?
  
 
 \end{itemize}
@@ -294,22 +296,22 @@ However, despite the huge advances in machine learning (in particular deep learn
 
 The notion of causality has been widely debated in science and philosophy \citep{hume1741treatise,mill1893system,pearson1911grammar,Pearl2000,Lewis2000,woodward2005making,heckman20051,cartwright2007hunting} but is still widely viewed as poorly defined. This has led to a reluctance among applied researchers in many fields to refer to causality in their work, leading them instead to report that variables are \textit{related}, \textit{correlated} or \textit{associated}. However, the magnitude, direction and even existence of an association depends on what other variables we adjust for (or include in a regression). Avoiding formalising causation, the real question of interest, leaves it up to the reader to determine via \quotes{common sense} the implications of the reported associations.
 
-There are two ways in which an association detected in a dataset may be non-causal. The first is that the variables concerned may not be related at all, and the association has arisen by chance in that data sample. Given a finite data on enough variables, there is a high probability of finding some that appear correlated even though they are completely unrelated. For example, based on data from the years 1999 to 2009, the age of miss America is strongly correlated with the number of murders  (in the US) by steam, hot vapours and hot objects \citep{Vigen2015}. We would not expect this relationship to hold if we were to look at a new sample of data. This form of spurious correlation also has serious repercussions. It lies at the heart of major problems with the process of scientific research: researchers are incentivised to detect effects and thus to explore many possible paths in the process of analysing data and studies that fail to find an effect are less likely to be published. As a consequnce, the likelyhood that reported effects have arisen by chance is underestimated, leading to the conclusion that \quotes{most published scientific results are false} \citep{Ioannidis2005}. This issue is also highlighted by recent crises in replication \citep{OpenScienceCollaboration2015}. This issue can be ameliorated by getting more data and by seperating learning models from evaluating their performance, for example by evaluating models on a stict hold-out set or on the extent to which their results can be replicated. 
+There are two ways in which an association detected in a data set may be non-causal. The first is that the variables concerned may not be related at all, and the association has arisen by chance in that data sample. Given a finite data on enough variables, there is a high probability of finding some that appear correlated even though they are completely unrelated. For example, based on data from the years 1999 to 2009, the age of miss America is strongly correlated with the number of murders  (in the US) by steam, hot vapours and hot objects \citep{Vigen2015}. We would not expect this relationship to hold if we were to look at a new sample of data. This form of spurious correlation also has serious repercussions. It lies at the heart of major problems with the process of scientific research: researchers are incentivised to detect effects and thus to explore many possible paths in the process of analysing data and studies that fail to find an effect are less likely to be published. As a consequence, the likelyhood that reported effects have arisen by chance is underestimated, leading to the conclusion that \quotes{most published scientific results are false} \citep{Ioannidis2005}. This issue is also highlighted by recent crises in replication \citep{OpenScienceCollaboration2015}. This issue can be ameliorated by getting more data and by separating learning models from evaluating their performance, for example by evaluating models on a strict hold-out set or on the extent to which their results can be replicated. 
 
-However, a strong association, observed in multiple indpendent studies may still not be causal. The correlation can arise because both variables are consequences of some other, unmeasured factor. For example, the reading ability of children under twelve is strongy correlated with their height, because older children are taller and can read better. However height is not a cause of reading ability because if we were to intervene to increase a child's height, for example by giving them growth hormones, we would not expect dramatic improvements in their reading. Similarly, extra tutoring in reading will not make a child grow taller. This problem is fundamentally different to the issue of spurious correlations arising by chance in finite datasets. Obtaining more (even infinitely many more) samples without directly intervening in the system to manipulate the variables does not allow us to seperate causation from correlation. 
+However, a strong association, observed in multiple independent studies may still not be causal. The correlation can arise because both variables are consequences of some other, unmeasured factor. For example, the reading ability of children under twelve is strongly correlated with their height, because older children are taller and can read better. However height is not a cause of reading ability because if we were to intervene to increase a child's height, for example by giving them growth hormones, we would not expect dramatic improvements in their reading. Similarly, extra tutoring in reading will not make a child grow taller. This problem is fundamentally different to the issue of spurious correlations arising by chance in finite data sets. Obtaining more (even infinitely many more) samples without directly intervening in the system to manipulate the variables does not allow us to separate causation from correlation. 
 
-The key distinction between a real, but non-causal, association and a causal relationship is in what happens if we intervene in the system and change one of the variables. In this thesis, I take an interventionalist viewpoint of causality: any model or approach designed to predict the outcome of intervening in a system is causal. This viewpoint captures the types of questions that motivate this thesis. How can we change the way we do things to obtain better outcomes. 
+The key distinction between a real, but non-causal, association and a causal relationship is in what happens if we intervene in the system and change one of the variables. In this thesis, I take an interventionist viewpoint of causality: any model or approach designed to predict the outcome of intervening in a system is causal. This viewpoint captures the types of questions that motivate this thesis. How can we change the way we do things to obtain better outcomes. 
 
-Causality is often liked to explaination; understanding how and why things happen. I view explaination in terms of compression and generalisabilty: how much information about the world a model can capture. This creates a hierachy in the degree to which models are explainitory, rather than a simple binary distinction. A standard predictive model encodes all the information we need to predict some output given inputs provided the system generating the data does not change. A high-level causal model might be able to predict the outcome of a specific intervention holding all else fixed. More detailed causal models could predict the outcome for a wide range of combiations of interventions conditional on a range of contexts. By considering conditional interventions within our definition of causal questions we also capture mediation: the study of through which pathways one variable causes another \cite{vanderweele2015explanation}. Finally, a model that can distil how elements interact to mathematical equatons like Newton's laws can be used to predict what will happen in an astounding range of settings, including many we have never previously observed \footnote{Although Newton's laws are not fully general, as they break down for extremely massive objects}.
+Causality is often liked to explanation; understanding how and why things happen. I view explanation in terms of compression and generalisabilty: how much information about the world a model can capture. This creates a hierarchy in the degree to which models are explanatory, rather than a simple binary distinction. A standard predictive model encodes all the information we need to predict some output given inputs provided the system generating the data does not change. A high-level causal model might be able to predict the outcome of a specific intervention holding all else fixed. More detailed causal models could predict the outcome for a wide range of combinations of interventions conditional on a range of contexts. By considering conditional interventions within our definition of causal questions we also capture mediation: the study of through which pathways one variable causes another \cite{vanderweele2015explanation}. Finally, a model that can distil how elements interact to mathematical equations like Newton's laws can be used to predict what will happen in an astounding range of settings, including many we have never previously observed \footnote{Although Newton's laws are not fully general, as they break down for extremely massive objects}.
 
-\citet{Gelman2010,gelman2013ask} make a distinction between forward causal inference, the types of \quotes{What if} questions I focus on in this thesis, and reverse causal questions, asking why something occurs. The former aims to identify the effect of a known cause. The latter can be viewed as identiying causes of an effect. They regard forward causal inference as well defined within the counterfactual and graphical model frameworks for causal inference, which we describe in chapter \ref{chap:causal_models}. However, state that \quotes{A reverse causal question does not in general have a well-defined answer, even in a setting where all possible data are made available.} I view this as overly pessimistic, depending on how \quotes{all possible data} is defined. The goal of identifying the causes of an effect can be formalised within the graphical causal model framework. Solving this problem is certainly much more challanging than identifying the effect of a specific intervention on given outcome, since it requires us to test or infer the effect of interventions on many different variables. These practical difficulties may well be overwealming, particularly in fields such as social science and economics where datasets are relatively small, systems are complex, the variables are difficult to directly manipulate and even relatively simple "What if" questions are hard to resolve conclusively. However, this does not mean that the problem of identifying causes of effects is ill-posed in principle. It can be viewed as a form of causal discovery: the attempt to learn the structure of the causal relationships between variables, on which there is a rich liturature which we review briefly in section \ref{sec:causal-discovery}.
+\citet{Gelman2010,gelman2013ask} make a distinction between forward causal inference, the types of \quotes{What if} questions I focus on in this thesis, and reverse causal questions, asking why something occurs. The former aims to identify the effect of a known cause. The latter can be viewed as identifying causes of an effect. They regard forward causal inference as well defined within the counterfactual and graphical model frameworks for causal inference, which we describe in chapter \ref{chap:causal_models}. However, state that \quotes{A reverse causal question does not in general have a well-defined answer, even in a setting where all possible data are made available.} I view this as overly pessimistic, depending on how \quotes{all possible data} is defined. The goal of identifying the causes of an effect can be formalised within the graphical causal model framework. Solving this problem is certainly much more challenging than identifying the effect of a specific intervention on given outcome, since it requires us to test or infer the effect of interventions on many different variables. These practical difficulties may well be overwhelming, particularly in fields such as social science and economics where data sets are relatively small, systems are complex, the variables are difficult to directly manipulate and even relatively simple "What if" questions are hard to resolve conclusively. However, this does not mean that the problem of identifying causes of effects is ill-posed in principle. It can be viewed as a form of causal discovery: the attempt to learn the structure of the causal relationships between variables, on which there is a rich literature which we review briefly in section \ref{sec:causal-discovery}.
 \todo{reference a review paper on causal discovery here}
 
-There has traditionally been a large gap between researches in machine learning who focus on prediction, use largly non-interpretable models and researches in statistics, social science and economics who (at least implicitly) aim to answer causal questions and tend to use heavily theory driven models. However, there is relatively little awareness, particularly within the machine learning and data science communities, of what constitutes a causal problem and the implications of for the training and evaluation models. In the next section we emphasise the subtley that can exist in determining if a problem is causal by examiming some typical examples. 
+There has traditionally been a large gap between researches in machine learning who focus on prediction, use largely non-interpretable models and researches in statistics, social science and economics who (at least implicitly) aim to answer causal questions and tend to use heavily theory driven models. However, there is relatively little awareness, particularly within the machine learning and data science communities, of what constitutes a causal problem and the implications of for the training and evaluation models. In the next section we emphasise the subtly that can exist in determining if a problem is causal by examining some typical examples. 
 
 \section{What makes a problem causal?}
 
-Machine learning is in the midst of a boom, driven by the availability of large datasets and the computation resources to process them. Machine learning techniques are being applied a huge range of problems, in both industry and achademia. The following examles are inteded to capture the bredth of problems that machine learning algorithms are actively beeing applied to. Which, if any, of these problems require causal inference? 
+Machine learning is in the midst of a boom, driven by the availability of large data sets and the computation resources to process them. Machine learning techniques are being applied a huge range of problems, in both industry and academia. The following examples are intended to capture the breadth of problems that machine learning algorithms are actively being applied to. Which, if any, of these problems require causal inference? 
 
 \begin{itemize}
 \item Speech recognition (for systems like Siri or Google)
@@ -324,7 +326,7 @@ Machine learning is in the midst of a boom, driven by the availability of large 
 \item Playing Go 
 \end{itemize}
 
-The question is disingenuous because I have not posed the problems in sufficient detail to determine if causality is an important considertion. In particular, I failed to specify how any model we might build would be used: what actions would be taken in response to its predictions. 
+The question is disingenuous because I have not posed the problems in sufficient detail to determine if causality is an important consideration. In particular, I failed to specify how any model we might build would be used: what actions would be taken in response to its predictions. 
 
 Consider speech recognition. You say something, which causes sound waves, which are converted converted to a digital signal that Siri maps to words. Whatever action Siri takes is unlikely to change the distribution of words you use, and even less likely to change the function that maps sound waves to text (unless she sends you a DVD on elocution). A similar argument could be made for many applications of machine translation and image classification. 
 
@@ -334,69 +336,51 @@ What about forecasting the weather? If you are using a short term forecast to de
 
 Identifying spam and automated essay marking both involve  processing text to determine an underlying (complex) attribute such as its topic or quality. In both cases, there is inherent competition between the algorithm and the people generating the text. As a result, decisions made by the algorithm are likely to change the relationship between the features it relies on and the true label. Spammers and students will modify their writing in order to optimise their results. A standard supervised learning approach can only work if the resulting change in the mapping from features to label is sufficiently gradual. There are two key ways of ensuring this. The first is to limit people's ability to observe (and thus react to) decisions made by the algorithm. The second is to use a model in which the features are related to the outcome in such a way that they cannot be manipulated independently. 
 
-This example also highlights a connection between causal models and transparancy in machine learning. If we are using a non-causal model to make decision effecting people, there will be a trade-off between the performance and transparancy of the model; not because the requirement for transparancy restricts us to simple models but because revealing how the model works allows people to change their behaviour to game it. 
+This example also highlights a connection between causal models and transparency in machine learning. If we are using a non-causal model to make decision effecting people, there will be a trade-off between the performance and transparency of the model; not because the requirement for transparency restricts us to simple models but because revealing how the model works allows people to change their behaviour to game it. 
 
-What about predicting the risk of death in patients with pneumonia? Suppose the goal is to build a model to decide who should be treated in hospital and who can be sent home with antibiotics. If we assume that in hospital treatment is more effective for serious cases, this seems like a straightforward prediction problem. It is not. Depending on how the decision to admit was previously made and what features are included (or omitted) in the model, the relationship between those features and the outcome may change if the model is used to make admition decisons. \citet{Caruana2015} found exactly this effect in a real data set. The model learnt that people suffering asthma were \emph{less} likely to die from pneumonia. They realised this was because doctors were treating such patients very aggressively, thus actually lowering their risk. The issue is not with model, it performed very well at the task for which it was trained, which is to predict wo would be likely to die under the original admition and treatment protocols. However, using it to decide how to \emph{change} these protocols could kill. The actual question of interest in this case is what happens to patients with charachteristics $X$ if we assign them treatment according to decision rule $Z$. 
+What about predicting the risk of death in patients with pneumonia? Suppose the goal is to build a model to decide who should be treated in hospital and who can be sent home with antibiotics. If we assume that in hospital treatment is more effective for serious cases, this seems like a straightforward prediction problem. It is not. Depending on how the decision to admit was previously made and what features are included (or omitted) in the model, the relationship between those features and the outcome may change if the model is used to make admission decisions. \citet{Caruana2015} found exactly this effect in a real data set. The model learnt that people suffering asthma were \emph{less} likely to die from pneumonia. They realised this was because doctors were treating such patients very aggressively, thus actually lowering their risk. The issue is not with model, it performed very well at the task for which it was trained, which is to predict who would be likely to die under the original admission and treatment protocols. However, using it to decide how to \emph{change} these protocols could kill. The actual question of interest in this case is what happens to patients with characteristics $X$ if we assign them treatment according to decision rule $Z$. 
 
 Predicting which customers will leave or who will re-offend if granted parole also fit within the category of problems where you wish to identify a group for which a problem will occur and target some treatment to them (hospitalisation, loyalty reward, more monitoring \& support on parole, etc). Predictive models can be applied to such problems provided it is known which treatment option will be most effective for the target group and deciding who to treat on the based of the model predictions won't change the relationship between features and outcome.
 
 Demand prediction seems like a relatively straightforward prediction problem. These models use features such as location, pricing, marketing, time of year, weather, etc to forecast the demand for a product. It seems unlikely that using the model to ensure stock is available will itself change demand. However, depending on the way demand is measured, there is a potential data censoring issue. If demand is modelled by the number of sales, then if a product is out of stock demand will appear to be zero. Changing availability does then change demand.
    
-Playing Go (and other games) is a case with some subtleties. At every turn, the AI agent has a number of actions available. The board state following each action is deterministic and given by the rules of the game. The agent can apply supervised machine learning, based on millions of previous games, to estimate the probability that each of these reachable board states will lead to a win \footnote{This is a challenging pattern recognition problem. There are around $2 \times 10^{170}$ legal board positions in Go, (\citep{tromp2016number}), so the algorithm cannot simply memorise the proportion of times each state leads to a win, it must identify higher level features of the board state that are associated with winning.}. Supervised learning can also be applied to learn a policy $\P{a|s}$, the probability of selecting action $a$ given board state $s$. This allows the agent to estimate the likelyhood of winning from a given starting state by simulating (many times) the remainder of the game, drawing actions from $\P{a|s}$ for both players. Google's Alpha Go, which in May 2017 beat the then strongest human player \citep{Mozur2017}, incorporates a compbination of these approaches \citep{silver2016mastering}. The supervised learning was enhanced by having the agent play (varients) of itself many times, so that its estimates of value for each board state and of the likelyhood an opponent will play as given move are based on a combination of replicating the way humans play and on the moves that led to a win when playing itself. 
+Playing Go (and other games) is a case with some subtleties. At every turn, the AI agent has a number of actions available. The board state following each action is deterministic and given by the rules of the game. The agent can apply supervised machine learning, based on millions of previous games, to estimate the probability that each of these reachable board states will lead to a win \footnote{This is a challenging pattern recognition problem. There are around $2 \times 10^{170}$ legal board positions in Go, (\citep{tromp2016number}), so the algorithm cannot simply memorise the proportion of times each state leads to a win, it must identify higher level features of the board state that are associated with winning.}. Supervised learning can also be applied to learn a policy $\P{a|s}$, the probability of selecting action $a$ given board state $s$. This allows the agent to estimate the likelyhood of winning from a given starting state by simulating (many times) the remainder of the game, drawing actions from $\P{a|s}$ for both players. Google's Alpha Go, which in May 2017 beat the then strongest human player \citep{Mozur2017}, incorporates a combination of these approaches \citep{silver2016mastering}. The supervised learning was enhanced by having the agent play (variants) of itself many times, so that its estimates of value for each board state and of the likelyhood an opponent will play as given move are based on a combination of replicating the way humans play and on the moves that led to a win when playing itself. 
 
-The problem of playing go is causal from the interventionalist perspective. The agent wishes to learn the probability of a win given an action they take. However, there are some special characteristics to the go problem that make it amenable to a primarily supervised learning approach. The actions the agent has to explore are the sames ones as human players explored to generate the trainging data, and both have the same objective - to win the game. In addition, the state of the board encapsulates all the information relevent to selecting a move. These factors make it reasonable to conclude that selecting moves with an algorithm will not change the value of a board state or the probability of given move by the opponent by a sufficiently large margin to invalidate the training data. 
+The problem of playing go is causal from the interventionalist perspective. The agent wishes to learn the probability of a win given an action they take. However, there are some special characteristics to the go problem that make it amenable to a primarily supervised learning approach. The actions the agent has to explore are the sames ones as human players explored to generate the training data, and both have the same objective - to win the game. In addition, the state of the board encapsulates all the information relevant to selecting a move. These factors make it reasonable to conclude that selecting moves with an algorithm will not change the value of a board state or the probability of given move by the opponent by a sufficiently large margin to invalidate the training data. 
  
-Having considered these examples we can now identify some general aspects of problems that require causal (as opposed to purely predicive) inference. A predictive model may be sufficient if, given the variable(s) being predicted, it is clear which action is optimal and if selecting actions on the basis of the model does not change the mapping from features to outcomes. The second requirement is particularly difficult to satisfy when an algorithm is making important decisions effecting individual people. Think about problems like credit scoring and parole decisons. There are strong ethical grounds for demanding transparancy, but if the goals of society and the individuals are not perfectly aligned and there is any posibility that people can manipulate features independtly of the outcome, there will be a conflict between model accuracy and transparancy. It is rare to build a model without any intent to make some kind of decion on the basis of its results. Thus, I argue we should assume a causal model is required until we can justify otherwise.  
+Having considered these examples we can now identify some general aspects of problems that require causal (as opposed to purely predictive) inference. A predictive model may be sufficient if, given the variable(s) being predicted, it is clear which action is optimal and if selecting actions on the basis of the model does not change the mapping from features to outcomes. The second requirement is particularly difficult to satisfy when an algorithm is making important decisions effecting individual people. Think about problems like credit scoring and parole decisions. There are strong ethical grounds for demanding transparency, but if the goals of society and the individuals are not perfectly aligned and there is any possibility that people can manipulate features independently of the outcome, there will be a conflict between model accuracy and transparency. It is rare to build a model without any intent to make some kind of decision on the basis of its results. Thus, I argue we should assume a causal model is required until we can justify otherwise.  
 
 \section{An overview of this thesis and its contributions}
 
--------------------
+As we have shown, problems involving causality are ubiquitous in many fields. As a result, techniques for addressing them have developed in parallel within many disciplines, including statistics, economics, social science, epidemiology and machine learning. Although the focus and terminology can differ substantially between fields these techniques all address the underlying goal of estimating the effect of or optimally selecting interventions in some system. Methods for learning about interventions can be usefully categorised into two broad approaches, reinforcement learning and observational causal inference. 
 
+In reinforcement learning, under which we include traditional randomised experiments, we learn the outcome of actions by taking them. We take the role of an agent, capable of intervening in the system, and aim to develop algorithms that allow the agent to select actions optimally with respect to some goal. A particular strand of research within reinforcement learning are multi-armed bandit problems. They describe settings in which there are a set of available actions, the agent repeatedly decides which to select and then observes the outcome of the chosen action. They capture problems such as a doctor deciding which treatment to prescribe to a patient or a search engine selecting which advertisement to display to a user, where the agent faces the same set of choices repeatedly and is able to assess the value of outcome of the actions. 
 
-In chapter \ref{chap:interventionalist_view} I describe the interventionalist viewpoint on learning the outcome of actions. 
-
-I review the key problems and results within the bandit liturature
-
-highlight some interesting connections between existing strands of work on bandits and causal inference. 
-
-
-
--------------------
-
-Causal questions are everywhere. Statistics, economics, social science, artificial intelligence and machine learning. Techniques and for addressing such problems have developed in parralel within many diciplines. These techniques can usefully be categorised into two broad approaches, reinforcement learning and observational causal inference. 
-
-In reinforcement learning, under which we include traditional randomised experiments, we learn the outcome of actions by taking them. We take the role of an agent, capable of intervening in the system, and aim to develop algorithms that allow the agent to select actions optimally with respect to some goal. A particular strand of research within reinforcement learning are multi-armed bandit problems. They describe settings in which there are a set of available actions, the agent repeately decides which to select and then observes the outcome of the chosen action. They capture problems such as a doctor deciding which treatment to prescribe to a patient or a search engine selecting which advertisement to display to a user, where the agent faces the same set of choices repeatedly and is able to assess the value of outcome of the actions. 
-
-The approach of learning the outcome of an action by taking it has plays a key role in advancing our knoweledge of the world. However, we frequently have access to large bodies of data that have been collected from a system in which we did not have any control over what actions were taken, or perfect knowledge of the basis on which those actions were chosen. Estimating the affect of an action from such observational data sets is the problem addressed by observational causal inference. 
-
-Observational causal inference can be viewed as a form of transfer learning. The goal is to leverage data obtained from one system, the system we have observed, to estimate key characteristics of another, the system after we select an action via some policy that may differ from the process driving which actions occur in the orignial system. This is impossible without some assumptions about how the the orignal system and the system after intervention are related to one-another. The key to observational inference is a framework that models how actions change the state of the world and thus allows us to map information collected in one setting to another. 
+The approach of learning the outcome of an action by taking it has plays a key role in advancing our knowledge of the world. However, we frequently have access to large bodies of data that have been collected from a system in which we did not have any control over what actions were taken, or perfect knowledge of the basis on which those actions were chosen. Estimating the affect of an action from such observational data sets is the problem addressed by observational causal inference. Observational causal inference can be viewed as a form of transfer learning. The goal is to leverage data obtained from one system, the system we have observed, to estimate key characteristics of another, the system after we select an action via some policy that may differ from the process driving which actions occur in the original system. This is impossible without some assumptions about how the the original system and the system after intervention are related to one-another. The key to observational inference is to model how actions change the state of the world in such a way that we can map information collected in one setting to another. 
 
 Both multi-armed bandits and observational causal inference can be seen as extensions to the concept of randomised controlled trials. Bandit algorithms deal with the sequential nature of the decision making process, causal inference with the problem randomisation is not always feasible, affordable or ethical. The similarities between the problems that these techniques have been developed to address raises the question of if there are problems best addressed by a combination of these approaches and how they can be combined. 
 
-The goals of this thesis are: to clarify the distinction between prediction and causal inference and highlight when and how we can leverage advances in prediction to improve causal inference and to draw together the key approaches to solving causal problems, from both the interventionalist and observational viewpoints. In chapter two, I describe the existing frameworks for formalising causality developed withing economics, statistics and machine learning and discuss how they relate to one another. Chapter three reviews the key approaches to causal inference from observational data. Chapter four highlights the interventionalist viewpoint, covering traditional randomised experiments and the closely related multi-armed bandit problems and highlights connections between the algorithms applied to bandit problems and those for estimating causal effects from observational data. 
+The primary goal of this thesis is to draw together the key approaches to solving causal problems from both the interventionalist and observational viewpoints. 
 
-In chapter five, I develop a framework that unifies the causal graphical model approach for inference in observational settings with the sequential experimental approach encapsulated by multi-armed bandits. The causal models allow us to represent our knowledge of how variables are related to one-another in a very natural way and induces an interesting and novel form of structure between the different actions modelled in the bandit problem. I develop a new algorithm that can exploit this structure as a first step towards a unified approach to decision making under uncertainty. 
+In chapter \ref{chap:causality} I describe key frameworks for causal inference from observational data and discuss how the relate to one-anther and review how they can be leveraged to answer causal queries. Chapter \ref{chap:interventionalist_view} covers the interventionalist viewpoint, including traditional randomised experiments and the closely related multi-armed bandit problems. It describes the key problems and results within the bandit literature and highlights some interesting connections between existing strands of work on bandits and causal inference. In chapter \ref{chap:causal-bandit}, I develop a framework that unifies the causal graphical model approach for inference in observational settings with the sequential experimental approach encapsulated by multi-armed bandits. The causal models allow us to represent our knowledge of how variables are related to one-another in a very natural way and induces an interesting and novel form of structure between the different actions modelled in the bandit problem. I develop a new algorithm that can exploit this structure as a first step towards a unified approach to decision making under uncertainty. 
 
-Chapters two to four predominantly review the existing liturature with the goal of making connections between the different viewpoints and approaches. They do not contain novel technical results but present the material in a unified way. Chapter five is a novel contribution. It formally connect causal graphical models and multi-armed bandit problems, demonstrates this leads to a form of structure that had not previously been analysed within the bandit liturature and describes an algorithm that can leverage this structure to make better decisons. 
+Chapters \ref{chap:causality} and \ref{chap:interventionalist_view} predominantly review the existing literature with the goal of highlighting connections between the different viewpoints and approaches. They do not contain novel technical results but present the material in a unified way. Chapter \ref{chap:causal-bandit} is a novel contribution. It formally connect causal graphical models and multi-armed bandit problems, demonstrates this leads to a form of structure that had not previously been analysed within the bandit literature and describes an algorithm that can leverage this structure to make better decisions. 
 
 \chapter{Learning from observational data}
 \label{chap:causality}
 
-The goal of causal inference is to learn the effect of taking an action. We can do this directly via experimental approaches, however any given agent only has a limited capacity to manipulate the world. We are generating and storing data on almost every aspect of our lives at an unprecedented rate. As we incorporate sensors and robotics into our cities, homes, cars, everyday products and even our bodies, the breadth and scale of this data will only increase. However, only a tiny fraction of this data will be generated in a controlled way with the specific goal of answering a single question. An agent that can only learn from data when it had explicit control (or perfect knowledge of) the process by which that data was generated will be severly limted. This makes it critical that we develop effective methods that us to predict the outcome of an intervention in some system from observing it. This is the problem of observational causal inference. 
+The goal of causal inference is to learn the effect of taking an action. We can do this directly via experimental approaches, however any given agent only has a limited capacity to manipulate the world. We are generating and storing data on almost every aspect of our lives at an unprecedented rate. As we incorporate sensors and robotics into our cities, homes, cars, everyday products and even our bodies, the breadth and scale of this data will only increase. However, only a tiny fraction of this data will be generated in a controlled way with the specific goal of answering a single question. An agent that can only learn from data when it had explicit control (or perfect knowledge of) the process by which that data was generated will be severely limited. This makes it critical that we develop effective methods that us to predict the outcome of an intervention in some system from observing it. This is the problem of observational causal inference. 
 
 \section{Causal models}
 \label{sec:causal_models}
 
-As previusly mentioned, observational causal inference is 
+Observational causal inference aims to infer the outcome of an intervention in some system from data obtained by observing (but not intervening in) it. As previously mentioned, this is a form of transfer learning; we need to infer properties of the system post-intervention from observations of the system pre-intervention. Mapping properties from one system to another requires some assumptions about how these two systems are related, or other words, a way of describing actions and how we anticipate a system will respond to them. Three key approaches have emerged: counterfactuals, structural equation models and causal Bayesian networks. 
 
-Observational causal inference aims to infer the outcome of an intervention in some system from data obtained by observing (but not intervening in) it. As previuosly mentioned, this is a form of transfer learning; we need to infer properties of the system post-intervention from observations of the system pre-intervention. Doing this requires some assumptions about how these two systems are related, or other words, a way of describing actions and how we anticipate the system will respond to them. Three key approaches have emerged: counterfactuals, structural equation models and causal Bayesian networks. 
+Counterfactuals \citep{Rubin1974} were developed from the starting point of generalising from randomised trials to less controlled settings. They describe causal effects in terms of differences between counterfactual variables, what would happen if we took one action verses what would happen if we took another. Counterfactual assertions can be expressed very naturally in human languages and are quite prevalent in  every day conversations;\quotes{if I had worked harder I would have got better grades}, \quotes{she would have been much sicker if she hadn't taken antibiotics}. Structural equation models have been developed and applied primarily within economics and related disciplines and can be seen as an attempt to capture key aspects of the behaviour of people with mathematics. Questions around designing policies or interventions play a central role in economics. Thus they have transformed simultaneous equations into a powerful (though somewhat poorly formalised) framework and associated set of methods for estimating causal effects. Causal Bayesian networks \citep{Pearl2000} are a more recent development and arise from the addition of a fundamental assumption about the meaning of a link to Bayesian networks. They inherit and leverage the way Bayesian networks encode conditional independencies between variables to localise the impact of an intervention in a system in a way that allows formalisation of conditions under causal effects can be inferred from observational data. 
 
-counterfactuals 
+An understanding of causal Bayesian networks and their properties (in particular the do calculus, see section \ref{sec:do_calculus}) is sufficient to appreciate my main technical contributions in chapter \ref{chap:causal-bandit}, as well as the importance of formal causal reasoning in Bayesian inference that I highlight in section  \ref{sec:bayesian_causality}. However, the literature on causal inference techniques remains spit between the different frameworks. Much of the recent work on estimating causal effects within machine learning, as well as widely used methodologies such as propensity scores, are described using the counterfactual framework. Methods developed within economics, in particular instrumental variable based approaches, or those requiring parametric or functional assumptions are often based around structural equation models. This makes it worthwhile for researchers interested in causality to develop an understanding off all these viewpoints.
 
-MOTIVATE WHY I AM DESCRIBING THEM ALL SUMMARISE WHAT EACH OFFERS.
-
-
-In this chapter we will examine the problems these approaches allow us to solve, the assumptions they rely on and how they differ. We will also use them to describe the following simplified examples. The aim is to demonstrate the notations and formalisms needed to tackle more interesting problems later on.
+In the next sections we describe causal Bayesian networks, counterfactuals and structural equation models: the problems they he problems they allow us to solve, the assumptions they rely on and how they differ. We hope that by describing all three frameworks, how they relate to one-another, and when they can be viewed as equivalent, we will make it easier for researchers familiar with one framework to understand the others and to transfer ideas and techniques between them. However, sections \ref{sec:SEM} (Structural Equation models), and \ref{sec:unifying_causal_models} (Unifying the models) are not crucial to understanding my technical contributions and may be safely skipped by uninterested readers. In order to demonstrate the notation and formalisms each framework provides we will use them to describe the following simple examples. 
 
 \vspace*{.3cm}
 \begin{example}
@@ -499,7 +483,7 @@ We can represent this graphically by drawing a network with a node for each vari
     (2) edge (3);
 \end{tikzpicture}
 \end{subfigure}
-\caption{Some valid Bayesian networks for a distribution $P$ over $(X_1,X_2,X_3)$ in which $X_3$ is conditionally independent of $X_1$ given $X_2$, denoted $X_3 \ci X_1 | X_2$. Graphs (a), (b) and (c) are all a \emph{perfect map} for $P$ as the graphical stucture implies exactly the same set of independencies exhibitied by the distribution. Graph (d), like figure \ref{fig:bayesnet} does not imply any conditional independencies, and is thus a valid (but not very useful) Bayesian network representation for any distribution over three variables.}
+\caption{Some valid Bayesian networks for a distribution $P$ over $(X_1,X_2,X_3)$ in which $X_3$ is conditionally independent of $X_1$ given $X_2$, denoted $X_3 \ci X_1 | X_2$. Graphs (a), (b) and (c) are all a \emph{perfect map} for $P$ as the graphical structure implies exactly the same set of independencies exhibited by the distribution. Graph (d), like figure \ref{fig:bayesnet} does not imply any conditional independencies, and is thus a valid (but not very useful) Bayesian network representation for any distribution over three variables.}
 \label{fig:bayesnet2}
 \end{figure}
 
@@ -585,43 +569,10 @@ We have seen from these two examples that the expression to estimate the causal 
 \label{fig:causal_adjust} 
 \end{figure}
 
-Causal Bayesian networks are Bayesian networks, so results that apply to Bayesian networks carry directly across: the local Markov property states that variables are independent of their non-effects given their direct causes. The global Markov property and d-separation also hold in causal networks. D-speration, which characterises which conditional independencies must hold in any distribution that can represented by a given Bayesian network $G$, is key to many important results and algorithms for causal inference. We include a brief introduction in section \ref{sec:dsep}. 
-
-\subsubsection{Can't everything be encoded in a Bayesian model?}
-Formalising the definition of an intervention within the framework of causal graphical models provides us with an explicit mechanism to map information from one data generating process, the system pre-intervention, to another, the system post-intervention. The power of defining an intervention in this way stems from the number of things that are invariant between the two processes. All the (conditional) distributions for variables in the graph that were not directly set by the intervention are assumed not be changed by it.  
-
-We could represent problems of the type where we try to infer properties of the post-interventional system based on data generated by the pre-interventional distribution by explicitly representing both systems and what they have in common, see figure \ref{fig:causal_ordinary_bayes}. This does not require any special framework or notation. The graphs in figure  \ref{fig:causal_ordinary_bayes} are ordinary Bayesian networks. However, without a causal framework, we have to make assumptions about what will be invariant to the intervention specifically for each such problem we encounter. For complex problems, it is very difficult to conceptualise the assumptions we expect to hold without the benefit of a causal framework.  
-
-\begin{figure}[h]
-\center
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.2cm, thick,node/.style={observed},lt/.style={latent}]
-\tikzstyle{box}=[rectangle, draw=black!100]
- %nodes
-\node[node](1){$Z$};
-\node[node, below left=of 1](2){$X$};
-\node[node, below right=of 1](3){$Y$};
-\node[node, right=1.5cm of 3](4){$x$};
-\node[lt, above right=of 4](5){$Z'$};
-\node[lt, below right=of 5](6){$Y'$};
-\node[lt, above=2.0cm of 3](9){$\theta_{y}$};
-\node[lt, above=0.5cm of 9](7){$\theta_z$};
-\node[lt, above=2.0cm of 2](8){$\theta_x$};
-\path[every node/.style={font=\sffamily\small}]
-    (1) edge (2) edge (3)
-    (2) edge (3)
-    (4) edge (6)
-    (5) edge (6)
-    (8) edge (2)
-    (7) edge (1) edge (5)
-    (9) edge (3) edge (6);
-\node[rectangle, inner sep=4.0mm, fit= (1) (2) (3),draw=black!100,label=below right:N] {};
-\node[rectangle, inner sep=4.0mm, fit= (5) (6),draw=black!100,label=below right:M] {};
-\end{tikzpicture} 
-\caption{Causal inference with ordinary Bayesian networks. The plate on the left represents the observed data generated prior to the intervention and the plate on the right the data we anticipate obtaining after an intervention that sets the pre-interventional variable $X$ to $x$. The assumptions characterised by this plate model correspond to those implied by the causal Bayesian network in figure \ref{fig:causal_adjust} for the intervention $do(X=x)$. As the networks in this figure are ordinary Bayesian networks, we could have represented the same information with a different ordering of the links within each plate. However, we would then have a complex transformation relating the parameters between the two plates rather than a simple invariance.}
-\label{fig:causal_ordinary_bayes}
-\end{figure}
-
 A causal Bayesian network represents much more information than a Bayesian network with identical structure. A causal network encodes all possible interventions that could be specified with the do-notation. For example, if the network in figure \ref{fig:causal_adjust} were an ordinary Bayesian network and all the variables were binary, the associated distribution could be described by 7 parameters. The equivalent causal Bayesian network additionally represents the post-interventional distributions for six possible single variable interventions and twelve possible two variable interventions. Encoding all this information without the assumptions implicit in the causal Bayesian network would require an additional 30 parameters \footnote{After each single variable intervention we have a distribution over two variables, which can be represented by three parameters. After each two variable intervention, we have a distribution over one variables which requires one parameter. This takes us to a total of $6\times3+12\times1 = 30$ additional parameters.}.
+
+Causal Bayesian networks are Bayesian networks, so results that apply to Bayesian networks carry directly across: the local Markov property states that variables are independent of their non-effects given their direct causes. The global Markov property and d-separation also hold in causal networks. D-separation, which characterises which conditional independencies must hold in any distribution that can represented by a given Bayesian network $G$, is key to many important results and algorithms for causal inference. We include a brief review of D-separation in section \ref{sec:dsep}. 
+
 
 \subsubsection{Limitations of causal Bayesian networks}
 A number of criticisms have been levelled at this approach to modelling causality. One is that the definition of an intervention only in terms of setting the value of one or more variables is too precise and that any real world intervention will affect many variables in complex and non-deterministic ways \citep{rickles2009causality,cartwright2007hunting}. However, by augmenting the causal graph with additional variables that model how interventions may take effect, the deterministic do operator can model more complex interventions. For example, in the drug treatment case, we assumed that all subjects complied, taking the treatment or placebo as assigned by the experimenter. But, what if some people failed to take the prescribed treatment? We can model this within the framework of deterministic interventions by adding a node representing what they were prescribed (the intervention) which probabilistically influences the treatment they actually receive, see figure \ref{fig:randomized_imperfect_compliance}. Note that the fact that we no longer directly assign the treatment opens the possibility that an unobserved latent variable could affect both the actual treatment taken and the outcome.
@@ -694,46 +645,7 @@ Assuming that within each socio-economic status level, attendance at pre-school 
 
 Another assumption introduced within the Neyman-Rubin causal framework is the Stable Unit Treatment Value Assumption (SUTVA) \citep{Rubin1978}. This is the assumption that the potential outcome for one individual (or unit) does not depend on the treatment assigned to another individual. As an example of a SUTVA violation, suppose disadvantaged four year olds were randomly assigned to attend pre-school. The subsequent school results of children in the control group, who did not attend, could be boosted by the improved behaviour of those who did and who now share the classroom with them. SUTVA violations would manifest as a form of model misspecification in causal Bayesian networks. 
 
-
-There are complex philosophical objections to counterfactuals arising from the way they describe alternate universes that were never realised. This makes it quite easy to (accidentally) make statements about counterfactuals that cannot be tested with empirical data. Consider the following example based on \citet{Dawid2000}. Again we have a drug where the outcome for an individual if treated is represented by the counterfactual variable $\cf{Y}{1}$ and the outcome if not treated is $\cf{Y}{0}$. Suppose these counterfactual variables $\cf{Y}{1}$ and $\cf{Y}{0}$ are jointly normal with equal variance (for simplicity).
-
-% vector with mean mu_t,mu_c and a covariance matrix
-\eqn{
-P(\cf{Y}{1},\cf{Y}{0}) \sim N( 
-         \begin{bmatrix}
-           \mu_{1} \\
-           \mu_2 \\
-         \end{bmatrix},
-         \begin{bmatrix}
-           \sigma^2 & \rho \sigma^2 \\
-           \rho \sigma^2 & \sigma^2 \\
-         \end{bmatrix}
-         )
-}
-
-The distribution of \emph{individual treatment effects}, $\tau = \cf{Y}{1} - \cf{Y}{0}$ is also normal,
-
-\eqn{
-P(\tau) = N(\mu_1 - \mu_0,2\sigma^{2}(1-\rho))
-}
-
-
-\begin{figure}[h]
-\captionsetup[subfigure]{position=b}
-\centering
-\subcaptionbox{Marginal distributions over the potential outcomes $\cf{Y}{1}$ and $\cf{Y}{0}$ for $\mu_1=1$, $\mu_0=0$ and $\sigma = 1$. The blue curve shows the distribution of $Y$ if everyone were to be treated and the blue curve the distribution if no-one was treated. \label{fig:metaphys_a}}{\includegraphics[width=.45\linewidth]{figures/counterfactual_nonidentify_a.pdf}}
-\hspace{0.02\textwidth}
-\subcaptionbox{Two very different distributions of individual causal effects consistent with the potential outcome distributions. \label{fig:metaphys_b}}
-{\includegraphics[width=.45\linewidth]{figures/counterfactual_nonidentify_b.pdf}}
-\caption{The distribution of individual treatment effects is not identifiable, even from a randomised controlled trial.}
-\label{fig:metaphysical_distribution_difference}
-\end{figure}
-
-From a (large) randomised controlled trial we can estimate the marginal distributions over the counterfactual variables, see figure \ref{fig:metaphys_a}. These represent the distributions we would expect over the outcome $Y$ if everyone were treated or not treated respectively. However, the distribution over the individual causal effects depends on $\rho$, see figure \ref{fig:metaphys_b}. The key problem is that we can never observe the joint distribution over $\cf{Y}{1}$ and $\cf{Y}{0}$. As a result, $\rho$ and thus the variance of $\tau$ is not identifiable, even from experimental data. \citet{Dawid2000} argues that we should avoid using counterfactuals as they are defined in terms of (metaphysical) individual causal effects. He further points out that the interventional distributions in figure \ref{fig:metaphys_a}, along with a loss function, contain all the information required to decide how to treat a new patient.  
-
-This result is unintuitive. It seems on the face of it that the distribution of individual causal effects is relevant to our decision making. If $\rho = 1$ then almost everyone benefits slightly from the treatment whilst if $\rho=0$, there is a wide range, with some people benefiting a lot and others suffering significant harm. This confusion can be resolved by thinking about personalised rather than individual causal effects. It is entirely possible that potentially observable characteristics (such as gender, age, genetics, etc) affect how people will respond to the treatment. We can partition people into sub-populations on the basis of these characteristics and measure different \emph{personalised} causal effects for each group. The variance of the potential outcome distributions $f(\cf{Y}{1})$ and $f(\cf{Y}{0})$ provides bounds on how much can be gained from further personalisation. The metaphysical nature of individual causal effects only arises when we are at the point where the only remaining variation is due to inherent randomness (or variables that we could not even in principle measure). 
-
-One way of looking at counterfactuals is as a natural language short hand for describing highly specific interventions like those denoted by the do-notation. Rather than talking about the distribution of $Y$ given we intervene to set $X=x$ and hold everything else about the system constant we just say what would the distribution of $Y$ be had $X$ been $x$. This is certainly convenient, if rather imprecise. However, the ease with which we can make statements with counterfactuals that cannot be tested with empirical data warrants careful attention. It is important to be clear what assumptions are being made and whether or not they could be validated (at least in theory). 
+There are complex philosophical objections to counterfactuals arising from the way they describe alternate universes that were never realised. In particular, statements involving joint distributions over counterfactual variables may not be able to be validated empirically \citet{Dawid2000}. One way of looking at counterfactuals is as a natural language short hand for describing highly specific interventions like those denoted by the do-notation. Rather than talking about the distribution of $Y$ given we intervene to set $X=x$ and hold everything else about the system constant we just say what would the distribution of $Y$ be had $X$ been $x$. This is certainly convenient, if rather imprecise. However, the ease with which we can make statements with counterfactuals that cannot be tested with empirical data warrants careful attention. It is important to be clear what assumptions are being made and whether or not they could be validated (at least in theory). 
 
 \subsection{Structural Equation models}
 \label{sec:SEM}
@@ -812,6 +724,7 @@ Equation \ref{eqn:sem:adjusting} corresponds to equations \ref{eqn:backdoor_exam
 Structural equation models are generally applied with strong constraints on the functional form of the relationship between the variables and noise is typically assumed to be additive, $X_i = f_i(\cdot)+\epsilon_i$. A structural equation model with $N$ variables resembles a set of $N$ simultaneous equations, with each variable playing the role of the dependent (left hand side) variable in one equation. However a SEM is, by definition, more than a set of simultaneous equations. By declaring it to be structural we are saying that it represents assumptions about the relationships between variables. When we visualise the model as a network the absence of an arrow between two variables encodes the assumption that one does not cause the other. The similarity between the notation used to describe and analyse structural equation models and simultaneous equations, combined with a reluctance to make explicit statements about causality, has led to some confusion in the interpretation of SEMs \citep{heckman2015causal,Pearl2000}. 
 
 \subsection{Comparing and unifying the models}
+\label{sec:unifying_causal_models}
 
 Remarkably for models developed relatively independently in fields with very different approaches and problems, the models we have discussed can be nicely unified for interventional queries (those that can be expressed with the do-notation). If the network for a structural equation model is acyclic, that is if starting from any node and following edges in the direction of the arrows you cannot return to the starting point, then it implies a recursive factorisation of the joint distribution over its variables. In other words, the network is a causal Bayesian network. All of the results that apply to causal Bayesian networks also apply to acyclic structural equation models.  Taking an action that sets a variable to a specific value equates to replacing the equation for that variable with a constant. This corresponds to dropping a term in the factorisation and the truncated product formula (equation \ref{eq:truncatedproduct}). Thus, the interventional query $P(Y|do(X))$ is identical in these two frameworks. We can also connect this to counterfactuals via:
 
@@ -833,7 +746,7 @@ It is possible to relax the independence of errors assumption for SEMs to corres
 
 In practice, differences in focus and approach between the fields in which each model dominates eclipse the actual differences in the frameworks. The work on causal graphical models \citep{Pearl2000,Sprites2000} focuses on asymptotic, non-parametric estimation and rigorous theoretical foundations. The Neyman-Rubin framework builds on the understanding of randomised experiment and generalises to quasi-experimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimation of average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \citep{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data to support policy decisions is central to the field. Economists are often interested in more informative measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \citep{Heckman2008}. In addition, the parametric structural equation models favoured in economics can be extended to analyse cyclic (otherwise referred to as non-recursive) models. 
 
-\section{What does a causal model give us? Resolving Simpson's paradox}
+\subsection{What does a causal model give us? Resolving Simpson's paradox}
 
 We will now demonstrate our new notation and frameworks for causal inference to resolve a fascinating paradox, noted by \citet{yule1903notes}, demonstrated in real data by \citet{Cohen1934} and popularised by \citet{simpson1951interpretation}. The following example is adapted from \citet{Pearl2000}. Suppose a doctor has two treatments, A and B, which she offers to patients to prevent heart disease. She keeps track of which medication her patients choose and whether or not the treatment is successful. She obtains the results in table \ref{tab:simpson1}.
 
@@ -928,17 +841,17 @@ Note that we have not changed the data itself, only the description of the varia
 \label{fig:simpsons_vector}
 \end{figure}
 
-There are many other plausible causal graphs for both scenarios above. Perhaps income affects drug choice as well as gender, or gender might affect treatment choice and blood pressure control given treatment, etc. Causal modelling provides a powerful tool to specify such assumptions and to determine how to estimate causal effects for a given model see section \ref{sec:causal effect estimation}.
+There are many other plausible causal graphs for both scenarios above. Perhaps income affects drug choice as well as gender, or gender might affect treatment choice and blood pressure control given treatment, etc. Causal modelling provides a powerful tool to specify such assumptions and to determine how to estimate causal effects for a given model as we discuss in the next section.
 
-
-
-\section{Causal effect estimation} 
+\section{Answering Causal Questions} 
 \label{sec:causal effect estimation}
-We can roughly categorise the problems studied within causal inference into two groups, causal effect estimation and causal discovery. In causal effect estimation we assume (at least implicitly) that key aspects of the causal graph are known. The goal is then to estimate the effect of an intervention or range of interventions in the system. Causal effect estimation is implicit in countless studies in economics, social science and epidemiology of everything from the effect of education on earnings \citep{card1999causal}, diet on cancer \citep{bingham2004diet} and breastfeeding on intelligence \citep{jain2002good} to the effect of pet ownership on survival after a heart attack \citep{friedmann1995pet}. Almost every time someone runs a regression model the key quantity of interest is a causal effect. Given how it underlies so much of our scientific progress, there is a enormous potential in properly understanding when we can draw causal conclusions, exactly what assumptions are required to do so and how we can best leverage those assumptions to infer as much information as we can from our data. 
+We can roughly categorise the problems studied within causal inference from observational data into two groups, causal effect estimation and causal discovery. In causal effect estimation we assume (at least implicitly) that key aspects of the causal graph are known. The goal is then to estimate the effect of an intervention or range of interventions in the system. Causal effect estimation is implicit in countless studies in economics, social science and epidemiology of everything from the effect of education on earnings \citep{card1999causal}, diet on cancer \citep{bingham2004diet} and breastfeeding on intelligence \citep{jain2002good} to the effect of pet ownership on survival after a heart attack \citep{friedmann1995pet}. Almost every time someone runs a regression model the key quantity of interest is a causal effect. Given how it underlies so much of our scientific progress, there is a enormous potential in properly understanding when we can draw causal conclusions, exactly what assumptions are required to do so and how we can best leverage those assumptions to infer as much information as we can from our data. 
 
-Causal discovery aims to leverage much broader assumptions to learn the structure of causal graphs from data. This is critical in fields where we are generating a lot of data but have limited theoretical knowledge from which to draw on to determine how variables are related to one another. Causal discovery algorithms are being applied in bioinformatics \citep{Bay2002,Sachs2005,Ram2006,Alekseyenko2011,Statnikov2012,Gao2015,Sokolova2015,Taruttis2015}, medical imaging \citep{Ramsey2010} and climate science \citep{Uphoff2013}. An effective and generalisable approach for causal discovery would be a major step towards the automation of the scientific endeavour. \todo{note that I focus on problems where causal structure known, reference rewiew on structure learning}
+Causal discovery aims to leverage much broader assumptions to learn the structure of causal graphs from data. This is critical in fields where we are generating a lot of data but have limited theoretical knowledge from which to draw on to determine how variables are related to one another. Causal discovery algorithms are being applied in bioinformatics \citep{Bay2002,Sachs2005,Ram2006,Alekseyenko2011,Statnikov2012,Gao2015,Sokolova2015,Taruttis2015}, medical imaging \citep{Ramsey2010} and climate science \citep{Uphoff2013}. An effective and generalisable approach for causal discovery would be a major step towards the automation of the scientific endeavour. In this thesis I have focused on problems where the structure of the causal graph is known. Extending my work to problems where the causal structure is unknown, leveraging the work on causal discovery, is a rich and fascinating line of potential future work, which I discuss very briefly in section \ref{sec:causal_bandit_discussion}. 
 
-Estimating causal effects from observational data comes down to determining if and how we can write expressions for the interventional distributions of interest in terms of observational quantities, which can be measured. We did this on an ad-hoc basis to resolve the examples discussed in chapter \ref{chap:causal_models}. In this chapter we describe a principled approach to mapping observational quantities to interventional ones and discuss some of the key issues involved in estimating such expressions from finite sample data. We assume the basic structure of the graph is known. That is, we assume that we can draw a network containing (at a minimum):
+\subsection{Mapping from observational to interventional distributions}
+
+A central component of estimating causal effects from observational data is determining if and how we can write expressions for the interventional distributions of interest in terms of observational quantities, which can be measured. We did this on an ad-hoc basis to resolve the examples discussed in section \ref{sec:causal_models}. In this section we describe a principled approach to mapping observational quantities to interventional ones and then, in section \ref{sec:estimation_from_finite_data}, discuss the key issues involved in estimating such expressions from finite sample data. We assume the basic structure of the graph is known. That is, we assume that we can draw a network containing (at a minimum):
 
 \begin{itemize}
 \item the target/outcome variable we care about,
@@ -954,7 +867,7 @@ How can the structure of the causal graph be leveraged to compute interventional
 The key to estimating causal effects in the presence of latent variables lies in combining the assumption of how an intervention changes the graph, encoded by the truncated product formula, with information the graph structure provides about conditional independencies between variables. 
 By leveraging conditional independencies we can effectively localise the effect of an intervention to a specific part of a larger graph. This gives rise to the do-calculus \citep{Pearl2000}. The do calculus consists of three rules. They are derived from the causal information encoded in a causal network and the properties of d-separation and do not require any additional assumptions other than that of specifying the causal network.
 
-\subsection{Independence in Bayesian networks: D-separation}
+\subsubsection{Independence in Bayesian networks: D-separation}
 \label{sec:dsep}
 
 Many causal algorithms are based on leveraging the independence properties encoded in Bayesian networks. Therefor, in this section, we briefly review the key properties of Bayesian networks. A more thorough introduction (including proofs) can be found in \citep{Koller2009}. Recall that a Bayesian network is a way of representing the joint distribution over its variables in a way which highlights conditional independencies between them. 
@@ -1054,12 +967,12 @@ Theorem \ref{thrm:dsep_independence} says that independencies implied by d-separ
 
 If $\indep{G} = \indep{P}$ then $G$ is called a perfect map for $P$. However, it is possible to construct distributions that do not have a perfect map, that is they contain conditional independencies that cannot be represented by d-separation. A particular case in which this occurs is when there are deterministic relationships between variables. If we have a Bayesian network $G$ in which we specify that some nodes are deterministic we cannot conclude that if $X$ and $Y$ are d-connected then there exists a distribution $P'$ \emph{consistent} with $G$ in which they are dependent. This does not conflict with theorem \ref{thrm:dsep_independence} as \emph{consistent} in this setting requires that $P'$ both factorises over $G$ and satisfies the specified the deterministic relations between variables. This subtlety led to confusion in assessing what independencies hold between counterfactuals via twin networks \citep{Pearl2000,Richardson2013} and demonstrates the caution required in using d-connecteness to assert lack of independence. D-separation can be extended to compute the additional independencies implied by a graph in which certain nodes are known to be deterministic \citep{Geiger1990}. 
 
-\subsection{The Do Calculus} 
+\subsubsection{The Do Calculus} 
 \label{sec:do_calculus}
 
 The do-calculus is a set of three rules \citep{Pearl1995} that can be applied to simplify the expression for an interventional distribution. If by repeated application of the do-calculus, along with standard probability transformations, we can obtain an expression containing only observational quantities then we can use it to estimate the interventional distribution from observational data. Let $\boldsymbol{X}$,$\boldsymbol{Y}$,$\boldsymbol{Z}$ and $\boldsymbol{W}$ be disjoint sets of variables in a causal graph $G$. We denote the graph $G$ after the an intervention $do(\boldsymbol{X})$, which has the effect of removing all edges into variables in $\boldsymbol{X}$, as $G_{\overline{\boldsymbol{X}}}$
 
-\subsubsection{Rule 1: (adding or removing evidence)} 
+\paragraph{Rule 1: (adding or removing evidence)} 
 
 Rule 1 allows us to remove (or insert) observational evidence from the right hand side of a conditional interventional distribution. It follows directly from the fact that the relationship between d-separation in a network and independence in the corresponding probability distribution still applies after an intervention. 
 
@@ -1119,7 +1032,7 @@ If $(\boldsymbol{Y} \ci \boldsymbol{W} | \boldsymbol{Z},\boldsymbol{X})$ in $G_{
 \label{fig:mutilatednet}
 \end{figure}
 
-\subsubsection{Rule 2: (exchanging actions with observations)}
+\paragraph{Rule 2: (exchanging actions with observations)}
 Rule 2 describes when conditioning on $\boldsymbol{X} = \boldsymbol{x}$ and intervening, $do(\boldsymbol{X}=\boldsymbol{x})$, have the same effect on the distribution over $\boldsymbol{Y}$. Let $G_{\underline{\boldsymbol{X}}}$ denote the causal graph $G$ with all edges \emph{leaving} $X$ removed.
 
 If  $(\boldsymbol{Y} \ci \boldsymbol{X}|\boldsymbol{W})$ in $G_{\underline{\boldsymbol{X}}}$:
@@ -1264,7 +1177,7 @@ do(\boldsymbol{Z}=\boldsymbol{z}),
 \label{fig:rule2_2}
 \end{figure}
 
-\subsubsection{Rule 3: (adding or removing actions)}
+\paragraph{Rule 3: (adding or removing actions)}
 This rule describes cases where the intervention $do(\boldsymbol{X}=\boldsymbol{x})$ has no effect on the distribution of the outcome $\boldsymbol{Y}$. A simple case of rule 3 is given in equation \ref{eq:Do3_1}. If $\boldsymbol{Y}$ is independent of $\boldsymbol{{X}}$ in $G$ after removing links entering $\boldsymbol{X}$ then can be no direct path from $\boldsymbol{X}$ to $\boldsymbol{Y}$ and any intervention on $\boldsymbol{X}$ will not affect $\boldsymbol{Y}$.
 
 if $(\boldsymbol{Y} \ci \boldsymbol{{X}})$ in $G_{\boldsymbol{\overline{X}}}$:
@@ -1345,7 +1258,7 @@ The statement that $\boldsymbol{Y} \ci \boldsymbol{\hat{X}}$ (without conditioni
 \end{figure}
 
 
-\subsection{Identifiability}
+\subsubsection{Identifiability}
 A natural question to ask is, given a set of assumptions about the causal graph, is it possible to estimate a given interventional distribution from observational data? This is the identifiablity problem. It asks if we can obtain an unbiased point estimate for the causal query of interest in the infinite data limit. A query is non-parametrically identifiable if it is identifiable without  assumptions about the functional form of the dependencies between variables in the graph.
 
 \vspace*{.3cm}
@@ -1474,8 +1387,8 @@ Many interesting questions relating to identifiability remain open. What is the 
 Although identifiability is a natural and important question to ask, it does not partition causal questions into solvable and unsolvable. Estimators for identifiable queries can be slow to converge and we may be able to obtain useful bounds on causal effects in cases where point estimates are not identified.
 
 
-\subsection{Estimation}
-\subsubsection{Defining causal effects} 
+
+\subsection{Defining causal effects} 
 So far we have described causal effect estimation in term of identifying the interventional distribution $\P{Y|do(X)}$ from observational data. This interventional distribution is in fact a family of distributions parameterised by the value, $x$, to which the treatment variable $X$ is set. From a decision theoretic viewpoint, we can select an optimal action $x$ by specifying a utility function $\mathcal{U}:y \in \mathcal{Y} \rightarrow \mathbb{R}$ that assigns a value to each outcome $y$ and then selecting the action that maximises the expected utility. 
 
 \eqn{
@@ -1515,7 +1428,7 @@ Causal effects can also be written in terms of counterfactuals. The ACE is $\E{\
 Another way of conceptualising causal effects is as a property indicating the strength of the causal link between two variables. This notion is complex to formalise when the relationship between variables is non-linear. Suppose $Y = X \oplus Z$ with $P(Z=1)=\frac{1}{2}$, the interventional distributions over $X$ are identical after marginalising out $Z$. \citet{Janzing2013} propose a number of postulates that a notion of causal strength could satisfy, demonstrate why previous measures fail these postulates and propose an alternative based on information flow. 
 
 
-\subsubsection{Estimating causal effects by adjusting for confounding variables}
+\subsection{Estimating causal effects by adjusting for confounding variables}
 \label{sec:causal_effect_under_ignorability}
 Probably the two most frequently applied approaches to estimating causal effects from observational data are instrumental variables and adjusting for confounding factors. Instrumental variables correspond to the graph in figure \ref{fig:nid2_instrumental_variable}, which is not identifiable without parametric assumptions, however they can provide tight bounds. Adjusting for confounding equates to identifying a set of variables $\boldsymbol{Z}$ such that the ignorability assumption discussed in section \ref{sec:counterfactuals} holds. This corresponds to a simple graphical test known as the backdoor criterion \citep{Pearl2000}. The setting is also referred to as unconfounded. 
 
@@ -1707,7 +1620,113 @@ The significance of this should not be underestimated. Cross-validation has allo
 
 The performance of methods for causal effect estimation can be tested on simulated data \citep{Frolich2001,zhao2004using,Hill2011,Dorie2016} or by comparing estimates from observational studies with the results from corresponding experiments \citep{lalonde1986evaluating,Fraker1987,heckman1997matching,heckman1998characterizing,dehejia1999causal,Smith2001,Anglemyer2014}. Unfortunately there are a relatively small number of examples where comparable observational and experimental data are available. The results are mixed with later studies finding generally better alignment of results but it is hard to ascertain if this is due to improved methodological approaches or over-fitting to the available data-sets.  
 
+\section{Bayesian reasoning and causality}
+\label{sec:bayesian_causality}
+The Bayesian approach to modelling encapsulates a very general approach to combining prior knowledge and assumptions with data to draw inferences. You can specify a complex model, capturing  your assumptions about the underlying mechanisms of your system, describe what you are uncertain about with parameters (and priors over their values) and then update your beliefs about the values of these parameters based on the observed data. If you believe the model to be a mechanistic representation of the way world works then you can use it to infer the consequences of interventions.
 
+Why then do we need a special framework for causal inference; can't we simply encode all the assumptions required to infer the outcome of an intervention in a given system in a Bayesian model? The short answer is we could. However, causal graphical models represent a useful level of abstraction for many problems. Formalising the definition of an intervention within the framework of causal graphical models provides us with an explicit mechanism to map information from one data generating process, the system pre-intervention, to another, the system post-intervention. We do not need to specify the functional relationships between the variables or priors over their distributions. The power of defining an intervention in this way stems from the number of things that are assumed invariant between the two processes. All the (conditional) distributions for variables in the graph that were not directly set by the intervention are assumed not be changed by it. The causal framework also provides, via the do-calculus, a rigorous method to draw a boundary around which variables we must measure and model to identify causal effects.  
+
+We could represent problems of the type where we try to infer properties of the post-interventional system based on data generated by the pre-interventional distribution by explicitly representing both systems and what they have in common, see figure \ref{fig:causal_ordinary_bayes}. This does not require any special framework or notation. The graphs in figure  \ref{fig:causal_ordinary_bayes} are ordinary Bayesian networks. However, without a causal framework, we have to make assumptions about what will be invariant to the intervention specifically for each such problem we encounter. For complex problems, it is very difficult to conceptualise the assumptions we expect to hold without the benefit of a causal framework.  
+
+\begin{figure}[h]
+\center
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.2cm, thick,node/.style={observed},lt/.style={latent}]
+\tikzstyle{box}=[rectangle, draw=black!100]
+ %nodes
+\node[node](1){$Z$};
+\node[node, below left=of 1](2){$X$};
+\node[node, below right=of 1](3){$Y$};
+\node[node, right=1.5cm of 3](4){$x$};
+\node[lt, above right=of 4](5){$Z'$};
+\node[lt, below right=of 5](6){$Y'$};
+\node[lt, above=2.0cm of 3](9){$\theta_{y}$};
+\node[lt, above=0.5cm of 9](7){$\theta_z$};
+\node[lt, above=2.0cm of 2](8){$\theta_x$};
+\path[every node/.style={font=\sffamily\small}]
+    (1) edge (2) edge (3)
+    (2) edge (3)
+    (4) edge (6)
+    (5) edge (6)
+    (8) edge (2)
+    (7) edge (1) edge (5)
+    (9) edge (3) edge (6);
+\node[rectangle, inner sep=4.0mm, fit= (1) (2) (3),draw=black!100,label=below right:N] {};
+\node[rectangle, inner sep=4.0mm, fit= (5) (6),draw=black!100,label=below right:M] {};
+\end{tikzpicture} 
+\caption{Causal inference with ordinary Bayesian networks. The plate on the left represents the observed data generated prior to the intervention and the plate on the right the data we anticipate obtaining after an intervention that sets the pre-interventional variable $X$ to $x$. The assumptions characterised by this plate model correspond to those implied by the causal Bayesian network in figure \ref{fig:causal_adjust} for the intervention $do(X=x)$. As the networks in this figure are ordinary Bayesian networks, we could have represented the same information with a different ordering of the links within each plate. However, we would then have a complex transformation relating the parameters between the two plates rather than a simple invariance.}
+\label{fig:causal_ordinary_bayes}
+\end{figure}
+
+We can also combine causal graphical models with Bayesian approaches to estimation. For example, we can use a causal graphical model to identify a set of variables that form a valid adjustment set and then use Bayesian regression to estimate posterior distribution over a given causal effect. However, in doing so we need to be careful about the way in which we specify priors as I highlight in the next section.  
+
+\subsection{Careful with that prior}
+
+Suppose we have a data generated by the linear Gaussian Bayesian network below. The goal is to estimate the causal effect of $X$ on $Y$, that is identifying the value of the coefficient $w_{yx}$. The variable $U$ is latent. 
+
+\eqn{
+\P{U} &= N(0 , v_u) \\
+\label{eqn:careful_with_priors}
+\P{Z|U} &= N(w_{zu}U , v_z) \\
+\P{X|Z} &= N(w_{xz}Z , v_x) \\
+\P{Y|U,Z,X} & = N(w_{yu}U +w_{yz}Z + w_{yx}X , v_y)
+}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+  thick,main node/.style={observed},lt/.style={latent}]
+
+ %nodes
+\node[main node](1){$Z$};
+\node[main node, below left=of 1](2){$X$};
+\node[main node, below right=of 1](3){$Y$};
+\node[lt, right=of 1](4){$U$};
+
+
+ \path[every node/.style={font=\sffamily\small}]
+    (1) edge (2)
+    	edge (3)
+    (2) edge (3)
+    (4) edge (1) edge (3);
+	
+\end{tikzpicture} 
+\caption{ }
+\label{fig:careful_with_priors}
+\end{figure}
+
+As each variable is a linear function of its parents, with Gaussian noise, resulting in a joint distribution $\P{U,Z,X,Y}$ that is multivariate normal. Marginalising out $U$ and conditioning on $X$ and $Z$ yields,
+
+\eqn{
+Y \sim N(w_{yx} X + \beta Z, \epsilon) 
+}
+
+where
+
+\eqn{
+\beta &= w_{yz}+\frac{w_{yu}w_{zu}}{w_{zu}^2+\frac{v_z}{v_u}}, \text{ and}\\
+\epsilon &= v_y + w_{yu}^2v_u - \frac{v_u^2 w_{zu}^2 w_{yu}^2 }{v_z^2+v_u^2 w_{zu}^2}
+}
+
+The causal effect of $X$ on $Y$ is identifiable (even without the linear Gaussian assumptions) as $Z$ satisfies the backdoor criterion and the expectation of the coefficient for $X$ in a standard OLS regression of $Y$ against $X$ and $Z$ is $w_{yx}$. However, the causal effect of $Z$ on $Y$ is not identifiable due the presence of the unobserved confounder $U$. The coefficient $\beta$ captures both the causal relationship between $Z$ and $Y$, $w_{yz}$ and the indirect relationship through $U$, which we cannot separate without observing $U$. 
+
+If we do a Bayesian regression of $X$ and $Z$ against $Y$ and use intuition based on the causal relationship between $Z$ and $Y$ to select a prior for $\beta$ we are likely to select something centered around $w_{yz}$, but this is not correct and can introduce bias into our estimate of the coefficient for $w_{yx}$, as we demonstrate in figure \ref{fig:careful-prior-example}. The prior for $\beta$ should be based on our belief about how we expect $Z$ to be \emph{associated} with $Y$ after marginalising out any confounding variables. 
+
+
+\begin{figure}[h]
+\begin{subfigure}[t]{0.99\textwidth}
+     \caption{No prior on $\beta$, the posterior on $w_{yx}$ is centered around its true value}
+    \includegraphics[scale=1]{prior_no_prior}
+\end{subfigure}
+\begin{subfigure}[t]{0.99\textwidth}
+     \caption{Prior on $\beta$ centered around $w_{yz}$, the causal effect of $Z$ on $Y$, $Prior(\beta)= N(w_{yz},\sigma = 0.5)$. The posterior on $w_{yx}$ is biased away from its true value (as is the posterior on $\beta$ but this is not the key quantity of interest).}
+    \includegraphics[scale=1]{prior_bad_prior.pdf}
+\end{subfigure}
+\caption{An example demonstrating how selecting a prior for a nuisance parameter centered around the causal effect of that parameter on the outcome, rather than its association with the outcome, can bias estimates for actual parameter of interest. We sample $n=1000$ data points from the joint distribution defined by $P(U)P(Z|U)P(X|Z)P(Y|U,Z,X) \sim N(0,1)N(2U,0.09)N(0.5Z,1)N(3U -Z + 0.5X , 0.25)$ and fit the model $Y \sim N(w_yx X+\beta Z,\epsilon)$ in Stan and plot the posterior distributions over $w_yx$ and $\beta$. Figure (a) shows the results with no prior (equivalently an improper prior) for both $w_yx$ and $\beta$. Figure (b) shows the results when we place a Gaussian prior centered around the $w_yz$ on the distribution for $\beta$.}\label{fig:careful-prior-example}
+\end{figure}
+
+
+
+This result is counter intuitive. When fitting a model to estimate the affect of marketing on sales, it is natural to put a prior on the coefficient for price that is strongly negative because we believe increasing price decreases sales. However, our prior should be on the expected association between price and sales, holding fixed all the other variables in the model, not the causal relationship between price and sales. An alternative is to explicitly include $U$ as a latent variable in the model. However, this comes at a computational cost with little benefit for estimation, unless we have good knowledge of the relationships between $U$, $Z$ and $Y$. More fundamentally, at whatever level we decide to stop adding latent variables and specify a prior, we can introduce this form of bias if priors are selected naively on the basis of causal intuition and the issue is not limited to linear-Gaussian models. I believe this is an important insight for the many applications of Bayesian modelling that make use of human elicited priors, since people tend to think causally. The solutions, either explicitly modelling latent variables to higher levels or allowing for them in setting priors, have the effect of broadening the priors over nuisance parameters in the model. 
 
 
 \chapter{Learning from interventions}
@@ -1808,7 +1827,7 @@ Let $\actionspace = \set{1,...,k}$ be the set of available actions (or bandit ar
 \item the learner observes and receives (only) the reward for the selected action $\cfb{Y}{a_t}$ 
 \end{enumerate}
 
-At the end of the game the total reward obtained by the learner is $\sum_{t=1}^T \cfb{Y}{a_t}$. We denote the expected reward for the action $i$ by $\mu_i$ and the action with the highest expected reward by $i^*$. Note we have used counterfactual notation (see ) to denote the rewards for each action, $\cfb{Y}{i}$ is the reward the algorithm would have recieved if it selected action $i$ at timestep $t$.  
+At the end of the game the total reward obtained by the learner is $\sum_{t=1}^T \cfb{Y}{a_t}$. We denote the expected reward for the action $i$ by $\mu_i$ and the action with the highest expected reward by $i^*$. Note we have used counterfactual notation (see ) to denote the rewards for each action, $\cfb{Y}{i}$ is the reward the algorithm would have received if it selected action $i$ at timestep $t$.  
 \end{definition} 
 
 
@@ -1834,7 +1853,7 @@ The regret is invariant to adding a constant to the expected rewards for all act
 \subsection{The counterfactual nature of regret}
 \todo{Fix this bit up}
 
-Note that we have used the conterfactual notation to represent the rewards given each action. The stochastic bandit problem can be defined without recourse to counterfactual variables by having the world stochastically generate only a reward for the selected action at each timestep. The psuedo-regret (equation \ref{eqn:pseudo_regret}) remains unchanged as both it and the learner's actions depend only on the marginal distributions over $\cfb{Y}{i}$ for each $i \in \set{1,...k}$. However, the regret as defined in equation \ref{eqn:raw_regret} is no longer properly defined as it relies on both $\cfb{Y}{a_t}$ and $\cfb{Y}{i^*}$ being defined at each timestep. The variance (but not expectation) of $\rawregret$ depends on the covariance between counterfactual variables.
+Note that we have used the counterfactual notation to represent the rewards given each action. The stochastic bandit problem can be defined without recourse to counterfactual variables by having the world stochastically generate only a reward for the selected action at each timestep. The pseudo-regret (equation \ref{eqn:pseudo_regret}) remains unchanged as both it and the learner's actions depend only on the marginal distributions over $\cfb{Y}{i}$ for each $i \in \set{1,...k}$. However, the regret as defined in equation \ref{eqn:raw_regret} is no longer properly defined as it relies on both $\cfb{Y}{a_t}$ and $\cfb{Y}{i^*}$ being defined at each timestep. The variance (but not expectation) of $\rawregret$ depends on the covariance between counterfactual variables.
 
  The learner is only able to observe properties of the marginal distributions over $\cfb{Y}{i}$ for each $i \in \set{1,...k}$.
  The stochastic bandit problem can be defined without recourse to counterfactual variables by  
@@ -1958,7 +1977,7 @@ The policy (or algorithm) used by the learner is available to the adversary befo
 
 The seminal algorithm for adversarial bandits is Exp-3 \citep{Auer2002}, which, like UCB, obtains worst case pseudo-regret of $\bigo{\sqrt{TK\log(T)}}$  \citep{Auer1995}. Optimal algorithms, with $\regret = \bigo{\sqrt{TK}}$, have also been demonstrated for the oblivious adversarial setting \citep{Audibert2009}. The focus, for adversarial bandits, is on analysing the worst case regret because the problem dependent regret is not well defined without additional assumptions. However there has been recent work on developing algorithms that are optimised for both the adversarial and stochastic settings, in that they are sufficiently cautious to avoid linear regret in the adversarial setting but can nonetheless obtain good problem dependent regret in more favourable environments \citep{bubeck2012bothworlds,Auer2016}. 
 
-Adversarial bandits appear to be more applicable to real world problems because they do not assume that the rewards associated with each arm are constant over time or independent of the previous actions of the learner. However, pseudo-regret, as defined in equation \ref{eqn:pseudo_regret-adversarial}, does not fully capture an algorithms performance in such cases because it is defined with respect to playing the single arm with the best average return over the game. In settings where the rewards change over time, the pseudo-regret can be negative, see figure \ref{fig:non-stationary-bandit}, so upper bounds on the pseudo-regret do not reflect how sub-optimal the algorithm may be. An example of a setting that lies between stochastic and adversarial bandit problems is the non-stationary setting, in which the rewards are generated stochastically from a distribution that varies over time. Adversarial bandit algorithms may perform better in such settings than standard stochastic policies to the extent that they explore more (to avoid the adversary simulating their behaviour) and thus adapt quicker to changes in the reward distribution. Adversarial algorithms also have stronger worst case regret guarantees, since even the weak regret for stochastic bandits is not guaranteed to be sublinear in such settings. However, if we have constraints on how rapidly or frequently the reward distributions can change over time it is better to use algorithms specificly developed to exploit such information (and compare them against a stronger notion of regret), see for example \citep{garivier2008upper,Garivier2011a,Besbes2014}. 
+Adversarial bandits appear to be more applicable to real world problems because they do not assume that the rewards associated with each arm are constant over time or independent of the previous actions of the learner. However, pseudo-regret, as defined in equation \ref{eqn:pseudo_regret-adversarial}, does not fully capture an algorithms performance in such cases because it is defined with respect to playing the single arm with the best average return over the game. In settings where the rewards change over time, the pseudo-regret can be negative, see figure \ref{fig:non-stationary-bandit}, so upper bounds on the pseudo-regret do not reflect how sub-optimal the algorithm may be. An example of a setting that lies between stochastic and adversarial bandit problems is the non-stationary setting, in which the rewards are generated stochastically from a distribution that varies over time. Adversarial bandit algorithms may perform better in such settings than standard stochastic policies to the extent that they explore more (to avoid the adversary simulating their behaviour) and thus adapt quicker to changes in the reward distribution. Adversarial algorithms also have stronger worst case regret guarantees, since even the weak regret for stochastic bandits is not guaranteed to be sub-linear in such settings. However, if we have constraints on how rapidly or frequently the reward distributions can change over time it is better to use algorithms specifically developed to exploit such information (and compare them against a stronger notion of regret), see for example \citep{garivier2008upper,Garivier2011a,Besbes2014}. 
 
 
 
@@ -2127,7 +2146,8 @@ In the next chapter, I propose a very natural connection between causal graphs a
 
 
 \chapter{Causal Bandits: Unifying the approaches}
-
+\label{chap:causal-bandit}
+\todo{write an intro to this chapter}
 \section{The framework}
 \label{sec:intro_causal_bandit}
 A natural way to connect the causal framework with the bandit setting is to model the action space as interventions on variables in a causal directed acyclic graph. Each possible assignment of variables to values is a potential action (or bandit arm), see figure \ref{fig:unify_frameworks} for a simple example. In some settings, it makes sense to restrict the action space available to the agent to a subset of all the possible actions, for example the set of single variable interventions. The reward could be a general function of the action selected and the final state of the graph. However for simplicity, we will consider the reward to be the value of a single specified node. We refer to these problems as \emph{causal bandit problems}. In this thesis I focus on the case where the causal graph is known. Extending this work to simultaneously learning the casual graph is discussed in \S\ref{sec:causal_bandit_discussion}.
@@ -2183,9 +2203,9 @@ The causal bandit game proceeds over $T$ rounds. In each round $t$, the learner:
 \end{enumerate} 
 \end{definition}
 
-We refer to the set of variables that can be observed prior to selecting an action $\vec{X}^c$ as contextual variables and the set of variables observed after the action is chosen, $\vec{X}^o$, as post-action feedback variables. Note that $\vec{X}^c$ and $\vec{X}^o$ need not be disjoint. A variable may be observed both prior to and after the agent selects an action, and the action may change its value. The notation $\P{\cdot|\vec{X}^c_t, do(\vec{X}_t = \vec{x}_t)}$ denotes distributions conditional on having observed $\vec{X}^c_t$ and \emph{then} intervened to set $\vec{X}_t = \vec{x}_t$. The values of variables in $\vec{X}^c_t$ that are non-decendents of $\vec{X}_t$ remain unchanged by the intervention. The objective of the learner is to minimise either the simple (equation \ref{}) or cumulative regret (equation \ref{}). 
+We refer to the set of variables that can be observed prior to selecting an action $\vec{X}^c$ as contextual variables and the set of variables observed after the action is chosen, $\vec{X}^o$, as post-action feedback variables. Note that $\vec{X}^c$ and $\vec{X}^o$ need not be disjoint. A variable may be observed both prior to and after the agent selects an action, and the action may change its value. The notation $\P{\cdot|\vec{X}^c_t, do(\vec{X}_t = \vec{x}_t)}$ denotes distributions conditional on having observed $\vec{X}^c_t$ and \emph{then} intervened to set $\vec{X}_t = \vec{x}_t$. The values of variables in $\vec{X}^c_t$ that are non-descendents of $\vec{X}_t$ remain unchanged by the intervention. The objective of the learner is to minimise either the simple (equation \ref{}) or cumulative regret (equation \ref{}). 
 
-The causal bandit problem takes on characteristics of different bandit settings depending on the action-space $\actionspace$ and correspondign costs, which variables are observable prior to selecting an action and on which variables we receive post-action feedback. If we can (cheaply) intervene on all of the parents of $Y$ simultaneusly then any context or alternative actions are irrelevent and the problem reduces to a standard multi-armed bandit problem. This is formalised in theorem \ref{theorem:cb-intervene-all-parents}. 
+The causal bandit problem takes on characteristics of different bandit settings depending on the action-space $\actionspace$ and corresponding costs, which variables are observable prior to selecting an action and on which variables we receive post-action feedback. If we can (cheaply) intervene on all of the parents of $Y$ simultaneously then any context or alternative actions are irrelevant and the problem reduces to a standard multi-armed bandit problem. This is formalised in theorem \ref{theorem:cb-intervene-all-parents}. 
 
 \vspace{0.5cm}
 \begin{theorem}
@@ -2233,9 +2253,9 @@ P(Y|do(W = 0)) &= P(Y|do(),W = 0) \\
 
 Thus we gain information about the reward for the action $do(W=0)$ from selecting the action $do()$ or $do(X = x)$ and then observing $W = 0$.  We only get this form of side information for actions that don't specify the value of every variable, for example those in the bottom half of the table in figure \ref{fig:unify_frameworks}. If additional variables are only observed before an intervention is selected the causal bandit problem can be treated as a stochastic contextual bandit problem, which are already reasonably well understood \citep{Agarwal2014}.
 
-Two other problems that sit in the space between causal inference and bandit problems, bandits with unobserved confounders \cite{Bareinboim2015} and compliance aware bandits \citep{DellaPenna2016}, can also be viewed as specific causal bandit problems. In the work on bandits with unobserved confounders it is assumed that the reward given each action may depend on some latent variable $U$ which we cannot observe directly. However, prior to selecting an action, we can observe  $I$, the action that would have been selected under an alternate (stationary) policy, which may depend on $U$, see figure \ref{fig:confounded-causal-bandit-graph}. In this case the set of contextual variables $\vec{X}^c = I$, the set of post-action feedback variables $\vec{X}^o = \set{Y}$ and the action space consists of all possible assigments of values to a single node $X$, $\actionspace = do(X=x)$. This setting reduces to a contextual bandit problem in our causal bandit framework. However in thier work on bandits with unobserved confounders \citet{Forney2017} also leverage the fact that $I$ represents the action that would have been selected under an alternate policy to fuse data collected under the previous (observational) policy with data collected under the new policy. This information is not encoded in the causal bandit graph in figure \ref{fig:confounded-causal-bandit-graph}, as $I$ could be any variable that is influenced by the unobserved context $U$, and thus cannot be exploited by a standard contextual bandit algorithm. 
+Two other problems that sit in the space between causal inference and bandit problems, bandits with unobserved confounders \cite{Bareinboim2015} and compliance aware bandits \citep{DellaPenna2016}, can also be viewed as specific causal bandit problems. In the work on bandits with unobserved confounders it is assumed that the reward given each action may depend on some latent variable $U$ which we cannot observe directly. However, prior to selecting an action, we can observe  $I$, the action that would have been selected under an alternate (stationary) policy, which may depend on $U$, see figure \ref{fig:confounded-causal-bandit-graph}. In this case the set of contextual variables $\vec{X}^c = I$, the set of post-action feedback variables $\vec{X}^o = \set{Y}$ and the action space consists of all possible assignments of values to a single node $X$, $\actionspace = do(X=x)$. This setting reduces to a contextual bandit problem in our causal bandit framework. However in their work on bandits with unobserved confounders \citet{Forney2017} also leverage the fact that $I$ represents the action that would have been selected under an alternate policy to fuse data collected under the previous (observational) policy with data collected under the new policy. This information is not encoded in the causal bandit graph in figure \ref{fig:confounded-causal-bandit-graph}, as $I$ could be any variable that is influenced by the unobserved context $U$, and thus cannot be exploited by a standard contextual bandit algorithm. 
 
-Compliance aware bandits describe situations in which the action recommended by the bandit algorithm is not always followed. For example a patient may refuse to take a treatment or an advertiser may have complex rules about how many ads a given customer can recieve which prevends some of the suggestions from the ad recomendation engine from being followed. After an action is selected the algorithm can observe the action that was actually taken in addition to the reward. \citet{DellaPenna2016} analyse this setting with binary treatments both with and without the presense of a latent confounding variable $U$, see figure \ref{fig:imperfect-compliance-causal-bandit-graph}. In this case, there are no contextual variables and the action space is again the set of assignments to a single variable but there is post-action feedback, which reveals the value of the action that was actually taken.\footnote{There are some interesting variants of the compliance aware bandit setting that, to my knowledge, have not been analysed. The first is if the confounding variable $U$ is observable, either as context or post-action feedback. The second is if we extend the allowable action set to include acting directly on $X$, albeit at a higher cost than acting on $A$. It is also worth noting the connection between this setting and instrumental variables \cite{balke1997bounds}. By making some functional assumptions about the relationships between the variables, we can use $A$ as an instrumental variable to bound or estimate the (casual) effect of $X$ on $Y$. The estimation will be somewhat complicated in the bandit setting because the action chosen at each timestep is dependent on the previous sequence actions and rewards.}
+Compliance aware bandits describe situations in which the action recommended by the bandit algorithm is not always followed. For example a patient may refuse to take a treatment or an advertiser may have complex rules about how many ads a given customer can receive which prevents some of the suggestions from the ad recommendation engine from being followed. After an action is selected the algorithm can observe the action that was actually taken in addition to the reward. \citet{DellaPenna2016} analyse this setting with binary treatments both with and without the presence of a latent confounding variable $U$, see figure \ref{fig:imperfect-compliance-causal-bandit-graph}. In this case, there are no contextual variables and the action space is again the set of assignments to a single variable but there is post-action feedback, which reveals the value of the action that was actually taken.\footnote{There are some interesting variants of the compliance aware bandit setting that, to my knowledge, have not been analysed. The first is if the confounding variable $U$ is observable, either as context or post-action feedback. The second is if we extend the allowable action set to include acting directly on $X$, albeit at a higher cost than acting on $A$. It is also worth noting the connection between this setting and instrumental variables \cite{balke1997bounds}. By making some functional assumptions about the relationships between the variables, we can use $A$ as an instrumental variable to bound or estimate the (casual) effect of $X$ on $Y$. The estimation will be somewhat complicated in the bandit setting because the action chosen at each timestep is dependent on the previous sequence actions and rewards.}
 
 \begin{figure}[h]
 \centering
@@ -3019,10 +3039,10 @@ Therefore $m(\eta*) \leq m(\eta) \leq 2m(\boldsymbol{q})$ as required.
 
 \chapter*{Regret is a goat}
 
-Consider a stochastic, two-armed bernoulli bandit with the (general) joint distribution of the (conterfactual) rewards $\P{\cf{Y}{1},\cf{Y}{2}}$ given in table \ref{table:joint_bernoulli_counterfactuals}. Suppose without loss of generality that arm 1 is the optimal arm.  
+Consider a stochastic, two-armed Bernoulli bandit with the (general) joint distribution of the (counterfactual) rewards $\P{\cf{Y}{1},\cf{Y}{2}}$ given in table \ref{table:joint_bernoulli_counterfactuals}. Suppose without loss of generality that arm 1 is the optimal arm.  
 
 \begin{table}[h]
-\caption{General joint distribution over two bernoulli random variables.}
+\caption{General joint distribution over two Bernoulli random variables.}
 \label{table:joint_bernoulli_counterfactuals}
 \begin{center}
 \begin{tabular}{ c | c | c }
@@ -3043,7 +3063,7 @@ Recall that the regret is defined by,
 \rawregret = \sum_{t=1}^T (\cfb{Y}{i^*} - \cfb{Y}{a_t})
 }
 
-Consider an algorithm that always selects arm 2. The variance (but not expectation) of the regret incured by this algorithm depends on the covariance between the counterfactual variables $\cf{Y}{1}$ and $\cf{Y}{2}$, which cannot estimated from data. 
+Consider an algorithm that always selects arm 2. The variance (but not expectation) of the regret incurred by this algorithm depends on the covariance between the counterfactual variables $\cf{Y}{1}$ and $\cf{Y}{2}$, which cannot estimated from data. 
 
 \eqn{
 \E{\rawregret} = \sum_{t=1}^T(\E{\cf{Y}{1}}-\E{\cf{Y}{2}}) = T(p-q)
@@ -3070,7 +3090,7 @@ Consider an algorithm that always selects arm 2. The variance (but not expectati
 \chapter{Causation vs Prediction}
 
 The two cultures \citep{Breiman2001}
- - wrong because suggets we can just use the machine learning approach for everything. Does not address the problems that a) structural assumptions required for causal inference. b) we cannot use cross-vaidation to assess the validity of a causal model (really b is the whole point).
+ - wrong because suggests we can just use the machine learning approach for everything. Does not address the problems that a) structural assumptions required for causal inference. b) we cannot use cross-validation to assess the validity of a causal model (really b is the whole point).
 
 
 To explain or to predict \citep{Shmueli2010}
@@ -3082,13 +3102,13 @@ Predict the relationship between X and Y as a way to stratify to reduce the vari
 
 They consider a different definition of explanatory models, 
 
-Definition as backwards. Explanatory models focus on theory because some theory (or equivelently stated assumptions) are required in order to predict the outcome of an intervention from observational data. 
+Definition as backwards. Explanatory models focus on theory because some theory (or equivalently stated assumptions) are required in order to predict the outcome of an intervention from observational data. 
 
-Causal modelling frameworks allow us to seperate assumptions about the structure of the relationships between variables from assumptions about the functional form. 
+Causal modelling frameworks allow us to separate assumptions about the structure of the relationships between variables from assumptions about the functional form. 
 
 What can be data driven and what cannot? (for a given set of assumptions). 
 
 
-Allowing for the possibility that we might only need to be able to predict the outcome of an intervention on a given subset of variables (for example those over which we have the ability to manipulate) or the possibility that we can can obtain observation from directly intervening in a system creates creates a need for models that are neither explanatory or predictive in the languate of EoP but are built on a hybrid of both approaches. 
+Allowing for the possibility that we might only need to be able to predict the outcome of an intervention on a given subset of variables (for example those over which we have the ability to manipulate) or the possibility that we can can obtain observation from directly intervening in a system creates creates a need for models that are neither explanatory or predictive in the language of EoP but are built on a hybrid of both approaches. 
 
 
