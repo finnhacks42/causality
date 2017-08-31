@@ -2175,10 +2175,10 @@ where $N_i(T)$ is the number of times arm $i$ was played up to timestep $T$ and 
 
 \chapter{Causal Bandits: Unifying the approaches}
 \label{chap:causal-bandit}
-\todo{write an intro to this chapter}
 
+As we have seen in the previous two chapters, critical insights and methods for learning how to act have emerged from both the observational and experimental approaches to causality. From observational inference, we have the do-calculus, which allows us to map information between observational and interventional distributions and we have a range of estimators designed for these types of mapping problems including propensity scores and doubly robust methods. The bandit community has developed carefully tuned algorithms to balance exploration and exploitation, estimation approaches for identifying and selecting the optimal action (rather than estimating the rewards for all actions) and techniques to bound the bias of estimators due to the adaptive nature of decision making processes.
 
-As we have demonstrated in the previous two chapters both observational causal inference and experimental approaches a
+However, despite the commonality of the underlying problem, there has been relatively little work on intersection between observational causal inference and adaptive decision making processes. Although some ideas, such as doubly robust estimators and inverse propensity score weighting have transferred across (from causal inference to off-policy evaluation), there are many more opportunities for fruitful work in this space. In most key real world decision making processes, from algorithms recommending drug treatments to robots deciding how to open doors, we have access to both potentially huge observational data sets as well as the ability to intervene in the system at some level. It is critical that we develop methods that allow us to incorporate the causal knowledge we have about the world, along with data sets collected under a range of different conditions, into our current decision making process. In this chapter I introduce a very general framework that connects causal graphical models with multi-armed bandit problems and demonstrate how it can be leveraged to make better decisions.
 
 
 \section{A framework to connect bandit problems with observational causal inference}

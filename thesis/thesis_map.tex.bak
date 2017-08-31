@@ -233,10 +233,10 @@
 \author{Finnian Lattimore}
 \title{Learning how to act: making good decisions with machine learning}
 
-\setcounter{secnumdepth}{4}
+\setcounter{secnumdepth}{3}
 
 \begin{document}
-\todo{figure out theoremstle is undefined}
+
 %\def\ci{\perp\!\!\!\perp} % from Wikipedia
 
 
@@ -249,33 +249,6 @@ That what we chanced, was what we meant, to do.}{Alexander Pope}
 
 \tableofcontents
 
-\chapter*{Todo}
-\begin{enumerate}
-\item Add something about Granger causality - does this belong in chapter 2 or chapter 3?
-\item Sell my PhD as two key contribution. 1) A technical one, the other educational and unifying (across viewpoints)
-\item Add a chapter in 'PhD prose' making some statement about the intersection of prediction and causality. When is a problem causal, what bounds does predictive accuracy give on causal models? To what degree is predictive accuracy a metric on which causal models can be judged? 
-\item Benchmark estimation algorithms
-\item clarify causal interpretation of Dirichlet models
-\item Empirical evaluation of bandit algorithms (updated to include latest suggestions). Maybe a proper software bench marking solution?
-\item If comparing bandit performance, it would be interesting to include some that violate the stochastic bandit assumption. For example, if the rewards change slowly over time or jump suddenly a limited number of times, or with some small probability. 
-\item Does defining causality in term of the truncated product formula ensure that a causal Bayesian network is unique? It would seem no, one can ad links (although this is hardly useful) - seems like there is no reverse condition. 
-\end{enumerate}
-
-\section*{Questions}
-\begin{itemize}
-\item Are there any problematic counterfactuals being used in defining bandit problems
-\item in the Schölkopf causal fairness paper - is there an issue with the use of twin networks. Could it be fixed with SWIGs?
-\item Contextual bandits are solving this argmax h problem. Should causal inference actually be solving the same thing?
-\item what is the connection between which variables should be included when doing estimating causal effects from observational data and stratification in randomised experimental design?
-\item I don't understand why covariate shift is not supposed to be an issue in Bayesian models. 
-\item What does conditioning mean in the Bayesian sense? - can imposing a prior which is true with respect to that variable, increase bias due to confounding? (In the same way that in the pneumonia case, the coefficient for Asthma should be set to zero after the model has been fit, not before. 
-
-\item What are the necessary and sufficient conditions for decision making? How much about a the distribution of rewards for different arms must I know in order to select one (under different assumptions about the loss function). Ie when is the mean sufficient? What about the mean and the variance? - when can we take one set of results and compute something about a different loss function?
-
-\item Does the way we define supervised learning and loss functions imply an additive noise model? Why would we expect this to hold - why don't we run into more problems?
- 
-
-\end{itemize}
 
 \chapter{Introduction}
 
@@ -2090,17 +2063,17 @@ It is worth noting that definition \ref{def:contextual-bandit-problem} does not 
    (1) edge (2);
 \end{tikzpicture} 
 \end{subfigure}
-\caption{Several potential causal graphical models for the contextual bandit problem (if actions are selected at random). $\vec{X}$ and $\vec{Y}$ represent the context and reward vectors respectively, and $Y = \vec{Y}^a$ is the reward received by the learner, which is a deterministic function of $\vec{Y}$ and $a$. Regardless of the causal structure, observing the context $\vec{X}$ provides information about the vector of rewards $\vec{Y}$. The causal structures in figures \ref{fig:context-graph-causal} and \ref{fig:context-graph-confounded} also make sense if the elments of $\vec{Y}$ are genuine counterfactuals, that is only the reward of the selected action is ever realized. The context $\vec{X}$ can only be useful in causal graphs of the form in figure \ref{fig:context-graph-anti-causal} if the components of $\vec{Y}$ are realized prior to the agent selecting an action, i.e when the components of $\vec{Y}$ are not truly counterfactual, it just that the agent is limited to only observing the outcome of the action they choose.  To represent a realistic (contextual) bandit problem, where actions are not selected at random, we would need to \quotes{unroll} the graphs, such that there was a copy for each time-step $t$ and allow the action $A_t$ to depend on the context $\vec{X}_t$ and the previous observations $(\vec{X},A,Y)_1^{t-1}$. }
+\caption{Several potential causal graphical models for the contextual bandit problem (if actions are selected at random). $\vec{X}$ and $\vec{Y}$ represent the context and reward vectors respectively, and $Y = \vec{Y}^a$ is the reward received by the learner, which is a deterministic function of $\vec{Y}$ and $a$. Regardless of the causal structure, observing the context $\vec{X}$ provides information about the vector of rewards $\vec{Y}$. The causal structures in figures \ref{fig:context-graph-causal} and \ref{fig:context-graph-confounded} also make sense if the elements of $\vec{Y}$ are genuine counterfactuals, that is only the reward of the selected action is ever realised. The context $\vec{X}$ can only be useful in causal graphs of the form in figure \ref{fig:context-graph-anti-causal} if the components of $\vec{Y}$ are realised prior to the agent selecting an action, i.e when the components of $\vec{Y}$ are not truly counterfactual, it just that the agent is limited to only observing the outcome of the action they choose.  To represent a realistic (contextual) bandit problem, where actions are not selected at random, we would need to \quotes{unroll} the graphs, such that there was a copy for each time-step $t$ and allow the action $A_t$ to depend on the context $\vec{X}_t$ and the previous observations $(\vec{X},A,Y)_1^{t-1}$. }
 \label{fig:contextual-bandit-causal-graph}
 \end{figure}
 
 \vspace{0.5cm}
 \begin{example}
 \label{exm:anti-casual-context}
-Imagine a modified game of roulette. As in standard roulette, it consists of a spinning wheel with a ball that can land in one of 37 numbered pockets. However, unlike in the standard game, where punters place bets before the wheel is spun, in this variant the wheel is spun first. Five seconds before it comes to rest the face of the wheel darkens to hide the position of the ball from the players. They then place bets after it has stopped (and are each allowed only to check if the position they have bet on was correct). At the point in time the players are selecting their actions, the rewards for each possible choice are fully determined (all zero except for the pocket containing the ball). Suppose a canny gambler realises the ball makes a tiny sound, from rocking back and forth, if it is close to the left or right side of the wheel such that the pocket holding it is close to horizontal. The existance (or not) of this sound is a consequence of the position of the ball and thus the reward state and the gambler can use it as context to improve the likelyhood of obtaining a reward.
+Imagine a modified game of roulette. As in standard roulette, it consists of a spinning wheel with a ball that can land in one of 37 numbered pockets. However, unlike in the standard game, where punters place bets before the wheel is spun, in this variant the wheel is spun first. Five seconds before it comes to rest the face of the wheel darkens to hide the position of the ball from the players. They then place bets after it has stopped (and are each allowed only to check if the position they have bet on was correct). At the point in time the players are selecting their actions, the rewards for each possible choice are fully determined (all zero except for the pocket containing the ball). Suppose a canny gambler realises the ball makes a tiny sound, from rocking back and forth, if it is close to the left or right side of the wheel such that the pocket holding it is close to horizontal. The existence (or not) of this sound is a consequence of the position of the ball and thus the reward state and the gambler can use it as context to improve the likelyhood of obtaining a reward.
 \end{example}
 
-It is difficult to come up with realistic examples in which the full sequence of rewards is generated but only the one associated with the selected action is observable to the learner. In the typically cited applications of contextual bandit algorithms, such as selecting how to treat patients or which ad to serve only the reward of the selected action is ever realized, and the alternate rewards are counterfactual variables.
+It is difficult to come up with realistic examples in which the full sequence of rewards is generated but only the one associated with the selected action is observable to the learner. In the typically cited applications of contextual bandit algorithms, such as selecting how to treat patients or which ad to serve only the reward of the selected action is ever realised, and the alternate rewards are counterfactual variables.
 
 \subsection{Learning from logged bandit data}
 Another topic of interest within the bandit community, which is deeply connected to causal effect estimation from observational data, is learning from logged bandit feedback data or off-policy evaluation\citep{Langford2008a,strehl2010learning,Li2010,Dudik2011,Bottou2013,Swaminathan2015}. In this setting, the learner has a data set $S = \set{(\vec{X}_t,A_t,\cfb{Y}{A_t})}_{t=1}^T$, which is assumed to have been generated by a stochastic contextual bandit environment interacting with some unknown, potentially stochastic, policy $\pi(\vec{x}_t,h_t)$, where $h_t$ is the sequence of observed data up to time $t$. The goal of the learner is to evaluate the value of an alternate policy, $\pi'$, for selecting actions, often with the underlying motivation of identifying an optimal policy within some space of policies $\Pi$. 
@@ -2145,7 +2118,7 @@ In the next chapter, I propose a very natural connection between causal graphs a
 
 We conclude this chapter on bandits with a note on the counterfactual nature of regret. I have not seen this discussed with respect to bandit regret elsewhere, however the issues raised are very closely related to the work by \citet{Dawid2000}, on problems associated with the use of counterfactual variables for (observational) causal inference.
 
-It is possible, as we demonstrated in example \ref{exm:anti-casual-context}, to construct bandit problems in which the full vector of rewards $[\cfb{Y}{1},...,\cfb{Y}{k}]$ is actually generated at each time-step (and, at least in principle, is observable to someone although not the agent). However, in most real applications for bandit problems, only the outcome associated with the selected action is ever realized and so the remaining components of the reward vector are counterfactual, justifying our use of the counterfactual notation to denote them. There are complex philosophical objections to counterfactuals arising from the way they describe alternate universes that were never realised. This makes it easy to make statements using counterfactuals that cannot be confirmed empirically (even with infinite experimental data). We now show with a simple example that the standard definition of regret is such a fundamentally counterfactual quantity. Recall that the cummulative regret is defined by,
+It is possible, as we demonstrated in example \ref{exm:anti-casual-context}, to construct bandit problems in which the full vector of rewards $[\cfb{Y}{1},...,\cfb{Y}{k}]$ is actually generated at each time-step (and, at least in principle, is observable to someone although not the agent). However, in most real applications for bandit problems, only the outcome associated with the selected action is ever realised and so the remaining components of the reward vector are counterfactual, justifying our use of the counterfactual notation to denote them. There are complex philosophical objections to counterfactuals arising from the way they describe alternate universes that were never realised. This makes it easy to make statements using counterfactuals that cannot be confirmed empirically (even with infinite experimental data). We now show with a simple example that the standard definition of regret is such a fundamentally counterfactual quantity. Recall that the cumulative regret is defined by,
 
 \eqn{
 \label{eqn:raw_regret2}
@@ -2153,7 +2126,7 @@ It is possible, as we demonstrated in example \ref{exm:anti-casual-context}, to 
 \\&= \sum_{t=1}^T \left(\cfb{Y}{i^*} - \cfb{Y}{a_t}\right)
 }
 
-Take a stochastic, two-armed, Gaussain bandit with the joint distribution of the (counterfactual) rewards $\P{\cfb{Y}{1},\cfb{Y}{2}}$ given by equation \ref{eqn:joint-gaussain-reward}. Suppose without loss of generality that arm 1 is the optimal arm, such that $\mu_1 > \mu_2$.  
+Take a stochastic, two-armed, Gaussian bandit with the joint distribution of the (counterfactual) rewards $\P{\cfb{Y}{1},\cfb{Y}{2}}$ given by equation \ref{eqn:joint-gaussain-reward}. Suppose without loss of generality that arm 1 is the optimal arm, such that $\mu_1 > \mu_2$.  
 
 % vector with mean mu_t,mu_c and a covariance matrix
 \eqn{
@@ -2176,7 +2149,7 @@ Consider an algorithm that always selects arm 2.  The distribution over the diff
 \rawregret \sim N\left(T(\mu_1 - \mu_2), 2\sigma^2 T(1-\rho)\right)
 }
 
-The parameters of the marginal distributions, $\P{\cfb{Y}{1}}$ and $\P{\cfb{Y}{2}}$, can be estimated directly by simply sampling from each arm. However, the covariance $\rho$ cannot, because we never simultaneously observe the rewards for both arms. As a result, even if we have full knowledge of the reward distributions for each arm, we cannot in general compute the distribution over regret without untestable assumptions about the covariance between counterfactuals, see figure \ref{fig:metaphysical_distribution_difference}. 
+The parameters of the marginal distributions, $\P{\cfb{Y}{1}}$ and $\P{\cfb{Y}{2}}$, can be estimated directly by simply sampling from each arm. However, the covariance $\rho$ cannot, because we never simultaneously observe the rewards for both arms. As a result, even if we have full knowledge of the reward distributions for each arm, we cannot in general compute the distribution over regret without un-testable assumptions about the covariance between counterfactuals, see figure \ref{fig:metaphysical_distribution_difference}. 
 
 \begin{figure}[h]
 \captionsetup[subfigure]{position=b}
@@ -2189,21 +2162,26 @@ The parameters of the marginal distributions, $\P{\cfb{Y}{1}}$ and $\P{\cfb{Y}{2
 \label{fig:metaphysical_distribution_difference}
 \end{figure}
 
-This result is somewhat perturbing. The stochastic bandit problem can be defined without recourse to counterfactual variables by having the world stochastically generate only a reward for the selected action at each timestep and the behaviour of standard bandit algorithms depends only on the marginal reward distributions for each arm. The expectation of the regret as defined by equation \ref{eqn:pseudo_regret} also remains unchanged as both it's definition and the learner's actions depend only on the marginal distributions. It seems therefor unfortunate that we should have to assume, for example, that the rewards for alternate actions are independent of one-another in order to be able to analyse the variance of the regret. Particularly as this assumption is likely to be violated in many realistic bandit problems. For example, a given user may be more (or less) likely to buy something no matter which ad they are served leading to a positive correlation between counterfactual rewards, or an illness might have two (unobservable) subtypes with each medication (bandit arm) effective only against one, resulting in a negative correlation between the counterfactual rewards. 
+This result is somewhat perturbing. The stochastic bandit problem can be defined without recourse to counterfactual variables by having the world stochastically generate only a reward for the selected action at each timestep and the behaviour of standard bandit algorithms depends only on the marginal reward distributions for each arm. The expectation of the regret as defined by equation \ref{eqn:pseudo_regret} also remains unchanged as both it's definition and the learner's actions depend only on the marginal distributions. It seems therefor unfortunate that we should have to assume, for example, that the rewards for alternate actions are independent of one-another in order to be able to analyse the variance of the regret. Particularly as this assumption is likely to be violated in many realistic bandit problems. For example, a given user may be more (or less) likely to buy something no matter which ad they are served leading to a positive correlation between counterfactual rewards, or an illness might have two (unobservable) sub-types with each medication (bandit arm) effective only against one, resulting in a negative correlation between the counterfactual rewards. 
 
-We could focus only on analysing the expected regret, since this depends only on the marginal distributions. However, there are many real problems for which we do care how tightly concentreated the regret is around its expectation. For example, if we are risk averse, we may prefer an algorithm with slightly higher expected regret but a lower probability of suffering extremely large regret. This raises the question, can we construct an alternate definition of regret that allows us to capture how consistently bandit algorithms behave, but which does not depend on any properties of the joint distribution over counterfactual rewards. A natural candiate would be,
+We could focus only on analysing the expected regret, since this depends only on the marginal distributions. However, there are many real problems for which we do care how tightly concentrated the regret is around its expectation. For example, if we are risk averse, we may prefer an algorithm with slightly higher expected regret but a lower probability of suffering extremely large regret. This raises the question, can we construct an alternate definition of regret that allows us to capture how consistently bandit algorithms behave, but which does not depend on any properties of the joint distribution over counterfactual rewards. A natural candidate would be,
 
 \eqn{
 R_T = \sum_{i=1}^k N_i(T)\Delta_i, 
 }
 
-where $N_i(T)$ is the number of times arm $i$ was played upto timestep $T$ and $\Delta_i$ is the degree to which arm $i$ is sub-optimal, $\Delta_i = \mu^* - \mu_i$. The expecation of this variant of regret is the same as for the standard version defined in equation \ref{eqn:raw_regret2}. It depends only on the randomness of the reward distribution only indirectly through the number of times each action is selected, which in turn depends only on the marginal distributions. Furthermore, this quantity has already been analysed in existing work on the concentration of bandit regret, \citep{Audibert2007,Audibert2009exploration} as a more tractable proxy to the standard regret. In conclusion, when selecting measures of bandit perforance, it is worth noting whether or not they rely on counterfactual assumptions and considering if these assumptions are justifiable or needed for the specific problem on interest.
+where $N_i(T)$ is the number of times arm $i$ was played up to timestep $T$ and $\Delta_i$ is the degree to which arm $i$ is sub-optimal, $\Delta_i = \mu^* - \mu_i$. The expectation of this variant of regret is the same as for the standard version defined in equation \ref{eqn:raw_regret2}. It depends only on the randomness of the reward distribution only indirectly through the number of times each action is selected, which in turn depends only on the marginal distributions. Furthermore, this quantity has already been analysed in existing work on the concentration of bandit regret, \citep{Audibert2007,Audibert2009exploration} as a more tractable proxy to the standard regret. In conclusion, when selecting measures of bandit performance, it is worth noting whether or not they rely on counterfactual assumptions and considering if these assumptions are justifiable or needed for the specific problem on interest.
 
 
 \chapter{Causal Bandits: Unifying the approaches}
 \label{chap:causal-bandit}
-\todo{write an intro to this chapter}
-\section{The framework}
+
+As we have seen in the previous two chapters, critical insights and methods for learning how to act have emerged from both the observational and experimental approaches to causality. From observational inference, we have the do-calculus, which allows us to map information between observational and interventional distributions and we have a range of estimators designed for these types of mapping problems including propensity scores and doubly robust methods. The bandit community has developed carefully tuned algorithms to balance exploration and exploitation, estimation approaches for identifying and selecting the optimal action (rather than estimating the rewards for all actions) and techniques to bound the bias of estimaters due to the adaptive nature of decision making processes.
+
+However, despite the comonality of the underlying problem, there has been relatively little work on intersection between observational causal inference and adaptive decison making processes. Although some ideas, such as doubly robust estimators and inverse propensity score weighting have transfered accross (from causal inference to off-policy evaluation), there are many more opportunities for fruitful work in this space. In most key real world decision making processes, from algorithms recommending drug treatments to robots deciding how to open doors, we have access to both potentially huge observational data sets as well as the ability to intervene in the system at some level. It is critical that we develop methods that allow us to incorporate the causal knoweledge we have about the world, along with datasets collected under a range of different conditions, into our current decision making process. In this chapter I introduce a very general framework that connects causal graphical models with multi-armed bandit problems and demonstrate how it can be leveraged to make better decisions.
+
+
+\section{A framework to connect bandit problems with observational causal inference}
 \label{sec:intro_causal_bandit}
 A natural way to connect the causal framework with the bandit setting is to model the action space as interventions on variables in a causal directed acyclic graph. Each possible assignment of variables to values is a potential action (or bandit arm), see figure \ref{fig:unify_frameworks} for a simple example. In some settings, it makes sense to restrict the action space available to the agent to a subset of all the possible actions, for example the set of single variable interventions. The reward could be a general function of the action selected and the final state of the graph. However for simplicity, we will consider the reward to be the value of a single specified node. We refer to these problems as \emph{causal bandit problems}. In this thesis I focus on the case where the causal graph is known. Extending this work to simultaneously learning the casual graph is discussed in \S\ref{sec:causal_bandit_discussion}.
 
