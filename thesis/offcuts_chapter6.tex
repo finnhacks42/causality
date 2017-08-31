@@ -1,3 +1,32 @@
+
+\chapter*{Todo}
+\begin{enumerate}
+\item Add something about Granger causality - does this belong in chapter 2 or chapter 3?
+\item Sell my PhD as two key contribution. 1) A technical one, the other educational and unifying (across viewpoints)
+\item Add a chapter in 'PhD prose' making some statement about the intersection of prediction and causality. When is a problem causal, what bounds does predictive accuracy give on causal models? To what degree is predictive accuracy a metric on which causal models can be judged? 
+\item Benchmark estimation algorithms
+\item clarify causal interpretation of Dirichlet models
+\item Empirical evaluation of bandit algorithms (updated to include latest suggestions). Maybe a proper software bench marking solution?
+\item If comparing bandit performance, it would be interesting to include some that violate the stochastic bandit assumption. For example, if the rewards change slowly over time or jump suddenly a limited number of times, or with some small probability. 
+\item Does defining causality in term of the truncated product formula ensure that a causal Bayesian network is unique? It would seem no, one can ad links (although this is hardly useful) - seems like there is no reverse condition. 
+\end{enumerate}
+
+\section*{Questions}
+\begin{itemize}
+\item Are there any problematic counterfactuals being used in defining bandit problems
+\item in the Schölkopf causal fairness paper - is there an issue with the use of twin networks. Could it be fixed with SWIGs?
+\item Contextual bandits are solving this argmax h problem. Should causal inference actually be solving the same thing?
+\item what is the connection between which variables should be included when doing estimating causal effects from observational data and stratification in randomised experimental design?
+\item I don't understand why covariate shift is not supposed to be an issue in Bayesian models. 
+\item What does conditioning mean in the Bayesian sense? - can imposing a prior which is true with respect to that variable, increase bias due to confounding? (In the same way that in the pneumonia case, the coefficient for Asthma should be set to zero after the model has been fit, not before. 
+
+\item What are the necessary and sufficient conditions for decision making? How much about a the distribution of rewards for different arms must I know in order to select one (under different assumptions about the loss function). Ie when is the mean sufficient? What about the mean and the variance? - when can we take one set of results and compute something about a different loss function?
+
+\item Does the way we define supervised learning and loss functions imply an additive noise model? Why would we expect this to hold - why don't we run into more problems?
+ 
+
+\end{itemize}
+
 \section{careful prior}
 
 \subsubsection{Example}
@@ -509,6 +538,13 @@ P(\tau) = N(\mu_1 - \mu_0,2\sigma^{2}(1-\rho))
 From a (large) randomised controlled trial we can estimate the marginal distributions over the counterfactual variables, see figure \ref{fig:metaphys_a}. These represent the distributions we would expect over the outcome $Y$ if everyone were treated or not treated respectively. However, the distribution over the individual causal effects depends on $\rho$, see figure \ref{fig:metaphys_b}. The key problem is that we can never observe the joint distribution over $\cf{Y}{1}$ and $\cf{Y}{0}$. As a result, $\rho$ and thus the variance of $\tau$ is not identifiable, even from experimental data. \citet{Dawid2000} argues that we should avoid using counterfactuals as they are defined in terms of (metaphysical) individual causal effects. He further points out that the interventional distributions in figure \ref{fig:metaphys_a}, along with a loss function, contain all the information required to decide how to treat a new patient.  
 
 This result is unintuitive. It seems on the face of it that the distribution of individual causal effects is relevant to our decision making. If $\rho = 1$ then almost everyone benefits slightly from the treatment whilst if $\rho=0$, there is a wide range, with some people benefiting a lot and others suffering significant harm. This confusion can be resolved by thinking about personalised rather than individual causal effects. It is entirely possible that potentially observable characteristics (such as gender, age, genetics, etc) affect how people will respond to the treatment. We can partition people into sub-populations on the basis of these characteristics and measure different \emph{personalised} causal effects for each group. The variance of the potential outcome distributions $f(\cf{Y}{1})$ and $f(\cf{Y}{0})$ provides bounds on how much can be gained from further personalisation. The metaphysical nature of individual causal effects only arises when we are at the point where the only remaining variation is due to inherent randomness (or variables that we could not even in principle measure). 
+
+\section{intro}
+Chapters \ref{chap:causality} and \ref{chap:interventionalist_view} predominantly review the existing literature with the goal of highlighting connections between the different viewpoints and approaches. They do not contain novel technical results but present the material in a unified way. Chapter \ref{chap:causal-bandit} is a novel contribution. It formally connect causal graphical models and multi-armed bandit problems, demonstrates this leads to a form of structure that had not previously been analysed within the bandit literature and describes an algorithm that can leverage this structure to make better decisions. 
+
+There are complex philosophical objections to counterfactuals arising from the way they describe alternate universes that were never realised. This makes it easy to make statements using counterfactuals that cannot be confirmed empirically (even with infinite experimental data). We now demonstrate with a simple example that the variance of the cummulative regret depends on unobservable properties of the joint distribution over counterfactual rewards. 
+
+Take a stochastic, two-armed, Gaussain bandit with the joint distribution of the (counterfactual) rewards $\P{\cfb{Y}{1},\cfb{Y}{2}}$ given by equation \ref{eqn:joint-gaussain-reward}. Suppose without loss of generality that arm 1 is the optimal arm, such that $\mu_1 > \mu_2$. 
 
 
 
