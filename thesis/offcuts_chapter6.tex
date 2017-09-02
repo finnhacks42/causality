@@ -1,6 +1,14 @@
 
+\section*{Questions for Tor}
+- How do I fix the page numbering in my thesis?
+- How does one derive the regret decompostion
+- Any suggestions on reviewers for my thesis (or people who should not be reviewers)
+- Who else do I need to cite in my bandits chapter?
+
+
 \chapter*{Todo}
 \begin{enumerate}
+\item Check what I actually have to do to submit
 \item Add something about Granger causality - does this belong in chapter 2 or chapter 3?
 \item Sell my PhD as two key contribution. 1) A technical one, the other educational and unifying (across viewpoints)
 \item Add a chapter in 'PhD prose' making some statement about the intersection of prediction and causality. When is a problem causal, what bounds does predictive accuracy give on causal models? To what degree is predictive accuracy a metric on which causal models can be judged? 
@@ -28,26 +36,6 @@
 
 \end{itemize}
 
-\section{careful prior}
-
-\subsubsection{Example}
-
-\eqn{
-U &\sim N(0 , 1)\\
-Z &\sim N(2U , 0.09)\\
-X &\sim N(0.5Z , 1)\\
-Y &\sim N(3U + -Z + 0.5X , 0.25)
-}
-
-\begin{figure}[h]
-\includegraphics[scale=.3]{prior_no_prior}
-\caption{no prior, posterior on $w_{yx}$ centered around $w_{yx}$}
-\end{figure}
-
-\begin{figure}[h]
-\includegraphics[scale=.3]{prior_bad_prior}
-\caption{Prior around $w_{yz}$, $\beta \sim N(w_{yz},\sigma = 0.5)$. The posterior on $w_{yx}$ is biased away from its true value}
-\end{figure}
 
 
 
@@ -541,11 +529,39 @@ From a (large) randomised controlled trial we can estimate the marginal distribu
 This result is unintuitive. It seems on the face of it that the distribution of individual causal effects is relevant to our decision making. If $\rho = 1$ then almost everyone benefits slightly from the treatment whilst if $\rho=0$, there is a wide range, with some people benefiting a lot and others suffering significant harm. This confusion can be resolved by thinking about personalised rather than individual causal effects. It is entirely possible that potentially observable characteristics (such as gender, age, genetics, etc) affect how people will respond to the treatment. We can partition people into sub-populations on the basis of these characteristics and measure different \emph{personalised} causal effects for each group. The variance of the potential outcome distributions $f(\cf{Y}{1})$ and $f(\cf{Y}{0})$ provides bounds on how much can be gained from further personalisation. The metaphysical nature of individual causal effects only arises when we are at the point where the only remaining variation is due to inherent randomness (or variables that we could not even in principle measure). 
 
 \section{intro}
+\paragraph*{This thesis contributes to knowledge by:} Introducing a framework connecting causal graphical models with multi-armed bandits as a first step towards a unified approach to estimating the effect of interventions.  
+
+We study the problem of using causal models to improve the rate at which good interventions can be learned online in a stochastic environment. 
+Our formalism combines multi-arm bandits and causal inference to model a novel type of bandit feedback that is not exploited by existing approaches.
+We propose a new algorithm that exploits the causal feedback and prove a bound on its simple regret that is strictly better (in all quantities) 
+than algorithms that do not use the additional causal information. 
+
+
 Chapters \ref{chap:causality} and \ref{chap:interventionalist_view} predominantly review the existing literature with the goal of highlighting connections between the different viewpoints and approaches. They do not contain novel technical results but present the material in a unified way. Chapter \ref{chap:causal-bandit} is a novel contribution. It formally connect causal graphical models and multi-armed bandit problems, demonstrates this leads to a form of structure that had not previously been analysed within the bandit literature and describes an algorithm that can leverage this structure to make better decisions. 
+
+\paragraph*{My key research questions are:} 
+\begin{itemize}
+\item To understand and the difference between prediction and causal inference in machine learning and clarify which problems require causal approaches.
+\item To summarise the key strands of causal inference research from economics and social sciences for the machine learning community
+\item To make connections between learning to act from observational versus experimental data. In particular, between causal graphical models and multi-armed bandits.
+\end{itemize}
+
+
+
+A secondary goal is to summarise the key strands of causal inference research from economics and social sciences for the machine learning community and highlight connections and productive areas for future research. 
+
+I describe the key existing frameworks for 
+
+Demonstrate connections between existing lines of work within the bandit and casusal inference communities. 
+
+To summarise the key strands of causal inference research from economics and social sciences for the machine learning community.
+\section{Random}
 
 There are complex philosophical objections to counterfactuals arising from the way they describe alternate universes that were never realised. This makes it easy to make statements using counterfactuals that cannot be confirmed empirically (even with infinite experimental data). We now demonstrate with a simple example that the variance of the cummulative regret depends on unobservable properties of the joint distribution over counterfactual rewards. 
 
 Take a stochastic, two-armed, Gaussain bandit with the joint distribution of the (counterfactual) rewards $\P{\cfb{Y}{1},\cfb{Y}{2}}$ given by equation \ref{eqn:joint-gaussain-reward}. Suppose without loss of generality that arm 1 is the optimal arm, such that $\mu_1 > \mu_2$. 
+
+
 
 
 

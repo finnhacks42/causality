@@ -1,4 +1,4 @@
-\documentclass[11pt,a4paper,oneside]{book}
+\documentclass[11pt,a4paper,twoside]{report}
 \usepackage[table]{xcolor}
 \usepackage[utf8]{inputenc}
 \usepackage{textcomp}
@@ -239,19 +239,77 @@
 
 %\def\ci{\perp\!\!\!\perp} % from Wikipedia
 
+\begin{titlepage}
+    \begin{center}
+        \vspace*{1cm}
+        
+        \Huge
+        {Learning how to act: making good decisions with machine learning}
+        
+        \vspace{2cm}
+        \Large
+        {Finnian Lattimore}
+        
+        \vfill
+        \Large
+        A thesis submitted for the degree of Doctor of Philosophy
+         
+         The Australian National University
+        
+        \vspace{1cm}
+        
+        September 2017
+        
+    \end{center}
+\end{titlepage}
 
-\maketitle
 
 \epigraph{In vain the grave, with retrospective Eye,
 Would from the apparent what conclude the why,
 Infer the Motive from the Deed, and show
 That what we chanced, was what we meant, to do.}{Alexander Pope}
 
+
+
+\clearpage
+\vspace*{\fill}
+\begin{center}
+\begin{minipage}{.9\textwidth}
+Except where acknowledged in the customary manner, the material 
+presented in this thesis is, to the best of my knowledge, original and has not been submitted in whole or part for a degree in any 
+university.
+
+\vspace{40mm}  % vertical space
+
+\hspace{80mm}\rule{40mm}{.15mm}\par   % horizontal space, line, start new line
+\hspace{80mm} Finnian Lattimore\par
+\hspace{80mm} September, 2017
+\end{minipage}
+\end{center}
+\vfill % equivalent to \vspace{\fill}
+\clearpage
+
+
+
+
+\begin{abstract} 
+
+This thesis is about machine learning and statistical approaches to decision making. How can we learn from data to anticipate the consequence of, and optimally select, interventions or actions? Such problems, from deciding which medication to prescribe to patients, who should be released on bail or how much to charge for insurance, to designing policies to reduce unemployment or improve school attendance are ubiqutes and have far reaching impacts on our lives. There are two fundamental approaches to learning how to act: reinforcment learning, in which an agent directly intervenes in a system and learns from the outcome, and observational causal inference, whereby we seek to infer the outcome of an intervention from observing the system. 
+
+The goal of this thesis to to connect and unify these key approaches. I introduce causal bandit problems: a framework which combines causal graphical models, which were developed for observational causal inference, with multi-armed bandit problems, which are a subset of reinforcment learning problems that are simple enough to admit formal analysis. I show that knoweledge of the causal structure allows us to transfer information learned about the outcome of one action to predict the outcome of an alternate action, yielding a novel form of structure between bandit arms that cannot be expoited by existing algorithms. I propose an algorithm for causal bandit problems and prove bounds on the simple regret demonstrating it is close to mini-max optimal and strictly better than algorithms that do not use the additional causal information. 
+
+\end{abstract} 
+
+%\chapter*{Acknowledgements}  
+
+
+
+
+
 \tableofcontents
 
 
 \chapter{Introduction}
-
 
 \section{Motivation}
 Many of the most important questions in science and in our personal lives are about the outcomes of doing something. Will asking people to pay upfront at the doctors reduce long term health expenditure? If we developed a drug to suppress particular genes, could we cure MS and would delaying teen-aged pregnancies improve the outcome for their kids.  
@@ -287,7 +345,7 @@ There has traditionally been a large gap between researches in machine learning 
 Machine learning is in the midst of a boom, driven by the availability of large data sets and the computation resources to process them. Machine learning techniques are being applied a huge range of problems, in both industry and academia. The following examples are intended to capture the breadth of problems that machine learning algorithms are actively being applied to. Which, if any, of these problems require causal inference? 
 
 \begin{itemize}
-\item Speech recognition (for systems like Siri or Google)
+\item Speech recognition (for systems like Siri or Google Assistant)
 \item Image classification
 \item Forecasting the weather
 \item Identifying spam emails
@@ -323,9 +381,9 @@ The problem of playing go is causal from the interventionalist perspective. The 
  
 Having considered these examples we can now identify some general aspects of problems that require causal (as opposed to purely predictive) inference. A predictive model may be sufficient if, given the variable(s) being predicted, it is clear which action is optimal and if selecting actions on the basis of the model does not change the mapping from features to outcomes. The second requirement is particularly difficult to satisfy when an algorithm is making important decisions effecting individual people. Think about problems like credit scoring and parole decisions. There are strong ethical grounds for demanding transparency, but if the goals of society and the individuals are not perfectly aligned and there is any possibility that people can manipulate features independently of the outcome, there will be a conflict between model accuracy and transparency. It is rare to build a model without any intent to make some kind of decision on the basis of its results. Thus, I argue we should assume a causal model is required until we can justify otherwise.  
 
-\section{An overview of this thesis and its contributions}
+\section{Observe or intervene: two very different approaches to causal problems}
 
-As we have shown, problems involving causality are ubiquitous in many fields. As a result, techniques for addressing them have developed in parallel within many disciplines, including statistics, economics, social science, epidemiology and machine learning. Although the focus and terminology can differ substantially between fields these techniques all address the underlying goal of estimating the effect of, or optimally selecting, interventions in some system. Methods for learning about interventions can be usefully categorised into two broad approaches, reinforcement learning and observational causal inference. 
+As we have shown, problems involving causality are ubiquitous in many fields. As a result, techniques for addressing them have developed in parallel within many disciplines, including statistics, economics, social science, epidemiology and machine learning. Although the focus and terminology can differ substantially between fields these techniques, all address the underlying goal of estimating the effect of, or optimally selecting, interventions in some system. Methods for learning about interventions can be usefully categorised into two broad approaches, reinforcement learning and observational causal inference. 
 
 In reinforcement learning, under which we include traditional randomised experiments, we learn the outcome of actions by taking them. We take the role of an agent, capable of intervening in the system, and aim to develop algorithms that allow the agent to select actions optimally with respect to some goal. A particular strand of research within reinforcement learning are multi-armed bandit problems. They describe settings in which there are a set of available actions, the agent repeatedly decides which to select and then observes the outcome of the chosen action. They capture problems such as a doctor deciding which treatment to prescribe to a patient or a search engine selecting which advertisement to display to a user, where the agent faces the same set of choices repeatedly and is able to assess the value of outcome of the actions. 
 
@@ -333,7 +391,20 @@ The approach of learning the outcome of an action by taking it has plays a key r
 
 Both multi-armed bandits and observational causal inference can be seen as extensions to the concept of randomised controlled trials. Bandit algorithms deal with the sequential nature of the decision making process, causal inference with the problem randomisation is not always feasible, affordable or ethical. The similarities between the problems that these techniques have been developed to address raises the question of if there are problems best addressed by a combination of these approaches and how they can be combined. 
 
-The goal of this thesis is to draw together the key approaches to solving causal problems from both the interventionalist and observational viewpoints. In chapter \ref{chap:causality} I describe key frameworks for causal inference from observational data, discuss how the relate to one-anther and review how they can be leveraged to answer causal queries. Chapter \ref{chap:interventionalist_view} covers the interventionalist viewpoint, including traditional randomised experiments and the closely related multi-armed bandit problems. It describes the key problems and results within the bandit literature and highlights some interesting connections between existing strands of work on bandits and causal inference. In chapter \ref{chap:causal-bandit}, I develop a framework that unifies the causal graphical model approach for inference in observational settings with the sequential experimental approach encapsulated by multi-armed bandits. The causal models allow us to represent our knowledge of how variables are related to one-another in a very natural way and induces an interesting and novel form of structure between the different actions modelled in the bandit problem. I develop a new algorithm that can exploit this structure as a first step towards a unified approach to decision making under uncertainty. 
+\section{This thesis and its contributions}
+
+I view causal problems as one of the greatest arising challenges for machine learning. They incorporate a large set of problems, of huge practical significance, that require us to go beyond pattern recognition, but are well short of general artificial intelligence. For the major advances in representation and pattern recognition developed within machine learning to be effectively applied in many areas of medicine, economics, social sciences and industry we need to understand how to leverage our improved approaches to prediction to tackle causal problems. 
+
+\paragraph{Contributions} The goal of this thesis is to connect and unify the key approaches to solving causal problems from both the observational and interventional viewpoints. My major contribution is a framework which unifies the causal graphical model approach for inference in observational settings with the sequential experimental approach encapsulated by multi-armed bandits. This framework allows us to represent knowledge of how variables are related to one-another in a very natural way and induces an interesting and novel form of structure between the different actions modelled in the bandit problem. I develop a new algorithm that can exploit this structure as a first step towards a unified approach to decision making under uncertainty. My other contributions are primarily connective rather than technical. I demonstrate the role of a formal causal framework within Bayesian approaches to inference and show how assigning a prior based on human causal intuition without considering the causal structure of the problem can introduce bias. I highlight the connections between approaches to off-policy evaluation in bandit problems, causal effect estimation from observational data and covariate shift. I clarify the implicit causal structure underlying various bandit settings and the counterfactual nature of \emph{regret} - the measure by which bandit algorithms are assessed.
+
+\paragraph{Thesis overview} This thesis is divided into three key chapters, learning from observational data, learning from interventional data and unifying the approaches. Chapter \ref{chap:causality} covers learning to act from observational data. In \S\ref{sec:causal_models}, I describe the key existing frameworks for causal inference from observational data, discuss how they relate to one-another and introduce the notation required to describe causal problems. Section \ref{sec:causal effect estimation} describes the key tools these frameworks provide that enable us to answer causal questions, in particular, the do-calculus (\S\ref{sec:do_calculus}) and, in sections \ref{sec:defining-causal-effects} and \ref{sec:causal_effect_under_ignorability}, discusses how we define causal effects, the traditional approaches to estimation and how they relate to covariate shift and off-policy evaluation. Section \ref{sec:bayesian_causality} highlights the role graphical causal models can play in Bayesian inference. 
+
+
+Chapter \ref{chap:interventionalist_view} deals with interventionalist viewpoint, including traditional randomised experiments (\S\ref{sec:randomized_experiment}) and multi-armed bandit problems. In \S\ref{sec:multi-armed-bandits} I describe the key problems and results within the bandit literature, including stochastic bandits (\S\ref{sec:stochastic-bandit}), pure exploration problems (\S\ref{sec:pure-exploitation-problems}), adversarial bandits (\S\ref{sec:adversarial-bandits}) and contextual bandits (\S\ref{sec:contextual-bandits}). I clarify the causal structure of (stochastic) contextual bandit problems in \S\ref{sec:causal-structure-contextual-bandit}. In \S\ref{sec:off-policy-evaluation} I review the literature on off-policy evaluation for bandit problems and show how it is a somewhat special case of of causal effect estimation from observational data. Finally, in section \S\ref{sec:counterfactual-nature-regret} I discuss the counterfactual nature bandit regret. 
+
+In chapter \ref{chap:causal-bandit} I introduce causal bandit problems: a framework which unifies causal graphical models with multi-armed bandit problems. Bandit arms are related to interventions in a causal graphical model in a very natural way: each multi-armed bandit arm (or action) corresponds to a particular assignment of values to variables within the causal graphical model. I show how the framework can be used to describe a number of existing problems that lie in the intersection between the observational and interventional approaches to causality and demonstrate how problems reduce to different flavours of bandit problem depending what information is observable and when. 
+
+In \S\ref{sec:causal-bandit-post-action-feedback} I focus on causal bandit problems for which the values of variables in the causal graph are observed after an action is selected. I demonstrate that this leads to a novel form of structure between the bandit arms that cannot be exploited by any existing bandit algorithms. In \S\ref{sec:simple-regret} I describe and develop an algorithm for a special case of causal bandit problem I refer to as the \emph{parallel bandit problem}. I demonstrate via upper and lower bounds on the regret that the algorithm is close to optimal for these problems and that the introduction of the causal structure leads to substantially faster learning. In \S\ref{sec:simple-regret-general} I develop and prove regret bounds for an algorithm that can be applied to arbitrary causal graphs, albeit with stronger assumptions on what must be known apriori and introduce a measure that captures the underlying difficulty of causal bandit problems, which depends on the causal graph and can be viewed as an \quotes{effective number of arms}. Section \ref{sec:causal-bandit-experiments} provides experiments demonstrating the performance of these algorithms on causal bandit problems. Finally in \S\ref{sec:causal_bandit_discussion} I discuss extensions and potential future work. 
 
 
 \chapter{Learning from observational data}
@@ -695,6 +766,11 @@ Structural equation models are generally applied with strong constraints on the 
 
 \subsection{Comparing and unifying the models}
 \label{sec:unifying_causal_models}
+
+\todo{is there a mechanical method to go from one framework to another}
+
+\todo{does it matter if variables are discrete or continuous}
+
 
 Remarkably for models developed relatively independently in fields with very different approaches and problems, the models we have discussed can be nicely unified for interventional queries (those that can be expressed with the do-notation). If the network for a structural equation model is acyclic, that is if starting from any node and following edges in the direction of the arrows you cannot return to the starting point, then it implies a recursive factorisation of the joint distribution over its variables. In other words, the network is a causal Bayesian network. All of the results that apply to causal Bayesian networks also apply to acyclic structural equation models.  Taking an action that sets a variable to a specific value equates to replacing the equation for that variable with a constant. This corresponds to dropping a term in the factorisation and the truncated product formula (equation \ref{eq:truncatedproduct}). Thus, the interventional query $P(Y|do(X))$ is identical in these two frameworks. We can also connect this to counterfactuals via:
 
@@ -1359,6 +1435,7 @@ Although identifiability is a natural and important question to ask, it does not
 
 
 \subsection{Defining causal effects} 
+\label{sec:defining-causal-effects}
 So far we have described causal effect estimation in term of identifying the interventional distribution $\P{Y|do(X)}$ from observational data. This interventional distribution is in fact a family of distributions parameterised by the value, $x$, to which the treatment variable $X$ is set. From a decision theoretic viewpoint, we can select an optimal action $x$ by specifying a utility function $\mathcal{U}:y \in \mathcal{Y} \rightarrow \mathbb{R}$ that assigns a value to each outcome $y$ and then selecting the action that maximises the expected utility. 
 
 \eqn{
@@ -1705,6 +1782,7 @@ This result is counter intuitive. When fitting a model to estimate the affect of
 The previous sections all focus on aspects of the question; how can we estimate the effect of an intervention in a system from data collected prior to taking it. There is an obvious alternative. Instead of trying to infer the outcome of an intervention from passive observations one can intervene and see what happens. There are three key differences between observing a system and explicitly intervening in it. Firstly, when we intervene we choose which actions to take and thus have control over which data points we obtain to learn from. Selecting data points optimally for learning is the focus of the optimal experimental design literature within statistics \citep{pukelsheim2006optimal} and the active learning literature in machine learning \citep{settles2010active}. Secondly, explicitly choosing interventions yields a perfect model of the probability with which each action is selected, given any context, allowing control over confounding bias. Finally, when we are intervening in a system we typically care about the impact of our actions on the system in addition to optimising learning. For example, in a drug trial , assigning people a sub-optimal treatment has real world costs. This leads to a trade-off between exploiting the best known action so far and exploring alternative actions about which we are less certain. This exploration-exploitation trade-off lies at the heart of the field of reinforcement learning \citep{sutton1998reinforcement}. 
 
 \section{Randomised experiments}
+\label{sec:randomized_experiment}
 Randomised controlled trials are often presented as the gold standard for determining causal effects. What is it about randomisation that makes it so important when it comes to causality? The graphical model for a randomised controlled experiment is shown in figure \ref{fig:random_experiment_network}. If we assume perfect compliance (everyone takes the treatment that we select for them) then we have a perfect model for the treatment assignment process. Since treatment is assigned randomly, there can be no other variables that influence it and thus no confounding variables that effect both treatment and outcome. 
 
 \begin{figure}
@@ -1825,6 +1903,7 @@ The regret is invariant to adding a constant to the expected rewards for all act
 
 
 \subsection{Stochastic bandits: Approaches and results}
+\label{sec:stochastic-bandit}
 
 The adaptive nature of multi-armed bandit algorithms complicates the design and analyse of estimators. The action selected by an algorithm at a given timestep can depend on the history of previous actions and rewards. As a result, the probability that each action is selected evolves over time, the actions are not sampled i.i.d from a fixed distribution and the number of times each action is selected is a random variable. The expectation and variance guarantees of standard estimators do not hold in this setting, see figure \ref{fig:early_stopping} for a concrete example. This makes it very difficult to  obtain an analytical expression for the expected regret for a given algorithm and problem. Instead, the focus is on computing bounds on the expected regret. 
 
@@ -1887,6 +1966,7 @@ Subtle modifications to the UCB algorithm can eliminate the logarithmic term equ
 Finally, there is the heuristic principle of playing each arm with probability proportional to the likelyhood that it is optimal. This approach is generally called Thompson sampling as it was the method proposed in the original bandit paper by \citet{Thompson1993}. Thompson sampling has strong empirical performance, \citep{chapelle2011empirical}. However, it is complex to analyse, \citet{kaufmann2012thompson} demonstrate that it obtains optimal problem dependent bounds, \citet{agrawal2013further} show that it obtains worst case regret of $\bigo{\sqrt{kT\log(T)}}$, equivalent to UCB. 
 
 \subsection{Pure-exploration problems}
+\label{sec:pure-exploitation-problems}
 Another problem that has attracted a lot of recent attention \citep{Bubeck2009,Audibert2010,Gabillon2012,Karnin2013} within the stochastic multi-armed bandit framework is \textit{pure exploration} or \textit{best arm identification}. In this setting, the horizon $T$ represents a fixed budget for exploration after which the algorithm outputs a single best arm $i$. The performance of the algorithm is measured by the simple regret; the expected difference between the mean reward of the (truly) optimal arm and the mean reward of the arm selected by the algorithm.
 
 \vspace{0.5cm}
@@ -1910,6 +1990,7 @@ The best arm identification problem arises naturally in applications where there
 Pure-exploration does not mean simply playing the arm with the widest uncertainty bounds. The goal is to be sure the arm we believe is optimal is in fact optimal at the end of the exploration period. 
 
 \subsection{Adversarial Bandits}
+\label{sec:adversarial-bandits}
 
 Adversarial bandits, described by \citet{Auer1995}, are an alternate, widely studied, setting that relaxes the assumption that rewards are generated stochastically. Instead, simultaneously with the learner selecting an action $a_t$, a potentially malicious adversary selects the reward vector $\boldsymbol{Y}_t$. As in the stochastic setting, the learner then receives reward only for the selected action. 
 
@@ -2006,6 +2087,7 @@ This expression equates to identifying the best empirical policy based on previo
 Finally, if we have a parametric model for the relationship between context, action and reward that allows (efficient) computation of the posterior or confidence bounds on the reward for each arm given context, we can develop generalised versions of the UCB or Thompson sampling algorithms. For linear pay-off models, both approaches yield algorithms with strong regret guarantees, \emph{Lin-UCB} \citep{li2010contextual} and \emph{Generalised Thompson Sampling} \citep{Agrawal2013}. 
 
 \subsubsection{The causal structure of contextual bandits}
+\label{sec:causal-structure-contextual-bandit}
 
 It is worth noting that definition \ref{def:contextual-bandit-problem} does not make any assumptions about the \emph{causal} relationship between the context $\vec{X}$ and the reward $\vec{Y}$, see figure \ref{fig:contextual-bandit-causal-graph}. However, the context should be relevant, such that $\P{\vec{y}|\vec{x}} \neq \P{\vec{y}}$, otherwise including it is the equivalent to adding irrelevant features to a supervised learning problem. \citet{Bareinboim2015} demonstrate that, in some cases, policies that incorporate observations of the action an agent would have taken were their action not set by the bandit policy can achieve lower regret than those that ignore this information. This is an example of the case represented in figure \ref{fig:context-graph-confounded}. It is even possible to have (useful) context $\vec{X}$ that is a consequence of $\vec{Y}$ as in figure \ref{fig:context-graph-anti-causal} and example \ref{exm:anti-casual-context}.
 
@@ -2076,6 +2158,7 @@ Imagine a modified game of roulette. As in standard roulette, it consists of a s
 It is difficult to come up with realistic examples in which the full sequence of rewards is generated but only the one associated with the selected action is observable to the learner. In the typically cited applications of contextual bandit algorithms, such as selecting how to treat patients or which ad to serve only the reward of the selected action is ever realised, and the alternate rewards are counterfactual variables.
 
 \subsection{Learning from logged bandit data}
+\label{sec:off-policy-evaluation}
 Another topic of interest within the bandit community, which is deeply connected to causal effect estimation from observational data, is learning from logged bandit feedback data or off-policy evaluation\citep{Langford2008a,strehl2010learning,Li2010,Dudik2011,Bottou2013,Swaminathan2015}. In this setting, the learner has a data set $S = \set{(\vec{X}_t,A_t,\cfb{Y}{A_t})}_{t=1}^T$, which is assumed to have been generated by a stochastic contextual bandit environment interacting with some unknown, potentially stochastic, policy $\pi(\vec{x}_t,h_t)$, where $h_t$ is the sequence of observed data up to time $t$. The goal of the learner is to evaluate the value of an alternate policy, $\pi'$, for selecting actions, often with the underlying motivation of identifying an optimal policy within some space of policies $\Pi$. 
 
 This problem differs from the contextual bandit problem in that the learner is not interacting with the environment. As a result, there is no exploration-exploitation trade-off to be made. However, the problem does not reduce to supervised learning, because the label, $y$ is not the desired . In addition, if $\pi$ is allowed to depend $h$ then the samples are not i.i.d. The majority of the literature considers the case where the original policy $\pi$ was stationary ($\pi(\vec{x}_t,h_t) = \pi(\vec{x})$). \citet{Langford2008a} do allow the original policy to be adaptive and prove a high probability bound on the accuracy of their estimator for $\pi'$, albeit with the strong assumption that the original estimator $\pi$ did not depend on $\vec{X}$. 
@@ -2108,6 +2191,7 @@ As in estimating average causal effects under ignorability, we have a covariate 
 \citet{Swaminathan2015} point out that the problem of identifying the optimal policy (subject to some risk minimisation goal) is not as simple as estimating the expected reward associated with each policy in some space and selecting the empirical best because the variance of the estimators for some policies may be much higher than for others.
 
 \subsection{Adding structure to actions}
+\label{sec:adding-structure-bandit-actions}
 
 The classic multi-armed bandit is a powerful tool for sequential decision making. However, the regret grows linearly with the number of (sub-optimal) actions and many real world problems have large or even infinite action spaces. This has led to the development of a wide range of models that assume some structure across the reward distributions for different arms, for example generalised linear bandits \citep{filippi2010parametric}, dependent bandits \citep{Pandey2007}, X-armed bandits \citep{Bubeck2010} and Gaussian process bandits \citep{srinivas2009gaussian}, or that consider more complex feedback, for example the recent work on graph feedback\citep{Mannor2011,Lelarge2012,Alon2013,Buccapatnam2014,Kocak2014,Alon2015} and partial monitoring \citep{Piccolboni2001,Bartok2014}.
 
@@ -2332,6 +2416,7 @@ Compliance aware bandits describe situations in which the action recommended by 
 The classical $K$-armed stochastic bandit problem can be recovered in our framework by considering a simple causal model with one edge connecting a single variable $X$ that can take on $K$ values to a reward variable $Y \in \set{0,1}$ where $\P{Y = 1|X} = r(X)$ for some arbitrary but unknown, real-valued function $r$. The set of allowed actions in this case is $\mathcal{A} = \{ do(X = k) \colon k \in \{1, \ldots, K\}\}$. Conversely, any causal bandit problem can be reduced to a classical stochastic $|\mathcal{A}|$-armed bandit problem by treating each possible intervention as an independent arm and ignoring all sampled values for the observed variables except for the reward. However, the number of actions or arms grows exponentially with the number of variables in the graph making it important to develop algorithms that leverage the graph structure and additional observations.
 
 \section{Causal bandits with post action feedback}
+\label{sec:causal-bandit-post-action-feedback}
 
 We now focus on causal bandit problems with post-action feedback, in which the value of all the variables are observed after an intervention is selected, the cost of all allowable actions is equal and the goal of the learner is to minimise the simple regret. I presented this work at NIPS 2016 \citep{NIPS2016_6195}.
 
@@ -2602,6 +2687,7 @@ to learn from observational data.
 
 
 \subsection{Experiments}
+\label{sec:causal-bandit-experiments}
 We compare Algorithms \ref{alg:simple} and \ref{alg:general} with the Successive Reject algorithm of \citet{Audibert2010}, Thompson Sampling and UCB under a variety of conditions. Thomson sampling and UCB are optimised to minimise cumulative regret. We apply them in the fixed horizon, best arm identification setting by running them up to horizon $T$ and then selecting the arm with the highest empirical mean. The importance weighted estimator used by Algorithm \ref{alg:general} is not truncated, which is justified in this setting by Remark \ref{rem:truncate}. 
 
 Throughout we use a model in which $Y$ depends only on a single variable $X_1$ (this is unknown to the algorithms). $Y_t \sim \bernoulli(\frac{1}{2}+\epsilon)$ if $X_1=1$ and $Y_t \sim \bernoulli(\frac{1}{2}-\epsilon')$ otherwise, where $\epsilon' = q_1\epsilon/(1-q_1)$. This leads to an expected reward of $\frac{1}{2}+\epsilon$ for $do(X_1=1)$, $\frac{1}{2}-\epsilon'$ for $do(X_1=0)$ and $\frac{1}{2}$ for all other actions. We set $q_i = 0$ for $i \leq m$ and $\frac{1}{2}$ otherwise. Note that changing $m$ and thus $\boldsymbol{q}$ has no effect on the reward distribution. For each experiment, we show the average regret over 10,000 simulations with error bars displaying three standard errors. The code is available from \url{<https://github.com/finnhacks42/causal_bandits>} 
@@ -3070,6 +3156,11 @@ Therefore $m(\eta*) \leq m(\eta) \leq 2m(\boldsymbol{q})$ as required.
 
 \chapter{Conclusion}
 
+Causal questions are so important
+
+Summarise the amazing stuff I have done
+
+Many interesting future directions for research
 
 
 
