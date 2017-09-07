@@ -1,4 +1,6 @@
 
+
+
 \section*{Questions for Tor}
 - How do I fix the page numbering in my thesis?
 - How does one derive the regret decompostion
@@ -8,6 +10,7 @@
 
 \chapter*{Todo}
 \begin{enumerate}
+\item Write a talk - include slide on causal inference without do
 \item Check what I actually have to do to submit
 \item Add something about Granger causality - does this belong in chapter 2 or chapter 3?
 \item Sell my PhD as two key contribution. 1) A technical one, the other educational and unifying (across viewpoints)
@@ -561,6 +564,23 @@ There are complex philosophical objections to counterfactuals arising from the w
 
 Take a stochastic, two-armed, Gaussain bandit with the joint distribution of the (counterfactual) rewards $\P{\cfb{Y}{1},\cfb{Y}{2}}$ given by equation \ref{eqn:joint-gaussain-reward}. Suppose without loss of generality that arm 1 is the optimal arm, such that $\mu_1 > \mu_2$. 
 
+\section{Conclusion}
+
+
+Ideas developed within the off-policy selection liturature are also relevent classic causal problems within economics etc.
+ - optimal action selection (rather than evaluation)
+ - quantification of finite time properties of estimators (as opposed to asymptopic efficiency). eg \cite{}
+ 
+
+Most of the underlying applications do involve decisions which are in fact made sequentially (or in sequential batches). Even if a fully online system is impractical, the underlying concepts of the exploration/exploitation trade-off  
+
+That is a principled, yet very broadly applicable strategy to select model parameters in the absense of strong theory
+
+
+While theoretical bounds are extremely important and much work remains to be done in this area, particularly on finite time bounds, it is very difficult to obtain tig
+
+
+We do not have sufficent theory to give tight finite time bounds on the quality of complex estimation technqiues for causal estimation (or supervise
 
 
 
