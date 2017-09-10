@@ -41,23 +41,23 @@
 \contentsline {subsection}{\numberline {3.2.5}Learning from logged bandit data}{55}{subsection.3.2.5}
 \contentsline {subsection}{\numberline {3.2.6}Adding structure to actions}{56}{subsection.3.2.6}
 \contentsline {section}{\numberline {3.3}The counterfactual nature of regret}{57}{section.3.3}
-\contentsline {chapter}{\numberline {4}Causal Bandits: Unifying the approaches}{60}{chapter.4}
-\contentsline {section}{\numberline {4.1}A framework to connect bandit problems with observational causal inference}{60}{section.4.1}
-\contentsline {section}{\numberline {4.2}Causal bandits with post action feedback}{64}{section.4.2}
-\contentsline {paragraph}{Related Work}{64}{section*.46}
-\contentsline {subsection}{\numberline {4.2.1}The parallel bandit problem}{65}{subsection.4.2.1}
-\contentsline {paragraph}{The Parallel Bandit Algorithm}{65}{section*.48}
-\contentsline {subsection}{\numberline {4.2.2}General graphs}{66}{subsection.4.2.2}
-\contentsline {paragraph}{Choosing the Sampling Distribution}{68}{section*.49}
-\contentsline {subsection}{\numberline {4.2.3}Experiments}{70}{subsection.4.2.3}
-\contentsline {subsection}{\numberline {4.2.4}Discussion \& Future work}{72}{subsection.4.2.4}
-\contentsline {paragraph}{Making Better Use of the Reward Signal}{73}{section*.53}
-\contentsline {paragraph}{Cumulative Regret}{73}{section*.54}
-\contentsline {paragraph}{Causal Models with Non-Observable Variables}{74}{section*.55}
-\contentsline {paragraph}{Partially or Completely Unknown Causal Graph}{74}{section*.56}
-\contentsline {subsection}{\numberline {4.2.5}Proofs}{74}{subsection.4.2.5}
-\contentsline {subsubsection}{\numberline {4.2.5.1}Proof of Theorem \ref {thm:uq-simple}}{74}{subsubsection.4.2.5.1}
-\contentsline {subsubsection}{\numberline {4.2.5.2}Proof of Theorem \ref {thm:lower}}{76}{subsubsection.4.2.5.2}
-\contentsline {subsubsection}{\numberline {4.2.5.3}Proof of Theorem \ref {thm:general}}{77}{subsubsection.4.2.5.3}
-\contentsline {subsubsection}{\numberline {4.2.5.4}Relationship between $m(\eta )$ and $m(\boldsymbol {q})$}{78}{subsubsection.4.2.5.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{80}{chapter.5}
+\contentsline {chapter}{\numberline {4}Causal Bandits: Unifying the approaches}{59}{chapter.4}
+\contentsline {section}{\numberline {4.1}A framework to connect bandit problems with observational causal inference}{59}{section.4.1}
+\contentsline {section}{\numberline {4.2}Causal bandits with post action feedback}{63}{section.4.2}
+\contentsline {paragraph}{Related Work}{63}{section*.46}
+\contentsline {subsection}{\numberline {4.2.1}The parallel bandit problem}{64}{subsection.4.2.1}
+\contentsline {paragraph}{The Parallel Bandit Algorithm}{64}{section*.48}
+\contentsline {subsection}{\numberline {4.2.2}General graphs}{65}{subsection.4.2.2}
+\contentsline {paragraph}{Choosing the Sampling Distribution}{67}{section*.49}
+\contentsline {subsection}{\numberline {4.2.3}Experiments}{69}{subsection.4.2.3}
+\contentsline {subsection}{\numberline {4.2.4}Discussion \& Future work}{71}{subsection.4.2.4}
+\contentsline {paragraph}{Making Better Use of the Reward Signal}{72}{section*.53}
+\contentsline {paragraph}{Cumulative Regret}{72}{section*.54}
+\contentsline {paragraph}{Causal Models with Non-Observable Variables}{73}{section*.55}
+\contentsline {paragraph}{Partially or Completely Unknown Causal Graph}{73}{section*.56}
+\contentsline {subsection}{\numberline {4.2.5}Proofs}{73}{subsection.4.2.5}
+\contentsline {subsubsection}{\numberline {4.2.5.1}Proof of Theorem \ref {thm:uq-simple}}{73}{subsubsection.4.2.5.1}
+\contentsline {subsubsection}{\numberline {4.2.5.2}Proof of Theorem \ref {thm:lower}}{75}{subsubsection.4.2.5.2}
+\contentsline {subsubsection}{\numberline {4.2.5.3}Proof of Theorem \ref {thm:general}}{76}{subsubsection.4.2.5.3}
+\contentsline {subsubsection}{\numberline {4.2.5.4}Relationship between $m(\eta )$ and $m(\boldsymbol {q})$}{77}{subsubsection.4.2.5.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{79}{chapter.5}
