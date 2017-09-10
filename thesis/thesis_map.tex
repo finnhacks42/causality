@@ -230,7 +230,7 @@
 \newcommand{\nci}{\centernot{\ci}}
 
 
-\author{Finnian Lattimore}
+\author{Finnian Rachel Lattimore}
 \title{Learning how to act: making good decisions with machine learning}
 
 \setcounter{secnumdepth}{3}
@@ -239,63 +239,16 @@
 
 %\def\ci{\perp\!\!\!\perp} % from Wikipedia
 
-\begin{titlepage}
-    \begin{center}
-        \vspace*{1cm}
-        
-        \Huge
-        {Learning how to act: making good decisions with machine learning}
-        
-        \vspace{2cm}
-        \Large
-        {Finnian Lattimore}
-        
-        \vfill
-        \Large
-        A thesis submitted for the degree of Doctor of Philosophy
-         
-         The Australian National University
-        
-        \vspace{1cm}
-        
-        September 2017
-        
-    \end{center}
-\end{titlepage}
-
+\input{titlepage}
+\input{original_statement}
 
 \epigraph{In vain the grave, with retrospective Eye,
 Would from the apparent what conclude the why,
 Infer the Motive from the Deed, and show
 That what we chanced, was what we meant, to do.}{Alexander Pope}
 
-
-
-\clearpage
-\vspace*{\fill}
-\begin{center}
-\begin{minipage}{.9\textwidth}
-Except where acknowledged in the customary manner, the material 
-presented in this thesis is, to the best of my knowledge, original and has not been submitted in whole or part for a degree in any 
-university.
-
-\vspace{40mm}  % vertical space
-
-\hspace{80mm}\rule{40mm}{.15mm}\par   % horizontal space, line, start new line
-\hspace{80mm} Finnian Lattimore\par
-\hspace{80mm} September, 2017
-\end{minipage}
-\end{center}
-\vfill % equivalent to \vspace{\fill}
-\clearpage
-
-\begin{abstract} 
-
-This thesis is about machine learning and statistical approaches to decision making. How can we learn from data to anticipate the consequence of, and optimally select, interventions or actions? Problems such as deciding which medication to prescribe to patients, who should be released on bail, and how much to charge for insurance are ubiquitous, and have far reaching impacts on our lives. There are two fundamental approaches to learning how to act: reinforcement learning, in which an agent directly intervenes in a system and learns from the outcome, and observational causal inference, whereby we seek to infer the outcome of an intervention from observing the system. 
-
-The goal of this thesis to connect and unify these key approaches. I introduce causal bandit problems: a framework that combines causal graphical models, which were developed for observational causal inference, with multi-armed bandit problems, which are a subset of reinforcement learning problems that are simple enough to admit formal analysis. I show that knowledge of the causal structure allows us to transfer information learned about the outcome of one action to predict the outcome of an alternate action, yielding a novel form of structure between bandit arms that cannot be exploited by existing algorithms. I propose an algorithm for causal bandit problems and prove bounds on the simple regret demonstrating it is close to mini-max optimal and strictly better than algorithms that do not use the additional causal information. 
-
-\end{abstract} 
+\chapter*{Acknowledgements}
+\input{abstract}
 
 %\chapter*{Acknowledgements}  
 
