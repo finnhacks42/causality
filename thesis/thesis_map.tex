@@ -283,10 +283,10 @@ However, a strong association, observed in multiple independent studies may stil
 
 The key distinction between a real, but non-causal, association and a causal relationship is in what happens if we intervene in the system and change one of the variables. In this thesis, I take an interventionist viewpoint of causality: any model or approach designed to predict the outcome of intervening in a system is causal. This viewpoint captures the types of questions that motivate this thesis. How can we change the way we do things to obtain better outcomes? 
 
-Causality is often liked to explanation; understanding how and why things happen. I view explanation in terms of compression and generalisabilty: the amount of information about the world a model can capture. This creates a hierarchy in the degree to which models are explanatory, rather than a simple binary distinction. A standard predictive model encodes all the information needed to predict some output given inputs provided the system generating the data does not change. A high-level causal model might be able to predict the outcome of a specific intervention holding all else fixed. More detailed causal models could predict the outcome for a wide range of combinations of interventions conditional on a range of contexts. By considering conditional interventions within our definition of causal questions we also capture mediation: the study of pathways through which one variable causes another \cite{vanderweele2015explanation}. Finally, a model that can distil how elements interact into mathematical equations like Newton's laws can be used to predict what will happen in an astounding range of settings, including many never previously observed \footnote{Although Newton's laws are not fully general, as they break down for extremely massive objects}.
+Causality is often liked to explanation; understanding how and why things happen. I view explanation in terms of compression and generalisabilty: the amount of information about the world a model can capture. This creates a hierarchy in the degree to which models are explanatory, rather than a simple binary distinction. A standard predictive model encodes all the information needed to predict some output given inputs provided the system generating the data does not change. A high-level causal model might be able to predict the outcome of a specific intervention holding all else fixed. More detailed causal models could predict the outcome for a wide range of combinations of interventions conditional on a range of contexts. By considering conditional interventions within our definition of causal questions we also capture mediation: the study of pathways through which one variable causes another \cite{vanderweele2015explanation}. Finally, a model that can distil how elements interact into mathematical equations like Newton's laws can be used to predict what will happen in an astounding range of settings, including many never previously observed.\footnote{Although Newton's laws are not fully general, as they break down for extremely massive objects}
 
-\citet{Gelman2010,gelman2013ask} make a distinction between forward causal inference, the types of \quotes{what if} questions I focus on in this thesis, and reverse causal questions, asking why something occurs. The former aims to identify the effect of a known cause. The latter can be viewed as identifying causes of an effect. They regard forward causal inference as well defined within the counterfactual and graphical model frameworks for causal inference, that we describe in section \ref{sec:causal_models}. However, they state that \quotes{A reverse causal question does not in general have a well-defined answer, even in a setting where all possible data are made available.} I view this as overly pessimistic, depending on how \quotes{all possible data} is defined. The goal of identifying the causes of an effect can be formalised within the graphical causal model framework. Solving this problem is certainly much more challenging than identifying the effect of a specific intervention on a given outcome, since it requires us to test or infer the effect of interventions on many different variables. These practical difficulties may well be overwhelming, particularly in fields such as social science and economics where data sets are often relatively small, systems are complex, the variables are difficult to directly manipulate and even relatively simple "what if" questions are hard to resolve conclusively. However, this does not mean that the problem of identifying causes of effects is ill-posed in principle. It can be viewed as a form of causal discovery: the attempt to learn the structure of the causal relationships between variables, on which there is a rich literature, see for example \citep{}.
-\todo{reference a review paper on causal discovery here}
+\citet{Gelman2010,gelman2013ask} make a distinction between forward causal inference, the types of \quotes{what if} questions I focus on in this thesis, and reverse causal questions, asking why something occurs. The former aims to identify the effect of a known cause. The latter can be viewed as identifying causes of an effect. They regard forward causal inference as well defined within the counterfactual and graphical model frameworks for causal inference, that we describe in section \ref{sec:causal_models}. However, they state that \quotes{A reverse causal question does not in general have a well-defined answer, even in a setting where all possible data are made available.} I view this as overly pessimistic, depending on how \quotes{all possible data} is defined. The goal of identifying the causes of an effect can be formalised within the graphical causal model framework. Solving this problem is certainly much more challenging than identifying the effect of a specific intervention on a given outcome, since it requires us to test or infer the effect of interventions on many different variables. These practical difficulties may well be overwhelming, particularly in fields such as social science and economics where data sets are often relatively small, systems are complex, the variables are difficult to directly manipulate and even relatively simple "what if" questions are hard to resolve conclusively. However, this does not mean that the problem of identifying causes of effects is ill-posed in principle. It can be viewed as a form of causal discovery: the attempt to learn the structure of the causal relationships between variables, on which there is a rich literature, see \citet{Spirtes2016} for a recent review.
+
 
 There has traditionally been a large gap between researchers in machine learning who focus on prediction, using largely non-interpretable models and researchers in statistics, social science and economics who (at least implicitly) aim to answer causal questions and tend to use highly theory-driven models. However, there is relatively little awareness, particularly within the machine learning and data science communities, of what constitutes a causal problem and the implications of this for the training and evaluation models. In the next section we emphasise the subtly that can exist in determining if a problem is causal by examining some typical examples. 
 
@@ -327,7 +327,7 @@ Predicting which customers will leave or who will re-offend if granted parole al
 
 Demand prediction seems like a relatively straightforward prediction problem. Models use features such as location, pricing, marketing, time of year and weather, to forecast the demand for a product. It seems unlikely that using the model to ensure stock is available will itself change demand. However, depending on the way demand is measured, there is a potential data censoring issue. If demand is modelled by the number of sales, then if a product is out of stock demand will appear to be zero. Changing availability does then change demand.
    
-Playing Go (and other games) is a case with some subtleties. At every turn, the AI agent has a number of actions available. The state of the board following each action is deterministic and given by the rules of the game. The agent can apply supervised machine learning, based on millions of previous games, to estimate the probability that each of these reachable board states will lead to a win \footnote{This is a challenging pattern recognition problem. There are around $2 \times 10^{170}$ legal board positions in Go, (\citep{tromp2016number}), so the algorithm cannot simply memorise the proportion of times each state leads to a win. It must identify higher level features of the board state that are associated with winning.}. Supervised learning can also be applied to learn a policy $\P{a|s}$, the probability of a player selecting action $a$, given board state $s$. This allows the agent to estimate the likelihood of winning from a given starting state by simulating many times the remainder of the game, drawing actions from $\P{a|s}$ for both players. Google's Alpha Go, which in May 2017 beat the then strongest human player \citep{Mozur2017}, incorporates a combination of these approaches \citep{silver2016mastering}. The supervised learning was enhanced by having the agent play (variants) of itself many times, so that its estimates of value for each board state and of the likelihood an opponent will play a given move are based on a combination of replicating the way humans play and on the moves that led to a win when playing itself. 
+Playing Go (and other games) is a case with some subtleties. At every turn, the AI agent has a number of actions available. The state of the board following each action is deterministic and given by the rules of the game. The agent can apply supervised machine learning, based on millions of previous games, to estimate the probability that each of these reachable board states will lead to a win.\footnote{This is a challenging pattern recognition problem. There are around $2 \times 10^{170}$ legal board positions in Go, (\citep{tromp2016number}), so the algorithm cannot simply memorise the proportion of times each state leads to a win. It must identify higher level features of the board state that are associated with winning.} Supervised learning can also be applied to learn a policy $\P{a|s}$, the probability of a player selecting action $a$, given board state $s$. This allows the agent to estimate the likelihood of winning from a given starting state by simulating many times the remainder of the game, drawing actions from $\P{a|s}$ for both players. Google's Alpha Go, which in May 2017 beat the then strongest human player \citep{Mozur2017}, incorporates a combination of these approaches \citep{silver2016mastering}. The supervised learning was enhanced by having the agent play (variants) of itself many times, so that its estimates of value for each board state and of the likelihood an opponent will play a given move are based on a combination of replicating the way humans play and on the moves that led to a win when playing itself. 
 
 The problem of playing go is causal from the interventionalist perspective. The agent wishes to learn the probability of a win given an action they take. However, there are some special characteristics to the go problem that make it amenable to a primarily supervised learning approach. The actions the agent has to explore are the sames ones as human players explored to generate the training data, and both have the same objective - to win the game. In addition, the state of the board encapsulates all the information relevant to selecting a move. These factors make it reasonable to conclude that selecting moves with an algorithm will not change the value of a board state or the probability of given move by the opponent by a sufficiently large margin to invalidate the training data. 
  
@@ -400,7 +400,7 @@ P(X_{1},X_{2},X_{3},...)=P(X_{1})P(X_{2}|X_{1})P(X_{3}|X_{1},X_{2})...
 
 We can represent this graphically by drawing a network with a node for each variable and adding links from the variables on the right hand side to the variable on the left for each conditional probability distribution, see figure \ref{fig:bayesnet}. If the factorisation simplifies due to conditional independencies between variables, this is reflected by missing edges in the corresponding network. There are multiple valid Bayesian network representations for any probability distribution over more than one variable, see figure \ref{fig:bayesnet2} for an example. 
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={observed}]
@@ -523,7 +523,7 @@ Theorem \ref{thm:truncated_prodcut} does not hold for standard Bayesian networks
 
 Returning to example \ref{exm:ranomized_experiment}, and phrasing our query in terms of interventions; what would the distribution of outcomes look like if everyone was treated $\P{Y|do(X=1)}$, relative to if no one was treated $\P{Y|do(X=0)}$? The treatment $X$ is a potential cause of $Y$, along with other unobserved variables, such as the age, gender and the disease sub-type of the patient. Since $X$ is assigned via deliberate randomisation, it cannot be affected by any latent variables. The causal Bayesian network for this scenario is shown in figure \ref{fig:causal_network_example}. This network represents the (causal) factorisation  $\P{X,Y} = \P{X}\P{Y|X}$, so from equation (\ref{eq:truncatedproduct}), $\P{Y|do(X)} = \P{Y|X}$. In this example, the interventional distribution is equivalent to the observational one.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
 \node[node](2){$X \text{ (Treatment)}$};
@@ -563,7 +563,7 @@ We have seen from these two examples that the expression to estimate the causal 
 \label{fig:causal_adjust} 
 \end{figure}
 
-A causal Bayesian network represents much more information than a Bayesian network with identical structure. A causal network encodes all possible interventions that could be specified with the do-notation. For example, if the network in figure \ref{fig:causal_adjust} were an ordinary Bayesian network and all the variables were binary, the associated distribution could be described by seven parameters. The equivalent causal Bayesian network additionally represents the post-interventional distributions for six possible single variable interventions and twelve possible two variable interventions. Encoding all this information without the assumptions implicit in the causal Bayesian network would require an additional thirty parameters \footnote{After each single variable intervention we have a distribution over two variables, which can be represented by three parameters. After each two variable intervention, we have a distribution over one variables which requires one parameter. This takes us to a total of $6\times3+12\times1 = 30$ additional parameters.}.
+A causal Bayesian network represents much more information than a Bayesian network with identical structure. A causal network encodes all possible interventions that could be specified with the do-notation. For example, if the network in figure \ref{fig:causal_adjust} were an ordinary Bayesian network and all the variables were binary, the associated distribution could be described by seven parameters. The equivalent causal Bayesian network additionally represents the post-interventional distributions for six possible single variable interventions and twelve possible two variable interventions. Encoding all this information without the assumptions implicit in the causal Bayesian network would require an additional thirty parameters.\footnote{After each single variable intervention we have a distribution over two variables, which can be represented by three parameters. After each two variable intervention, we have a distribution over one variables which requires one parameter. This takes us to a total of $6\times3+12\times1 = 30$ additional parameters.}
 
 Causal Bayesian networks are Bayesian networks, so results that apply to Bayesian networks carry directly across: the local Markov property states that variables are independent of their non-effects given their direct causes. The global Markov property and d-separation also hold in causal networks. D-separation, which characterises which conditional independencies must hold in any distribution that can represented by a given Bayesian network $G$, is key to many important results and algorithms for causal inference. We include a brief review of D-separation in section \ref{sec:dsep}. 
 
@@ -571,7 +571,7 @@ Causal Bayesian networks are Bayesian networks, so results that apply to Bayesia
 \subsubsection{Limitations of causal Bayesian networks}
 A number of criticisms have been levelled at this approach to modelling causality. One is that the definition of an intervention only in terms of setting the value of one or more variables is too precise and that any real world intervention will affect many variables in complex and non-deterministic ways \citep{rickles2009causality,cartwright2007hunting}. However, by augmenting the causal graph with additional variables that model how interventions may take effect, the deterministic do operator can model more complex interventions. For example, in the drug treatment case, we assumed that all subjects complied, taking the treatment or placebo as assigned by the experimenter. But, what if some people failed to take the prescribed treatment? We can model this within the framework of deterministic interventions by adding a node representing what they were prescribed (the intervention) which probabilistically influences the treatment they actually receive (figure \ref{fig:randomized_imperfect_compliance}). Note that the fact that we no longer directly assign the treatment opens the possibility that an unobserved latent variable could affect both the actual treatment taken and the outcome.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
 \node[node](1){Prescribed Treatment};
@@ -648,7 +648,7 @@ Structural equation models (SEMs) describe a deterministic world, where some und
 
 Mathematically, each variable is a deterministic function of its direct causes and a noise term that captures unmeasured variables. The noise terms are required to be mutually independent. If there is the possibility that an unmeasured variable influences more than one variable of interest in a study, it must be modelled explicitly as a latent variable. Structural equation models can be represented visually as a network. Each variable is a node and arrows are drawn from causes to their effects. Figure \ref{fig:sem_randomized_treatment} illustrates the SEM for example \ref{exm:ranomized_experiment}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
 \node[node](2){$X = f_x(\epsilon_x)$};
@@ -695,7 +695,7 @@ Equation \ref{eqn:sem:adjusting} corresponds to equations \ref{eqn:backdoor_exam
 }
 
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
 \node[node](2){$X = f_x(Z,\epsilon_x)$};
@@ -719,10 +719,6 @@ Structural equation models are generally applied with strong constraints on the 
 
 \subsection{Comparing and unifying the models}
 \label{sec:unifying_causal_models}
-
-Clarify Cheng's Questions - is there a mechanical method to go from one framework to another, does it matter if variables are discrete or continuous. \todo{}
-
-
 
 Remarkably for models developed relatively independently in fields with very different approaches and problems, the models we have discussed can be nicely unified for interventional queries (those that can be expressed with the do-notation). If the network for a structural equation model is acyclic, that is if starting from any node and following edges in the direction of the arrows you cannot return to the starting point, then it implies a recursive factorisation of the joint distribution over its variables. In other words, the network is a causal Bayesian network. All of the results that apply to causal Bayesian networks also apply to acyclic structural equation models.  Taking an action that sets a variable to a specific value equates to replacing the equation for that variable with a constant. This corresponds to dropping a term in the factorisation and the truncated product formula (equation \ref{eq:truncatedproduct}). Thus, the interventional query $P(Y|do(X))$ is identical in these two frameworks. We can also connect this to counterfactuals via:
 
@@ -748,7 +744,7 @@ In practice, differences in focus and approach between the fields in which each 
 
 We will now demonstrate our new notation and frameworks for causal inference to resolve a fascinating paradox noted by \citet{yule1903notes}, demonstrated in real data by \citet{Cohen1934}, and popularised by \citet{simpson1951interpretation}. The following example is adapted from \citet{Pearl2000}. Suppose a doctor has two treatments, A and B, which she offers to patients to prevent heart disease. She keeps track of the medication her patients choose and whether or not the treatment is successful. She obtains the results in table \ref{tab:simpson1}.
 
-\begin{table}[h]
+\begin{table}[ht]
 \caption{Treatment results}
 \label{tab:simpson1}
 \center
@@ -764,7 +760,7 @@ A &  87 & 13 & 100 & 87\%\\
 
 Drug A appears to perform better. However, having read the latest literature on how medications affect men and women differently, she decides to break down her results by gender to see how well the drugs perform for each group, and obtains the data in table \ref{tab:simpson2}.
 
-\begin{table}[h]
+\begin{table}[ht]
 \caption{Treatment results by gender}
 \label{tab:simpson2}
 \center
@@ -785,7 +781,7 @@ Once the data is broken down by gender, drug B looks better for both men \emph{a
 
 Let's represent the treatment by the variable $T$, the gender of the patient by $Z$ and whether or not the treatment was successful by $Y$. The doctor is concerned with $\P{Y|do(T)}$, not the standard conditional distributions $\P{Y|T}$. Unfortunately, the data in tables \ref{tab:simpson1} and \ref{tab:simpson2} is insufficient to enable estimation of the interventional distribution $\P{Y|do(T)}$ or determine if $do(T=A)$ is better or worse than $do(T=B)$. Some assumptions about the causal relationships between the variables are required. In this example, it seems reasonable to conclude that gender may affect the treatment chosen and the outcome. Assuming there are no other such confounding variables (for example income) then we obtain the causal network in figure \ref{fig:simpsons_paradox}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
 \node[node](1){Z = Gender};
@@ -807,7 +803,7 @@ With this model, women are more likely to choose drug A and are also more likely
 
 Is the solution to Simpson's paradox to always to break down the data by as many variables as possible? No. Suppose we have the identical data as in \ref{tab:simpson1} and \ref{tab:simpson2}, but replace the column name 'gender' with 'blood pressure', 'M' with 'high' and 'F' with 'normal'. This is a drug designed to prevent heart disease. One pathway to doing so might well be to lower blood pressure. Figure \ref{fig:simpsons_paradox2} shows a plausible causal graph for this setting. It differs from the graph in figure \ref{fig:simpsons_paradox} only in the direction of a single link. Now, however, table \ref{tab:simpson2} tells us that people who took treatment $A$ had better blood pressure control and better overall outcomes. In this setting $\P{Y|do(T)} = \P{Y|T}$ and drug A is the better choice. 
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=2.5em,thick,node/.style={observedrect},lt/.style={latent}]
 \node[node](1){Z = Blood Pressure};
@@ -880,7 +876,7 @@ The set of conditional independence relations given by the local Markov conditio
 The statement that $X$ is conditionally independent of $Y$ given $Z$ implies that if we know $Z$, learning the value of $Y$ provides no additional information about $X$. From a graphical perspective, you can think of this as $Z$ blocks the flow of information from $X$ to $Y$ in the network. Figure \ref{fig:dseptriples} shows all possible network paths from a variable $X$ to $Y$ via $Z$. In figures (a) to (c) the path is blocked if we condition on $Z$ and unblocked otherwise. In figure (d), the path is unblocked if we condition on $Z$ and blocked otherwise. 
 
 The structure in figure \ref{fig:dseptripple4} is referred to as a collider or v-structure. The counter-intuitive result that conditioning on $Z$ introduces dependence between $X$ and $Y$ is called the \textit{explaining away phenomena}. As an example, consider a scholarship available to female or disadvantaged students. Let $X$ be gender, $Y$ be family background and $Z$ receipt of the scholarship. There are roughly equal numbers of boys and girls in both poor and wealthy families so $X$ and $Y$ are independent. However, if we know a student is receiving a scholarship, then learning that they are male  increases the probability that they are disadvantaged.
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{subfigure}[t]{0.2\textwidth}
 \centering
@@ -981,7 +977,7 @@ If $(\boldsymbol{Y} \ci \boldsymbol{W} | \boldsymbol{Z},\boldsymbol{X})$ in $G_{
 }
 
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{subfigure}[t]{0.3\textwidth}
 \centering
@@ -1050,7 +1046,7 @@ do(\boldsymbol{Z}=\boldsymbol{z}),
 \boldsymbol{W}) = P(\boldsymbol{Y}|\boldsymbol{X}=\boldsymbol{x},do(\boldsymbol{Z}=\boldsymbol{z}),\boldsymbol{W})
 }
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{subfigure}[t]{0.29\textwidth}
 \centering
@@ -1109,7 +1105,7 @@ do(\boldsymbol{Z}=\boldsymbol{z}),
 \label{fig:rule2}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{subfigure}[t]{0.29\textwidth}
 \centering
@@ -1195,7 +1191,7 @@ P(\boldsymbol{Y}|do(\boldsymbol{Z}=\boldsymbol{z}),do(\boldsymbol{X}=\boldsymbol
 
 The statement that $\boldsymbol{Y} \ci \boldsymbol{\hat{X}}$ (without conditioning on $\boldsymbol{X}$) implies that there is no unblocked path from $\boldsymbol{X}$ to $\boldsymbol{Y}$ in $G$ which \emph{includes} an arrow leaving $\boldsymbol{X}$. These are the only paths by which intervening in $\boldsymbol{X}$ can affect $\boldsymbol{Y}$.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{subfigure}[t]{0.29\textwidth}
 \centering
@@ -1272,7 +1268,7 @@ The question of non-parametric identifiability is solved. The do calculus is com
 
 Figure \ref{fig:identify} shows some examples of identifiable and non-identifiable queries. I have created a javascript implementation of the identifiability algorithm \citep{Shpitser2006a} on which you can test your own queries http://finnhacks42.github.io.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{subfigure}[t]{0.29\textwidth}
 \centering
@@ -1515,7 +1511,7 @@ E_{out} &= \Esub{(\vb{x},\vb{z},y)\sim \delta(\vb{x}-\vb{x'})\P{\vb{z}}\P{y|\vb{
 &= \Esub{(\vb{z},y)\sim \P{\vb{z}}\P{y|\vb{x},\vb{z}}}{L_2(h(\vb{x},\vb{z}),y)},
 }
 
-\citet{Johansson2016_counterfactual_rep} identified that this is equivalent to the covariate shift problem. If we let $\vb{v} = (\vb{x},\vb{z})$ then we have training data sampled from $\Pns{train}{\vb{v}}\P{y|\vb{v}}$ where $\Pns{train}{\vb{v}}=\P{\vb{z}}\P{\vb{x}|\vb{z}}$, but at test time the data will be sampled from $\Pns{test}{\vb{v}}\P{y|\vb{v}}$, where $\Pns{test}{\vb{v}} = \delta(\vb{x}-\vb{x'})\P{\vb{z}}$. \footnote{It is not obvious that the question of estimating causal effects under ignorability entirely reduces to  covariate shift. Take the case where we have a binary intervention $x \in \set{0,1}$. Suppose we learn $h(1,\vb{z}) = \E{Y|x=1,\vb{z}}+g(\vb{z})$ and $h(0,\vb{z}) = \E{Y|x=0,\vb{z}}+g(\vb{z})$, then the estimated average causal effect equals the true average causal effect for any function $g$, $\E{h(1,\vb{z})-h(0,\vb{z})} = \E{Y|x=1,\vb{z}} - \E{Y|x=0,\vb{z}}$. More generally, if the goal is to select an optimal action $x^*$ from a continuous space of possible interventions we need algorithms capable of leveraging any structure in the relationship between $x$ and $y$ as well as a means of focusing the loss on regions of the sample likely to affect $x^*$.} With this connection to covariate shift in mind, let us return to regression, matching and propensity scores. 
+\citet{Johansson2016_counterfactual_rep} identified that this is equivalent to the covariate shift problem. If we let $\vb{v} = (\vb{x},\vb{z})$ then we have training data sampled from $\Pns{train}{\vb{v}}\P{y|\vb{v}}$ where $\Pns{train}{\vb{v}}=\P{\vb{z}}\P{\vb{x}|\vb{z}}$, but at test time the data will be sampled from $\Pns{test}{\vb{v}}\P{y|\vb{v}}$, where $\Pns{test}{\vb{v}} = \delta(\vb{x}-\vb{x'})\P{\vb{z}}$.\footnote{It is not obvious that the question of estimating causal effects under ignorability entirely reduces to  covariate shift. Take the case where we have a binary intervention $x \in \set{0,1}$. Suppose we learn $h(1,\vb{z}) = \E{Y|x=1,\vb{z}}+g(\vb{z})$ and $h(0,\vb{z}) = \E{Y|x=0,\vb{z}}+g(\vb{z})$, then the estimated average causal effect equals the true average causal effect for any function $g$, $\E{h(1,\vb{z})-h(0,\vb{z})} = \E{Y|x=1,\vb{z}} - \E{Y|x=0,\vb{z}}$. More generally, if the goal is to select an optimal action $x^*$ from a continuous space of possible interventions we need algorithms capable of leveraging any structure in the relationship between $x$ and $y$ as well as a means of focusing the loss on regions of the sample likely to affect $x^*$.} With this connection to covariate shift in mind, let us return to regression, matching and propensity scores. 
 
 \subsubsection{Regression}
 
@@ -1550,7 +1546,7 @@ Regression thus has a direct causal interpretation if the parametric model is co
 If the parametric model is miss-specified then the parameter that minimises the loss depends on the distribution from which the covariates $z$ are sampled. The model learned by ERM could perform very well in a validation set (which estimates the generalisation error over the observational distribution of $(x,z)$) but yield very poor estimates of the causal effect, see figure \ref{fig:covariate_shift_adjust}. 
 
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=.55]{covariate_shift_estimation.pdf}
 \caption{
@@ -1578,7 +1574,7 @@ where $e(\vb{z})$ is the propensity score, defined by \citep{Rosenbaum1983};
 e(\vb{z})\equiv \P{x=1|\vb{z}}
 }
 
-The estimator in equation \ref{eqn:importance_weighted_erm} is an example of a doubly robust estimator \citep{scharfstein1999adjusting,}. Doubly robust methods are asymptotically unbiased so long as either the regression model $h$ or propensity score $e$ are correctly specified \citep{robins1995semiparametric}. 
+The estimator in equation \ref{eqn:importance_weighted_erm} is an example of a doubly robust estimator \citep{Robins1994a,Kang2007}. Doubly robust methods are asymptotically unbiased so long as either the regression model $h$ or propensity score $e$ are correctly specified \citep{robins1995semiparametric}. 
 
 The propensity score can be used to estimate the average causal effect without specifying a regression model for $\E{Y|X,\vb{Z}}$. \citet{Rosenbaum1983} demonstrated that if the ignorability assumption is satisfied by conditioning on $\vb{Z}$, then it is also satisfied by conditioning on $e(\vb{z})$. This allows for estimators based on stratifying, matching or regression on the propensity score rather than the covariates $\vb{Z}$. Inverse propensity weighting can also be combined with empirical estimation of $\E{Y|X,Z}$ yielding the simple, albeit inefficient, estimator in equation \ref{eqn:simple_inverse_propensity} \citep{Imbens2004}. In some settings, such as stratified randomised trials \citep{imbens2015causal} or learning from logged bandit feedback \citep{Bottou2013}, the propensity score may be known. However, in general, it must be estimated from data. Frequently this is undertaken with a simple parametric model, such as logistic regression, but a wide range of standard machine learning algorithms including bagging and boosting, random forests and neural networks can also be applied   \citep{Austin2011}. \citet{Lunceford2004} review the theoretical properties of key propensity score based estimators, including stratification and inverse propensity weighting. 
 
@@ -1622,7 +1618,7 @@ Why then do we need a special framework for causal inference? Why not encode all
 
 We can represent problems where the goal is to infer properties of the post-interventional system based on data generated by the pre-interventional distribution by explicitly representing both systems and their common features (figure \ref{fig:causal_ordinary_bayes}). This does not require any special framework or notation. The graphs in figure  \ref{fig:causal_ordinary_bayes} are ordinary Bayesian networks. However, without a causal framework, we have to make assumptions about what will be invariant to the intervention for each such problem encountered. For complex problems, it is very difficult to conceptualise the assumptions we expect to hold without the benefit of a causal framework.  
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \center
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.2cm, thick,node/.style={observed},lt/.style={latent}]
 \tikzstyle{box}=[rectangle, draw=black!100]
@@ -1665,7 +1661,7 @@ Suppose data is generated by the linear Gaussian Bayesian network below. The goa
 \P{Y|U,Z,X} & = N(w_{yu}U +w_{yz}Z + w_{yx}X , v_y)
 }
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={observed},lt/.style={latent}]
@@ -1705,7 +1701,7 @@ The causal effect of $X$ on $Y$ is identifiable (even without the linear Gaussia
 
 Undertaking a Bayesian regression of $X$ and $Z$ against $Y$ and using intuition based on the causal relationship between $Z$ and $Y$ to select a prior for $\beta$ will lead to selection of something centered around $w_{yz}$. However, this is incorrect and can introduce bias into our estimate of the coefficient for $w_{yx}$, as demonstrated in figure \ref{fig:careful-prior-example}. The prior for $\beta$ should be based on the belief about how $Z$ is expected to be \emph{associated} with $Y$, after marginalising out any confounding variables. 
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{subfigure}[t]{0.99\textwidth}
      \caption{No prior on $\beta$, the posterior on $w_{yx}$ is centered around its true value}
     \includegraphics[scale=1]{prior_no_prior}
@@ -1808,13 +1804,13 @@ Finally, non-adaptive randomised experiments are not optimal from either an acti
 \section{Multi armed bandits}
 \label{sec:multi-armed-bandits}
 
-Multi-armed bandits address the problem of designing experiments that can adapt as samples are observed. Their introduction is generally attributed to \citet{Thompson1993}. In its classic formulation \citep{Robbins1952,Lai1985} the (stochastic) k-armed bandit describes a sequential decision making problem, with $k$ possible actions or arms. Each arm $i$ is associated with a fixed but unknown reward distribution. \footnote{In order to quantify the performance of bandit algorithms, some assumptions are required on the distributions from which the rewards are generated. It sufficient (but not necessary) to assume they are sub-Gaussian.} For each time step up to some horizon $T$, the learner selects an action and receives a reward, sampled i.i.d from the marginal distribution corresponding to that action. The goal of the learner is to maximise the total reward they receive. This problem captures the exploration-exploitation trade-off. The learner must balance playing arms that have yielded good results previously with exploring arms about which they are uncertain.
+Multi-armed bandits address the problem of designing experiments that can adapt as samples are observed. Their introduction is generally attributed to \citet{Thompson1993}. In its classic formulation \citep{Robbins1952,Lai1985} the (stochastic) k-armed bandit describes a sequential decision making problem, with $k$ possible actions or arms. Each arm $i$ is associated with a fixed but unknown reward distribution.\footnote{In order to quantify the performance of bandit algorithms, some assumptions are required on the distributions from which the rewards are generated. It sufficient (but not necessary) to assume they are sub-Gaussian.} For each timestep up to some horizon $T$, the learner selects an action and receives a reward, sampled i.i.d from the marginal distribution corresponding to that action. The goal of the learner is to maximise the total reward they receive. This problem captures the exploration-exploitation trade-off. The learner must balance playing arms that have yielded good results previously with exploring arms about which they are uncertain.
 
 \vspace{0.5cm}
 \begin{definition}[Stochasitic k-armed bandit problem]
 Let $\actionspace = \set{1,...,k}$ be the set of available actions (or bandit arms) and $\P{\vec{y}} = \P{\cf{Y}{1},...,\cf{Y}{k}}$ be a joint distribution over the rewards for each action. The multi-armed bandit problem proceeds over $T$ rounds. In each round $t$, 
 \begin{enumerate}
-\item the learner selects an action $a_{t} \in \set{1,...,k}$, based on the actions and rewards from previous time-steps and a (potentially stochastic) \emph{policy} $\pi$
+\item the learner selects an action $a_{t} \in \set{1,...,k}$, based on the actions and rewards from previous timesteps and a (potentially stochastic) \emph{policy} $\pi$
 \item the world stochastically generates the rewards for each action, $[\cfb{Y}{1},...,\cfb{Y}{k}] \sim \P{\vec{y}}$
 \item the learner observes and receives (only) the reward for the selected action $\cfb{Y}{a_t}$ 
 \end{enumerate}
@@ -1823,7 +1819,7 @@ At the end of the game, the total reward obtained by the learner is $\sum_{t=1}^
 \end{definition} 
 
 
-The total reward a bandit algorithm/policy can expect to achieve depends on the distributions from which the rewards for each action are sampled. To account for this, the performance of bandit algorithms is quantified by the difference between the reward obtained by the algorithm and the reward that would have been obtained by an oracle that selects the arm with the highest expected reward at every time step. This difference is known as the (cumulative) regret \footnote{The term regret is somewhat overloaded in the reinforcement learning literature. There are alternative definitions that arise in the related problems of adversarial bandits and learning from expert advice. In addition, researches often refer to the expected regret as \quotes{the regret}.}.
+The total reward a bandit algorithm/policy can expect to achieve depends on the distributions from which the rewards for each action are sampled. To account for this, the performance of bandit algorithms is quantified by the difference between the reward obtained by the algorithm and the reward that would have been obtained by an oracle that selects the arm with the highest expected reward at every timestep. This difference is known as the (cumulative) regret.\footnote{The term regret is somewhat overloaded in the reinforcement learning literature. There are alternative definitions that arise in the related problems of adversarial bandits and learning from expert advice. In addition, researches often refer to the expected regret as \quotes{the regret}.}
 \eqn{
 \label{eqn:raw_regret}
 \rawregret = \sum_{t=1}^T \cfb{Y}{i^*} - \sum_{t=1}^T \cfb{Y}{a_t}
@@ -1847,7 +1843,7 @@ The regret is invariant to adding a constant to the expected rewards for all act
 
 The adaptive nature of multi-armed bandit algorithms complicates the design and analyse of estimators. The action selected by an algorithm at a given timestep can depend on the history of previous actions and rewards. As a result, the probability that each action is selected evolves over time, the actions are not sampled i.i.d from a fixed distribution and the number of times each action is selected is a random variable. The expectation and variance guarantees of standard estimators do not hold in this setting (see figure \ref{fig:early_stopping} for a concrete example). This makes it very difficult to  obtain an analytical expression for the expected regret for a given algorithm and problem. Instead, the focus is on computing bounds on the expected regret. 
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=1]{extreme_early_stopping}
 \caption{Standard empirical estimators can be biased if the number of samples, $n$, is not fixed in advance, but is a random variable that depends on the values of previous samples. This example plots the distribution (over $10^6$ simulations) of $\hat{\mu} = \frac{1}{n}\sum_{i=1}^n X_i$, where $X_i \sim Bernoulli(0.2)$. In each simulation, we stop taking samples if the average value of $X_i$ up to that point exceeds a threshold of $0.3$ or $n$ reaches $100$. $\E{\hat{\mu}} = 0.439$. The estimator is substantially biased above $\E{X_i} = 0.2$ by the early stopping. Note that excluding experiments that were stopped early creates a bias in the opposite direction, $\E{\hat{\mu}|n=100} = 0.185$, as trials that obtained positive results early are excluded. This has some interesting real world implications. Early stopping of clinical trials is controversial. A researcher conducting a meta-analysis who wished to avoid (rather than bound) bias due to early stopping would have to exclude not only those trials which were stopped early but those which \emph{could} have been stopped early.}
@@ -1940,14 +1936,14 @@ Adversarial bandits, described by \citet{Auer1995}, are an alternate, widely stu
 Let $\actionspace = \set{1,...k}$ be the set of available actions.  In each round $t \in 1,...,T$, 
 \begin{enumerate}
 \item the world (or adversary) generates, but does not reveal, a vector or rewards $\vec{Y_t}=[\cfb{Y}{1},...,\cfb{Y}{k}]$. 
-\item the learner selects an action $a_{t} \in \set{1,...,k}$, based on the actions and rewards from previous time-steps and a (potentially stochastic) \emph{policy} $\pi$
+\item the learner selects an action $a_{t} \in \set{1,...,k}$, based on the actions and rewards from previous timesteps and a (potentially stochastic) \emph{policy} $\pi$
 \item the learner observes and receives (only) the reward for the selected action $\cfb{Y}{a_t}$ 
 \end{enumerate} 
 \end{definition}
 
-Adversaries that generate rewards independently of the sequence of actions selected by the learner in previous time steps are referred to as \emph{oblivious}, as opposed to \emph{non-oblivious} adversaries, which can generate rewards as a function of the history of the game. In the case of oblivious adversaries, we can also define the adversarial bandit problem by assuming the adversary generates the entire sequence of reward vectors before the game commences. 
+Adversaries that generate rewards independently of the sequence of actions selected by the learner in previous timesteps are referred to as \emph{oblivious}, as opposed to \emph{non-oblivious} adversaries, which can generate rewards as a function of the history of the game. In the case of oblivious adversaries, we can also define the adversarial bandit problem by assuming the adversary generates the entire sequence of reward vectors before the game commences. 
 
-For oblivious adversarial bandits, we can define regret analogously to stochastic bandits as the difference between the reward obtained by playing the single arm with the highest reward in every round and the expected reward obtained by the algorithm \footnote{This is also referred to as the weak regret, since in the adversarial case, it can make more sense to compare against the best sequence of arms rather than the best single arm.}. We do not have to take the expectation over the first term of equation \ref{eqn:pseudo_regret-adversarial} because the sequence of rewards is fixed. However the reward obtained by the algorithm is still a random variable as we are considering randomised algorithms.  
+For oblivious adversarial bandits, we can define regret analogously to stochastic bandits as the difference between the reward obtained by playing the single arm with the highest reward in every round and the expected reward obtained by the algorithm.\footnote{This is also referred to as the weak regret, since in the adversarial case, it can make more sense to compare against the best sequence of arms rather than the best single arm.} We do not have to take the expectation over the first term of equation \ref{eqn:pseudo_regret-adversarial} because the sequence of rewards is fixed. However the reward obtained by the algorithm is still a random variable as we are considering randomised algorithms.  
 
 \eqn{
 \label{eqn:pseudo_regret-adversarial}
@@ -1960,7 +1956,7 @@ The seminal algorithm for adversarial bandits is Exp-3 \citep{Auer2002}, which, 
 
 Adversarial bandits appear to be more applicable to real world problems because they do not assume that the rewards associated with each arm are constant over time or independent of the previous actions of the learner. However, pseudo-regret, as defined in equation \ref{eqn:pseudo_regret-adversarial}, does not fully capture an algorithms performance in such cases because it is defined with respect to playing the single arm with the best average return over the game. In settings where the rewards change over time, the pseudo-regret can be negative (see figure \ref{fig:non-stationary-bandit}) so upper bounds on the pseudo-regret do not reflect how sub-optimal the algorithm may be. An example of a setting that lies between stochastic and adversarial bandit problems is the non-stationary setting, in which the rewards are generated stochastically from a distribution that varies over time. Adversarial bandit algorithms may perform better in such settings than standard stochastic policies to the extent that they explore more (to avoid the adversary simulating their behaviour) and thus adapt quicker to changes in the reward distribution. Adversarial algorithms also have stronger worst case regret guarantees, since even the weak regret for stochastic bandits is not guaranteed to be sub-linear in such settings. However, if there are constraints on how rapidly or frequently the reward distributions can change over time, it is better to use algorithms specifically developed to exploit such information and compare them against a stronger notion of regret (see for example \citep{garivier2008upper,Garivier2011a,Besbes2014}). 
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \begin{subfigure}[t]{0.49\textwidth}
 	\centering   
 	 \caption{Behaviour over time}\label{fig:non-stationary-bandit-time} 
@@ -1988,7 +1984,7 @@ Contextual bandits are a generalisation of multi-armed bandits that make use of 
 Let $\P{\vec{x},\vec{y}}$ be the joint distribution over the rewards for each action and some context $\vec{X} \in \mathcal{X}$. In each round $t \in \set{1,...T}$, 
 \begin{enumerate}
 \item the world stochastically generates the vector of rewards for each action and the context, $(\vec{X}_t,[\cfb{Y}{1},...,\cfb{Y}{k}]) \sim \P{\vec{x},\vec{y}}$ and reveals $\vec{X}_t$ to the learner
-\item the learner selects an action $A_{t} \in \set{1,...,k}$, based on the context as well as actions and rewards from previous time-steps,
+\item the learner selects an action $A_{t} \in \set{1,...,k}$, based on the context as well as actions and rewards from previous timesteps,
 \item the learner observes and receives (only) the reward for the selected action $Y_t = \cfb{Y}{A_t}$ 
 \end{enumerate}
 \end{definition} 
@@ -2000,13 +1996,13 @@ Standard multi-armed bandits learn to select the action $a$ that, with high prob
 \regret = \max_{h \in \mathcal{H}}\E{\sum_{t=1}^T{\cfb{Y}{h(\vec{X}_t)}}} - \E{\sum_{t=1}^T{\cfb{Y}{A_t}}}
 }
 
-If the context is discrete, $\mathcal{X} = \set{1,...,N}$, the contextual bandit problem can be reduced to the standard multi-armed bandit problem by creating a separate standard bandit instance for each value of the context. This approach results in a worst case regret of $\bigo{\sqrt{NkT}}$, with respect to the hypothesis class $\mathcal{H} = \mathcal{X} \times \actionspace$, consisting of all possible mappings from context to action\footnote{This follows from the fact that we have $N$ standard bandit instances, each suffering regret $\bigo{\sqrt{kT_c}}$, where $T_c$ is the number of times context $c$ occurred such that $\sum_{c=1}^N T_c = T$. The regret is maximised if $T_c = T/N$ resulting in total regret $\bigo{N\sqrt{kT/N}}$.}. This is optimal with respect to this class of hypothesis. However, as this reduction treats the problem of learning the correct action for each context completely independently, it cannot leverage any structure in the relationships between different contexts and actions. As in the supervised learning setting, the existence of some form of low-dimensional structure is key to learning in realistic problems, where the context is continuous or high-dimensional \footnote{Even if the context is genuinely discrete, $N$ grows exponentially with the number of variables. For example, with $n$ binary variables, $N = 2^n$}. We expect some form of smoothness; that is, values of context that are similar should lead to comparable rewards for a given action. We need algorithms that can leverage such assumptions. 
+If the context is discrete, $\mathcal{X} = \set{1,...,N}$, the contextual bandit problem can be reduced to the standard multi-armed bandit problem by creating a separate standard bandit instance for each value of the context. This approach results in a worst case regret of $\bigo{\sqrt{NkT}}$, with respect to the hypothesis class $\mathcal{H} = \mathcal{X} \times \actionspace$, consisting of all possible mappings from context to action\footnote{This follows from the fact that we have $N$ standard bandit instances, each suffering regret $\bigo{\sqrt{kT_c}}$, where $T_c$ is the number of times context $c$ occurred such that $\sum_{c=1}^N T_c = T$. The regret is maximised if $T_c = T/N$ resulting in total regret $\bigo{N\sqrt{kT/N}}$.}. This is optimal with respect to this class of hypothesis. However, as this reduction treats the problem of learning the correct action for each context completely independently, it cannot leverage any structure in the relationships between different contexts and actions. As in the supervised learning setting, the existence of some form of low-dimensional structure is key to learning in realistic problems, where the context is continuous or high-dimensional.\footnote{Even if the context is genuinely discrete, $N$ grows exponentially with the number of variables. For example, with $n$ binary variables, $N = 2^n$} We expect some form of smoothness; that is, values of context that are similar should lead to comparable rewards for a given action. We need algorithms that can leverage such assumptions. 
 
-An alternate reduction to the standard bandit problem, which allows us to constrain the hypothesis space to explore, is to treat each hypothesis $h$ as a bandit arm \citep{Langford2008}. At each time-step, we select $h \in \mathcal{H}$ based on the rewards previously observed for each hypothesis, take action $h(\vec{x})$ and observe the associated reward. Although this approach removes the explicit dependence on the size of the context, the regret  grows linearly with the size of the hypothesis class considered, limiting our ability to learn any complex mappings from context to actions. The key problem with this approach is each sample is used to update our knowledge about only one hypothesis, as opposed to the supervised learning setting, where each data point is (implicitly) used to compute the loss for every hypothesis simultaneously. 
+An alternate reduction to the standard bandit problem, which allows us to constrain the hypothesis space to explore, is to treat each hypothesis $h$ as a bandit arm \citep{Langford2008}. At each timestep, we select $h \in \mathcal{H}$ based on the rewards previously observed for each hypothesis, take action $h(\vec{x})$ and observe the associated reward. Although this approach removes the explicit dependence on the size of the context, the regret  grows linearly with the size of the hypothesis class considered, limiting our ability to learn any complex mappings from context to actions. The key problem with this approach is each sample is used to update our knowledge about only one hypothesis, as opposed to the supervised learning setting, where each data point is (implicitly) used to compute the loss for every hypothesis simultaneously. 
 
 Suppose that, at each timestep $t$, after selecting an action, the learner received the reward for chosen action but observed the full vector of rewards $[\cfb{Y}{1},...,\cfb{Y}{k}]$. This is known as the full information setting. In this case, the learner can simulate running each hypothesis over the history to compute the reward it would have obtained and use the hypothesis with the best empirical reward to select the next action. This is the \emph{follow the leader} algorithm, which obtains optimal regret $\bigo{\sqrt{T log(\card{\mathcal{H}})}}$ for the full-information problem \citep{cesa2006prediction}. Unfortunately, in the contextual bandit problem, the (counterfactual) rewards associated with alternate action choices are not observed. As in causal effect estimation, we can view this as a missing data problem. However, the data is missing not at random because the component of the reward that is observed depends on the action selected, which in turn is a function of the previous history of actions and rewards. 
 
-The Epoch-greedy algorithm, \citep{Langford2008}, addresses these issues by transforming the contextual bandit problem into a \quotes{data missing at random} problem by explicitly separating exploration from exploitation. Epoch-greedy is an explore-exploit algorithm. It selects actions uniformly at random during an exploration phase and leverages this data to estimate the value of each hypothesis, using inverse propensity weighted estimators to \quotes{fill in} the missing data. The hypothesis with the highest empirical reward is then used to select actions for the remaining time steps. The epsilon-greedy algorithm obtains worst case regret $\bigo{T^{\frac{2}{3}}(k \log{\card{\mathcal{H}}})^{\frac{1}{3}}}$, which has sub-optimal dependence on the horizon $T$.
+The Epoch-greedy algorithm, \citep{Langford2008}, addresses these issues by transforming the contextual bandit problem into a \quotes{data missing at random} problem by explicitly separating exploration from exploitation. Epoch-greedy is an explore-exploit algorithm. It selects actions uniformly at random during an exploration phase and leverages this data to estimate the value of each hypothesis, using inverse propensity weighted estimators to \quotes{fill in} the missing data. The hypothesis with the highest empirical reward is then used to select actions for the remaining timesteps. The epsilon-greedy algorithm obtains worst case regret $\bigo{T^{\frac{2}{3}}(k \log{\card{\mathcal{H}}})^{\frac{1}{3}}}$, which has sub-optimal dependence on the horizon $T$.
 
 The Exp-4 algorithm, developed in the context of learning from expert advice (each $h \in \mathcal{H}$ can be viewed as an expert who recommends which action to take), achieves optimal worst case regret of $\bigo{\sqrt{kT log(\card{\mathcal{H}})}}$ in both the stochastic and adversarial settings \citep{Auer2002a}. However, it involves maintaining a list of weights for each hypothesis $h$, resulting in time and memory requirements that grow linearly with the size of the hypothesis space and, unlike the epoch-greedy algorithm, it cannot be generalised to infinite dimensional hypothesis spaces in a straightforward way. The ILOVECONBANDITS algorithm combines the best of both worlds to obtain a computationally efficient algorithm with (almost) optimal regret \citep{Agarwal2014}
 
@@ -2025,7 +2021,7 @@ Finally, if we have a parametric model for the relationship between context, act
 
 The definition \ref{def:contextual-bandit-problem} does not make any assumptions about the \emph{causal} relationship between the context $\vec{X}$ and the reward $\vec{Y}$ (see figure \ref{fig:contextual-bandit-causal-graph}). However, the context should be relevant, such that $\P{\vec{y}|\vec{x}} \neq \P{\vec{y}}$, otherwise including it is the equivalent to adding irrelevant features to a supervised learning problem. \citet{Bareinboim2015} demonstrate that, in some cases, policies that incorporate observations of the action an agent would have taken were their action not set by the bandit policy can achieve lower regret than those that ignore this information. This is an example of the case represented in figure \ref{fig:context-graph-confounded}. It is even possible to have (useful) context $\vec{X}$ that is a consequence of $\vec{Y}$ as in figure \ref{fig:context-graph-anti-causal} and example \ref{exm:anti-casual-context}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{subfigure}[t]{0.29\textwidth}
 \centering
@@ -2079,7 +2075,7 @@ The definition \ref{def:contextual-bandit-problem} does not make any assumptions
    (1) edge (2);
 \end{tikzpicture} 
 \end{subfigure}
-\caption{Several potential causal graphical models for the contextual bandit problem (if actions are selected at random). $\vec{X}$ and $\vec{Y}$ represent the context and reward vectors respectively, and $Y = \vec{Y}^a$ is the reward received by the learner, which is a deterministic function of $\vec{Y}$ and $a$. Regardless of the causal structure, observing the context $\vec{X}$ provides information about the vector of rewards $\vec{Y}$. The causal structures in figures \ref{fig:context-graph-causal} and \ref{fig:context-graph-confounded} also make sense if the elements of $\vec{Y}$ are genuine counterfactuals, that is only the reward of the selected action is ever realised. The context $\vec{X}$ can only be useful in causal graphs of the form in figure \ref{fig:context-graph-anti-causal} if the components of $\vec{Y}$ are realised prior to the agent selecting an action, i.e when the components of $\vec{Y}$ are not truly counterfactual, it just that the agent is limited to only observing the outcome of the action they choose.  To represent a realistic (contextual) bandit problem, where actions are not selected at random, we would need to \quotes{unroll} the graphs, such that there was a copy for each time-step $t$ and allow the action $A_t$ to depend on the context $\vec{X}_t$ and the previous observations $(\vec{X},A,Y)_1^{t-1}$. }
+\caption{Several potential causal graphical models for the contextual bandit problem (if actions are selected at random). $\vec{X}$ and $\vec{Y}$ represent the context and reward vectors respectively, and $Y = \vec{Y}^a$ is the reward received by the learner, which is a deterministic function of $\vec{Y}$ and $a$. Regardless of the causal structure, observing the context $\vec{X}$ provides information about the vector of rewards $\vec{Y}$. The causal structures in figures \ref{fig:context-graph-causal} and \ref{fig:context-graph-confounded} also make sense if the elements of $\vec{Y}$ are genuine counterfactuals, that is only the reward of the selected action is ever realised. The context $\vec{X}$ can only be useful in causal graphs of the form in figure \ref{fig:context-graph-anti-causal} if the components of $\vec{Y}$ are realised prior to the agent selecting an action, i.e when the components of $\vec{Y}$ are not truly counterfactual, it just that the agent is limited to only observing the outcome of the action they choose.  To represent a realistic (contextual) bandit problem, where actions are not selected at random, we would need to \quotes{unroll} the graphs, such that there was a copy for each timestep $t$ and allow the action $A_t$ to depend on the context $\vec{X}_t$ and the previous observations $(\vec{X},A,Y)_1^{t-1}$. }
 \label{fig:contextual-bandit-causal-graph}
 \end{figure}
 
@@ -2136,7 +2132,7 @@ In the next chapter, I propose a very natural connection between causal graphs a
 
 We conclude this chapter on bandits with a note on the counterfactual nature of regret, which has not been discussed with respect to bandit regret. However, the issues raised are very closely related to the work by \citet{Dawid2000} on problems associated with the use of counterfactual variables for (observational) causal inference.
 
-It is possible, as we demonstrated in example \ref{exm:anti-casual-context}, to construct bandit problems in which the full vector of rewards $[\cfb{Y}{1},...,\cfb{Y}{k}]$ is actually generated at each time-step (and, at least in principle, is observable to someone although not the agent). However, in most real applications for bandit problems, only the outcome associated with the selected action is ever realised and so the remaining components of the reward vector are counterfactual, justifying the use of the counterfactual notation to denote them. There are complex philosophical objections to counterfactuals arising from the way they describe alternate universes that were never realised. This makes it easy to make statements using counterfactuals that cannot be confirmed empirically (even with infinite experimental data). We now show with a simple example that the standard definition of regret is a fundamentally counterfactual quantity. Recall that the cumulative regret is defined by,
+It is possible, as we demonstrated in example \ref{exm:anti-casual-context}, to construct bandit problems in which the full vector of rewards $[\cfb{Y}{1},...,\cfb{Y}{k}]$ is actually generated at each timestep (and, at least in principle, is observable to someone although not the agent). However, in most real applications for bandit problems, only the outcome associated with the selected action is ever realised and so the remaining components of the reward vector are counterfactual, justifying the use of the counterfactual notation to denote them. There are complex philosophical objections to counterfactuals arising from the way they describe alternate universes that were never realised. This makes it easy to make statements using counterfactuals that cannot be confirmed empirically (even with infinite experimental data). We now show with a simple example that the standard definition of regret is a fundamentally counterfactual quantity. Recall that the cumulative regret is defined by,
 
 \eqn{
 \label{eqn:raw_regret2}
@@ -2169,7 +2165,7 @@ Consider an algorithm that always selects arm 2.  The distribution over the diff
 
 The parameters of the marginal distributions, $\P{\cfb{Y}{1}}$ and $\P{\cfb{Y}{2}}$, can be estimated directly by simply sampling from each arm. However, the covariance $\rho$ cannot, because we never simultaneously observe the rewards for both arms. As a result, even with full knowledge of the reward distributions for each arm, the distribution over regret cannot, in general, be computed without un-testable assumptions about the covariance between counterfactuals (see figure \ref{fig:metaphysical_distribution_difference}). 
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \captionsetup[subfigure]{position=b}
 \centering
 \subcaptionbox{Marginal distributions over the rewards for each action for $\mu_1=1$, $\mu_2=0$ and $\sigma = 1$. \label{fig:metaphys_a}}{\includegraphics[width=.45\linewidth]{figures/counterfactual_nonidentify_a.pdf}}
@@ -2180,7 +2176,7 @@ The parameters of the marginal distributions, $\P{\cfb{Y}{1}}$ and $\P{\cfb{Y}{2
 \label{fig:metaphysical_distribution_difference}
 \end{figure}
 
-This result is somewhat perturbing. The stochastic bandit problem can be defined without recourse to counterfactual variables by having the world stochastically generate only a reward for the selected action at each timestep, and the behaviour of standard bandit algorithms depends only on the marginal reward distributions for each arm. The expectation of the regret as defined by equation \ref{eqn:pseudo_regret} also remains unchanged as both its definition and the learner's actions depend only on the marginal distributions. It seems therefor unfortunate that we should have to assume, for example, that the rewards for alternate actions are independent of one-another to be able to analyse the variance of the regret. This is particularly so, as this assumption is likely to be violated in many realistic bandit problems. For example, a given user may be more (or less) likely to buy something no matter which advertisement they are served, leading to a positive correlation between counterfactual rewards. Equally, an illness might have two (unobservable) sub-types, with each medication (bandit arm) effective only against one, resulting in a negative correlation between the counterfactual rewards. 
+This result is somewhat perturbing. The stochastic bandit problem can be defined without recourse to counterfactual variables by having the world stochastically generate only a reward for the selected action at each timestep, and the behaviour of standard bandit algorithms depends only on the marginal reward distributions for each arm. The expectation of the regret as defined by equation \ref{eqn:pseudo_regret} also remains unchanged as both its definition and the learner's actions depend only on the marginal distributions. It seems therefore unfortunate that we should have to assume, for example, that the rewards for alternate actions are independent of one-another to be able to analyse the variance of the regret. This is particularly so, as this assumption is likely to be violated in many realistic bandit problems. For example, a given user may be more (or less) likely to buy something no matter which advertisement they are served, leading to a positive correlation between counterfactual rewards. Equally, an illness might have two (unobservable) sub-types, with each medication (bandit arm) effective only against one, resulting in a negative correlation between the counterfactual rewards. 
 
 We could focus only on analysing the expected regret, since this depends only on the marginal distributions. However, there are many real problems for which we do care how tightly concentrated the regret is around its expectation. For example, if we are risk averse, we may prefer an algorithm with slightly higher expected regret but a lower probability of suffering extremely large regret. This raises the question, is it possible to construct an alternate definition of regret that can capture how consistently bandit algorithms behave, but that does not depend on any properties of the joint distribution over counterfactual rewards? A natural candidate would be:
 
@@ -2295,7 +2291,7 @@ Two other problems that sit in the space between causal inference and bandit pro
 
 Compliance-aware bandits describe situations in which the action recommended by the bandit algorithm is not always followed. For example, a patient may refuse to take a treatment or an advertiser may have complex rules about how many advertisements a given customer can receive, which prevents some of the suggestions from the ad recommendation engine from being followed. After an action is selected, the algorithm can observe the action that was actually taken, in addition to the reward. \citet{DellaPenna2016} analyse this setting with binary treatments both with and without the presence of a latent confounding variable $U$, see figure \ref{fig:imperfect-compliance-causal-bandit-graph}. In this case, there are no contextual variables and the action space is again the set of assignments to a single variable but there is post-action feedback, which reveals the value of the action that was actually taken.\footnote{There are some interesting variants of the compliance aware bandit setting that, to my knowledge, have not been analysed. The first is if the confounding variable $U$ is observable, either as context or post-action feedback. The second is if we extend the allowable action set to include acting directly on $X$, albeit at a higher cost than acting on $A$. It is also worth noting the connection between this setting and instrumental variables \cite{balke1997bounds}. By making some functional assumptions about the relationships between the variables, we can use $A$ as an instrumental variable to bound or estimate the (casual) effect of $X$ on $Y$. The estimation will be complicated in the bandit setting because the action chosen at each timestep is dependent on the previous sequence of actions and rewards.}
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{subfigure}[t]{0.49\textwidth}
 \centering
@@ -2654,7 +2650,7 @@ Throughout we use a model in which $Y$ depends only on a single variable $X_1$ (
 In Figure \ref{fig:simple_vs_m} we fix the number of variables $N$ and the horizon $T$ and compare the performance of the algorithms as $m$ increases. The regret for the Successive Reject algorithm is constant as it depends only on the reward distribution and has no knowledge of the causal structure. For the causal algorithms it increases approximately with $\sqrt{m}$. As $m$ approaches $N$, the gain the causal algorithms obtain from knowledge of the structure is outweighed by fact they do not leverage the observed rewards to focus sampling effort on actions with high pay-offs.
 
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \begin{subfigure}[t]{0.3\textwidth}
 		\centering    
     		\includegraphics[width=\textwidth]{experiment1_20161020_1247.pdf}
@@ -2792,7 +2788,7 @@ at least asymptotically.
 %\todom{Check this!}
 %Even though the original results are for Gaussian rewards we believe the analysis will go through largely unchanged.
 
-The parallel bandit problem can also be viewed as an instance of a time varying graph feedback problem \citep{Alon2015,Kocak2014}, where at each time step the feedback graph $G_t$ is selected stochastically, dependent on $\boldsymbol{q}$, and revealed after an action has been chosen. The feedback graph is distinct from the causal graph. A link $A \rightarrow B$ in $G_t$ indicates that selecting the action $A$ reveals the reward for action $B$. For this parallel bandit problem, $G_t$ will always be a star graph with the action $do()$ connected to half the remaining actions. However, \citet{Alon2015,Kocak2014} give adversarial algorithms, which when applied to the parallel bandit problem obtain the standard bandit regret. A malicious adversary can select the same graph each time, such that the rewards for half the arms are never revealed by the informative action. This is equivalent to a nominally stochastic selection of feedback graph where $\boldsymbol{q} = \boldsymbol{0}$. 
+The parallel bandit problem can also be viewed as an instance of a time varying graph feedback problem \citep{Alon2015,Kocak2014}, where at each timestep the feedback graph $G_t$ is selected stochastically, dependent on $\boldsymbol{q}$, and revealed after an action has been chosen. The feedback graph is distinct from the causal graph. A link $A \rightarrow B$ in $G_t$ indicates that selecting the action $A$ reveals the reward for action $B$. For this parallel bandit problem, $G_t$ will always be a star graph with the action $do()$ connected to half the remaining actions. However, \citet{Alon2015,Kocak2014} give adversarial algorithms, which when applied to the parallel bandit problem obtain the standard bandit regret. A malicious adversary can select the same graph each time, such that the rewards for half the arms are never revealed by the informative action. This is equivalent to a nominally stochastic selection of feedback graph where $\boldsymbol{q} = \boldsymbol{0}$. 
 
 \citet{Lelarge2012} consider a stochastic version of the graph feedback problem, but with a fixed graph available to the algorithm before it must select an action. In addition, their algorithm is not optimal for all graph structures and fails, in particular, to provide improvements for star like graphs as in our case. \citep{Buccapatnam2014} improve the dependence of the algorithm on the graph structure but still assume the graph is fixed and available to the algorithm before the action is selected. 
 
@@ -3125,11 +3121,7 @@ This work represents an important first step towards a unified approach to causa
 
 Another interesting line of research is the question of off-policy evaluation for causal-bandit problems. As in the online case, knowledge of the causal structure between variables in the graph provides additional information about the reward for the actions that were not selected at each timestep. The problem differs from typical observational causal inference in several ways; the focus is on identifying an optimal policy, rather than unbiased estimation of all policies, the goal is to explore the value of interventions on a range of different variables, rather than the optimal setting of a single variable, and the data will, in general, be non-stationary in a rather special way due to the adaptive nature of policy that generated it. Existing work on off-policy evaluation focuses (at least implicitly) on estimating causal effects by adjusting for all variables that simultaneously effect both the action selection and outcome. If additional information is available about the causal relationships between variables involved, other approaches to identifying causal effects such as instrumental variables or the \quotes{front door method} \citep{Pearl2000} could be also be applied to off-policy evaluation. 
 
-Insights from the bandit literature can also be applied to more classical causal inference problems. In particular, estimators that are geared towards optimal action selection (rather than evaluation of all actions) and approaches to quantify the finite time properties, as opposed to asymptotic efficiency, of estimators, for example \citep{li2014minimax}.  
- 
-An important line of research, that is relevant to both the observational and interventional approaches to causal inference, is developing methodologies for model evaluation and selection that provide something equivalent to what cross-validation does for supervised learning. 
-
-My hope is that in the next years, combining the reinforcement learning approach to decision making, with causal graphical models and causal effect estimation techniques developed within statistics and economics, will revolutionise our ability to make good data driven decisions. 
+Insights from the bandit literature can also be applied to more classical causal inference problems. In particular, estimators that are geared towards optimal action selection (rather than evaluation of all actions) and approaches to quantify the finite time properties, as opposed to asymptotic efficiency, of estimators, for example \citep{li2014minimax}. An important line of research, that is relevant to both the observational and interventional approaches to causal inference, is developing methodologies for model evaluation and selection that provide something equivalent to what cross-validation does for supervised learning. My hope is that in the next years, combining the reinforcement learning approach to decision making, with causal graphical models and causal effect estimation techniques developed within statistics and economics, will revolutionise our ability to make good data driven decisions. 
 
 \bibliographystyle{apalike}% Select the citation style e.g. ieeetr
 \bibliography{library}% write the directory to the .bib file
