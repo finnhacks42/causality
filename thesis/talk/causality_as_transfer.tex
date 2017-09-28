@@ -1,0 +1,34 @@
+\documentclass[tikz]{standalone}
+
+\usepackage[latin1]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage{xcolor}  
+
+\definecolor{talk}{HTML}{729FCF}
+\definecolor{talk2}{HTML}{E8A753}
+\definecolor{grey}{HTML}{DBDCDD}
+\begin{document}
+\pagestyle{empty}
+
+% Define block styles
+\tikzstyle{system} = [rectangle, draw=black, thick, dashed, fill=grey, 
+    text width=8em, text centered, rounded corners, minimum height=3em]
+\tikzstyle{block} = [rectangle, draw, fill=talk!50, 
+    text width=8em, text centered, rounded corners, minimum height=3em]
+\tikzstyle{line} = [->,line width = 1mm]
+   
+\begin{tikzpicture}[node distance = 5em, auto]
+    % Place nodes
+    \node [system] (original) {System pre-intervention};
+    \node [block, below of=original] (data) {Data};
+    \node [system, right of=original, node distance=18em] (new) {System post-intervention};
+   
+    % Draw edges
+    \path [draw,->, -latex] (original) -- (data);
+    \path [draw=talk2,->, line width=1.5mm, shorten >=0.1cm, shorten <=0.1cm, -latex,arrows={-latex[color=talk2]}] (original) edge node[pos=0.45]{do something} (new);
+    %\path [draw, line width=2mm,preaction={-triangle 90,thin,draw,shorten >=-1mm}] (original) -- (new);
+   
+\end{tikzpicture}
+
+\end{document}

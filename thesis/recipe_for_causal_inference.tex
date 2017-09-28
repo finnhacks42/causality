@@ -3,12 +3,16 @@
 \usepackage[latin1]{inputenc}
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows}
+\usepackage{xcolor}  
+
+\definecolor{talk}{HTML}{729FCF}
+\definecolor{talk2}{HTML}{E8A753}
 \begin{document}
 \pagestyle{empty}
 
 
 % Define block styles
-\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+\tikzstyle{block} = [rectangle, draw, fill=talk!50, 
     text width=10em, text centered, rounded corners, minimum height=3em]
 \tikzstyle{line} = [draw, -latex']
     
@@ -20,7 +24,7 @@
     \node [block, below right of=docalc, node distance=3.5cm] (success) {Identifiable};
     \node [block, below of=fail](notident){Bugger! You will have to make additional assumptions or do experiments};
      \node [block, below of=success](ident){Great! Apply the formula from the do-caclulus to estimate effect.};
-     \node [block, fill=red!10, dashed, right of=ident,node distance=4.5cm](stats){Deal with pesky statistical issues introduced by finite data as you see fit};
+     \node [block, fill=talk2!50, dashed, right of=ident,node distance=4.5cm](stats){Deal with pesky statistical issues introduced by finite data as you see fit};
     
     % Draw edges
     \path [line] (drawgraph) -- (docalc);

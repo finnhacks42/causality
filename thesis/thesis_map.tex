@@ -25,6 +25,20 @@
 \usepackage{wrapfig}
 \usepackage{centernot}
 
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ left=40mm,
+ right=20mm,
+ top=20mm,
+ bottom=30mm,
+ footskip=10mm
+ }
+
+\usepackage{setspace}
+
+
+
 % this is included to get tables with colored rows to not draw over hlines and vlines
 \usepackage{etoolbox}
 
@@ -248,9 +262,28 @@ Infer the Motive from the Deed, and show
 That what we chanced, was what we meant, to do.}{Alexander Pope}
 
 \chapter*{Acknowledgements}
+
+%There are many people without whose support this thesis would not have been possible. I would like to thank my supervisor Dr Cheng Song Ong,
+
+% Dr Mark Reid, Dr Tiberio Ceatano and Prof. Robert Williamson. 
+
+%My brother Tor for many interesting discussions on bandits.   
+
+%To my daughters, Freya and Anouk,  
+
+% supervisors
+% family (Tor)
+% thesis boot camp
+% scholarship
+
+
+
+%I am grateful to have recieved funding from an Australian Postgraduate Award and NICTA/Data61 scholarship to support this research. 
+
+\onehalfspacing
+ 
 \input{abstract}
 
-%\chapter*{Acknowledgements}  
 
 
 
@@ -283,7 +316,7 @@ However, a strong association, observed in multiple independent studies may stil
 
 The key distinction between a real, but non-causal, association and a causal relationship is in what happens if we intervene in the system and change one of the variables. In this thesis, I take an interventionist viewpoint of causality: any model or approach designed to predict the outcome of intervening in a system is causal. This viewpoint captures the types of questions that motivate this thesis. How can we change the way we do things to obtain better outcomes? 
 
-Causality is often linked to explanation; understanding how and why things happen. I view explanation in terms of compression and generalisation: the amount of information about the world a model can capture. This creates a hierarchy in the degree to which models are explanatory, rather than a simple binary distinction. A standard predictive model encodes all the information needed to predict some output given inputs provided the system generating the data does not change. A high-level causal model might be able to predict the outcome of a specific intervention holding all else fixed. More detailed causal models could predict the outcome for a wide range of combinations of interventions conditional on a range of contexts. By considering conditional interventions within our definition of causal questions we also capture mediation: the study of pathways through which one variable causes another \cite{vanderweele2015explanation}. Finally, a model that can distil how elements interact into mathematical equations like Newton's laws can be used to predict what will happen in an astounding range of settings, including many never previously observed.\footnote{Although Newton's laws are not fully general.}
+Causality is often linked to explanation; understanding how and why things happen. I view explanation in terms of compression and generalisation: the amount of information about the world a model can capture. This creates a hierarchy in the degree to which models are explanatory, rather than a simple binary distinction. A standard predictive model encodes all the information needed to predict some output given inputs provided the system generating the data does not change. A high-level causal model might be able to predict the outcome of a specific intervention holding all else fixed. More detailed causal models could predict the outcome for a wide range of combinations of interventions conditional on a range of contexts. By considering conditional interventions within our definition of causal questions we also capture mediation: the study of pathways through which one variable causes another \cite{vanderweele2015explanation}. Finally, a model that can distill how elements interact into mathematical equations like Newton's laws can be used to predict what will happen in an astounding range of settings, including many never previously observed.\footnote{Although Newton's laws are not fully general.}
 
 \citet{Gelman2010,gelman2013ask} make a distinction between forward causal inference, the types of \quotes{what if} questions I focus on in this thesis, and reverse causal questions, asking why something occurs. The former aims to identify the effect of a known cause. The latter can be viewed as identifying causes of an effect. They regard forward causal inference as well defined within the counterfactual and graphical model frameworks for causal inference, that we describe in section \ref{sec:causal_models}. However, they state that \quotes{A reverse causal question does not in general have a well-defined answer, even in a setting where all possible data are made available.} I view this as overly pessimistic, depending on how \quotes{all possible data} is defined. The goal of identifying the causes of an effect can be formalised within the graphical causal model framework. Solving this problem is certainly much more challenging than identifying the effect of a specific intervention on a given outcome, since it requires us to test or infer the effect of interventions on many different variables. These practical difficulties may well be overwhelming, particularly in fields such as social science and economics where data sets are often relatively small, systems are complex, the variables are difficult to directly manipulate and even relatively simple "what if" questions are hard to resolve conclusively. However, this does not mean that the problem of identifying causes of effects is ill-posed in principle. It can be viewed as a form of causal discovery: the attempt to learn the structure of the causal relationships between variables, on which there is a rich literature, see \citet{Spirtes2016} for a recent review.
 
@@ -349,7 +382,7 @@ I view causal problems as one of the greatest current challenges for machine lea
 
 I also make a number of additional connective contributions that are not encompassed by my work on causal bandit problems. I demonstrate the role of a formal causal framework within Bayesian approaches to inference and show how assigning a prior based on human causal intuition without considering the causal structure of the problem can introduce bias. I highlight the connections between approaches to off-policy evaluation in bandit problems, causal effect estimation from observational data, and covariate shift. Finally, I clarify the implicit causal structure underlying various bandit settings and the counterfactual nature of \emph{regret} - the measure by which bandit algorithms are assessed.
 
-\paragraph{Thesis overview} This thesis is divided into three key chapters: learning from observational data, learning from interventional data and unifying the approaches. Chapter \ref{chap:causality} covers learning to act from observational data. In \S\ref{sec:causal_models}, I describe the key existing frameworks for causal inference from observational data, discuss how they relate to one-another and introduce the notation required to describe causal problems. Section \S\ref{sec:causal effect estimation} describes the key tools these frameworks provide that enable us to answer causal questions, in particular, the do-calculus (\S\ref{sec:do_calculus}) and, in sections \S\ref{sec:defining-causal-effects} and \S\ref{sec:causal_effect_under_ignorability}, discusses how we define causal effects, the traditional approaches to estimation and how they relate to covariate shift and off-policy evaluation. Section \S\ref{sec:bayesian_causality} highlights the role graphical causal models can play in Bayesian inference. 
+\paragraph{Thesis overview} This thesis is divided into three key chapters: learning from observational data, learning from interventional data and unifying the approaches. Chapter \ref{chap:causality} covers learning to act from observational data, where the goal is to learn the outcome of an external intervention in a system from data obtained by observing it without control over which actions are selected. In \S\ref{sec:causal_models}, I describe the key existing frameworks for causal inference from observational data, discuss how they relate to one-another and introduce the notation required to describe causal problems. Section \S\ref{sec:causal effect estimation} describes the key tools these frameworks provide that enable us to answer causal questions, in particular, the do-calculus (\S\ref{sec:do_calculus}) and, in sections \S\ref{sec:defining-causal-effects} and \S\ref{sec:causal_effect_under_ignorability}, discusses how we define causal effects, the traditional approaches to estimation and how they relate to covariate shift and off-policy evaluation. Section \S\ref{sec:bayesian_causality} highlights the role graphical causal models can play in Bayesian inference. 
 
 Chapter \ref{chap:interventionalist_view} deals with the interventionalist viewpoint, including traditional randomised experiments (\S\ref{sec:randomized_experiment}) and multi-armed bandit problems. In \S\ref{sec:multi-armed-bandits}, I describe the key problems and results within the bandit literature, including stochastic bandits (\S\ref{sec:stochastic-bandit}), pure exploration problems (\S\ref{sec:pure-exploitation-problems}), adversarial bandits (\S\ref{sec:adversarial-bandits}) and contextual bandits (\S\ref{sec:contextual-bandits}). I clarify the causal structure of (stochastic) contextual bandit problems in \S\ref{sec:causal-structure-contextual-bandit}. In \S\ref{sec:off-policy-evaluation}, I review the literature on off-policy evaluation for bandit problems and show how it is a somewhat special case of causal effect estimation from observational data. Finally, in \S\ref{sec:counterfactual-nature-regret} I discuss the counterfactual nature of bandit regret. 
 
@@ -361,7 +394,7 @@ In \S\ref{sec:causal-bandit-post-action-feedback}, I focus on causal bandit prob
 \chapter{Learning from observational data}
 \label{chap:causality}
 
-The goal of causal inference is to learn the effect of taking an action. We can do this directly via experimental approaches, however any given agent only has a limited capacity to manipulate the world. We are generating and storing data on almost every aspect of our lives at an unprecedented rate. As we incorporate sensors and robotics into our cities, homes, cars, everyday products and even our bodies, the breadth and scale of this data will only increase. However, only a tiny fraction of this data will be generated in a controlled way with the specific goal of answering a single question. An agent that can only learn from data when it had explicit control (or perfect knowledge of) the process by which that data was generated will be severely limited. This makes it critical that we develop effective methods that enable us to predict the outcome of an intervention in some system by observing, rather than acting on it. This is the problem of observational causal inference. 
+The goal of causal inference is to learn the effect of taking an action. We can do this directly via experimental approaches, however any given agent only has a limited capacity to manipulate the world. We are generating and storing data on almost every aspect of our lives at an unprecedented rate. As we incorporate sensors and robotics into our cities, homes, cars, everyday products and even our bodies, the breadth and scale of this data will only increase. However, only a tiny fraction of this data will be generated in a controlled way with the specific goal of answering a single question. An agent that can only learn from data when it had explicit control (or perfect knowledge of) the process by which that data was generated will be severely limited. This makes it critical that we develop effective methods that enable us to predict the outcome of an intervention in some system by observing, rather than acting on it. This is the problem of observational causal inference. The key feature that distinguishes observational from interventional data is that the learning agent does not control the action about which they are trying to learn.
 
 \section{Causal models}
 \label{sec:causal_models}
@@ -713,12 +746,16 @@ Equation \ref{eqn:sem:adjusting} corresponds to equations \ref{eqn:backdoor_exam
 \label{fig:sem:preschool}
 \end{figure}
 
-Structural equation models are generally applied with strong constraints on the functional form of the relationship between the variables and noise, which is typically assumed to be additive, $X_i = f_i(\cdot)+\epsilon_i$. A structural equation model with $N$ variables resembles a set of $N$ simultaneous equations, with each variable playing the role of the dependent (left hand side) variable in one equation. However a SEM is, by definition, more than a set of simultaneous equations. By declaring it to be structural, we are saying that it represents \emph{causal} assumptions about the relationships between variables. When visualised as a network, the absence of an arrow between two variables encodes the assumption that one does not cause the other. The similarity between the notation used to describe and analyse structural equation models and simultaneous equations, combined with a reluctance to make explicit statements about causality, has led to some confusion in the interpretation of SEMs \citep{heckman2015causal,Pearl2000}. 
+Structural equation models are generally applied with strong constraints on the functional form of the relationship between the variables and noise, which is typically assumed to be additive, $X_i = f_i(\cdot)+\epsilon_i$. A structural equation model with $N$ variables resembles a set of $N$ simultaneous equations, with each variable playing the role of the dependent (left hand side) variable in one equation. However a SEM is, by definition, more than a set of simultaneous equations. By declaring it to be structural, we are saying that it represents \emph{causal} assumptions about the relationships between variables. When visualised as a network, the absence of an arrow between two variables encodes the assumption that one does not cause the other. The similarity between the notation used to describe and analyse structural equation models and simultaneous equations, combined with a reluctance to make explicit statements about causality, has led to some confusion in the interpretation of SEMs \citep{heckman2015causal,Pearl2000}.
+
+\paragraph{Granger causality}
+A discussion of approaches to (observational) causal inference would not be complete without a mention of Granger causality, \citep{Granger1969}. The fundamental idea behind Granger causality is to leverage the assumption that the future does not cause the past to test the existence and direction of a causal link between two time series. The basic approach is to test, for a pair of time series variables $X$ and $Y$, if $Y_t \ci (X_{1},...,X_{t-1}) | (Y_{1},...,Y_{t-1})$ - that is if the history of $X$ helps to predict $Y$ given the history of $Y$. The original formulation considered only pairs of variables and linear causal relationships but recent work has generalised the key idea to multiple variables and non-linear relationships. Unlike the previous models we have discussed, Granger causality does not provide us with a means to specify our assumptions about the causal structure between variables. Rather it aims to infer the causal structure of a structural equation model from observational data - subject to some assumptions. I would categorise Granger causality as method for \emph{causal discovery} in time series data, see the discussion of causal discovery versus causal effect estimation in section \ref{sec:causal effect estimation}.
+
 
 \subsection{Comparing and unifying the models}
 \label{sec:unifying_causal_models}
 
-Remarkably for models developed relatively independently in fields with very different approaches and problems, the models we have discussed can be nicely unified for interventional queries (those that can be expressed with the do-notation) \citep{Pearl2000}. If the network for a structural equation model is acyclic, that is if starting from any node and following edges in the direction of the arrows you cannot return to the starting point, then it implies a recursive factorisation of the joint distribution over its variables. In other words, the network is a causal Bayesian network. All of the results that apply to causal Bayesian networks also apply to acyclic structural equation models.  Taking an action that sets a variable to a specific value equates to replacing the equation for that variable with a constant. This corresponds to dropping a term in the factorisation and the truncated product formula (equation \ref{eq:truncatedproduct}). Thus, the interventional query $P(Y|do(X))$ is identical in these two frameworks. We can also connect this to counterfactuals via:
+Remarkably for models developed relatively independently in fields with very different approaches and problems, causal Bayesian networks, counterfactuals and structural equation models can be nicely unified for interventional queries (those that can be expressed with the do-notation) \citep{Pearl2000}. These queries, and the assumptions required to answer them, can be mapped between the frameworks in a straightforward way, allowing techniques developed within one framework to be immediately applied within another. If the network for a structural equation model is acyclic, that is if starting from any node and following edges in the direction of the arrows you cannot return to the starting point, then it implies a recursive factorisation of the joint distribution over its variables. In other words, the network is a causal Bayesian network. All of the results that apply to causal Bayesian networks also apply to acyclic structural equation models.  Taking an action that sets a variable to a specific value equates to replacing the equation for that variable with a constant. This corresponds to dropping a term in the factorisation and the truncated product formula (equation \ref{eq:truncatedproduct}). Thus, the interventional query $P(Y|do(X))$ is identical in these two frameworks. We can also connect this to counterfactuals via:
 
 \begin{equation}
 \begin{aligned}
@@ -734,9 +771,9 @@ The assumption $\epsilon_{X} \ci \epsilon_{Y}$, stated for our structural equati
 X \ci Y^{0} \text{ and } X \ci Y^{1}
 \end{equation}
 
-It is possible to relax the independence of errors assumption for SEMs to correspond exactly with the form of equation (\ref{eq:weakignore}) without losing any of the power provided by d-separation and graphical identification rules \citep{Richardson2013}. The correspondence between the models for interventional queries (those that can be phrased using the do-notation) makes it straightforward to combine key results and algorithms developed within any of these frameworks. For example, you can draw a causal graphical network to determine if a problem is identifiable and which variables should be adjusted for to obtain an unbiased causal estimate. Then use propensity scores \citep{Rosenbaum1983} to estimate the effect. If non-parametric assumptions are insufficient for identification or lead to overly large uncertainties, you can specify additional assumptions by phrasing your model in terms of structural equations. The frameworks do differ when it comes to causal queries that involve joint or nested counterfactuals and cannot be expressed with the do-notation. These types of queries arise in the study of mediation \citep{Pearl2014,Imai2010a,VanderWeele2011} and in legal decisions, particularly on issues such as discrimination \citep{Pearl2000}. 
+It is possible to relax the independence of errors assumption for SEMs to correspond exactly with the form of equation (\ref{eq:weakignore}) without losing any of the power provided by d-separation and graphical identification rules \citep{Richardson2013}. The correspondence between the models for interventional queries (those that can be phrased using the do-notation) makes it straightforward to combine key results and algorithms developed within any of these frameworks. For example, you can draw a causal graphical network to determine if a problem is identifiable and which variables should be adjusted for to obtain an unbiased causal estimate. Then use propensity scores \citep{Rosenbaum1983} to estimate the effect. If non-parametric assumptions are insufficient for identification or lead to overly large uncertainties, you can specify additional assumptions by phrasing your model in terms of structural equations. The frameworks do differ when it comes to causal queries that involve joint or nested counterfactuals and cannot be expressed with the do-notation. These types of queries arise in the study of mediation \citep{Pearl2014,Imai2010a,VanderWeele2011} and in legal decisions, particularly on issues such as discrimination \citep{Pearl2000}. The graphical approach to representing causal knowledge can be extended to cover these types of questions via Single World Intervention Graphs \citep{Richardson2013}, which explicitly represent counterfactual variables in the graph. 
 
-In practice, differences in focus and approach between the fields in which each model dominates eclipse the actual differences in the frameworks. The work on causal graphical models \citep{Pearl2000,Sprites2000} focuses on asymptotic, non-parametric estimation and rigorous theoretical foundations. The Neyman-Rubin framework builds on the understanding of randomised experiments and generalises to quasi-experimental and observational settings, with a particular focus on non-random assignment to treatment. This research emphasises estimation of average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \citep{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data to support policy decisions is central to the field. Economists are often interested in more informative measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \citep{Heckman2008}. In addition, the parametric structural equation models favoured in economics can be extended to analyse cyclic (otherwise referred to as non-recursive) models. 
+In practice, differences in focus and approach between the fields in which each model dominates eclipse the actual differences in the frameworks. The work on causal graphical models \citep{Pearl2000,Sprites2000} focuses on asymptotic, non-parametric estimation and rigorous theoretical foundations. The Neyman-Rubin framework builds on the understanding of randomised experiments and generalises to quasi-experimental and observational settings, with a particular focus on non-random assignment to treatment. Treatment variables are typically discrete (often binary). This research emphasises estimation of average causal effects and provides practical methods for estimation, in particular, propensity scores; a method to control for multiple variables in high dimensional settings with finite data \citep{Rosenbaum1983}. In economics, inferring causal effects from non-experimental data to support policy decisions is central to the field. Economists are often interested in more informative measures of the distribution of causal effects than the mean and make extensive use of structural equation models, generally with strong parametric assumptions \citep{Heckman2008}. The central approach to estimation is regression - which naturally handles continuous variables while discrete variables are typically encoded as indicator variables. In addition, the parametric structural equation models favoured in economics can be extended to analyse cyclic (otherwise referred to as non-recursive) models. However, these differences are not fundamental to the frameworks. Functional assumptions can be specified on the conditional distributions of (causal) Bayesian networks, counterfactuals can readily represent continuous treatments (eg $\cf{Y}{x}$), and structural equation models can represent complex non-linear relationships between both continuous and discrete variables. 
 
 \subsection{What does a causal model give us? Resolving Simpson's paradox}
 
@@ -1195,7 +1232,7 @@ The statement that $\boldsymbol{Y} \ci \boldsymbol{\hat{X}}$ (without conditioni
 \centering
 \caption{original network, $G$}
 \label{fig:rule3_original}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.8cm,
   thick,main node/.style={observed}]
  %nodes
 \node[main node](1){$Z$};
@@ -1212,7 +1249,7 @@ The statement that $\boldsymbol{Y} \ci \boldsymbol{\hat{X}}$ (without conditioni
 \centering
 \caption{augmented graph $G^{\hat{X}}$}
 \label{fig:rule3_augmented}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.8cm,
   thick,main node/.style={observed}]
  %nodes
 \node[main node](1){$Z$};
@@ -1231,7 +1268,7 @@ The statement that $\boldsymbol{Y} \ci \boldsymbol{\hat{X}}$ (without conditioni
 \centering
 \caption{$G_{\overline{X}}$}
 \label{fig:rule3_after}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.8cm,
   thick,main node/.style={observed}]
  %nodes
 \node[main node](1){$Z$};
@@ -1272,7 +1309,7 @@ Figure \ref{fig:identify} shows some examples of identifiable and non-identifiab
 \centering
 \caption{}
 \label{fig:id1}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.8cm,
   thick,lt/.style={latent},ob/.style={observed}]
 \node[ob](1){$Z$};
 \node[ob, below left=of 1](2){$X$};
@@ -1288,7 +1325,7 @@ Figure \ref{fig:identify} shows some examples of identifiable and non-identifiab
 \centering
 \caption{}
 \label{fig:id2}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.8cm,
   thick,lt/.style={latent},ob/.style={observed}]
 \node[ob](1){$X$};
 \node[ob, right=of 1](2){$Z$};
@@ -1304,7 +1341,7 @@ Figure \ref{fig:identify} shows some examples of identifiable and non-identifiab
 \centering
 \caption{}
 \label{fig:id3}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.8cm,
   thick,lt/.style={latent},ob/.style={observed}]
 \node[ob](1){$Z$};
 \node[ob, below left=of 1](2){$X$};
@@ -1322,7 +1359,7 @@ Figure \ref{fig:identify} shows some examples of identifiable and non-identifiab
 \vspace*{.5cm}
 \caption{}
 \label{fig:nid1}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.8cm,
   thick,lt/.style={latent},ob/.style={observed}]
 \node[lt](1){$U$};
 \node[ob, below left=of 1](2){$X$};
@@ -1337,7 +1374,7 @@ Figure \ref{fig:identify} shows some examples of identifiable and non-identifiab
 \vspace*{.5cm}
 \caption{}
 \label{fig:nid2_instrumental_variable}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.8cm,
   thick,lt/.style={latent},ob/.style={observed}]
 \node[lt](1){$U$};
 \node[ob, below left=of 1](2){$X$};
@@ -1354,7 +1391,7 @@ Figure \ref{fig:identify} shows some examples of identifiable and non-identifiab
 \vspace*{.5cm}
 \caption{}
 \label{fig:nid3}
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=.8cm,
   thick,lt/.style={latent},ob/.style={observed}]
 \node[ob](1){$Z$};
 \node[ob, below left=of 1](2){$X$};
@@ -1546,7 +1583,7 @@ If the parametric model is miss-specified then the parameter that minimises the 
 
 \begin{figure}[ht]
 \centering
-\includegraphics[scale=.55]{covariate_shift_estimation.pdf}
+\includegraphics[scale=.48]{covariate_shift_estimation.pdf}
 \caption{
 Parametric regression may yield poor estimates of causal effects if the model is miss-specified, even if the model fits well over the domain of the training data. In this example, $\P{Z|X=0} \sim N(\mu_0,\sigma_0^2)$ and $\P{Z|X=1} \sim N(\mu_1,\sigma_1^2)$ with little overlap in the densities. If $X=0$ then $Y \sim N(f_1(x)=sin(x),\sigma_y^2)$ and if $X=1$ then $Y \sim N(f_0(x) = \frac{1}{x+1},\sigma_y^2)$. We estimate $f_1(z)$ from the sample in which $X=1$ (green points) and $f_0(z)$ from the sample for which $X=0$ (blue points). In both cases the linear model is a good fit to the data. However, the resulting estimate of the causal effect is very poor for the lower values of $z$. } 
 \label{fig:covariate_shift_adjust}
@@ -1719,9 +1756,9 @@ This result is counter intuitive. When fitting a model to estimate the effect of
 
 The previous sections focused on aspects of the problem of estimating the likely effect of an intervention from data gathered prior to making the intervention. There is an obvious alternative. Instead of trying to infer the outcome of an intervention from passive observations, one can intervene and see what happens. There are three key differences between observing a system and explicitly intervening in it. First, we determine the nature of the intervention and thereby control the data points used to estimate causal effects. Selecting data points optimally for learning is the focus of the optimal experimental design literature within statistics \citep{pukelsheim2006optimal} and the active learning literature in machine learning \citep{settles2010active}. Secondly, explicitly choosing interventions yields a perfect model of the probability with which each action is selected, given any context, allowing control over confounding bias. Finally, when we are intervening in a system we typically care about the impact of our actions on the system in addition to optimising learning. For example, in a drug trial , assigning people a sub-optimal treatment has real world costs. This leads to a trade-off between exploiting the best known action so far and exploring alternative actions about which we are less certain. This exploration-exploitation trade-off lies at the heart of the field of reinforcement learning \citep{sutton1998reinforcement}.
 
-Reinforcement learning describes the problem of an agent interacting with an enviroment, learning by observing the outcome of its actions, with the goal of maximising some reward. These problems, which also incorporate planning, are extremely difficult because the value of an action is generally not immediately clear. The state of the enviroment may evolve over time and according to previously selected actions. Actions available at future timesteps can depend on those taken in the past, and rewards may be obtained only after a long sequence of actions. This makes it extremely difficult for the agent to acurately attribute value to each chosen action along the path to obtaining a given reward. 
+Reinforcement learning describes the problem of an agent interacting with an environment, learning by observing the outcome of its actions, with the goal of maximising some reward. These problems, which also incorporate planning, are extremely difficult because the value of an action is generally not immediately clear. The state of the environment may evolve over time and according to previously selected actions. Actions available at future time steps can depend on those taken in the past, and rewards may be obtained only after a long sequence of actions. This makes it extremely difficult for the agent to accurately attribute value to each chosen action along the path to obtaining a given reward. 
 
-We focus on a simpler class of problems within reinforcement learning known as multi-armed bandit problems. Multi-armed bandit problems also descibe an agent aiming to maximise some reward by interacting with an enviroment. However, the reward is observed immediately after the action is selected and the enviroment is stateless. Future rewards generated by the  enviroment in response to the agents actions do not depend on the previous actions of the agent. These assumptions are a reasonable approximation in settings where we face the same decision repeately with respect to many independent units or individuals and we have a good proxy for the outcome. In this chapter we describe the interventionalist approaches to learning to act for these types of problems, beginning with classical randomised experiments and then the, more adaptive, multi-armed bandit algorithms. We show how both observational causal inference and bandit algorithms can be viewed as generalisations of randomized experiments and highlight connections between the observational and interventional approaches to causal inference.
+We focus on a simpler class of problems within reinforcement learning known as multi-armed bandit problems. Multi-armed bandit problems also describe an agent aiming to maximise some reward by interacting with an environment. However, the reward is observed immediately after the action is selected and the environment is stateless. Future rewards generated by the  environment in response to the agents actions do not depend on the previous actions of the agent. These assumptions are a reasonable approximation in settings where we face the same decision repeatedly with respect to many independent units or individuals and we have a good proxy for the outcome. In this chapter we describe the interventionalist approaches to learning to act for these types of problems, beginning with classical randomised experiments and then the, more adaptive, multi-armed bandit algorithms. We show how both observational causal inference and bandit algorithms can be viewed as generalisations of randomised experiments and highlight connections between the observational and interventional approaches to causal inference.
 
 \section{Randomised experiments}
 \label{sec:randomized_experiment}
@@ -2186,7 +2223,7 @@ We could focus only on analysing the expected regret, since this depends only on
 R_T = \sum_{i=1}^k N_i(T)\Delta_i, 
 }
 
-where $N_i(T)$ is the number of times arm $i$ was played up to timestep $T$ and $\Delta_i$ is the degree to which arm $i$ is sub-optimal, $\Delta_i = \mu^* - \mu_i$. The expectation of this variant of regret is the same as for the standard version defined in equation \ref{eqn:raw_regret2}. It depends only on the randomness of the reward distribution only indirectly through the number of times each action is selected, which in turn depends only on the marginal distributions. Furthermore, this quantity has already been analysed in existing work on the concentration of bandit regret, \citep{Audibert2007,Audibert2009exploration} as a more tractable proxy to the standard regret. In conclusion, when selecting measures of bandit performance, it is worth noting whether they rely on counterfactual assumptions and considering if these assumptions are justifiable or needed for the specific problem on interest.
+where $N_i(T)$ is the number of times arm $i$ was played up to timestep $T$ and $\Delta_i$ is the degree to which arm $i$ is sub-optimal, $\Delta_i = \mu^* - \mu_i$. The expectation of this variant of regret is the same as for the  version defined in equation \ref{eqn:raw_regret2}. It depends only on the randomness of the reward distribution only indirectly through the number of times each action is selected, which in turn depends only on the marginal distributions. Furthermore, this quantity has already been analysed in existing work on the concentration of bandit regret, \citep{Audibert2007,Audibert2009exploration} as a more tractable proxy to the standard regret. In conclusion, when selecting measures of bandit performance, it is worth noting whether they rely on counterfactual assumptions and considering if these assumptions are justifiable or needed for the specific problem on interest.
 
 
 \chapter{Causal Bandits: Unifying the approaches}
@@ -2234,7 +2271,7 @@ $\actionspace$ = \begin{tabular}{|c|}
 \end{figure} 
 
 The type of problem we are concerned with is best illustrated with an example. Consider a farmer wishing to optimise the yield of her crop. She knows that crop yield is only affected by temperature, a particular soil nutrient, and moisture level but the precise effect of their combination is unknown. In each season the farmer has enough time and money to intervene and control at most one of these
-variables: deploying shade or heat lamps will set the temperature to be low or high; the nutrient can be added or removed through a choice of fertiliser; and irrigation or rain-proof covers will keep the soil wet or dry. Where there is no intervenion, the temperature, soil, and moisture vary naturally from season to season due to weather conditions. These are all observed along with the final crop yield at the end of each season. How might the farmer best experiment to identify the single, highest yielding intervention in a limited number of seasons?
+variables: deploying shade or heat lamps will set the temperature to be low or high; the nutrient can be added or removed through a choice of fertiliser; and irrigation or rain-proof covers will keep the soil wet or dry. Where there is no intervention, the temperature, soil, and moisture vary naturally from season to season due to weather conditions. These are all observed along with the final crop yield at the end of each season. How might the farmer best experiment to identify the single, highest yielding intervention in a limited number of seasons?
 
 We now formalise the definition of causal bandit problems. We will assume each variable only takes on a finite number of distinct values. (The path to relaxing this assumption would be through levering the work on continuous armed bandits). 
 
@@ -2255,11 +2292,7 @@ We refer to the set of variables that can be observed prior to selecting an acti
 
 The empty intervention (where no variable is set) is denoted $do()$. The \emph{parents} of a variable $X_i$, denoted $\parents{X_i}$, is the set of all variables $X_j$ such that there is an edge from $X_j$ to $X_i$ in $\mathcal{G}$. We denote the expected reward for the action $a = do(\vec{X} = \vec{x})$ by $\mu_{a} := \E{Y | do(\vec{X} = \vec{x})}$ and the optimal expected reward by $\mu^* := \max_{a\in\actions} \mu_{a}$. 
 
-The causal bandit problem takes on characteristics of different bandit settings depending on the action-space $\actionspace$ and corresponding costs, which variables are observable prior to selecting an action, and on which variables we receive post-action feedback. If we can (cheaply) intervene on all of the parents of $Y$ simultaneously then any context or alternative actions are irrelevant, and the problem reduces to a standard multi-armed bandit problem. 
-
-%This is formalised in theorem \ref{theorem:cb-intervene-all-parents}. 
-
-If feedback is received only on the reward node $\vec{X}^o = \set{Y}$, as in the standard bandit setting, then the do-calculus can be applied to eliminate some actions immediately, before any experiments are performed and then a standard bandit algorithm can be run on the remaining actions, see figure \ref{fig:cholesterol_graph} as an example. If we receive post-action feedback on additional nodes the problem can be more interesting. In addition to being able to eliminate some actions prior to sampling any data as in the previous case, taking one action may give us some information on actions that were not selected. Consider again the model in figure \ref{fig:unify_frameworks}. The causal structure implies: 
+The causal bandit problem takes on characteristics of different bandit settings depending on the action-space $\actionspace$ and corresponding costs, which variables are observable prior to selecting an action, and on which variables we receive post-action feedback. If we can (at no cost) intervene on all of the parents of $Y$ simultaneously then any context or alternative actions are irrelevant, and the problem can be treated as a standard multi-armed bandit problem over the set of actions that fully specify the values for the parents of $Y$. If feedback is received only on the reward node $\vec{X}^o = \set{Y}$, as in the standard bandit setting, then the do-calculus can be applied to eliminate some actions immediately, before any experiments are performed and then a standard bandit algorithm can be run on the remaining actions, see figure \ref{fig:cholesterol_graph} as an example. If we receive post-action feedback on additional nodes the problem can be more interesting. In addition to being able to eliminate some actions prior to sampling any data as in the previous case, taking one action may give us some information on actions that were not selected. Consider again the model in figure \ref{fig:unify_frameworks}. The causal structure implies: 
 
 \eq{
 P(Y|do(W = 0)) &= P(Y|do(),W = 0) \\
@@ -2345,21 +2378,16 @@ Our framework bears a superficial similarity to contextual bandit problems, \S\r
 However, a crucial difference is that in our model the extra observations are only revealed \emph{after} selecting an intervention and hence cannot be used as context. 
 
 There have been several proposals for bandit problems where extra feedback is received after an action is taken.
-Most recently, \citet{Alon2015}, \citet{Kocak2014} have considered very general models related to partial monitoring games~\citep{Bartok2014} where rewards on un-played actions are revealed according to a feedback graph. As we discuss in \S\ref{sec:causal_bandit_discussion}, the parallel bandit problem can be captured in this framework. However, the regret bounds are not optimal in our setting. They also focus on cumulative regret, which cannot be used to guarantee low simple regret~\citep{Bubeck2009a}. The partial monitoring approach taken by \citet{wu2015online} could be applied (up to modifications for the simple regret) to the parallel bandit, but the resulting strategy require knowledge about the likelihood of each factor in advance, while our strategy learns this online. \citet{Yu2009} utilise extra observations to detect changes in the reward distribution, whereas we assume fixed reward distributions and use extra observations to improve arm selection. \citet{Avner2012} analyse bandit problems where the choice of arm to pull and arm to receive feedback on are decoupled. The main difference from our present work is our focus on simple regret and the more complex information linking rewards for different arms via causal graphs. To the best of our knowledge, our paper is the first to analyse simple regret in bandit problems with extra post-action feedback.
+Most recently, \citet{Alon2015}, \citet{Kocak2014} have considered very general models related to partial monitoring games~\citep{Bartok2014} where rewards on un-played actions are revealed according to a feedback graph. As we discuss in \S\ref{sec:causal_bandit_discussion}, the parallel bandit problem can be captured in this framework. However, the regret bounds are not optimal in our setting. They also focus on cumulative regret. The partial monitoring approach taken by \citet{wu2015online} could be applied (up to modifications for the simple regret) to the parallel bandit, but the resulting strategy require knowledge about the likelihood of each factor in advance, while our strategy learns this online. \citet{Yu2009} utilise extra observations to detect changes in the reward distribution, whereas we assume fixed reward distributions and use extra observations to improve arm selection. \citet{Avner2012} analyse bandit problems where the choice of arm to pull and arm to receive feedback on are decoupled. The main difference from our present work is our focus on simple regret and the more complex information linking rewards for different arms via causal graphs. To the best of our knowledge, our paper is the first to analyse simple regret in bandit problems with extra post-action feedback.
 
 
 %\citet{Yu2009} consider bandit problems where a learner chooses an arm to play as well as set of arms to observe rewards for in a stochastic setting where the reward distributions can change infrequently and the aim is to minimize cumulative regret. They use extra observations to detect changes whereas we assume fixed reward distributions and use extra observations to improve arm selection.
 % Partial monitoring is a very general framework for for decoupling the feedback from the action and reward. It can be used to classify problems into one of four categories, trivial with no regret, easy with $R_T = \bigthetatilde{\sqrt{T}}$ , hard with $R_T = \bigtheta{T^{2/3}}$ and hopeless with $R_T = \bigomega{T}$ \citep{Bartok2014}. Partial monitoring algorithms yield results that are optimal with respect the horizon $T$ but not other parameters, such as $K$, which is the key focus of incorporating causal structure. 
 
-Two pieces of recent work also consider applying ideas from causal inference to bandit problems.\citet{Bareinboim2015} demonstrate that in the presence of confounding variables the value that a variable would have taken had it not been 
-intervened on can provide important contextual information. Their work differs from this thesis in many ways. For example, the focus is on the cumulative regret, and the context is observed before the action is taken and cannot be controlled by the learning agent.  
+Two pieces of recent work also consider applying ideas from causal inference to bandit problems. \citet{Bareinboim2015} demonstrate that in the presence of confounding variables the value that a variable would have taken had it not been 
+intervened on can provide important contextual information. Their work differs from this thesis in many ways. For example, the focus is on the cumulative regret, and the context is observed before the action is taken and cannot be controlled by the learning agent. \citet{Ortega2014thompson} present an analysis and extension of Thompson sampling, assuming actions are causal interventions. Their focus is on causal induction (\ie, learning an unknown causal model) instead of exploiting a known causal model. Combining their handling of  causal induction with our analysis is left as future work.
 
-%\todof{write one sentence to explain how their work is different to ours}
-
-\citet{Ortega2014thompson} present an analysis and extension of Thompson sampling, assuming actions are causal interventions. Their focus is on causal induction (\ie, learning an unknown causal model) instead of exploiting a known causal model. Combining their handling of  causal induction with our analysis is left as future work.
-% Key to Elias' paper is: observing the action an agent would take if it were allowed to make its natural choice can provide some information about hidden confounders that influence both the reward and the choice of action. Therefore, incorporating an agents natural choice as context may outperform a standard bandit that does not use that context. (Note: even in the presence of hidden confounders, including the agents natural choice as context only may improve the results. It is easy to come up with a counter example in which it does not).
-
-The truncated importance weighted estimators used in \S\ref{sec:simple-regret-general} have been studied before in a causal framework by \citet{Bottou2013}, 
+The truncated importance weighted estimators used in \S\ref{sec:simple-regret-general} have been studied before in a causal setting by \citet{Bottou2013}, 
 where the focus is on learning from observational data, but not controlling the sampling process. They also briefly discuss some of the issues 
 encountered in sequential design, but do not give an algorithm or theoretical results for this case.
 
@@ -2642,6 +2670,39 @@ N_a > \frac{1}{|\mathcal{A'}|} \forall{a} &\implies \sum_{a\in \mathcal{A'}}N_a 
 This violates the fact that $\eta$ is a distribution over the actions, and thus must have weights that sum to 1, thus completing the proof.
 \end{proof}
 \end{theorem} 
+
+\subsubsection{Combining interventional and observational data}
+
+In the previous sections we have demonstrated that knowledge of the causal structure between variables allows the rewards of multiple actions to be estimated simultaneously in an online, interventional setting, leading to more rapid identification of the optimal arm. In many cases we may also have access to observational data; in other words data sampled from $\P{\vec{X},Y|do()}$. Under the assumptions we made for algorithm \ref{alg:general}, we can incorporate such data in a straightforward way. Let $N$ be the number of observational data points previously collected and $T$ again be the number of rounds in which we can intervene. Combining these two periods, the values for the parents of $Y$ are sampled from;
+
+\eqn {
+Q'(\parents{Y}(X)) = \frac{N}{N+T}\Pn{do()}{\parents{Y}(X)} + \frac{T}{N+T}\sum_{b \in \calA}{\eta_b \Pn{b}{\parents{Y}(X)}}
+}
+
+We can then let $R_a(X) = \frac{\Pn{a}{\parents{Y}(X)}}{Q'(\parents{Y}(X))}$ and select weights to minimise the worst case variance of the importance weighted estimator with respect to $Q'$. 
+
+\eqn{
+\eta^* 
+ = \argmin_\eta \underbrace{\max_{a \in \calA} \EEa \left[\frac{\Pn{a}{\parents{Y}(X)}}{Q'(\parents{Y}(X))}\right]}_{m'(\eta)}\,.
+}
+
+Algorithm 3 is modified to sum over both $N$ and $T$ \footnote{In practise, to minimise the problem dependent regret, we would also incorporate an elimination step based on the observational data prior to selecting interventions. See the discussion on making better use of the reward in section \ref{sec:causal_bandit_discussion}} and obtains regret bounds;
+
+\eqn{
+\simpleregret \in \bigo{\sqrt{\frac{m'(\eta)}{N+T} \log\left(2(N+T)|\calA|\right)}}\,.
+}
+
+In the worse case, the observational distribution over the parents of $Y$ has no overlap with the distributions for any of the actions in $\actionspace$. This results in $m'(\eta^*)$ that is a factor of $\frac{N+T}{T}$ larger than $m(\eta^*)$ (which assumes all actions were selected from the optimal sampling distribution) and results in regret that decays with $\sqrt{T^{-1}}$ as in the case where no observational data is provided.  
+
+\subsubsection{The relative value of observational versus interventional data} Another interesting question is the relative value of observational data versus interventional data in a given setting. Obtaining interventional data often involves substantial fixed costs in setting up a system to control the allocation of interventions. Ideally, we would be able to estimate of the additional value interventional data would provide prior to setting up such a system. The quantity $m(\eta)$ also provides a means to this goal. The regret bound in theorem \ref{thm:general} holds for any $\eta$. Thus we can compare the relative value of purely observational data as opposed to optimally designed interventional data by considering the ratio:
+
+\eqn{
+v_{obs} \in [0,1] = \frac{m(\eta^*)}{m(\eta_b = \ind{b=do()})}
+}
+
+If $v_{obs} = 0$, then there exists an action for which the reward cannot be estimated from observational data. Thus we cannot guarantee that we will identify the optimal action regardless of the quantity of available observational data. This does not imply that observational data will not improve estimation in conjunction with interventional data as we discussed in the previous section - just that observational data \emph{alone} is insufficient for best arm identification. If $v_{obs} = 1$, then the worst case regret from purely observational data matches that for interventional data. A value of $v_{obs} = .5$ would imply we would need twice as many samples to obtain the same regret bound from observational data as compared to interventional data. 
+
+The ratio $v_{obs}$ can be computed prior to collecting any data, observational or interventional, subject to the assumption that the distribution over the parents of $Y$ given each action are known - as we assumed for Algorithm \ref{alg:general}. The approach is also not limited to the comparison of observational data with optimised interventional data. It can equally be applied to evaluate the potential for improvement on any other distribution over actions, for example we might want to evaluate the benefit of replacing a system that uniformly explores all actions with Algorithm \ref{alg:general}. We should note however that theorem \ref{thm:general} bounds the worst case regret, which occurs when the rewards for each action are sufficiently close that we must obtain good estimates for the value of all of the actions. Where the rewards are better separated, the \emph{problem-dependent} regret can be reduced by using an adaptive algorithm that ceases to explore actions that are sub-optimal with high probability, as we discuss in \S\ref{sec:causal_bandit_discussion}. Although $v_{obs}$ accurately captures the relative value of interventional versus observational data for a fixed design algorithm like Algorithm \ref{alg:general}, in general, using interventional data with an adaptive algorithm will lead to lower regret than selecting the best action on the basis of observational data even when $v_{obs} = 1$. However, the gap between the problem dependent and worst case regret is not known in advance - as the reward distributions are unknown - so the additional benefit of adaptive control cannot be computed ahead of time.
 
 \subsection{Experiments}
 \label{sec:causal-bandit-experiments}
