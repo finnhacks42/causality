@@ -248,6 +248,8 @@
 \title{Learning how to act: making good decisions with machine learning}
 
 \setcounter{secnumdepth}{3}
+\setlength{\epigraphwidth}{.6\textwidth}
+
 
 \begin{document}
 
@@ -256,10 +258,10 @@
 \input{titlepage}
 \input{original_statement}
 
-\epigraph{In vain the grave, with retrospective Eye,
-Would from the apparent what conclude the why,
-Infer the Motive from the Deed, and show
-That what we chanced, was what we meant, to do.}{Alexander Pope}
+\epigraph{In vain the Sage, with retrospective eye,\\
+Would from th' apparent What conclude the Why,\\
+Infer the Motive from the Deed, and show,\\
+That what we chanced, was what we meant to do.}{Alexander Pope}
 
 \chapter*{Acknowledgements}
 
@@ -2702,7 +2704,7 @@ v_{obs} \in [0,1] = \frac{m(\eta^*)}{m(\eta_b = \ind{b=do()})}
 
 If $v_{obs} = 0$, then there exists an action for which the reward cannot be estimated from observational data. Thus we cannot guarantee that we will identify the optimal action regardless of the quantity of available observational data. This does not imply that observational data will not improve estimation in conjunction with interventional data as we discussed in the previous section - just that observational data \emph{alone} is insufficient for best arm identification. If $v_{obs} = 1$, then the worst case regret from purely observational data matches that for interventional data. A value of $v_{obs} = .5$ would imply we would need twice as many samples to obtain the same regret bound from observational data as compared to interventional data. 
 
-The ratio $v_{obs}$ can be computed prior to collecting any data, observational or interventional, subject to the assumption that the distribution over the parents of $Y$ given each action are known - as we assumed for Algorithm \ref{alg:general}. The approach is also not limited to the comparison of observational data with optimised interventional data. It can equally be applied to evaluate the potential for improvement on any other distribution over actions, for example we might want to evaluate the benefit of replacing a system that uniformly explores all actions with Algorithm \ref{alg:general}. We should note however that theorem \ref{thm:general} bounds the worst case regret, which occurs when the rewards for each action are sufficiently close that we must obtain good estimates for the value of all of the actions. Where the rewards are better separated, the \emph{problem-dependent} regret can be reduced by using an adaptive algorithm that ceases to explore actions that are sub-optimal with high probability, as we discuss in \S\ref{sec:causal_bandit_discussion}. Although $v_{obs}$ accurately captures the relative value of interventional versus observational data for a fixed design algorithm like Algorithm \ref{alg:general}, in general, using interventional data with an adaptive algorithm will lead to lower regret than selecting the best action on the basis of observational data even when $v_{obs} = 1$. However, the gap between the problem dependent and worst case regret is not known in advance - as the reward distributions are unknown - so the additional benefit of adaptive control cannot be computed ahead of time.
+The ratio $v_{obs}$ can be computed prior to collecting any data, observational or interventional, if the distribution over the parents of $Y$ given each action are known - as we assumed for Algorithm \ref{alg:general}. The approach is also not limited to the comparison of observational data with optimised interventional data. It can equally be applied to evaluate the potential for improvement on any other distribution over actions, for example we might want to evaluate the benefit of replacing a system that uniformly explores all actions with Algorithm \ref{alg:general}. We should note however that theorem \ref{thm:general} bounds the worst case regret, which occurs when the rewards for each action are sufficiently close that we must obtain good estimates for the value of all of the actions. Where the rewards are better separated, the \emph{problem-dependent} regret can be reduced by using an adaptive algorithm that ceases to explore actions that are sub-optimal with high probability, as we discuss in \S\ref{sec:causal_bandit_discussion}. Although $v_{obs}$ accurately captures the relative value of interventional versus observational data for a fixed design algorithm like Algorithm \ref{alg:general}, in general, using interventional data with an adaptive algorithm will lead to lower regret than selecting the best action on the basis of observational data even when $v_{obs} = 1$. However, the gap between the problem dependent and worst case regret is not known in advance - as the reward distributions are unknown - so the additional benefit of adaptive control cannot be computed ahead of time.
 
 \subsection{Experiments}
 \label{sec:causal-bandit-experiments}
