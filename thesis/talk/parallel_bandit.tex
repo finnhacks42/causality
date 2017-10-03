@@ -1,0 +1,119 @@
+\documentclass{article}
+\usepackage{tikz} 
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithm
+\usepackage[noend]{algpseudocode}% http://ctan.org/pkg/algorithmicx
+\usepackage{tikz}
+\usepackage{graphicx}
+
+
+\usepackage{subcaption}
+\usepackage{multicol,caption}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={210mm,297mm},
+ left=20mm,
+ right=20mm,
+ top=20mm,
+ bottom=20mm,
+ }
+
+\usetikzlibrary{arrows,positioning,shapes,fit} 
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+\thispagestyle{empty}
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+
+\definecolor{talk}{HTML}{729FCF}
+\definecolor{talk2}{HTML}{E8A753}
+\definecolor{grey}{HTML}{DBDCDD}
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+   	circle,
+   	rounded corners,
+   	draw=black, thick,
+   	minimum width=2.3em,
+   	minimum height=2.3em,
+   	font=\footnotesize,
+   	text centered,
+   	fill=talk!50
+   },
+   latent/.style={
+   	circle,
+   	rounded corners,
+   	draw=black, thick, dashed,
+   	minimum width=2.2em,
+   	minimum height=2.2em,
+   	font=\footnotesize,
+   	text centered
+   },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 },
+observedrect/.style={
+	rectangle,
+	rounded corners,
+	draw=black, thick,
+	minimum width=3em,
+	minimum height=1.5em,
+	font=\footnotesize,
+	text centered,
+	fill=talk2!80
+},  
+ target/.style={
+	circle,
+	rounded corners,
+	draw=black, thick,
+	minimum width=2.3em,
+	minimum height=2.3em,
+	font=\footnotesize,
+	text centered,
+	fill=talk2!80
+},
+empty/.style={
+	circle,
+	rounded corners,
+	minimum width=.5em,
+	minimum height=.5em,
+	font=\footnotesize,
+	text centered,
+},
+}
+   
+\begin{document}
+%\pagestyle{empty}
+
+ \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.5cm,
+thick,main node/.style={observed}, em/.style={empty},background rectangle/.style={fill=olive!45}]
+%every node/.style={scale=0.6}
+%nodes
+\node[main node](1){$X_{1}$};
+\node[em, above of=1,yshift=-.8cm](6){$P(X_1=1)=q_1$};
+\node[main node, right=of 1](2){$X_{2}$};
+\node[em, above of=2,yshift=-.8cm](7){$P(X_2=1)=q_2$};
+\node[em, right=of 2](3){\huge $...$};
+\node[main node, right=of 3](4){$X_{N}$};
+\node[em, above of=4,yshift=-.8cm](8){$P(X_N=1)=q_N$};
+\node[main node, below right=of 2,yshift=.5cm](5){$Y$};
+\path[every node/.style={font=\tiny}]
+(1) edge (5)
+(2) edge (5)
+(4) edge (5);
+\end{tikzpicture} 
+
+\end{document}

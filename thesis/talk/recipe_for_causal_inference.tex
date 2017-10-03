@@ -1,0 +1,141 @@
+\documentclass[tikz]{standalone}
+
+\usepackage[latin1]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage{xcolor}  
+
+\definecolor{talk}{HTML}{729FCF}
+\definecolor{talk2}{HTML}{E8A753}
+\definecolor{grey}{HTML}{DBDCDD}
+\begin{document}
+\pagestyle{empty}
+
+\tikzset{
+	%Define standard arrow tip
+	>=stealth',
+	%Define style for boxes
+	punkt/.style={
+		circle,
+		rounded corners,
+		draw=black, 
+		text width=1em,
+		minimum height=1em,
+		text centered},
+	observed/.style={
+		circle,
+		rounded corners,
+		draw=black, thick,
+		minimum width=2.3em,
+		minimum height=2.3em,
+		font=\footnotesize,
+		text centered,
+		fill=talk
+	},
+	latent/.style={
+		circle,
+		rounded corners,
+		draw=black, thick, dashed,
+		minimum width=2.2em,
+		minimum height=2.2em,
+		font=\footnotesize,
+		text centered
+	},
+	target/.style={
+		circle,
+		rounded corners,
+		draw=black, thick,
+		minimum width=2.2em,
+		minimum height=2.2em,
+		font=\footnotesize,
+		text centered,
+		fill=black!20!white,
+	},
+	observedrect/.style={
+		rectangle,
+		rounded corners,
+		draw=black, thick,
+		minimum width=6em,
+		minimum height=2em,
+		font=\footnotesize,
+		text centered,
+		fill=talk!50
+	},
+	latentrect/.style={
+		rectangle,
+		rounded corners,
+		draw=black, thick, dashed,
+		minimum width=2.2em,
+		minimum height=2.2em,
+		font=\footnotesize,
+		text centered
+	},
+	targetrect/.style={
+		rectangle,
+		rounded corners,
+		draw=black, thick,
+		minimum width=6em,
+		minimum height=2em,
+		font=\footnotesize,
+		text centered,
+		fill=black!20!white,
+	},
+	empty/.style={
+		circle,
+		rounded corners,
+		minimum width=.5em,
+		minimum height=.5em,
+		font=\footnotesize,
+		text centered,
+	},
+	% Define arrow style
+	pil/.style={
+		o->,
+		thick,
+		shorten <=2pt,
+		shorten >=2pt,},
+	sh/.style={ shade, shading=axis, left color=red, right color=green,
+		shading angle=45 },
+	line/.style={
+		draw,
+		-latex
+	},
+    ln/.style={
+    	draw
+    },
+	block/.style={
+		rectangle, 
+		draw, 
+		fill=talk!50, 
+		text width=8em, 
+		text centered, 
+		rounded corners, 
+		minimum height=3em
+	}   
+}
+
+\begin{tikzpicture}[node distance = 2cm, node/.style={punkt}]
+% Place nodes
+\node[node](or){or};
+\node[block, right of = or](learngraph){Apply \emph{Causal Discovery} to learn the graph};
+\node [block,left of=or] (drawgraph) {Use prior knowledge to draw the graph};
+\node [block, below of=or] (docalc) {Apply the Do Calculus};
+\node [block, below left of=docalc,node distance=3.5cm] (fail) {Non Identifiable};
+\node [block, below right of=docalc, node distance=3.5cm] (success) {Identifiable};
+\node [block, below of=fail](notident){Bugger! You will have to make additional assumptions or do experiments};
+\node [block, below of=success](ident){Great! Apply the formula from the do-caclulus to estimate effect.};
+\node [block, fill=talk2!50, dashed, right of=ident,node distance=4.5cm](stats){Deal with pesky statistical issues introduced by finite data as you see fit};
+
+% Draw edges
+\path[ln](or) -- (learngraph);
+\path[ln](or) -- (drawgraph);
+\path[line] (or) -- (docalc);
+\path[line] (docalc) -- (fail);
+\path[line] (docalc) -- (success);
+\path[line] (fail) -- (notident);
+\path[line] (success) -- (ident);
+\path[line] (stats) -- (ident);
+
+\end{tikzpicture}
+
+\end{document}

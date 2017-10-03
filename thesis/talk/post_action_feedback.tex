@@ -1,0 +1,117 @@
+\documentclass[tikz]{standalone}
+
+\usepackage[latin1]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage{xcolor}  
+
+\definecolor{talk}{HTML}{729FCF}
+\definecolor{talk2}{HTML}{E8A753}
+\definecolor{grey}{HTML}{DBDCDD}
+\begin{document}
+\pagestyle{empty}
+
+\tikzset{
+	%Define standard arrow tip
+	>=stealth',
+	%Define style for boxes
+	punkt/.style={
+		circle,
+		rounded corners,
+		draw=black, thick,
+		text width=1em,
+		minimum height=1em,
+		text centered},
+	observed/.style={
+		circle,
+		rounded corners,
+		draw=black, thick,
+		minimum width=2.3em,
+		minimum height=2.3em,
+		font=\footnotesize,
+		text centered,
+		fill=talk!50
+	},
+	latent/.style={
+		circle,
+		rounded corners,
+		draw=black, thick, dashed,
+		minimum width=2.2em,
+		minimum height=2.2em,
+		font=\footnotesize,
+		text centered
+	},
+	target/.style={
+		circle,
+		rounded corners,
+		draw=black, thick,
+		minimum width=2.2em,
+		minimum height=2.2em,
+		font=\footnotesize,
+		text centered,
+		fill=black!20!white,
+	},
+	observedrect/.style={
+		rectangle,
+		rounded corners,
+		draw=black, thick,
+		minimum width=6em,
+		minimum height=2em,
+		font=\footnotesize,
+		text centered,
+		fill=talk!50
+	},
+	latentrect/.style={
+		rectangle,
+		rounded corners,
+		draw=black, thick, dashed,
+		minimum width=2.2em,
+		minimum height=2.2em,
+		font=\footnotesize,
+		text centered
+	},
+	targetrect/.style={
+		rectangle,
+		rounded corners,
+		draw=black, thick,
+		minimum width=6em,
+		minimum height=2em,
+		font=\footnotesize,
+		text centered,
+		fill=black!20!white,
+	},
+	empty/.style={
+		circle,
+		rounded corners,
+		minimum width=.5em,
+		minimum height=.5em,
+		font=\footnotesize,
+		text centered,
+	},
+	% Define arrow style
+	pil/.style={
+		o->,
+		thick,
+		shorten <=2pt,
+		shorten >=2pt,},
+	sh/.style={ shade, shading=axis, left color=red, right color=green,
+		shading angle=45 }   
+}
+
+% Define block styles
+\tikzstyle{system} = [rectangle, draw=black, thick, dashed, fill=grey, 
+    text width=8em, text centered, rounded corners, minimum height=3em]
+\tikzstyle{block} = [rectangle, draw, fill=talk!50, 
+    text width=8em, text centered, rounded corners, minimum height=3em]
+\tikzstyle{line} = [->,line width = 1mm]
+   
+	\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=5em,thick,main node/.style={observed}, tg/.style={target}]
+\node[main node](1){W};
+\node[main node, below right of= 1](2){Y};
+\node[main node, above right of= 2](3){X};
+\path[]
+(1) edge (2)
+(3) edge (2);
+\end{tikzpicture}
+
+\end{document}
