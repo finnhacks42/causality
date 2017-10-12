@@ -159,6 +159,12 @@ class BasicBernoulliModel(object):
         expected_rewards = np.full(K,.5)
         expected_rewards[-1] = .5 + epsilon # reward of one arm is just better than the others.
         return cls(expected_rewards)
+        
+    @classmethod
+    def create_random(cls,K):
+        """ creates a bandit where the expected rewards are sampled from a uniform distribution """
+        expected_rewards = np.random.uniform(size=K)
+        return cls(expected_rewards)
     
     @classmethod
     def create_worst_case(cls,K,T):

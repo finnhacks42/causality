@@ -111,8 +111,7 @@ class DiscreteContextualBandit(object):
         
         for context, bandit in enumerate(self.bandits):
             self.arms[self.contexts == context] = bandit.arms[0:bandit.t]
-        
-        
+            
 class ThompsonSampling(object):
     """ Sample actions via the Thomson sampling approach and return the empirically best arm 
         when the number of rounds is exhausted """
@@ -203,13 +202,6 @@ class UCB(object):
         self.best_action = argmax_rand(mu)
         return best_reward - model.expected_rewards[self.best_action]
     
-    
-        
-    
-        
-        
-        
-
 class AlphaUCB(UCB):
     """ 
     Implementation based on ... 

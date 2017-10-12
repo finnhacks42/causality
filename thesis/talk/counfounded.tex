@@ -105,15 +105,18 @@
     text width=8em, text centered, rounded corners, minimum height=3em]
 \tikzstyle{line} = [->,line width = 1mm]
    
-	\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=4em,thick, node/.style={observed}, em/.style={empty}]
-\node[ node](1){$X_1$};
-\node[em,above=1,yshift=-1.8em](4){$P(X_1 = 1)=.5$};
-\node[node, below  left of= 1](2){$X_2$};
-\node[em,below of= 2,yshift=2.4em](5){$X_2=X_1$};
+\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=4em,thick, node/.style={observed}, em/.style={empty}]
+\node[ node](1){$Z$};
+\node[node, below  left of= 1](2){$X$};
 \node[node,below right of =1](3){$Y$};
+\node[node,right of =1,node distance=9em](4){$Z$};
+\node[node,below left of =4](5){$x$};
+\node[node,below right of =4](6){$Y$};
 \path[]
 (1) edge (2) edge (3)
-(2) edge (3);
+(2) edge (3)
+(4) edge (6)
+(5) edge (6);
 \end{tikzpicture}
 
 \end{document}
