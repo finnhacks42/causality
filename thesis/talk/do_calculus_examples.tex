@@ -1,0 +1,181 @@
+\documentclass{article}
+\usepackage{tikz} 
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithm
+\usepackage[noend]{algpseudocode}% http://ctan.org/pkg/algorithmicx
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{standalone}
+
+\usepackage{subcaption}
+\usepackage{multicol,caption}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={210mm,297mm},
+ left=20mm,
+ right=20mm,
+ top=20mm,
+ bottom=20mm,
+ }
+
+\usetikzlibrary{arrows,positioning,shapes} 
+\pgfarrowsdeclarecombine{ring}{ring}{}{}{o}{o}
+\thispagestyle{empty}
+\DeclareMathOperator{\ringarrow}{\raisebox{0.5ex}{\tikz[baseline]{\draw[ring->](0,0)--(2em,0);}}}
+
+\definecolor{talk}{HTML}{729FCF}
+\definecolor{talk2}{HTML}{E8A753}
+\definecolor{grey}{HTML}{DBDCDD}
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    observed/.style={
+   	circle,
+   	rounded corners,
+   	draw=black, thick,
+   	minimum width=2.3em,
+   	minimum height=2.3em,
+   	font=\footnotesize,
+   	text centered,
+   	fill=talk!50
+   },
+   latent/.style={
+   	circle,
+   	rounded corners,
+   	draw=black, thick, dashed,
+   	minimum width=2.2em,
+   	minimum height=2.2em,
+   	font=\footnotesize,
+   	text centered
+   },
+    % Define arrow style
+    pil/.style={
+           o->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    sh/.style={ shade, shading=axis, left color=red, right color=green,
+    shading angle=45 },
+observedrect/.style={
+	rectangle,
+	rounded corners,
+	draw=black, thick,
+	minimum width=3em,
+	minimum height=1.5em,
+	font=\footnotesize,
+	text centered,
+	fill=talk!50
+},  
+ target/.style={
+	circle,
+	rounded corners,
+	draw=black, thick,
+	minimum width=2.3em,
+	minimum height=2.3em,
+	font=\footnotesize,
+	text centered,
+	fill=talk!50
+},
+empty/.style={
+	circle,
+	rounded corners,
+	minimum width=.5em,
+	minimum height=.5em,
+	font=\footnotesize,
+	text centered,
+},
+}
+   
+\begin{document}
+\pagestyle{empty}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[t]{0.3\textwidth}
+	\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=5em,thick,node/.style={observed}, tg/.style={target},act/.style={observed},lt/.style={empty}]
+	\node[lt](3){};
+	\node[act, below left of=3](1){X};
+	\node[tg, below right of = 3](2){Y};
+	\node[above=of 1,yshift=-4em](T){\includegraphics[width=1cm]{tick.png}};
+	\path[]
+	(1) edge (2);
+	\end{tikzpicture}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.3\textwidth}
+	\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=5em,thick,node/.style={observed}, tg/.style={target},act/.style={observed},lt/.style={latent}]
+	\node[lt](3){U};
+	\node[act, below left of=3](1){X};
+	\node[tg, below right of = 3](2){Y};
+	\node[above=of 1,yshift=-4em](T){\includegraphics[width=1cm]{cross.png}};
+	\path[]
+	(1) edge (2)
+	(3) edge (1) edge (2);
+	\end{tikzpicture}
+\end{subfigure}
+\begin{subfigure}[t]{0.3\textwidth}
+	\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=5em,thick,node/.style={observed}, tg/.style={target},act/.style={observed},lt/.style={latent}]
+	\node[lt](3){U};
+	\node[act, below left of=3](1){X};
+	\node[tg, below right of = 3](2){Y};
+	\node[node,above left of=1](4){Z};
+	\node[above=of 1,yshift=-4em](T){\includegraphics[width=1cm]{cross.png}};
+	\path[]
+	(1) edge (2)
+	(3) edge (1) edge (2)
+	(4) edge (1);
+	\end{tikzpicture}
+\end{subfigure}
+	\begin{subfigure}[t]{0.3\textwidth}
+	\vspace{3em}
+	\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=5em,thick,node/.style={observed}, tg/.style={target},act/.style={observed},lt/.style={empty}]
+\node[node](3){Z};
+\node[act, below left of=3](1){X};
+\node[tg, below right of = 3](2){Y};
+\node[above=of 1,yshift=-4em](T){\includegraphics[width=1cm]{tick.png}};
+\path[]
+(1) edge (2)
+(3) edge (1) edge (2);
+\end{tikzpicture}
+\end{subfigure}
+\begin{subfigure}[t]{0.3\textwidth}
+	\vspace{3em}
+	\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=5em,thick,node/.style={observed}, tg/.style={target},act/.style={observed},lt/.style={latent}]
+	\node[act](1){X};
+	\node[node,right of = 1](4){Z};
+	\node[lt, above of=4,yshift=-1.5em](3){U};
+	\node[tg, right of = 4](2){Y};
+	\node[above=of 1,yshift=-4em](T){\includegraphics[width=1cm]{tick.png}};
+	\path[]
+	(1) edge (4)
+	(4) edge (2)
+	(3) edge (1) edge (2);
+	\end{tikzpicture}
+\end{subfigure}
+\begin{subfigure}[t]{0.3\textwidth}
+	\vspace{3em}
+\begin{tikzpicture}[->,shorten >=0pt,shorten <=0pt,node distance=5em,thick,node/.style={observed}, tg/.style={target},act/.style={observed},lt/.style={latent}]
+\node[act](1){X};
+\node[node,right of = 1](4){Z};
+\node[lt, above of=4,yshift=-1.5em](3){U};
+\node[tg, right of = 4](2){Y};
+\node[lt, below right of = 4,xshift=-.9em,yshift=0.5em](5){U};
+\node[above=of 1,yshift=-4em](T){\includegraphics[width=1cm]{cross.png}};
+\path[]
+(1) edge (4)
+(4) edge (2)
+(3) edge (1) edge (2)
+(5) edge (4) edge (2);
+\end{tikzpicture}
+\end{subfigure}
+\end{figure} 
+
+\end{document}

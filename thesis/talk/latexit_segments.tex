@@ -1,0 +1,15 @@
+At each timestep $t \in 1,...,T$:
+\begin{enumerate}
+\itemsep0em 
+\item The agent sets the value of zero or one variables, $do()$ or $do(X_i = j)$.
+\item Non-intervened variables sampled from underlying distributions.
+\item The agent receives reward $Y$ sampled from $P(Y|x_1,...,x_N)$.
+\item The values of all variables, $x_1,...,x_N$, are revealed to the agent.
+\end{enumerate}
+The variables are binary $\implies$ there are $2N+1$ arms.\\
+If the agent opts to observe, $do()$, it will obtain an estimate for half the arms
+
+\text{for } t \in & \set{1,...,T}:\\ 
+&\text{Sample action } a_t \text{ from } \eta \\
+\text{for } a \in & \actionspace:\\ 
+&\hat \mu_a =  \frac{1}{T} \sum_{t=1}^T Y_t \frac{\Pn{a}{\parents{Y}(X_t)}}{\sum_{a \in \calA} \eta_a \P{\parents{Y}(X_t)|a}}
