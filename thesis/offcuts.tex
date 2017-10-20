@@ -428,5 +428,35 @@ Observing a system, without the ability to intervene or experiment on it. Fundam
 In this case, the observed correlation is not an artifact of random noise in a sample of data. We would expect the association to continue to hold if sampled new data. 
 
  Covariate shift clearly comes in here. Because there are areas where mechanisms are understood it is relatively easy to argue that covariate shift is not occurring and that results will be transferable. The mechanism is known but the function may be complex. Can we write down something that causal models are invariant to in terms of shift that is not the case for non-causal models? Yes, if the way in which features get their values changes, then causal models will be invariant to that in a way that non-causal ones are not. 
+ 
+ \chapter{Causation vs Prediction}
+ 
+ 
+ Mixing continuous experimentation at an individual level with batch approaches. There may be fixed costs associated with \quotes{enabling} certain actions. For example, social programs may have some fixed overheads, no matter how many people are enrolled in them, etc. Reuse data obtained to optimise for one outcome to learn about optimising for another. We don't have a single outcome or loss-measure that fully incorporates everything we care about for the majority of problems.
+ 
+ The two cultures \citep{Breiman2001}
+ - wrong because suggests we can just use the machine learning approach for everything. Does not address the problems that a) structural assumptions required for causal inference. b) we cannot use cross-validation to assess the validity of a causal model (really b is the whole point).
+ 
+ 
+ To explain or to predict \citep{Shmueli2010}
+ - wrong because they assume all the parts of explanatory modelling are required - so black box models cannot be used. 
+ 
+ 
+ 
+ Predict the relationship between X and Y as a way to stratify to reduce the variance in an experiment.
+ 
+ They consider a different definition of explanatory models, 
+ 
+ Definition as backwards. Explanatory models focus on theory because some theory (or equivalently stated assumptions) are required in order to predict the outcome of an intervention from observational data. 
+ 
+ Causal modelling frameworks allow us to separate assumptions about the structure of the relationships between variables from assumptions about the functional form. 
+ 
+ What can be data driven and what cannot? (for a given set of assumptions). 
+ 
+ 
+ Allowing for the possibility that we might only need to be able to predict the outcome of an intervention on a given subset of variables (for example those over which we have the ability to manipulate) or the possibility that we can can obtain observation from directly intervening in a system creates creates a need for models that are neither explanatory or predictive in the language of EoP but are built on a hybrid of both approaches. 
+ 
+ 
+ 
 
 

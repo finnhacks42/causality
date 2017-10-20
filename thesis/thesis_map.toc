@@ -43,19 +43,19 @@
 \contentsline {subsection}{\numberline {3.2.6}Adding structure to actions}{72}{subsection.3.2.6}
 \contentsline {section}{\numberline {3.3}The counterfactual nature of regret}{72}{section.3.3}
 \contentsline {chapter}{\numberline {4}Causal Bandits: Unifying the approaches}{75}{chapter.4}
-\contentsline {section}{\numberline {4.1}A framework to connect bandit problems with observational causal inference}{76}{section.4.1}
+\contentsline {section}{\numberline {4.1}A synthesis that connects bandit problems and observational causal inference}{76}{section.4.1}
 \contentsline {section}{\numberline {4.2}Causal bandits with post action feedback}{80}{section.4.2}
 \contentsline {paragraph}{Related Work}{80}{section*.47}
 \contentsline {subsection}{\numberline {4.2.1}The parallel bandit problem}{81}{subsection.4.2.1}
-\contentsline {paragraph}{The Parallel Bandit Algorithm}{81}{section*.49}
+\contentsline {paragraph}{The Parallel Bandit Algorithm}{82}{section*.49}
 \contentsline {subsection}{\numberline {4.2.2}General graphs}{83}{subsection.4.2.2}
 \contentsline {paragraph}{Choosing the Sampling Distribution}{85}{section*.50}
 \contentsline {subsubsection}{\numberline {4.2.2.1}Combining interventional and observational data}{87}{subsubsection.4.2.2.1}
 \contentsline {subsubsection}{\numberline {4.2.2.2}The relative value of observational versus interventional data}{88}{subsubsection.4.2.2.2}
 \contentsline {subsection}{\numberline {4.2.3}Experiments}{89}{subsection.4.2.3}
-\contentsline {subsection}{\numberline {4.2.4}Discussion \& Future work}{91}{subsection.4.2.4}
+\contentsline {subsection}{\numberline {4.2.4}Discussion \& Future work}{92}{subsection.4.2.4}
 \contentsline {paragraph}{Making Better Use of the Reward Signal}{92}{section*.54}
-\contentsline {paragraph}{Cumulative Regret}{92}{section*.55}
+\contentsline {paragraph}{Cumulative Regret}{93}{section*.55}
 \contentsline {paragraph}{Causal Models with Non-Observable Variables}{93}{section*.56}
 \contentsline {paragraph}{Partially or Completely Unknown Causal Graph}{93}{section*.57}
 \contentsline {subsection}{\numberline {4.2.5}Proofs}{94}{subsection.4.2.5}
