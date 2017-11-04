@@ -71,7 +71,7 @@
 
 
 
-
+\definecolor{nodeblue}{HTML}{729FCF}
 \tikzset{
     %Define standard arrow tip
     >=stealth',
@@ -91,6 +91,7 @@
            minimum height=2.3em,
            font=\footnotesize,
            text centered,
+           %fill=nodeblue!50
            fill=black!10!white
            },
      latent/.style={
@@ -110,7 +111,8 @@
            minimum height=2.2em,
            font=\footnotesize,
            text centered,
-           fill=black!20!white,
+           fill=black!10!white,
+           %fill=nodeblue!50
            },
     observedrect/.style={
            rectangle,
@@ -120,7 +122,8 @@
            minimum height=2em,
            font=\footnotesize,
            text centered,
-           fill=black!10!white
+           fill=black!10!white,
+           %fill=nodeblue!50
            },
     latentrect/.style={
            rectangle,
@@ -139,7 +142,8 @@
            minimum height=2em,
            font=\footnotesize,
            text centered,
-           fill=black!20!white,
+           fill=black!10!white,
+           %fill=nodeblue!50
            },
      empty/.style={
            circle,
@@ -256,7 +260,26 @@
 %\def\ci{\perp\!\!\!\perp} % from Wikipedia
 
 \input{titlepage}
-\input{original_statement}
+
+\clearpage
+\vspace*{\fill}
+\begin{center}
+\begin{minipage}{.9\textwidth}
+Except where acknowledged in the customary manner, the material 
+presented in this thesis is, to the best of my knowledge, original and has not been submitted in whole or part for a degree in any 
+university.
+
+\vspace{40mm}  % vertical space
+\hspace{80mm}\includegraphics[scale=.1]{sig}
+\vspace{.1mm}
+\hspace{80mm}\rule{40mm}{.15mm}\par   % horizontal space, line, start new line
+\hspace{80mm} Finnian Lattimore\par
+\hspace{80mm} November, 2017
+\end{minipage}
+\end{center}
+\vfill % equivalent to \vspace{\fill}
+\clearpage
+%\input{original_statement}
 
 \epigraph{In vain the Sage, with retrospective eye,\\
 Would from th' apparent What conclude the Why,\\
@@ -265,9 +288,11 @@ That what we chanced, was what we meant to do.}{Alexander Pope}
 
 \chapter*{Acknowledgements}
 
-There are many people without whose support this thesis would not have been possible. I would like to thank my supervisors Dr Cheng Song Ong, Dr Mark Reid and Dr Tiberio Caetano, Prof. Robert Williamson for chairing my panel, my brother Tor for many interesting and insightful discussions on bandit problems, and my parents for helping me proofread and the many days given to care for my lovely daughters. I would also like to thank Victoria, Inger, Natalie and all the people at ANU thesis bootcamp for giving me the techniques I needed to get past the blank page and get words out. Finally I want to thank my wonderful husband for his unwavering support and willingness to take on the household chaos, and my two beautiful daughters Freya and Anouk for their patience while mummy worked on her "tesis". 
+There are many people without whose support this thesis would not have been possible. I would like to thank my supervisors Dr Cheng Soon Ong, Dr Mark Reid and Dr Tiberio Caetano, Prof. Robert Williamson for chairing my panel, my brother Tor for many interesting and insightful discussions on bandit problems, and my parents for helping me proofread and the many days given to care for my lovely daughters. I would also like to thank Victoria, Inger, Natalie and all the people at ANU thesis bootcamp for giving me the techniques I needed to get past the blank page and get words out. Finally I want to thank my wonderful husband for his unwavering support and willingness to take on the household chaos, and my two beautiful daughters Freya and Anouk for their patience while mummy worked on her "tesis". 
 
 I am also grateful for the financial support provided by an Australian Postgraduate Award and a NICTA/Data61 top up scholarship. 
+
+This research is supported by an Australian Research Training Program (RTP) Scholarship.
 
 \onehalfspacing
  
@@ -386,7 +411,7 @@ The goal of causal inference is to learn the effect of taking an action. We can 
 
 Observational causal inference aims to infer the outcome of an intervention in some system from data obtained by observing (but not intervening on) it. As previously mentioned, this is a form of transfer learning; we need to infer properties of the system post-intervention from observations of the system pre-intervention. Mapping properties from one system to another requires some assumptions about how these two systems are related, or in other words, a way of describing actions and how we anticipate a system will respond to them. Three key approaches have emerged: counterfactuals, structural equation models and causal Bayesian networks. 
 
-Counterfactuals \citep{Rubin1974} were developed from the starting point of generalising from randomised trials to less controlled settings. They describe causal effects in terms of differences between counterfactual variables, what would happen if we took one action versus what would happen if we took another. Counterfactual assertions can be expressed very naturally in human languages and are  prevalent in  everyday conversations; \quotes{if I had worked harder I would have got better grades} and \quotes{she would have been much sicker if she hadn't taken antibiotics}. Structural equation models have been developed and applied primarily within economics and related disciplines. They can be seen as an attempt to capture key aspects of the people's behaviour with mathematics. Questions around designing policies or interventions play a central role in economics. Thus they have transformed simultaneous equations into a powerful framework and associated set of methods for estimating causal effects. The is also a rich strand of work on using the assumptions that can be encoded in structural equation models, also known as functional causal models to discover the structure and direction of causal relationships - see for example \citet{mooij2016distinguishing}. Causal Bayesian networks \citep{Pearl2000} are a more recent development and arise from the addition of a fundamental assumption about the meaning of a link to Bayesian networks. They inherit and leverage the way Bayesian networks encode conditional independencies between variables to localise the impact of an intervention in a system in a way that allows formalisation of the conditions under which causal effects can be inferred from observational data. 
+Counterfactuals \citep{Rubin1974} were developed from the starting point of generalising from randomised trials to less controlled settings. They describe causal effects in terms of differences between counterfactual variables, what would happen if we took one action versus what would happen if we took another. Counterfactual assertions can be expressed very naturally in human languages and are  prevalent in  everyday conversations; \quotes{if I had worked harder I would have got better grades} and \quotes{she would have been much sicker if she hadn't taken antibiotics}. Structural equation models have been developed and applied primarily within economics and related disciplines. They can be seen as an attempt to capture key aspects of the people's behaviour with mathematics. Questions around designing policies or interventions play a central role in economics. Thus they have transformed simultaneous equations into a powerful framework and associated set of methods for estimating causal effects. The is also a rich strand of work on using the assumptions that can be encoded in structural equation models, also known as functional causal models to discover the structure and direction of causal relationships - see for example \citep{Mooij2016a,Peters2014}. Causal Bayesian networks \citep{Pearl2000} are a more recent development and arise from the addition of a fundamental assumption about the meaning of a link to Bayesian networks. They inherit and leverage the way Bayesian networks encode conditional independencies between variables to localise the impact of an intervention in a system in a way that allows formalisation of the conditions under which causal effects can be inferred from observational data. 
 
 An understanding of causal Bayesian networks and their properties (in particular the do calculus, see section \ref{sec:do_calculus}) is sufficient to appreciate my main technical contributions in chapter \ref{chap:causal-bandit}, as well as the importance of formal causal reasoning in Bayesian inference that I highlight in section  \ref{sec:bayesian_causality}. However, the literature on causal inference techniques remains split between the different frameworks. Much of the recent work on estimating causal effects within machine learning, as well as widely used methodologies such as propensity scoring, are described using the counterfactual framework. Methods developed within economics, in particular instrumental variable based approaches, or those requiring parametric or functional assumptions, are often based around structural equation models. This makes it worthwhile for researchers interested in causality to develop an understanding of all these viewpoints.
 
@@ -1616,7 +1641,7 @@ There is a straightforward connection between matching and regression for causal
 \hat{\tau}_{reg} = \sum_{i=1}^n \left[\ind{x_i=1}\left(y_i - \hat{f}_0(z_i)\right) +\ind{x_i=0}\left(\hat{f}_1(z_i) - y_i \right)\right]
 }
 
-This formulation of the regression estimator highlights the missing data aspect of causal effect estimation. For each instance, the regression models are used to estimate the counterfactual outcome had the instance received the alternate treatment. Matching estimates the counterfactual outcome for an instance from the outcome of \emph{similar} instances that received a different treatment. \citet{abadie2002simple} analyse an estimator where both target and control instances are matched and the matching is done with replacement, let $j \in J_k(i)$ be the indices of the $k$ instances closest to $i$ by some metric $d(z_i,z_j)$ such that $x_i \neq x_j$.
+This formulation of the regression estimator highlights the missing data aspect of causal effect estimation. For each instance, the regression models are used to estimate the counterfactual outcome had the instance received the alternate treatment. Matching estimates the counterfactual outcome for an instance from the outcome of \emph{similar} instances that received a different treatment. \citet{Abadie2002} analyse an estimator where both target and control instances are matched and the matching is done with replacement, let $j \in J_k(i)$ be the indices of the $k$ instances closest to $i$ by some metric $d(z_i,z_j)$ such that $x_i \neq x_j$.
 
 \eqn{
 \hat{\tau}_{match} = \sum_{i=1}^n \left[\ind{x_i=1}\left(y_i - \frac{1}{k}\sum_{j \in J_k(i)}y_j\right) +\ind{x_i=0}\left(\frac{1}{k}\sum_{j \in J_k(i)}y_j - y_i \right)\right]
@@ -2310,9 +2335,9 @@ Compliance-aware bandits describe situations in which the action recommended by 
 
 \begin{figure}[ht]
 \centering
-\begin{subfigure}[t]{0.49\textwidth}
+\begin{subfigure}[t]{0.45\textwidth}
 \centering
-\caption{Bandits with unobserved confounders:$\vec{X}^c=\set{I}$, $\vec{X}^o = \set{Y}$, $\actionspace = do(X=x)$}
+\caption{Bandits with unobserved confounders: $\vec{X}^c=\set{I}$, $\vec{X}^o = \set{Y}$, $\actionspace = do(X=x)$}
 \label{fig:confounded-causal-bandit-graph}
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1cm,
   thick,main node/.style={observed},lt/.style={latent}]
@@ -2326,7 +2351,8 @@ Compliance-aware bandits describe situations in which the action recommended by 
    (4) edge (2);
 \end{tikzpicture} 
 \end{subfigure}
-\begin{subfigure}[t]{0.49\textwidth}
+\hspace{1cm}
+\begin{subfigure}[t]{0.45\textwidth}
 \centering
 \caption{Compliance aware bandits: $\vec{X}^c=\set{}$, $\vec{X}^o = \set{T,Y}$, $\actionspace = do(X=x)$ }
 \label{fig:imperfect-compliance-causal-bandit-graph}
@@ -2343,7 +2369,7 @@ Compliance-aware bandits describe situations in which the action recommended by 
    (4) edge (2);
 \end{tikzpicture} 
 \end{subfigure}
-\caption{}
+\caption{Causal bandit representation of bandits with unobserved confounders and compliance aware bandits.}
 \label{fig:causal-bandit-version-confounded-compliance}
 \end{figure}
 
